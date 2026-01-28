@@ -3,6 +3,14 @@
   "WorkspaceRootPath": "D:\\Code\\Source\\SWP391 project\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\code\\source\\swp391 project\\eyewearstore_swp391\\pages\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\code\\source\\swp391 project\\eyewearstore_swp391\\pages\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\code\\source\\swp391 project\\eyewearstore_swp391\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
@@ -26,24 +34,48 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Index.cshtml.cs",
+              "DocumentMoniker": "D:\\Code\\Source\\SWP391 project\\EyewearStore_SWP391\\Pages\\Index.cshtml.cs",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Index.cshtml.cs",
+              "ToolTip": "D:\\Code\\Source\\SWP391 project\\EyewearStore_SWP391\\Pages\\Index.cshtml.cs",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Index.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-28T13:14:21.551Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "D:\\Code\\Source\\SWP391 project\\EyewearStore_SWP391\\appsettings.json",
-              "RelativeDocumentMoniker": "EyewearStore_SWP391\\appsettings.json",
-              "ToolTip": "D:\\Code\\Source\\SWP391 project\\EyewearStore_SWP391\\appsettings.json*",
-              "RelativeToolTip": "EyewearStore_SWP391\\appsettings.json*",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-01-28T12:15:29.771Z",
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\Code\\Source\\SWP391 project\\EyewearStore_SWP391\\Pages\\Index.cshtml",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Index.cshtml",
+              "ToolTip": "D:\\Code\\Source\\SWP391 project\\EyewearStore_SWP391\\Pages\\Index.cshtml",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-01-28T13:14:15.458Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\Code\\Source\\SWP391 project\\EyewearStore_SWP391\\appsettings.json",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\appsettings.json",
+              "ToolTip": "D:\\Code\\Source\\SWP391 project\\EyewearStore_SWP391\\appsettings.json",
+              "RelativeToolTip": "EyewearStore_SWP391\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-01-28T12:15:29.771Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "appsettings.Development.json",
               "DocumentMoniker": "D:\\Code\\Source\\SWP391 project\\EyewearStore_SWP391\\appsettings.Development.json",
               "RelativeDocumentMoniker": "EyewearStore_SWP391\\appsettings.Development.json",
@@ -51,12 +83,11 @@
               "RelativeToolTip": "EyewearStore_SWP391\\appsettings.Development.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-01-28T12:15:08.315Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T12:15:08.315Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\Code\\Source\\SWP391 project\\EyewearStore_SWP391\\Program.cs",
               "RelativeDocumentMoniker": "EyewearStore_SWP391\\Program.cs",
@@ -64,12 +95,11 @@
               "RelativeToolTip": "EyewearStore_SWP391\\Program.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T12:14:57.677Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T12:14:57.677Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "launchSettings.json",
               "DocumentMoniker": "D:\\Code\\Source\\SWP391 project\\EyewearStore_SWP391\\Properties\\launchSettings.json",
               "RelativeDocumentMoniker": "EyewearStore_SWP391\\Properties\\launchSettings.json",
@@ -77,8 +107,7 @@
               "RelativeToolTip": "EyewearStore_SWP391\\Properties\\launchSettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-01-28T12:14:55.378Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T12:14:55.378Z"
             }
           ]
         }

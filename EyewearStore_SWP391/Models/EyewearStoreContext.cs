@@ -27,6 +27,8 @@ public partial class EyewearStoreContext : DbContext
 
     public virtual DbSet<Frame> Frames { get; set; }
 
+    public virtual DbSet<Image> Images { get; set; }
+
     public virtual DbSet<Lense> Lenses { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
@@ -410,26 +412,72 @@ public partial class EyewearStoreContext : DbContext
                 .HasConstraintName("FK_PrescriptionProfiles_Users");
         });
 
-        modelBuilder.Entity<ProductImage>(entity =>
+        modelBuilder.Entity<Image>(entity =>
         {
-            entity.HasKey(e => e.ImageId).HasName("PK__ProductI__336E9B559E9AFEEA");
+            entity.HasKey(e => e.ImageId).HasName("PK_Images");
 
-            entity.HasIndex(e => new { e.ProductType, e.ProductId, e.IsPrimary }, "IX_ProductImages_IsPrimary");
+            entity.HasIndex(e => e.ImageType, "IX_Images_ImageType");
 
-            entity.HasIndex(e => new { e.ProductType, e.ProductId }, "IX_ProductImages_ProductType");
+            entity.HasIndex(e => e.IsActive, "IX_Images_IsActive");
 
             entity.Property(e => e.ImageId).HasColumnName("imageId");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("createdAt");
             entity.Property(e => e.ImageUrl)
                 .HasMaxLength(500)
                 .HasColumnName("imageUrl");
-            entity.Property(e => e.IsPrimary).HasColumnName("isPrimary");
+            entity.Property(e => e.AltText)
+                .HasMaxLength(255)
+                .HasColumnName("altText");
+            entity.Property(e => e.ImageType)
+                .HasMaxLength(50)
+                .HasColumnName("imageType");
+            entity.Property(e => e.Context)
+                .HasMaxLength(255)
+                .HasColumnName("context");
+            entity.Property(e => e.Title)
+                .HasMaxLength(200)
+                .HasColumnName("title");
+            entity.Property(e => e.Description)
+                .HasMaxLength(1000)
+                .HasColumnName("description");
+            entity.Property(e => e.LinkUrl)
+                .HasMaxLength(500)
+                .HasColumnName("linkUrl");
+            entity.Property(e => e.DisplayOrder)
+                .HasDefaultValue(0)
+                .HasColumnName("displayOrder");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("isActive");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnName("createdAt");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnName("updatedAt");
+        });
+
+        modelBuilder.Entity<ProductImage>(entity =>
+        {
+            entity.HasKey(e => e.ProductImageId).HasName("PK_ProductImages");
+
+            entity.HasIndex(e => e.ProductId, "IX_ProductImages_ProductId");
+
+            entity.HasIndex(e => e.ImageId, "IX_ProductImages_ImageId");
+
+            entity.HasIndex(e => new { e.ProductId, e.IsPrimary }, "IX_ProductImages_IsPrimary")
+                .HasFilter("[isPrimary] = 1")
+                .IsUnique();
+
+            entity.Property(e => e.ProductImageId).HasColumnName("productImageId");
             entity.Property(e => e.ProductId).HasColumnName("productId");
-            entity.Property(e => e.ProductType)
-                .HasMaxLength(20)
-                .HasColumnName("productType");
+            entity.Property(e => e.ImageId).HasColumnName("imageId");
+            entity.Property(e => e.IsPrimary).HasColumnName("isPrimary");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnName("createdAt");
+
+            entity.HasOne(d => d.Image).WithMany(p => p.ProductImages)
+                .HasForeignKey(d => d.ImageId)
+                .HasConstraintName("FK_ProductImages_Images");
         });
 
         modelBuilder.Entity<Return>(entity =>

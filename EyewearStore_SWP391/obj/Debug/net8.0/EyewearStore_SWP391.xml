@@ -9,11 +9,11 @@
             API Controller for managing lens products
             </summary>
         </member>
-        <member name="M:EyewearStore_SWP391.Controllers.LensesController.#ctor(EyewearStore_SWP391.Models.EyewearStoreContext)">
+        <member name="M:EyewearStore_SWP391.Controllers.LensesController.#ctor(EyewearStore_SWP391.Services.ILensService)">
             <summary>
             Initializes a new instance of the LensesController
             </summary>
-            <param name="context">The database context</param>
+            <param name="lensService">The lens service</param>
         </member>
         <member name="M:EyewearStore_SWP391.Controllers.LensesController.CreateLens(EyewearStore_SWP391.DTOs.Lens.CreateLensDto)">
             <summary>
@@ -79,16 +79,6 @@
             Soft delete is implemented by setting StockStatus to "out-of-stock".
             Valid StockStatus values per DB constraint: "in-stock", "low-stock", "out-of-stock".
             </remarks>
-        </member>
-        <member name="M:EyewearStore_SWP391.Controllers.LensesController.MapToResponseDto(EyewearStore_SWP391.Models.Lense)">
-            <summary>
-            Maps a Lense entity to a LensResponseDto
-            </summary>
-        </member>
-        <member name="M:EyewearStore_SWP391.Controllers.LensesController.ApplySorting(System.Linq.IQueryable{EyewearStore_SWP391.Models.Lense},System.String,System.String)">
-            <summary>
-            Applies sorting to the query based on the specified field and order
-            </summary>
         </member>
         <member name="T:EyewearStore_SWP391.DTOs.Lens.CreateLensDto">
             <summary>
@@ -246,6 +236,81 @@
             <summary>
             Link table entity connecting products to images.
             Allows multiple images per product with primary image designation.
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Services.ILensService">
+            <summary>
+            Interface for lens product operations
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.ILensService.CreateLensAsync(EyewearStore_SWP391.DTOs.Lens.CreateLensDto)">
+            <summary>
+            Creates a new lens product
+            </summary>
+            <param name="createDto">The lens data to create</param>
+            <returns>The created lens as a response DTO</returns>
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.ILensService.GetAllLensesAsync(System.String,System.String,System.String,System.Nullable{System.Decimal},System.Nullable{System.Decimal},System.String,System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Gets all lenses with optional filtering, searching, sorting, and pagination
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.ILensService.GetLensByIdAsync(System.Int32)">
+            <summary>
+            Gets a single lens by ID
+            </summary>
+            <param name="id">The lens ID</param>
+            <returns>The lens if found, null otherwise</returns>
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.ILensService.UpdateLensAsync(System.Int32,EyewearStore_SWP391.DTOs.Lens.UpdateLensDto)">
+            <summary>
+            Updates an existing lens product
+            </summary>
+            <param name="id">The lens ID to update</param>
+            <param name="updateDto">The updated lens data</param>
+            <returns>The updated lens if found, null otherwise</returns>
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.ILensService.DeleteLensAsync(System.Int32)">
+            <summary>
+            Soft deletes a lens by setting StockStatus to "out-of-stock"
+            </summary>
+            <param name="id">The lens ID to delete</param>
+            <returns>True if the lens was found and deleted, false otherwise</returns>
+        </member>
+        <member name="T:EyewearStore_SWP391.Services.LensService">
+            <summary>
+            Service implementation for lens product operations
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.LensService.#ctor(EyewearStore_SWP391.Models.EyewearStoreContext)">
+            <summary>
+            Initializes a new instance of the LensService
+            </summary>
+            <param name="context">The database context</param>
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.LensService.CreateLensAsync(EyewearStore_SWP391.DTOs.Lens.CreateLensDto)">
+            <inheritdoc />
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.LensService.GetAllLensesAsync(System.String,System.String,System.String,System.Nullable{System.Decimal},System.Nullable{System.Decimal},System.String,System.String,System.String,System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.LensService.GetLensByIdAsync(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.LensService.UpdateLensAsync(System.Int32,EyewearStore_SWP391.DTOs.Lens.UpdateLensDto)">
+            <inheritdoc />
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.LensService.DeleteLensAsync(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.LensService.MapToResponseDto(EyewearStore_SWP391.Models.Lense)">
+            <summary>
+            Maps a Lense entity to a LensResponseDto
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.LensService.ApplySorting(System.Linq.IQueryable{EyewearStore_SWP391.Models.Lense},System.String,System.String)">
+            <summary>
+            Applies sorting to the query based on the specified field and order
             </summary>
         </member>
     </members>

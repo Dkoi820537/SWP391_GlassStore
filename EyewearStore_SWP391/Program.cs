@@ -44,6 +44,9 @@ builder.Services.AddSwaggerGen(options =>
 // Register your cart service
 builder.Services.AddScoped<ICartService, CartService>();
 
+// Register lens service
+builder.Services.AddScoped<ILensService, LensService>();
+
 // Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

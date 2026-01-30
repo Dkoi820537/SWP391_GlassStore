@@ -4,6 +4,51 @@
         <name>EyewearStore_SWP391</name>
     </assembly>
     <members>
+        <member name="T:EyewearStore_SWP391.Controllers.ImagesController">
+            <summary>
+            API Controller for managing image uploads
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.ImagesController.UploadImage(Microsoft.AspNetCore.Http.IFormFile,System.String,System.String,System.String)">
+            <summary>
+            Uploads an image file and creates an Image record
+            </summary>
+            <param name="file">The image file to upload</param>
+            <param name="imageType">Type of image (e.g., "product", "lens")</param>
+            <param name="context">Context identifier (e.g., "lens:123")</param>
+            <param name="altText">Alternative text for the image</param>
+            <returns>The created image record with URL</returns>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.ImagesController.GetImages(System.String,System.String)">
+            <summary>
+            Gets images filtered by context
+            </summary>
+            <param name="context">Filter by context (e.g., "lens:123")</param>
+            <param name="imageType">Filter by image type</param>
+            <returns>List of images</returns>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.ImagesController.GetImageById(System.Int32)">
+            <summary>
+            Gets an image by ID
+            </summary>
+            <param name="id">The image ID</param>
+            <returns>The image record</returns>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.ImagesController.DeleteImage(System.Int32)">
+            <summary>
+            Deletes an image (soft delete by setting IsActive to false)
+            </summary>
+            <param name="id">The image ID to delete</param>
+            <returns>No content on success</returns>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.ImagesController.UpdateImageContext(System.Int32,System.String)">
+            <summary>
+            Updates an image's context (for linking to a lens after creation)
+            </summary>
+            <param name="id">The image ID</param>
+            <param name="context">The new context value</param>
+            <returns>The updated image</returns>
+        </member>
         <member name="T:EyewearStore_SWP391.Controllers.LensesController">
             <summary>
             API Controller for managing lens products
@@ -236,6 +281,66 @@
             <summary>
             Link table entity connecting products to images.
             Allows multiple images per product with primary image designation.
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Admin.Lenses.CreateModel">
+            <summary>
+            Page model for creating a new lens product
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Admin.Lenses.CreateModel.OnGet">
+            <summary>
+            Handles GET request - form submission is handled via JavaScript/API
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Admin.Lenses.DetailsModel">
+            <summary>
+            Page model for viewing lens product details
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Admin.Lenses.DetailsModel.Id">
+            <summary>
+            The lens ID from query parameter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Admin.Lenses.DetailsModel.LensId">
+            <summary>
+            Lens ID to pass to the view
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Admin.Lenses.DetailsModel.OnGet">
+            <summary>
+            Handles GET request - data is loaded via JavaScript/API
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Admin.Lenses.EditModel">
+            <summary>
+            Page model for editing an existing lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Admin.Lenses.EditModel.Id">
+            <summary>
+            The lens ID from query parameter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Admin.Lenses.EditModel.LensId">
+            <summary>
+            Lens ID to pass to the view
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Admin.Lenses.EditModel.OnGet">
+            <summary>
+            Handles GET request - form data is loaded via JavaScript/API
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Admin.Lenses.IndexModel">
+            <summary>
+            Page model for listing and managing lens products
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Admin.Lenses.IndexModel.OnGet">
+            <summary>
+            Handles GET request - page content is loaded via JavaScript/API
             </summary>
         </member>
         <member name="T:EyewearStore_SWP391.Services.ILensService">

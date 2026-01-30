@@ -1,0 +1,402 @@
+@page
+@model EyewearStore_SWP391.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "_Layout";
+}
+
+<link rel="stylesheet" href="~/css/lenses-admin.css" asp-append-version="true" />
+
+<style>
+    /* === ADMIN DASHBOARD STYLES === */
+    .admin-dashboard {
+        min-height: calc(100vh - 200px);
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 2rem 0;
+    }
+
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+    }
+
+    .dashboard-header h1 {
+        font-family: var(--font-secondary, 'Playfair Display', serif);
+        font-size: 2.5rem;
+        color: var(--primary-navy, #1a365d);
+        margin-bottom: 0.5rem;
+    }
+
+    .dashboard-header p {
+        color: var(--secondary-warm-gray, #6b7280);
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .dashboard-welcome {
+        background: linear-gradient(135deg, var(--primary-navy, #1a365d) 0%, #2d4a6f 100%);
+        color: white;
+        padding: 1.5rem 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 4px 15px rgba(26, 54, 93, 0.3);
+    }
+
+    .dashboard-welcome .welcome-icon {
+        font-size: 2.5rem;
+    }
+
+    .dashboard-welcome .welcome-text h2 {
+        margin: 0 0 0.25rem 0;
+        font-size: 1.5rem;
+    }
+
+    .dashboard-welcome .welcome-text p {
+        margin: 0;
+        opacity: 0.9;
+    }
+
+    /* === ADMIN CARDS GRID === */
+    .admin-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        padding: 0 1rem;
+    }
+
+    .admin-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .admin-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .admin-card-icon {
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--primary-gold, #d4a574) 0%, #c49660 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .admin-card-icon::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .admin-card-icon svg {
+        width: 50px;
+        height: 50px;
+        stroke: white;
+        stroke-width: 1.5;
+        fill: none;
+        position: relative;
+        z-index: 1;
+    }
+
+    .admin-card-body {
+        padding: 1.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .admin-card-title {
+        font-family: var(--font-secondary, 'Playfair Display', serif);
+        font-size: 1.25rem;
+        color: var(--primary-navy, #1a365d);
+        margin: 0 0 0.5rem 0;
+    }
+
+    .admin-card-description {
+        color: var(--secondary-warm-gray, #6b7280);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+        flex: 1;
+    }
+
+    .admin-card-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: var(--primary-navy, #1a365d);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .admin-card-btn:hover {
+        background: #2d4a6f;
+        color: white;
+        transform: translateX(4px);
+    }
+
+    .admin-card-btn svg {
+        width: 16px;
+        height: 16px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+        transition: transform 0.3s ease;
+    }
+
+    .admin-card-btn:hover svg {
+        transform: translateX(4px);
+    }
+
+    /* === CARD VARIANTS === */
+    .admin-card.lenses .admin-card-icon {
+        background: linear-gradient(135deg, #4f9dde 0%, #3b82c4 100%);
+    }
+
+    .admin-card.frames .admin-card-icon {
+        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+    }
+
+    .admin-card.orders .admin-card-icon {
+        background: linear-gradient(135deg, #27ae60 0%, #219a52 100%);
+    }
+
+    .admin-card.users .admin-card-icon {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    }
+
+    .admin-card.reports .admin-card-icon {
+        background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+    }
+
+    .admin-card.settings .admin-card-icon {
+        background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+    }
+
+    /* === BADGE === */
+    .card-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: white;
+        color: var(--primary-navy, #1a365d);
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* === QUICK STATS === */
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding: 0 1rem;
+    }
+
+    .stat-item {
+        background: white;
+        padding: 1.25rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--primary-navy, #1a365d);
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: var(--secondary-warm-gray, #6b7280);
+        margin-top: 0.25rem;
+    }
+
+    /* === RESPONSIVE === */
+    @@media (max-width: 768px) {
+        .dashboard-header h1 {
+            font-size: 1.75rem;
+        }
+
+        .admin-cards-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-welcome {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .quick-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+
+<div class="admin-dashboard">
+    <div class="admin-container">
+        <!-- Breadcrumb -->
+        <nav class="admin-breadcrumb" aria-label="breadcrumb">
+            <a href="/">Home</a>
+            <span class="separator">›</span>
+            <span>Admin Dashboard</span>
+        </nav>
+
+        <!-- Welcome Banner -->
+        <div class="dashboard-welcome">
+            <span class="welcome-icon">👋</span>
+            <div class="welcome-text">
+                <h2>Welcome, @User.Identity?.Name!</h2>
+                <p>Manage your OptiPlus eyewear store from this central dashboard.</p>
+            </div>
+        </div>
+
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1>Admin Dashboard</h1>
+            <p>Access all administrative functions to manage your eyewear store products, orders, and more.</p>
+        </div>
+
+        <!-- Admin Cards Grid -->
+        <div class="admin-cards-grid">
+            <!-- Lenses Card -->
+            <div class="admin-card lenses">
+                <div class="admin-card-icon">
+                    <span class="card-badge">CRUD</span>
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <circle cx="12" cy="12" r="4"/>
+                        <line x1="12" y1="2" x2="12" y2="4"/>
+                        <line x1="12" y1="20" x2="12" y2="22"/>
+                        <line x1="2" y1="12" x2="4" y2="12"/>
+                        <line x1="20" y1="12" x2="22" y2="12"/>
+                    </svg>
+                </div>
+                <div class="admin-card-body">
+                    <h3 class="admin-card-title">Lens Management</h3>
+                    <p class="admin-card-description">
+                        Create, view, update, and manage lens products. Control stock status, pricing, 
+                        lens types, and specifications for all your optical lenses.
+                    </p>
+                    <a href="/Admin/Lenses" class="admin-card-btn">
+                        Manage Lenses
+                        <svg viewBox="0 0 24 24">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Frames Card (Coming Soon) -->
+            <div class="admin-card frames">
+                <div class="admin-card-icon">
+                    <span class="card-badge">Coming Soon</span>
+                    <svg viewBox="0 0 24 24">
+                        <rect x="2" y="8" width="8" height="6" rx="2"/>
+                        <rect x="14" y="8" width="8" height="6" rx="2"/>
+                        <path d="M10 11h4"/>
+                        <path d="M2 11H0"/>
+                        <path d="M24 11h-2"/>
+                    </svg>
+                </div>
+                <div class="admin-card-body">
+                    <h3 class="admin-card-title">Frame Management</h3>
+                    <p class="admin-card-description">
+                        Manage eyeglass frames inventory. Add new styles, update pricing, and track 
+                        stock levels for all frame products.
+                    </p>
+                    <span class="admin-card-btn" style="opacity: 0.5; pointer-events: none;">
+                        Coming Soon
+                        <svg viewBox="0 0 24 24">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Orders Card (Coming Soon) -->
+            <div class="admin-card orders">
+                <div class="admin-card-icon">
+                    <span class="card-badge">Coming Soon</span>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <path d="M16 10a4 4 0 0 1-8 0"/>
+                    </svg>
+                </div>
+                <div class="admin-card-body">
+                    <h3 class="admin-card-title">Order Management</h3>
+                    <p class="admin-card-description">
+                        View and process customer orders. Track order status, manage shipping, 
+                        and handle returns and refunds.
+                    </p>
+                    <span class="admin-card-btn" style="opacity: 0.5; pointer-events: none;">
+                        Coming Soon
+                        <svg viewBox="0 0 24 24">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Users Card (Coming Soon) -->
+            <div class="admin-card users">
+                <div class="admin-card-icon">
+                    <span class="card-badge">Coming Soon</span>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                </div>
+                <div class="admin-card-body">
+                    <h3 class="admin-card-title">User Management</h3>
+                    <p class="admin-card-description">
+                        Manage customer accounts, admin users, and roles. View customer details 
+                        and handle account-related requests.
+                    </p>
+                    <span class="admin-card-btn" style="opacity: 0.5; pointer-events: none;">
+                        Coming Soon
+                        <svg viewBox="0 0 24 24">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,116 @@
+@page
+@model EyewearStore_SWP391.Pages.Admin.Lenses.IndexModel
+@{
+    ViewData["Title"] = "Manage Lenses";
+    Layout = "_Layout";
+}
+
+<link rel="stylesheet" href="~/css/lenses-admin.css" asp-append-version="true" />
+
+<div class="admin-container">
+    <!-- Breadcrumb -->
+    <nav class="admin-breadcrumb" aria-label="breadcrumb">
+        <a href="/">Home</a>
+        <span class="separator">›</span>
+        <a href="/Admin">Admin</a>
+        <span class="separator">›</span>
+        <span>Lenses</span>
+    </nav>
+
+    <!-- Header -->
+    <div class="admin-header">
+        <h1>Lens Products</h1>
+        <div class="admin-header-actions">
+            <a href="/Admin/Lenses/Create" class="btn btn-primary">
+                + Add New Lens
+            </a>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="admin-toolbar">
+        <div class="search-box">
+            <input type="text" 
+                   id="searchInput" 
+                   placeholder="Search lenses..." 
+                   aria-label="Search lenses">
+        </div>
+        
+        <div class="filter-group">
+            <select id="lensTypeFilter" class="filter-select" aria-label="Filter by lens type">
+                <option value="">All Types</option>
+                <option value="Single Vision">Single Vision</option>
+                <option value="Bifocal">Bifocal</option>
+                <option value="Progressive">Progressive</option>
+                <option value="Reading">Reading</option>
+            </select>
+
+            <select id="stockStatusFilter" class="filter-select" aria-label="Filter by stock status">
+                <option value="">All Status</option>
+                <option value="in-stock">In Stock</option>
+                <option value="low-stock">Low Stock</option>
+                <option value="out-of-stock">Out of Stock</option>
+            </select>
+
+            <select id="sortBySelect" class="filter-select" aria-label="Sort by">
+                <option value="createdAt-desc">Newest First</option>
+                <option value="createdAt-asc">Oldest First</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="lensType-asc">Type: A-Z</option>
+            </select>
+
+            <label class="toggle-switch">
+                <input type="checkbox" id="showInactiveToggle">
+                <span class="toggle-slider"></span>
+                <span>Show Inactive</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Lens Grid -->
+    <div id="lensGrid" class="lens-grid">
+        <!-- Lenses will be loaded here via JavaScript -->
+        <div class="empty-state">
+            <div class="loading-spinner"></div>
+            <p>Loading lenses...</p>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-wrapper">
+        <span id="paginationInfo" class="pagination-info"></span>
+        <div id="pagination" class="pagination"></div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+    <div class="modal-content">
+        <h2 id="deleteModalTitle" class="modal-title">Confirm Delete</h2>
+        <div class="modal-body">
+            <p>Are you sure you want to delete this lens? This action will mark the lens as inactive (out of stock).</p>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="LensAdmin.hideDeleteModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" style="background: var(--error);" onclick="LensAdmin.executeDelete()">Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner"></div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer" class="toast-container"></div>
+
+@section Scripts {
+    <script src="~/js/lenses-admin.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            LensAdmin.init({ page: 'index' });
+        });
+    </script>
+}

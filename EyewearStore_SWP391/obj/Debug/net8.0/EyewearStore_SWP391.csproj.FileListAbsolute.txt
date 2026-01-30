@@ -453,3 +453,10 @@ D:\SWP391_GlassStore\EyewearStore_SWP391\obj\Debug\net8.0\refint\EyewearStore_SW
 D:\SWP391_GlassStore\EyewearStore_SWP391\obj\Debug\net8.0\EyewearStore_SWP391.pdb
 D:\SWP391_GlassStore\EyewearStore_SWP391\obj\Debug\net8.0\EyewearStore_SWP391.genruntimeconfig.cache
 D:\SWP391_GlassStore\EyewearStore_SWP391\obj\Debug\net8.0\ref\EyewearStore_SWP391.dll
+D:\Code\Source\SWP391 project\EyewearStore_SWP391\bin\Debug\net8.0\EyewearStore_SWP391.xml
+D:\Code\Source\SWP391 project\EyewearStore_SWP391\bin\Debug\net8.0\Microsoft.OpenApi.dll
+D:\Code\Source\SWP391 project\EyewearStore_SWP391\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\Code\Source\SWP391 project\EyewearStore_SWP391\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\Code\Source\SWP391 project\EyewearStore_SWP391\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\Code\Source\SWP391 project\EyewearStore_SWP391\obj\Debug\net8.0\EyewearStore_SWP391.MvcApplicationPartsAssemblyInfo.cs
+D:\Code\Source\SWP391 project\EyewearStore_SWP391\obj\Debug\net8.0\EyewearStore_SWP391.xml

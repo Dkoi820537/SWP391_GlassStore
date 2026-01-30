@@ -1,0 +1,252 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>EyewearStore_SWP391</name>
+    </assembly>
+    <members>
+        <member name="T:EyewearStore_SWP391.Controllers.LensesController">
+            <summary>
+            API Controller for managing lens products
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.LensesController.#ctor(EyewearStore_SWP391.Models.EyewearStoreContext)">
+            <summary>
+            Initializes a new instance of the LensesController
+            </summary>
+            <param name="context">The database context</param>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.LensesController.CreateLens(EyewearStore_SWP391.DTOs.Lens.CreateLensDto)">
+            <summary>
+            Creates a new lens product
+            </summary>
+            <param name="createDto">The lens data to create</param>
+            <returns>The created lens product</returns>
+            <response code="201">Returns the newly created lens</response>
+            <response code="400">If the lens data is invalid</response>
+            <response code="500">If there was an internal server error</response>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.LensesController.GetAllLenses(System.String,System.String,System.String,System.Nullable{System.Decimal},System.Nullable{System.Decimal},System.String,System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Gets all lenses with optional filtering, searching, sorting, and pagination
+            </summary>
+            <param name="search">Search term for lens type or coating</param>
+            <param name="lensType">Filter by lens type</param>
+            <param name="coating">Filter by coating</param>
+            <param name="priceMin">Minimum price filter</param>
+            <param name="priceMax">Maximum price filter</param>
+            <param name="stockStatus">Filter by stock status</param>
+            <param name="sortBy">Sort field (price, lensType, createdAt)</param>
+            <param name="sortOrder">Sort order (asc, desc)</param>
+            <param name="pageNumber">Page number (default: 1)</param>
+            <param name="pageSize">Page size (default: 10, max: 100)</param>
+            <returns>A paginated list of lenses</returns>
+            <response code="200">Returns the list of lenses</response>
+            <response code="500">If there was an internal server error</response>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.LensesController.GetLensById(System.Int32)">
+            <summary>
+            Gets a single lens by ID
+            </summary>
+            <param name="id">The lens ID</param>
+            <returns>The lens product</returns>
+            <response code="200">Returns the lens</response>
+            <response code="404">If the lens is not found</response>
+            <response code="500">If there was an internal server error</response>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.LensesController.UpdateLens(System.Int32,EyewearStore_SWP391.DTOs.Lens.UpdateLensDto)">
+            <summary>
+            Updates an existing lens product
+            </summary>
+            <param name="id">The lens ID to update</param>
+            <param name="updateDto">The updated lens data</param>
+            <returns>The updated lens product</returns>
+            <response code="200">Returns the updated lens</response>
+            <response code="400">If the lens data is invalid</response>
+            <response code="404">If the lens is not found</response>
+            <response code="500">If there was an internal server error</response>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.LensesController.DeleteLens(System.Int32)">
+            <summary>
+            Soft deletes a lens by setting StockStatus to "out-of-stock"
+            </summary>
+            <param name="id">The lens ID to delete</param>
+            <returns>No content on success</returns>
+            <response code="204">The lens was successfully soft deleted</response>
+            <response code="404">If the lens is not found</response>
+            <response code="500">If there was an internal server error</response>
+            <remarks>
+            Note: The Lense model does not have an IsActive property.
+            Soft delete is implemented by setting StockStatus to "out-of-stock".
+            Valid StockStatus values per DB constraint: "in-stock", "low-stock", "out-of-stock".
+            </remarks>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.LensesController.MapToResponseDto(EyewearStore_SWP391.Models.Lense)">
+            <summary>
+            Maps a Lense entity to a LensResponseDto
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.LensesController.ApplySorting(System.Linq.IQueryable{EyewearStore_SWP391.Models.Lense},System.String,System.String)">
+            <summary>
+            Applies sorting to the query based on the specified field and order
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.DTOs.Lens.CreateLensDto">
+            <summary>
+            Data Transfer Object for creating a new lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.LensType">
+            <summary>
+            The type of lens (e.g., Single Vision, Bifocal, Progressive)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.IndexValue">
+            <summary>
+            The refractive index value of the lens (e.g., 1.50, 1.60, 1.67, 1.74)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.Coating">
+            <summary>
+            The coating applied to the lens (e.g., Anti-Reflective, Blue Light Filter)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.Price">
+            <summary>
+            The price of the lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.StockStatus">
+            <summary>
+            The stock status of the lens. Valid values: "in-stock", "low-stock", "out-of-stock"
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.DTOs.Lens.LensListResponseDto">
+            <summary>
+            Data Transfer Object for paginated lens list responses
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensListResponseDto.Items">
+            <summary>
+            The list of lens items for the current page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensListResponseDto.PageNumber">
+            <summary>
+            The current page number (1-indexed)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensListResponseDto.PageSize">
+            <summary>
+            The number of items per page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensListResponseDto.TotalCount">
+            <summary>
+            The total number of items across all pages
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensListResponseDto.TotalPages">
+            <summary>
+            The total number of pages
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensListResponseDto.HasPreviousPage">
+            <summary>
+            Indicates whether there is a previous page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensListResponseDto.HasNextPage">
+            <summary>
+            Indicates whether there is a next page
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.DTOs.Lens.LensResponseDto">
+            <summary>
+            Data Transfer Object for returning lens product data
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.LensId">
+            <summary>
+            The unique identifier of the lens
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.LensType">
+            <summary>
+            The type of lens (e.g., Single Vision, Bifocal, Progressive)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.IndexValue">
+            <summary>
+            The refractive index value of the lens
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.Coating">
+            <summary>
+            The coating applied to the lens
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.Price">
+            <summary>
+            The price of the lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.StockStatus">
+            <summary>
+            The stock status of the lens
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.CreatedAt">
+            <summary>
+            The date and time when the lens was created
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto">
+            <summary>
+            Data Transfer Object for updating an existing lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.LensType">
+            <summary>
+            The type of lens (e.g., Single Vision, Bifocal, Progressive)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.IndexValue">
+            <summary>
+            The refractive index value of the lens (e.g., 1.50, 1.60, 1.67, 1.74)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.Coating">
+            <summary>
+            The coating applied to the lens (e.g., Anti-Reflective, Blue Light Filter)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.Price">
+            <summary>
+            The price of the lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.StockStatus">
+            <summary>
+            The stock status of the lens. Valid values: "in-stock", "low-stock", "out-of-stock"
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.Image">
+            <summary>
+            Universal image entity for storing all image assets.
+            Supports product images, banners, logos, promotions, and category images.
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.ImageType">
+            <summary>
+            Defines the type of image stored in the Images table.
+            Used for filtering and categorizing images across the application.
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.ProductImage">
+            <summary>
+            Link table entity connecting products to images.
+            Allows multiple images per product with primary image designation.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,14 +1,20 @@
 using EyewearStore_SWP391.Models;
+using EyewearStore_SWP391.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Razor + DbContext
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<EyewearStoreContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
 
+// Register your cart service
+builder.Services.AddScoped<ICartService, CartService>();
+
+// Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

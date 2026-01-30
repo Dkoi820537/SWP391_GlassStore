@@ -1,0 +1,104 @@
+﻿@using System.Security.Claims
+@using EyewearStore_SWP391.Models
+@inject EyewearStore_SWP391.Services.ICartService CartService
+
+@{
+    int itemCount = 0;
+    decimal subtotal = 0m;
+    List<CartItem>? items = null;
+
+    if (User?.Identity?.IsAuthenticated ?? false)
+    {
+        var uidStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (int.TryParse(uidStr, out var uid))
+        {
+            var cart = await CartService.GetCartByUserIdAsync(uid);
+            if (cart != null)
+            {
+                items = cart.CartItems.ToList();
+                itemCount = items.Sum(i => i.Quantity);
+                subtotal = items.Sum(i =>
+                {
+                    decimal unit = 0m;
+                    if (i.Frame != null) unit = i.Frame.Price;
+                    else if (i.Lens != null) unit = i.Lens.Price;
+                    else if (i.Bundle != null) unit = i.Bundle.BundlePrice;
+                    else if (i.Service != null) unit = i.Service.Price;
+                    return unit * i.Quantity;
+                });
+            }
+        }
+    }
+}
+
+<li class="nav-item dropdown ms-3">
+    <a class="nav-link d-flex align-items-center position-relative" href="#" id="cartDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Giỏ hàng">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.25" class="me-1">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12l-1 12H7L6 7z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 7V6a3 3 0 116 0v1" />
+        </svg>
+
+        <span class="cart-badge badge bg-danger position-absolute">@itemCount</span>
+    </a>
+
+    <ul class="dropdown-menu dropdown-menu-end p-3 shadow" aria-labelledby="cartDropdown" style="min-width:320px; max-width:420px;">
+        <li>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong>Giỏ hàng</strong>
+                <small class="text-muted">@itemCount item(s)</small>
+            </div>
+        </li>
+
+        @if (itemCount == 0)
+        {
+            <li class="py-3 text-center text-muted">
+                <div>Giỏ hàng trống</div>
+                <div class="small">Thêm sản phẩm để bắt đầu</div>
+            </li>
+        }
+        else
+        {
+            <li>
+                <div style="max-height:240px; overflow:auto;">
+                    @foreach (var it in items)
+                    {
+                        decimal unit = it.Frame != null ? it.Frame.Price :
+                        it.Lens != null ? it.Lens.Price :
+                        it.Bundle != null ? it.Bundle.BundlePrice :
+                        it.Service != null ? it.Service.Price : 0m;
+
+                        <div class="d-flex align-items-center mb-2">
+                            <div style="width:56px; height:56px; background:#f5f5f5; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; color:#777; margin-right:10px;">
+                                IMG
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold">
+                                    @(
+                                                                it.Frame != null ? it.Frame.Name :
+                                                                it.Lens != null ? it.Lens.LensType :
+                                                                it.Bundle != null ? it.Bundle.Name :
+                                                                it.Service != null ? it.Service.Name : "Sản phẩm")
+                        </div>
+                        <div class="small text-muted">x @it.Quantity • @unit.ToString("N0") VND</div>
+                    </div>
+                    <div class="ms-2 text-end">
+                        <div class="fw-bold">@((unit * it.Quantity).ToString("N0")) VND</div>
+                    </div>
+                </div>
+                                }
+                </div>
+            </li>
+
+            <li><hr class="dropdown-divider" /></li>
+            <li class="d-flex justify-content-between align-items-center mb-2">
+                <div><small class="text-muted">Tổng</small></div>
+                <div class="fw-bold">@subtotal.ToString("N0") VND</div>
+            </li>
+
+            <li class="d-flex gap-2">
+                <a class="btn btn-sm btn-outline-secondary flex-grow-1" asp-page="/Cart/Index">Xem giỏ</a>
+                <a class="btn btn-sm btn-primary flex-grow-1" asp-page="/Orders/Checkout">Thanh toán</a>
+            </li>
+        }
+    </ul>
+</li>

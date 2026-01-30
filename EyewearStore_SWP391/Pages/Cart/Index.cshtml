@@ -1,0 +1,502 @@
+﻿@page
+@model EyewearStore_SWP391.Pages.Cart.IndexModel
+@{
+    ViewData["Title"] = "Shopping Cart";
+}
+
+<div class="container py-5">
+    <!-- Page Header -->
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Shopping Cart</li>
+            </ol>
+        </nav>
+        <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
+            🛒 Your Shopping Cart
+        </h1>
+        <p style="color: var(--secondary-warm-gray); font-size: 1.1rem;">
+            Review your items and proceed to checkout
+        </p>
+    </div>
+
+    <!-- Alert Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 8px; border-left: 4px solid var(--success);">
+            <strong>✓</strong> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px; border-left: 4px solid var(--error);">
+            <strong>⚠</strong> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model.Cart == null || !Model.Cart.CartItems.Any())
+    {
+        <!-- Empty Cart State -->
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card" style="border: none;
+                                             border-radius: 16px;
+                                             box-shadow: var(--shadow-lg);
+                                             text-align: center;
+                                             padding: 5rem 3rem;
+                                             background: linear-gradient(135deg, var(--white) 0%, var(--secondary-cream) 100%);">
+
+                    <!-- Empty Cart Icon -->
+                    <div style="margin-bottom: 2rem;">
+                        <svg width="140" height="140" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="color: var(--primary-navy); opacity: 0.15; margin: 0 auto; display: block;">
+                            <circle cx="9" cy="21" r="1" />
+                            <circle cx="20" cy="21" r="1" />
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                        </svg>
+                    </div>
+
+                    <!-- Empty Cart Message -->
+                    <h2 style="color: var(--primary-navy);
+                                   margin-bottom: 1.25rem;
+                                   font-family: var(--font-secondary);
+                                   font-size: 2.25rem;
+                                   font-weight: 700;">
+                        Your Cart is Empty
+                    </h2>
+
+                    <p style="color: var(--secondary-warm-gray);
+                                  margin-bottom: 3rem;
+                                  font-size: 1.15rem;
+                                  max-width: 550px;
+                                  margin-left: auto;
+                                  margin-right: auto;
+                                  line-height: 1.7;">
+                        Looks like you haven't added any items yet. Discover our premium collection of eyewear and find your perfect pair!
+                    </p>
+
+                    <!-- Single Continue Shopping Button -->
+                    <div>
+                        <a asp-page="/Index"
+                           class="btn btn-primary"
+                           style="padding: 1.25rem 3.5rem;
+                                      font-size: 1.2rem;
+                                      background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+                                      color: white !important;
+                                      border: none;
+                                      border-radius: 10px;
+                                      text-transform: none;
+                                      font-weight: 600;
+                                      box-shadow: 0 4px 16px rgba(26, 35, 50, 0.25);
+                                      letter-spacing: 0.3px;
+                                      transition: all 0.3s ease;
+                                      display: inline-block;
+                                      text-decoration: none;">
+                            Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            <!-- Cart Items Column -->
+            <div class="col-lg-8">
+                <!-- Cart Header Actions -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 style="color: var(--primary-navy); margin: 0; font-weight: 600;">
+                        Cart Items (@Model.Cart.CartItems.Count)
+                    </h5>
+                    <form method="post" asp-page-handler="Clear" onsubmit="return confirm('Are you sure you want to clear your entire cart?');" style="margin: 0;">
+                        <button type="submit"
+                                class="btn btn-sm"
+                                style="color: var(--error);
+                                           border: 1px solid var(--error);
+                                           background: transparent;
+                                           padding: 0.5rem 1rem;
+                                           border-radius: 6px;
+                                           transition: all 0.25s ease;">
+                            🗑️ Clear Cart
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Cart Items List -->
+                <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden;">
+                    @foreach (var it in Model.Cart.CartItems)
+                    {
+                        var unit = it.Frame != null ? it.Frame.Price :
+                        it.Lens != null ? it.Lens.Price :
+                        it.Bundle != null ? it.Bundle.BundlePrice :
+                        it.Service != null ? it.Service.Price : 0m;
+
+                        var productName = it.Frame != null ? it.Frame.Name :
+                        it.Lens != null ? it.Lens.LensType :
+                        it.Bundle != null ? it.Bundle.Name :
+                        it.Service != null ? it.Service.Name : "Product";
+
+                        var productType = it.Frame != null ? "Frame" :
+                        it.Lens != null ? "Lens" :
+                        it.Bundle != null ? "Bundle" :
+                        it.Service != null ? "Service" : "";
+
+                        <div style="padding: 1.5rem; border-bottom: 1px solid var(--medium-gray);">
+                            <div class="row g-3 align-items-center">
+                                <!-- Product Image -->
+                                <div class="col-auto">
+                                    <div style="width: 100px;
+                                                        height: 100px;
+                                                        background: linear-gradient(135deg, var(--light-gray) 0%, var(--secondary-cream) 100%);
+                                                        border-radius: 12px;
+                                                        display: flex;
+                                                        align-items: center;
+                                                        justify-content: center;
+                                                        border: 2px solid var(--medium-gray);">
+                                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            @if (it.Frame != null || it.Bundle != null)
+                                            {
+                                                <rect x="2" y="8" width="8" height="6" rx="2" />
+                                                <rect x="14" y="8" width="8" height="6" rx="2" />
+                                                <path d="M10 11h4" />
+                                            }
+                                            else if (it.Lens != null)
+                                            {
+                                                <circle cx="12" cy="12" r="10" />
+                                                <circle cx="12" cy="12" r="4" />
+                                            }
+                                            else
+                                            {
+                                                <circle cx="12" cy="12" r="3" />
+                                                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2" />
+                                            }
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <!-- Product Details -->
+                                <div class="col">
+                                    <h5 style="color: var(--primary-navy);
+                                                       margin-bottom: 0.5rem;
+                                                       font-weight: 600;
+                                                       font-size: 1.1rem;">
+                                        @productName
+                                    </h5>
+                                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+                                        <span class="badge"
+                                              style="background: var(--primary-gold);
+                                                             color: white;
+                                                             padding: 0.35rem 0.75rem;
+                                                             font-weight: 500;
+                                                             border-radius: 6px;">
+                                            @productType
+                                        </span>
+                                        @if (!string.IsNullOrEmpty(it.TempPrescriptionJson))
+                                        {
+                                            <span class="badge"
+                                                  style="background: var(--secondary-teal);
+                                                                     color: white;
+                                                                     padding: 0.35rem 0.75rem;
+                                                                     font-weight: 500;
+                                                                     border-radius: 6px;">
+                                                📋 Prescription Saved
+                                            </span>
+                                        }
+                                    </div>
+                                    <p style="color: var(--secondary-warm-gray);
+                                                      margin: 0;
+                                                      font-size: 1rem;
+                                                      font-weight: 600;">
+                                        @unit.ToString("N0") VND
+                                    </p>
+                                </div>
+
+                                <!-- Quantity Controls -->
+                                <div class="col-auto">
+                                    <form method="post" asp-page-handler="UpdateQuantity" style="margin: 0;">
+                                        <input type="hidden" name="cartItemId" value="@it.CartItemId" />
+                                        <div style="display: flex;
+                                                            align-items: center;
+                                                            gap: 0.75rem;
+                                                            background: var(--light-gray);
+                                                            padding: 0.5rem;
+                                                            border-radius: 8px;">
+                                            <label style="margin: 0;
+                                                                  color: var(--dark-gray);
+                                                                  font-size: 0.875rem;
+                                                                  font-weight: 600;">
+                                                Qty:
+                                            </label>
+                                            <input type="number"
+                                                   name="quantity"
+                                                   value="@it.Quantity"
+                                                   min="0"
+                                                   class="form-control"
+                                                   style="width: 70px;
+                                                                  text-align: center;
+                                                                  border: 2px solid var(--medium-gray);
+                                                                  border-radius: 6px;
+                                                                  padding: 0.35rem;" />
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-primary"
+                                                    style="padding: 0.35rem 1rem;
+                                                                   background: var(--primary-navy);
+                                                                   border: none;
+                                                                   border-radius: 6px;
+                                                                   font-size: 0.875rem;">
+                                                Update
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Subtotal & Remove -->
+                                <div class="col-auto text-end">
+                                    <div style="margin-bottom: 0.75rem;">
+                                        <div style="font-size: 0.875rem;
+                                                            color: var(--secondary-warm-gray);
+                                                            margin-bottom: 0.25rem;">
+                                            Subtotal
+                                        </div>
+                                        <div style="font-size: 1.25rem;
+                                                            font-weight: 700;
+                                                            color: var(--primary-navy);">
+                                            @((unit * it.Quantity).ToString("N0")) VND
+                                        </div>
+                                    </div>
+                                    <form method="post"
+                                          asp-page-handler="Remove"
+                                          onsubmit="return confirm('Remove this item from cart?');"
+                                          style="margin: 0;">
+                                        <input type="hidden" name="cartItemId" value="@it.CartItemId" />
+                                        <button type="submit"
+                                                class="btn btn-sm"
+                                                style="color: var(--error);
+                                                               border: 1px solid var(--error);
+                                                               background: transparent;
+                                                               padding: 0.35rem 0.75rem;
+                                                               border-radius: 6px;
+                                                               font-size: 0.875rem;">
+                                            🗑️ Remove
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Continue Shopping Link -->
+                <div class="mt-3">
+                    <a asp-page="/Index"
+                       style="color: var(--primary-gold);
+                                  text-decoration: none;
+                                  font-weight: 600;
+                                  display: inline-flex;
+                                  align-items: center;
+                                  gap: 0.5rem;">
+                        ← Continue Shopping
+                    </a>
+                </div>
+            </div>
+
+            <!-- Order Summary Column -->
+            <div class="col-lg-4">
+                <div class="card"
+                     style="border: none;
+                                border-radius: 12px;
+                                box-shadow: var(--shadow-lg);
+                                position: sticky;
+                                top: 100px;">
+
+                    <!-- Summary Header -->
+                    <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+                                    padding: 1.5rem;
+                                    border-radius: 12px 12px 0 0;">
+                        <h4 style="color: white;
+                                       margin: 0;
+                                       font-family: var(--font-secondary);
+                                       font-size: 1.5rem;">
+                            Order Summary
+                        </h4>
+                    </div>
+
+                    <!-- Summary Body -->
+                    <div style="padding: 1.5rem;">
+                        <!-- Items Count -->
+                        <div style="display: flex;
+                                        justify-content: space-between;
+                                        padding: 1rem 0;
+                                        border-bottom: 1px solid var(--medium-gray);">
+                            <span style="color: var(--dark-gray); font-weight: 500;">
+                                Items in Cart
+                            </span>
+                            <span style="color: var(--primary-navy); font-weight: 600;">
+                                @Model.Cart.CartItems.Count
+                            </span>
+                        </div>
+
+                        <!-- Subtotal -->
+                        <div style="display: flex;
+                                        justify-content: space-between;
+                                        padding: 1rem 0;
+                                        border-bottom: 1px solid var(--medium-gray);">
+                            <span style="color: var(--dark-gray); font-weight: 500;">
+                                Subtotal
+                            </span>
+                            <span style="color: var(--primary-navy); font-weight: 600;">
+                                @Model.Total.ToString("N0") VND
+                            </span>
+                        </div>
+
+                        <!-- Shipping -->
+                        <div style="display: flex;
+                                        justify-content: space-between;
+                                        padding: 1rem 0;
+                                        border-bottom: 2px solid var(--medium-gray);">
+                            <span style="color: var(--dark-gray); font-weight: 500;">
+                                Shipping
+                            </span>
+                            <span style="color: var(--success); font-weight: 600;">
+                                FREE 🎉
+                            </span>
+                        </div>
+
+                        <!-- Total -->
+                        <div style="display: flex;
+                                        justify-content: space-between;
+                                        padding: 1.5rem 0;">
+                            <span style="color: var(--primary-navy);
+                                             font-weight: 700;
+                                             font-size: 1.25rem;
+                                             font-family: var(--font-secondary);">
+                                Total
+                            </span>
+                            <span style="color: var(--primary-gold);
+                                             font-weight: 700;
+                                             font-size: 1.5rem;
+                                             font-family: var(--font-secondary);">
+                                @Model.Total.ToString("N0") VND
+                            </span>
+                        </div>
+
+                        <!-- Checkout Button -->
+                        <a href="/Orders/Checkout"
+                           class="btn btn-primary w-100"
+                           style="padding: 1rem;
+                                      font-size: 1.1rem;
+                                      font-weight: 600;
+                                      border-radius: 8px;
+                                      background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-light) 100%);
+                                      border: none;
+                                      text-transform: uppercase;
+                                      letter-spacing: 0.5px;
+                                      margin-bottom: 1rem;">
+                            Proceed to Checkout 🛍️
+                        </a>
+
+                        <!-- Security Badge -->
+                        <div style="text-align: center;
+                                        padding: 1rem;
+                                        background: var(--light-gray);
+                                        border-radius: 8px;">
+                            <div style="margin-bottom: 0.5rem;">🔒</div>
+                            <small style="color: var(--secondary-warm-gray);
+                                             font-weight: 500;
+                                             display: block;">
+                                Secure Checkout
+                            </small>
+                            <small style="color: var(--secondary-warm-gray);">
+                                Your payment info is safe with us
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Info Card -->
+                <div class="card mt-3"
+                     style="border: none;
+                                border-radius: 12px;
+                                background: linear-gradient(135deg, var(--secondary-cream) 0%, var(--light-gray) 100%);
+                                padding: 1.5rem;">
+                    <h6 style="color: var(--primary-navy);
+                                   font-weight: 600;
+                                   margin-bottom: 1rem;">
+                        💡 Shopping Benefits
+                    </h6>
+                    <ul style="list-style: none;
+                                   padding: 0;
+                                   margin: 0;
+                                   color: var(--dark-gray);">
+                        <li style="padding: 0.5rem 0;
+                                       display: flex;
+                                       align-items: start;
+                                       gap: 0.5rem;">
+                            <span>✓</span>
+                            <span>Free shipping on all orders</span>
+                        </li>
+                        <li style="padding: 0.5rem 0;
+                                       display: flex;
+                                       align-items: start;
+                                       gap: 0.5rem;">
+                            <span>✓</span>
+                            <span>30-day hassle-free returns</span>
+                        </li>
+                        <li style="padding: 0.5rem 0;
+                                       display: flex;
+                                       align-items: start;
+                                       gap: 0.5rem;">
+                            <span>✓</span>
+                            <span>1-year warranty included</span>
+                        </li>
+                        <li style="padding: 0.5rem 0;
+                                       display: flex;
+                                       align-items: start;
+                                       gap: 0.5rem;">
+                            <span>✓</span>
+                            <span>Expert customer support</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    /* Custom styling for quantity input arrows */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        opacity: 1;
+    }
+
+    /* Hover effects */
+    .btn:hover {
+        transform: translateY(-1px);
+        transition: all 0.25s ease;
+    }
+
+    /* Breadcrumb styling */
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin-bottom: 1rem;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--secondary-warm-gray);
+    }
+
+    .breadcrumb-item a {
+        color: var(--primary-gold);
+        text-decoration: none;
+    }
+
+    .breadcrumb-item.active {
+        color: var(--dark-gray);
+    }
+</style>

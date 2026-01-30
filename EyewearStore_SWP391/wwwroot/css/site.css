@@ -657,3 +657,75 @@ input[type="number"]::-webkit-outer-spin-button {
     font-weight: 500;
     border-radius: 6px;
 }
+/* ===== User dropdown improvements (append to site.css) ===== */
+.navbar .avatar-inline {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    font-size: 1rem;
+}
+
+.user-menu {
+    min-width: 260px;
+    padding: 0.4rem;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+    .user-menu .avatar {
+        width: 44px;
+        height: 44px;
+        background: #f4f6f7;
+        color: #6c757d;
+        border-radius: 50%;
+        font-size: 1.05rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .user-menu .user-meta .user-fullname {
+        color: #222;
+        font-size: 0.95rem;
+    }
+
+    .user-menu .user-meta .small,
+    .user-menu .user-meta .text-muted {
+        font-size: 0.82rem;
+    }
+
+    .user-menu .role-badge {
+        color: #0d6efd; /* accent color for role */
+        font-weight: 600;
+    }
+
+    /* style dropdown items so icons + text align nicely */
+    .user-menu .dropdown-item {
+        padding: 0.55rem 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    /* logout button looks like link but full width*/
+    .user-menu form .btn-link.dropdown-item {
+        text-align: left;
+        width: 100%;
+        color: #dc3545;
+    }
+
+/* responsive small tweak */
+@media (max-width: 420px) {
+    .user-menu {
+        min-width: 200px;
+    }
+
+    .navbar .user-name {
+        display: none;
+    }
+    /* hide long name on very small screens */
+}

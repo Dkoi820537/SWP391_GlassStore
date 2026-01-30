@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -21,7 +22,7 @@
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#mainNavbar">
+                        data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
@@ -31,7 +32,7 @@
                             <a class="nav-link" asp-page="/Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Shop</a>
+                            <a class="nav-link" href="/Products">Shop</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#services">Services</a>
@@ -45,50 +46,54 @@
                                 <a class="nav-link text-dark" asp-page="/Orders/Index">My Orders</a>
                             </li>
                         }
-                        @if (User.IsInRole("admin"))
+                        @if (User.IsInRole("Administrator"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-danger" asp-page="/Admin/Index">
-                                    Admin
-                                </a>
+                                <a class="nav-link text-danger" asp-page="/Admin/Index">Admin</a>
                             </li>
                         }
                     </ul>
-                    <ul class="navbar-nav">
 
-                        @* --- Cart summary partial (badge + dropdown) --- *@
+                    <ul class="navbar-nav align-items-center">
+                        @* Cart summary partial (badge + dropdown). Ensure Pages/Shared/_CartSummary.cshtml exists *@
                         @await Html.PartialAsync("_CartSummary")
 
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle"
-                                   href="#"
-                                   id="userDropdown"
-                                   role="button"
-                                   data-bs-toggle="dropdown">
-
-                                    👤 @User.Identity.Name
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown"
+                                   role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="me-2 avatar-inline" aria-hidden="true">👤</span>
+                                    <span class="user-name">@User.Identity.Name</span>
                                 </a>
 
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li class="dropdown-item text-muted">
-                                        Role: @User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value
+                                <ul class="dropdown-menu dropdown-menu-end user-menu" aria-labelledby="userDropdown">
+                                    <li class="px-3 py-2">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar rounded-circle d-flex align-items-center justify-content-center me-3">
+                                                <span>👤</span>
+                                            </div>
+
+                                            <div class="user-meta">
+                                                <div class="fw-bold user-fullname">@User.Identity.Name</div>
+                                                <div class="text-muted small">Role: <span class="role-badge">@User.FindFirst(ClaimTypes.Role)?.Value</span></div>
+                                            </div>
+                                        </div>
                                     </li>
 
                                     <li><hr class="dropdown-divider" /></li>
 
                                     <li>
-                                        <a class="dropdown-item" asp-page="/Profile/Index">
-                                            Profile
+                                        <a class="dropdown-item d-flex align-items-center" asp-page="/Profile/Index">
+                                            <span class="me-2">📝</span> Profile
                                         </a>
                                     </li>
 
                                     <li>
-                                        <form method="post" action="/Account/Logout">
-                                            <button type="submit"
-                                                    class="dropdown-item text-danger">
-                                                Logout
+                                        <form method="post" asp-page="/Account/Logout" class="m-0">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-link dropdown-item text-danger p-0 d-flex align-items-center" style="width:100%;">
+                                                <span class="me-2">🚪</span> Logout
                                             </button>
                                         </form>
                                     </li>
@@ -98,18 +103,13 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-page="/Account/Login">
-                                    Login
-                                </a>
+                                <a class="nav-link" asp-page="/Account/Login">Login</a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link" asp-page="/Account/Register">
-                                    Register
-                                </a>
+                                <a class="nav-link" asp-page="/Account/Register">Register</a>
                             </li>
                         }
-
                     </ul>
                 </div>
             </div>

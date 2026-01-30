@@ -9,6 +9,7 @@ using EyewearStore_SWP391.Models;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
+using System.Collections.Generic;
 
 namespace EyewearStore_SWP391.Pages.Account
 {
@@ -37,13 +38,12 @@ namespace EyewearStore_SWP391.Pages.Account
         [BindProperty]
         public LoginViewModel Input { get; set; }
 
-        // Nhận message từ TempData
         [TempData]
         public string SuccessMessage { get; set; }
 
         public void OnGet()
         {
-            // SuccessMessage sẽ tự được map từ TempData nếu có
+            // nếu cần, có thể set TempData -> SuccessMessage sẽ tự map.
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -70,7 +70,7 @@ namespace EyewearStore_SWP391.Pages.Account
                 return Page();
             }
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new Claim(ClaimTypes.Name, user.FullName ?? user.Email),
@@ -84,7 +84,11 @@ namespace EyewearStore_SWP391.Pages.Account
             var props = new AuthenticationProperties
             {
                 IsPersistent = Input.RememberMe,
-                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
+                ExpiresUtc = Input.RememberMe
+                    ? DateTimeOffset.UtcNow.AddDays(7)   // remember for 7 days (tùy bạn chỉnh)
+                    : DateTimeOffset.UtcNow.AddHours(8),
+                AllowRefresh = true,
+                IssuedUtc = DateTimeOffset.UtcNow
             };
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);

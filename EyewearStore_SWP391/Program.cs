@@ -1,10 +1,10 @@
 using EyewearStore_SWP391.Models;
 using EyewearStore_SWP391.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +32,6 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 
-    // Include XML comments for Swagger documentation
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
     if (File.Exists(xmlPath))
@@ -41,19 +40,40 @@ builder.Services.AddSwaggerGen(options =>
     }
 });
 
-// Register your cart service
+// Register application services
 builder.Services.AddScoped<ICartService, CartService>();
-
-// Register lens service
 builder.Services.AddScoped<ILensService, LensService>();
 
-// Authentication
+// Authentication (cookie) - secure defaults and RememberMe handling
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
+        // Paths
         options.LoginPath = "/Account/Login";
         options.AccessDeniedPath = "/Account/AccessDenied";
+
+        // Cookie settings
+        options.Cookie.Name = "LensadeAuth";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // đổi thành Always khi deploy HTTPS
+        options.Cookie.SameSite = SameSiteMode.Lax;
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+
+        // Optional: event to avoid redirect for API calls
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnRedirectToLogin = ctx =>
+            {
+                if (ctx.Request.Path.StartsWithSegments("/api") && !ctx.Request.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))
+                {
+                    ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Task.CompletedTask;
+                }
+                ctx.Response.Redirect(ctx.RedirectUri);
+                return Task.CompletedTask;
+            }
+        };
     });
 
 builder.Services.AddAuthorization();
@@ -67,7 +87,6 @@ if (!app.Environment.IsDevelopment())
 }
 else
 {
-    // Enable Swagger UI in development
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
@@ -84,21 +103,9 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Map API Controllers
+// Map controllers & razor pages
 app.MapControllers();
 
 app.MapRazorPages();
-
-app.MapGet("/Account/Logout", async (HttpContext http) =>
-{
-    await http.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-    http.Response.Redirect("/Account/Login");
-});
-
-app.MapPost("/Account/Logout", async (HttpContext http) =>
-{
-    await http.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-    http.Response.Redirect("/Account/Login");
-});
 
 app.Run();

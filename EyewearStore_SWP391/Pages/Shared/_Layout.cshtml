@@ -46,7 +46,7 @@
                                 <a class="nav-link text-dark" asp-page="/Orders/Index">My Orders</a>
                             </li>
                         }
-                        @if (User.IsInRole("Administrator"))
+                        @if (User.IsInRole("admin"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-danger" asp-page="/Admin/Index">Admin</a>

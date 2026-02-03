@@ -1,0 +1,238 @@
+USE EyewearStore;
+GO
+
+-- =========================
+-- USERS
+-- =========================
+CREATE TABLE dbo.users (
+    user_id INT IDENTITY PRIMARY KEY,
+    email NVARCHAR(255) NOT NULL,
+    password_hash NVARCHAR(255) NOT NULL,
+    full_name NVARCHAR(100) NOT NULL,
+    phone NVARCHAR(20),
+    role NVARCHAR(20) NOT NULL,
+    is_active BIT NOT NULL DEFAULT 1,
+    created_at DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+);
+GO
+
+-- =========================
+-- ADDRESSES
+-- =========================
+CREATE TABLE dbo.addresses (
+    address_id INT IDENTITY PRIMARY KEY,
+    user_id INT NOT NULL,
+    receiver_name NVARCHAR(100) NOT NULL,
+    phone NVARCHAR(20) NOT NULL,
+    address_line NVARCHAR(500) NOT NULL,
+    is_default BIT NOT NULL DEFAULT 0,
+    created_at DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+);
+GO
+
+-- =========================
+-- PRODUCT (PARENT)
+-- =========================
+CREATE TABLE dbo.product (
+    product_id INT IDENTITY PRIMARY KEY,
+    sku NVARCHAR(50) NOT NULL,
+    name NVARCHAR(255) NOT NULL,
+    description NVARCHAR(MAX),
+    product_type NVARCHAR(20) NOT NULL,
+    price DECIMAL(18,2) NOT NULL,
+    currency CHAR(3) NOT NULL,
+    inventory_qty INT NULL,
+    attributes NVARCHAR(MAX),
+    is_active BIT NOT NULL DEFAULT 1,
+    created_at DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    updated_at DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+);
+GO
+
+-- =========================
+-- FRAMES (TPT)
+-- =========================
+CREATE TABLE dbo.frames (
+    product_id INT PRIMARY KEY,
+    frame_material NVARCHAR(100),
+    frame_type NVARCHAR(50),
+    bridge_width DECIMAL(5,2),
+    temple_length DECIMAL(5,2)
+);
+GO
+
+-- =========================
+-- LENSES (TPT)
+-- =========================
+CREATE TABLE dbo.lenses (
+    product_id INT PRIMARY KEY,
+    lens_type NVARCHAR(50),
+    lens_index DECIMAL(4,2),
+    is_prescription BIT NOT NULL
+);
+GO
+
+-- =========================
+-- BUNDLES (TPT)
+-- =========================
+CREATE TABLE dbo.bundles (
+    product_id INT PRIMARY KEY,
+    bundle_note NVARCHAR(255)
+);
+GO
+
+-- =========================
+-- BUNDLE ITEMS
+-- =========================
+CREATE TABLE dbo.bundle_items (
+    bundle_item_id INT IDENTITY PRIMARY KEY,
+    bundle_product_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1
+);
+GO
+
+-- =========================
+-- SERVICES (NOT PRODUCTS)
+-- =========================
+CREATE TABLE dbo.services (
+    service_id INT IDENTITY PRIMARY KEY,
+    name NVARCHAR(200) NOT NULL,
+    price DECIMAL(18,2) NOT NULL,
+    created_at DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+);
+GO
+
+-- =========================
+-- PRODUCT IMAGES
+-- =========================
+CREATE TABLE dbo.product_images (
+    image_id INT IDENTITY PRIMARY KEY,
+    product_id INT NOT NULL,
+    image_url NVARCHAR(500) NOT NULL,
+    alt_text NVARCHAR(255),
+    is_primary BIT NOT NULL DEFAULT 0,
+    sort_order INT NOT NULL DEFAULT 0,
+    is_active BIT NOT NULL DEFAULT 1,
+    created_at DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+);
+GO
+
+-- =========================
+-- CARTS
+-- =========================
+CREATE TABLE dbo.carts (
+    cart_id INT IDENTITY PRIMARY KEY,
+    user_id INT NOT NULL,
+    created_at DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+);
+GO
+
+-- =========================
+-- CART ITEMS
+-- =========================
+CREATE TABLE dbo.cart_items (
+    cart_item_id INT IDENTITY PRIMARY KEY,
+    cart_id INT NOT NULL,
+    product_id INT NOT NULL,
+    service_id INT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    temp_prescription_json NVARCHAR(MAX)
+);
+GO
+
+-- =========================
+-- PRESCRIPTION PROFILES
+-- =========================
+CREATE TABLE dbo.prescription_profiles (
+    prescription_id INT IDENTITY PRIMARY KEY,
+    user_id INT NOT NULL,
+    profile_name NVARCHAR(100),
+    left_sph DECIMAL(5,2),
+    left_cyl DECIMAL(5,2),
+    left_axis INT,
+    right_sph DECIMAL(5,2),
+    right_cyl DECIMAL(5,2),
+    right_axis INT,
+    is_active BIT NOT NULL DEFAULT 0,
+    created_at DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+);
+GO
+
+-- =========================
+-- ORDERS
+-- =========================
+CREATE TABLE dbo.orders (
+    order_id INT IDENTITY PRIMARY KEY,
+    user_id INT NOT NULL,
+    address_id INT NOT NULL,
+    status NVARCHAR(20) NOT NULL,
+    total_amount DECIMAL(18,2) NOT NULL,
+    payment_method NVARCHAR(50),
+    created_at DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+);
+GO
+
+-- =========================
+-- ORDER ITEMS
+-- =========================
+CREATE TABLE dbo.order_items (
+    order_item_id INT IDENTITY PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    prescription_id INT NULL,
+    unit_price DECIMAL(18,2) NOT NULL,
+    quantity INT NOT NULL,
+    is_bundle BIT NOT NULL DEFAULT 0,
+    snapshot_json NVARCHAR(MAX)
+);
+GO
+
+-- =========================
+-- SHIPMENTS
+-- =========================
+CREATE TABLE dbo.shipments (
+    shipment_id INT IDENTITY PRIMARY KEY,
+    order_id INT NOT NULL,
+    carrier NVARCHAR(100),
+    tracking_number NVARCHAR(100),
+    status NVARCHAR(20),
+    shipped_at DATETIME2,
+    delivered_at DATETIME2
+);
+GO
+
+-- =========================
+-- SHIPMENT STATUS HISTORY
+-- =========================
+CREATE TABLE dbo.shipment_status_history (
+    history_id INT IDENTITY PRIMARY KEY,
+    shipment_id INT NOT NULL,
+    status NVARCHAR(20),
+    created_at DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+);
+GO
+
+-- =========================
+-- RETURNS
+-- =========================
+CREATE TABLE dbo.returns (
+    return_id INT IDENTITY PRIMARY KEY,
+    order_item_id INT NOT NULL,
+    reason NVARCHAR(500),
+    status NVARCHAR(20),
+    created_at DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+);
+GO
+
+-- =========================
+-- WISHLIST
+-- =========================
+CREATE TABLE dbo.wishlist (
+    wishlist_id INT IDENTITY PRIMARY KEY,
+    user_id INT NOT NULL,
+    product_id INT NOT NULL,
+    notify_on_restock BIT NOT NULL DEFAULT 1,
+    created_at DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+);
+GO

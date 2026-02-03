@@ -26,7 +26,7 @@
 
     <!-- Form -->
     <form id="lensForm" class="admin-form" novalidate>
-        <input type="hidden" name="lensId" value="">
+        <input type="hidden" name="productId" value="">
 
         <!-- Basic Information -->
         <div class="form-section">
@@ -34,52 +34,83 @@
             
             <div class="form-row">
                 <div class="form-group">
-                    <label for="lensType">Lens Type <span style="color: var(--error);">*</span></label>
-                    <select id="lensType" name="lensType" required aria-required="true">
+                    <label for="sku">SKU <span style="color: var(--error);">*</span></label>
+                    <input type="text" 
+                           id="sku" 
+                           name="sku" 
+                           maxlength="50"
+                           required 
+                           aria-required="true"
+                           placeholder="e.g., LENS-SV-001">
+                    <span class="error-message">SKU is required</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Name <span style="color: var(--error);">*</span></label>
+                    <input type="text" 
+                           id="name" 
+                           name="name" 
+                           maxlength="255"
+                           required 
+                           aria-required="true"
+                           placeholder="e.g., Single Vision Clear Lens">
+                    <span class="error-message">Name is required</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" 
+                          name="description" 
+                          rows="3"
+                          placeholder="Enter lens description..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="lensType">Lens Type</label>
+                    <select id="lensType" name="lensType">
                         <option value="">Select lens type</option>
                         <option value="Single Vision">Single Vision</option>
                         <option value="Bifocal">Bifocal</option>
                         <option value="Progressive">Progressive</option>
                         <option value="Reading">Reading</option>
                     </select>
-                    <span class="error-message">Lens type is required</span>
                 </div>
 
                 <div class="form-group">
-                    <label for="indexValue">Index Value</label>
+                    <label for="lensIndex">Lens Index</label>
                     <input type="number" 
-                           id="indexValue" 
-                           name="indexValue" 
+                           id="lensIndex" 
+                           name="lensIndex" 
                            step="0.01" 
                            min="1.0" 
                            max="2.0" 
                            placeholder="e.g., 1.50, 1.60, 1.67"
-                           aria-describedby="indexValueHelp">
-                    <small id="indexValueHelp" style="color: var(--secondary-warm-gray);">
+                           aria-describedby="lensIndexHelp">
+                    <small id="lensIndexHelp" style="color: var(--secondary-warm-gray);">
                         Refractive index between 1.0 and 2.0
                     </small>
-                    <span class="error-message">Index value must be between 1.0 and 2.0</span>
+                    <span class="error-message">Lens index must be between 1.0 and 2.0</span>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="coating">Coating</label>
-                <input type="text" 
-                       id="coating" 
-                       name="coating" 
-                       maxlength="100"
-                       placeholder="e.g., Anti-Reflective, Blue Light Filter, Transition">
-                <span class="error-message">Coating cannot exceed 100 characters</span>
+                <label for="isPrescription">Prescription Required</label>
+                <select id="isPrescription" name="isPrescription">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
             </div>
         </div>
 
         <!-- Pricing & Stock -->
         <div class="form-section">
-            <h2 class="form-section-title">Pricing & Stock</h2>
+            <h2 class="form-section-title">Pricing & Inventory</h2>
             
             <div class="form-row">
                 <div class="form-group">
-                    <label for="price">Price ($) <span style="color: var(--error);">*</span></label>
+                    <label for="price">Price <span style="color: var(--error);">*</span></label>
                     <input type="number" 
                            id="price" 
                            name="price" 
@@ -92,11 +123,29 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="stockStatus">Stock Status</label>
-                    <select id="stockStatus" name="stockStatus">
-                        <option value="in-stock">In Stock</option>
-                        <option value="low-stock">Low Stock</option>
-                        <option value="out-of-stock">Out of Stock</option>
+                    <label for="currency">Currency</label>
+                    <select id="currency" name="currency">
+                        <option value="VND" selected>VND</option>
+                        <option value="USD">USD</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inventoryQty">Inventory Quantity</label>
+                    <input type="number" 
+                           id="inventoryQty" 
+                           name="inventoryQty" 
+                           min="0" 
+                           placeholder="Optional">
+                </div>
+
+                <div class="form-group">
+                    <label for="isActive">Status</label>
+                    <select id="isActive" name="isActive">
+                        <option value="true" selected>Active</option>
+                        <option value="false">Inactive</option>
                     </select>
                 </div>
             </div>

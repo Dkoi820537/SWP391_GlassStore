@@ -53,7 +53,7 @@ public class LensesController : ControllerBase
 
             return CreatedAtAction(
                 nameof(GetLensById),
-                new { id = responseDto.LensId },
+                new { id = responseDto.ProductId },
                 responseDto);
         }
         catch (Exception ex)
@@ -66,13 +66,13 @@ public class LensesController : ControllerBase
     /// <summary>
     /// Gets all lenses with optional filtering, searching, sorting, and pagination
     /// </summary>
-    /// <param name="search">Search term for lens type or coating</param>
+    /// <param name="search">Search term for name, description, or lens type</param>
     /// <param name="lensType">Filter by lens type</param>
-    /// <param name="coating">Filter by coating</param>
     /// <param name="priceMin">Minimum price filter</param>
     /// <param name="priceMax">Maximum price filter</param>
-    /// <param name="stockStatus">Filter by stock status</param>
-    /// <param name="sortBy">Sort field (price, lensType, createdAt)</param>
+    /// <param name="isActive">Filter by active status</param>
+    /// <param name="isPrescription">Filter by prescription requirement</param>
+    /// <param name="sortBy">Sort field (price, name, lensType, createdAt)</param>
     /// <param name="sortOrder">Sort order (asc, desc)</param>
     /// <param name="pageNumber">Page number (default: 1)</param>
     /// <param name="pageSize">Page size (default: 10, max: 100)</param>
@@ -85,10 +85,10 @@ public class LensesController : ControllerBase
     public async Task<IActionResult> GetAllLenses(
         [FromQuery] string? search = null,
         [FromQuery] string? lensType = null,
-        [FromQuery] string? coating = null,
         [FromQuery] decimal? priceMin = null,
         [FromQuery] decimal? priceMax = null,
-        [FromQuery] string? stockStatus = null,
+        [FromQuery] bool? isActive = null,
+        [FromQuery] bool? isPrescription = null,
         [FromQuery] string sortBy = "createdAt",
         [FromQuery] string sortOrder = "desc",
         [FromQuery] int pageNumber = 1,
@@ -97,8 +97,8 @@ public class LensesController : ControllerBase
         try
         {
             var response = await _lensService.GetAllLensesAsync(
-                search, lensType, coating, priceMin, priceMax,
-                stockStatus, sortBy, sortOrder, pageNumber, pageSize);
+                search, lensType, priceMin, priceMax,
+                isActive, isPrescription, sortBy, sortOrder, pageNumber, pageSize);
 
             return Ok(response);
         }
@@ -110,9 +110,9 @@ public class LensesController : ControllerBase
     }
 
     /// <summary>
-    /// Gets a single lens by ID
+    /// Gets a single lens by ID (ProductId)
     /// </summary>
-    /// <param name="id">The lens ID</param>
+    /// <param name="id">The product ID</param>
     /// <returns>The lens product</returns>
     /// <response code="200">Returns the lens</response>
     /// <response code="404">If the lens is not found</response>
@@ -144,7 +144,7 @@ public class LensesController : ControllerBase
     /// <summary>
     /// Updates an existing lens product
     /// </summary>
-    /// <param name="id">The lens ID to update</param>
+    /// <param name="id">The product ID to update</param>
     /// <param name="updateDto">The updated lens data</param>
     /// <returns>The updated lens product</returns>
     /// <response code="200">Returns the updated lens</response>
@@ -187,17 +187,16 @@ public class LensesController : ControllerBase
     }
 
     /// <summary>
-    /// Soft deletes a lens by setting StockStatus to "out-of-stock"
+    /// Soft deletes a lens by setting IsActive to false
     /// </summary>
-    /// <param name="id">The lens ID to delete</param>
+    /// <param name="id">The product ID to delete</param>
     /// <returns>No content on success</returns>
     /// <response code="204">The lens was successfully soft deleted</response>
     /// <response code="404">If the lens is not found</response>
     /// <response code="500">If there was an internal server error</response>
     /// <remarks>
-    /// Note: The Lense model does not have an IsActive property.
-    /// Soft delete is implemented by setting StockStatus to "out-of-stock".
-    /// Valid StockStatus values per DB constraint: "in-stock", "low-stock", "out-of-stock".
+    /// Soft delete is implemented by setting IsActive to false.
+    /// The product will no longer appear in active product listings.
     /// </remarks>
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

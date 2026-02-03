@@ -467,3 +467,4 @@ D:\SWP391_GlassStore\EyewearStore_SWP391\bin\Debug\net8.0\Swashbuckle.AspNetCore
 D:\SWP391_GlassStore\EyewearStore_SWP391\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 D:\SWP391_GlassStore\EyewearStore_SWP391\obj\Debug\net8.0\EyewearStore_SWP391.MvcApplicationPartsAssemblyInfo.cs
 D:\SWP391_GlassStore\EyewearStore_SWP391\obj\Debug\net8.0\EyewearStore_SWP391.xml
+D:\Code\Source\SWP391 project\EyewearStore_SWP391\bin\Debug\net8.0\appsettings.Example.json

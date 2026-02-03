@@ -17,17 +17,18 @@ public partial class User
 
     public string Role { get; set; } = null!;
 
-    public string Status { get; set; } = null!;
+    public bool IsActive { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
+    // Navigation properties
     public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();
-
-    public virtual ICollection<Bundle> Bundles { get; set; } = new List<Bundle>();
 
     public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public virtual ICollection<PrescriptionProfile> PrescriptionProfiles { get; set; } = new List<PrescriptionProfile>();
+
+    public virtual ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
 }

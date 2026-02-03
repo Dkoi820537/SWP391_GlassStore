@@ -7,15 +7,14 @@ public partial class BundleItem
 {
     public int BundleItemId { get; set; }
 
-    public int BundleId { get; set; }
+    public int BundleProductId { get; set; }
 
-    public string ItemType { get; set; } = null!;
-
-    public int ItemId { get; set; }
-
-    public bool IsRequired { get; set; }
+    public int ProductId { get; set; }
 
     public int Quantity { get; set; }
 
-    public virtual Bundle Bundle { get; set; } = null!;
+    // Navigation properties
+    public virtual Bundle BundleProduct { get; set; } = null!;
+
+    public virtual Product Product { get; set; } = null!;
 }

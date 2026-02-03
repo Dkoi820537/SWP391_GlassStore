@@ -13,18 +13,13 @@ public partial class Shipment
 
     public string? TrackingNumber { get; set; }
 
-    public string? TrackingUrl { get; set; }
-
     public string? Status { get; set; }
 
     public DateTime? ShippedAt { get; set; }
 
     public DateTime? DeliveredAt { get; set; }
 
-    public string? Notes { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
+    // Navigation properties
     public virtual Order Order { get; set; } = null!;
 
     public virtual ICollection<ShipmentStatusHistory> ShipmentStatusHistories { get; set; } = new List<ShipmentStatusHistory>();

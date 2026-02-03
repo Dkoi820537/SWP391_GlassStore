@@ -3,29 +3,14 @@ using System.Collections.Generic;
 
 namespace EyewearStore_SWP391.Models;
 
-public partial class Bundle
+/// <summary>
+/// Bundle entity - inherits from Product (TPT inheritance).
+/// Maps to the 'bundles' table.
+/// </summary>
+public class Bundle : Product
 {
-    public int BundleId { get; set; }
+    public string? BundleNote { get; set; }
 
-    public string Name { get; set; } = null!;
-
-    public string? Description { get; set; }
-
-    public decimal BundlePrice { get; set; }
-
-    public bool IsActive { get; set; }
-
-    public int? CreatedBy { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
+    // Navigation properties
     public virtual ICollection<BundleItem> BundleItems { get; set; } = new List<BundleItem>();
-
-    public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
-
-    public virtual User? CreatedByNavigation { get; set; }
-
-    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }

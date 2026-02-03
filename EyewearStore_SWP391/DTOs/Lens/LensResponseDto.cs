@@ -6,24 +6,24 @@ namespace EyewearStore_SWP391.DTOs.Lens;
 public class LensResponseDto
 {
     /// <summary>
-    /// The unique identifier of the lens
+    /// The unique identifier of the product (ProductId)
     /// </summary>
-    public int LensId { get; set; }
+    public int ProductId { get; set; }
 
     /// <summary>
-    /// The type of lens (e.g., Single Vision, Bifocal, Progressive)
+    /// The SKU (Stock Keeping Unit) for the product
     /// </summary>
-    public string LensType { get; set; } = null!;
+    public string Sku { get; set; } = null!;
 
     /// <summary>
-    /// The refractive index value of the lens
+    /// The name of the lens product
     /// </summary>
-    public decimal? IndexValue { get; set; }
+    public string Name { get; set; } = null!;
 
     /// <summary>
-    /// The coating applied to the lens
+    /// The description of the lens product
     /// </summary>
-    public string? Coating { get; set; }
+    public string? Description { get; set; }
 
     /// <summary>
     /// The price of the lens product
@@ -31,12 +31,49 @@ public class LensResponseDto
     public decimal Price { get; set; }
 
     /// <summary>
-    /// The stock status of the lens
+    /// The currency code
     /// </summary>
-    public string? StockStatus { get; set; }
+    public string Currency { get; set; } = null!;
+
+    /// <summary>
+    /// The inventory quantity
+    /// </summary>
+    public int? InventoryQty { get; set; }
+
+    /// <summary>
+    /// Whether the product is active
+    /// </summary>
+    public bool IsActive { get; set; }
 
     /// <summary>
     /// The date and time when the lens was created
     /// </summary>
     public DateTime CreatedAt { get; set; }
+
+    /// <summary>
+    /// The date and time when the lens was last updated
+    /// </summary>
+    public DateTime UpdatedAt { get; set; }
+
+    // Lens-specific properties
+
+    /// <summary>
+    /// The type of lens (e.g., Single Vision, Bifocal, Progressive)
+    /// </summary>
+    public string? LensType { get; set; }
+
+    /// <summary>
+    /// The refractive index value of the lens
+    /// </summary>
+    public decimal? LensIndex { get; set; }
+
+    /// <summary>
+    /// Whether this lens requires a prescription
+    /// </summary>
+    public bool IsPrescription { get; set; }
+
+    /// <summary>
+    /// Primary image URL for the product
+    /// </summary>
+    public string? PrimaryImageUrl { get; set; }
 }

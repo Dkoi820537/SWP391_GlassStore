@@ -9,7 +9,7 @@ public partial class PrescriptionProfile
 
     public int UserId { get; set; }
 
-    public string ProfileName { get; set; } = null!;
+    public string? ProfileName { get; set; }
 
     public decimal? LeftSph { get; set; }
 
@@ -27,7 +27,8 @@ public partial class PrescriptionProfile
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-
+    // Navigation properties
     public virtual User User { get; set; } = null!;
+
+    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }

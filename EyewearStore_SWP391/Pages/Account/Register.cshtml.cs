@@ -15,14 +15,14 @@ namespace EyewearStore_SWP391.Pages.Account
     public class RegisterViewModel
     {
         [Required, EmailAddress]
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
 
         [Required, MinLength(6)]
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public string Password { get; set; } = null!;
 
         [Required]
-        public string FullName { get; set; }
+        public string FullName { get; set; } = null!;
 
         [Phone]
         public string? Phone { get; set; }
@@ -40,7 +40,7 @@ namespace EyewearStore_SWP391.Pages.Account
         }
 
         [BindProperty]
-        public RegisterViewModel Input { get; set; }
+        public RegisterViewModel Input { get; set; } = new();
 
         public void OnGet() { }
 
@@ -61,7 +61,7 @@ namespace EyewearStore_SWP391.Pages.Account
                 FullName = Input.FullName,
                 Phone = Input.Phone,
                 Role = "Customer",
-                Status = "Active",
+                IsActive = true,
                 CreatedAt = DateTime.UtcNow
             };
 

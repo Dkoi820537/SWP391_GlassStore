@@ -9,15 +9,10 @@ public partial class ShipmentStatusHistory
 
     public int ShipmentId { get; set; }
 
-    public string Status { get; set; } = null!;
-
-    public string? StatusMessage { get; set; }
-
-    public string? Location { get; set; }
-
-    public string? UpdatedBy { get; set; }
+    public string? Status { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
+    // Navigation properties
     public virtual Shipment Shipment { get; set; } = null!;
 }

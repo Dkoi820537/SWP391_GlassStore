@@ -42,7 +42,7 @@
     <div class="modal-content">
         <h2 id="deleteModalTitle" class="modal-title">Confirm Delete</h2>
         <div class="modal-body">
-            <p>Are you sure you want to delete this lens? This action will mark the lens as inactive (out of stock).</p>
+            <p>Are you sure you want to delete this lens? This action will mark the lens as inactive.</p>
         </div>
         <div class="modal-actions">
             <button type="button" class="btn btn-secondary" onclick="LensAdmin.hideDeleteModal()">Cancel</button>
@@ -63,7 +63,7 @@
     <script src="~/js/lenses-admin.js" asp-append-version="true"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            LensAdmin.init({ page: 'details', lensId: @Model.LensId });
+            LensAdmin.init({ page: 'details', productId: @Model.ProductId });
         });
     </script>
 }

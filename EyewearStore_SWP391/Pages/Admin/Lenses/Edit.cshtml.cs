@@ -11,15 +11,15 @@ namespace EyewearStore_SWP391.Pages.Admin.Lenses;
 public class EditModel : PageModel
 {
     /// <summary>
-    /// The lens ID from query parameter
+    /// The product ID from query parameter
     /// </summary>
     [BindProperty(SupportsGet = true)]
     public int Id { get; set; }
 
     /// <summary>
-    /// Lens ID to pass to the view
+    /// Product ID to pass to the view
     /// </summary>
-    public int LensId => Id;
+    public int ProductId => Id;
 
     /// <summary>
     /// Handles GET request - form data is loaded via JavaScript/API

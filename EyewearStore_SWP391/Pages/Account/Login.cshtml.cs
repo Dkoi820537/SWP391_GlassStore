@@ -16,10 +16,10 @@ namespace EyewearStore_SWP391.Pages.Account
     public class LoginViewModel
     {
         [Required, EmailAddress]
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
 
         [Required, DataType(DataType.Password)]
-        public string Password { get; set; }
+        public string Password { get; set; } = null!;
 
         public bool RememberMe { get; set; }
     }
@@ -36,10 +36,10 @@ namespace EyewearStore_SWP391.Pages.Account
         }
 
         [BindProperty]
-        public LoginViewModel Input { get; set; }
+        public LoginViewModel Input { get; set; } = new();
 
         [TempData]
-        public string SuccessMessage { get; set; }
+        public string SuccessMessage { get; set; } = null!;
 
         public void OnGet()
         {
@@ -57,7 +57,7 @@ namespace EyewearStore_SWP391.Pages.Account
                 return Page();
             }
 
-            if (user.Status != "Active")
+            if (!user.IsActive)
             {
                 ModelState.AddModelError("", "Tài khoản không được phép đăng nhập");
                 return Page();

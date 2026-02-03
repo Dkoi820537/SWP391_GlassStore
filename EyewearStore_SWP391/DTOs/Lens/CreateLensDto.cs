@@ -8,35 +8,65 @@ namespace EyewearStore_SWP391.DTOs.Lens;
 public class CreateLensDto
 {
     /// <summary>
-    /// The type of lens (e.g., Single Vision, Bifocal, Progressive)
+    /// The SKU (Stock Keeping Unit) for the product
     /// </summary>
-    [Required(ErrorMessage = "Lens type is required")]
-    [StringLength(50, ErrorMessage = "Lens type cannot exceed 50 characters")]
-    public string LensType { get; set; } = null!;
+    [Required(ErrorMessage = "SKU is required")]
+    [StringLength(50, ErrorMessage = "SKU cannot exceed 50 characters")]
+    public string Sku { get; set; } = null!;
 
     /// <summary>
-    /// The refractive index value of the lens (e.g., 1.50, 1.60, 1.67, 1.74)
+    /// The name of the lens product
     /// </summary>
-    [Range(1.0, 2.0, ErrorMessage = "Index value must be between 1.0 and 2.0")]
-    public decimal? IndexValue { get; set; }
+    [Required(ErrorMessage = "Name is required")]
+    [StringLength(255, ErrorMessage = "Name cannot exceed 255 characters")]
+    public string Name { get; set; } = null!;
 
     /// <summary>
-    /// The coating applied to the lens (e.g., Anti-Reflective, Blue Light Filter)
+    /// The description of the lens product
     /// </summary>
-    [StringLength(100, ErrorMessage = "Coating cannot exceed 100 characters")]
-    public string? Coating { get; set; }
+    public string? Description { get; set; }
 
     /// <summary>
     /// The price of the lens product
     /// </summary>
     [Required(ErrorMessage = "Price is required")]
-    [Range(0.01, 999999999999, ErrorMessage = "Price must be greater than 0")]
+    [Range(0.01, 999999999999.99, ErrorMessage = "Price must be greater than 0")]
     public decimal Price { get; set; }
 
     /// <summary>
-    /// The stock status of the lens. Valid values: "in-stock", "low-stock", "out-of-stock"
+    /// The currency code (e.g., VND, USD)
     /// </summary>
-    [StringLength(20, ErrorMessage = "Stock status cannot exceed 20 characters")]
-    [RegularExpression("^(in-stock|low-stock|out-of-stock)$", ErrorMessage = "Invalid stock status. Valid values are: in-stock, low-stock, out-of-stock")]
-    public string? StockStatus { get; set; }
+    [Required(ErrorMessage = "Currency is required")]
+    [StringLength(3, MinimumLength = 3, ErrorMessage = "Currency must be exactly 3 characters")]
+    public string Currency { get; set; } = "VND";
+
+    /// <summary>
+    /// The inventory quantity (optional)
+    /// </summary>
+    [Range(0, int.MaxValue, ErrorMessage = "Inventory quantity cannot be negative")]
+    public int? InventoryQty { get; set; }
+
+    /// <summary>
+    /// Whether the product is active
+    /// </summary>
+    public bool IsActive { get; set; } = true;
+
+    // Lens-specific properties
+
+    /// <summary>
+    /// The type of lens (e.g., Single Vision, Bifocal, Progressive)
+    /// </summary>
+    [StringLength(50, ErrorMessage = "Lens type cannot exceed 50 characters")]
+    public string? LensType { get; set; }
+
+    /// <summary>
+    /// The refractive index value of the lens (e.g., 1.50, 1.60, 1.67, 1.74)
+    /// </summary>
+    [Range(1.0, 2.0, ErrorMessage = "Lens index must be between 1.0 and 2.0")]
+    public decimal? LensIndex { get; set; }
+
+    /// <summary>
+    /// Whether this lens requires a prescription
+    /// </summary>
+    public bool IsPrescription { get; set; }
 }

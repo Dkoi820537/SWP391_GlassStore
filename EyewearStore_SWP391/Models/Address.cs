@@ -19,7 +19,8 @@ public partial class Address
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-
+    // Navigation properties
     public virtual User User { get; set; } = null!;
+
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }

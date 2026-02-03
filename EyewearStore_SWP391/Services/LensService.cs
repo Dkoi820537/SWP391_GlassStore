@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace EyewearStore_SWP391.Services;
 
 /// <summary>
-/// Service implementation for lens product operations
+/// Service implementation for lens product operations using TPT inheritance
 /// </summary>
 public class LensService : ILensService
 {
@@ -23,30 +23,40 @@ public class LensService : ILensService
     /// <inheritdoc />
     public async Task<LensResponseDto> CreateLensAsync(CreateLensDto createDto)
     {
-        var lens = new Lense
+        var lens = new Lens
         {
-            LensType = createDto.LensType,
-            IndexValue = createDto.IndexValue,
-            Coating = createDto.Coating,
+            // Base Product properties
+            Sku = createDto.Sku,
+            Name = createDto.Name,
+            Description = createDto.Description,
+            ProductType = "Lens",
             Price = createDto.Price,
-            StockStatus = createDto.StockStatus ?? "in-stock",
-            CreatedAt = DateTime.UtcNow
+            Currency = createDto.Currency,
+            InventoryQty = createDto.InventoryQty,
+            IsActive = createDto.IsActive,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+
+            // Lens-specific properties
+            LensType = createDto.LensType,
+            LensIndex = createDto.LensIndex,
+            IsPrescription = createDto.IsPrescription
         };
 
         await _context.Lenses.AddAsync(lens);
         await _context.SaveChangesAsync();
 
-        return MapToResponseDto(lens);
+        return await MapToResponseDtoAsync(lens);
     }
 
     /// <inheritdoc />
     public async Task<LensListResponseDto> GetAllLensesAsync(
         string? search = null,
         string? lensType = null,
-        string? coating = null,
         decimal? priceMin = null,
         decimal? priceMax = null,
-        string? stockStatus = null,
+        bool? isActive = null,
+        bool? isPrescription = null,
         string sortBy = "createdAt",
         string sortOrder = "desc",
         int pageNumber = 1,
@@ -57,27 +67,23 @@ public class LensService : ILensService
         if (pageSize < 1) pageSize = 10;
         if (pageSize > 100) pageSize = 100;
 
-        var query = _context.Lenses.AsQueryable();
+        // Use OfType<Lens>() to query TPT inheritance
+        var query = _context.Products.OfType<Lens>().AsQueryable();
 
-        // Search filter (lens type or coating)
+        // Search filter (name or description)
         if (!string.IsNullOrWhiteSpace(search))
         {
             var searchLower = search.ToLower();
             query = query.Where(l =>
-                l.LensType.ToLower().Contains(searchLower) ||
-                (l.Coating != null && l.Coating.ToLower().Contains(searchLower)));
+                l.Name.ToLower().Contains(searchLower) ||
+                (l.Description != null && l.Description.ToLower().Contains(searchLower)) ||
+                (l.LensType != null && l.LensType.ToLower().Contains(searchLower)));
         }
 
         // Filter by lens type
         if (!string.IsNullOrWhiteSpace(lensType))
         {
-            query = query.Where(l => l.LensType.ToLower() == lensType.ToLower());
-        }
-
-        // Filter by coating
-        if (!string.IsNullOrWhiteSpace(coating))
-        {
-            query = query.Where(l => l.Coating != null && l.Coating.ToLower() == coating.ToLower());
+            query = query.Where(l => l.LensType != null && l.LensType.ToLower() == lensType.ToLower());
         }
 
         // Filter by price range
@@ -91,10 +97,16 @@ public class LensService : ILensService
             query = query.Where(l => l.Price <= priceMax.Value);
         }
 
-        // Filter by stock status
-        if (!string.IsNullOrWhiteSpace(stockStatus))
+        // Filter by is_active
+        if (isActive.HasValue)
         {
-            query = query.Where(l => l.StockStatus != null && l.StockStatus.ToLower() == stockStatus.ToLower());
+            query = query.Where(l => l.IsActive == isActive.Value);
+        }
+
+        // Filter by is_prescription
+        if (isPrescription.HasValue)
+        {
+            query = query.Where(l => l.IsPrescription == isPrescription.Value);
         }
 
         // Apply sorting
@@ -112,9 +124,16 @@ public class LensService : ILensService
             .Take(pageSize)
             .ToListAsync();
 
+        // Map to response DTOs (with primary image)
+        var items = new List<LensResponseDto>();
+        foreach (var lens in lenses)
+        {
+            items.Add(await MapToResponseDtoAsync(lens));
+        }
+
         return new LensListResponseDto
         {
-            Items = lenses.Select(MapToResponseDto).ToList(),
+            Items = items,
             PageNumber = pageNumber,
             PageSize = pageSize,
             TotalCount = totalCount,
@@ -125,54 +144,68 @@ public class LensService : ILensService
     /// <inheritdoc />
     public async Task<LensResponseDto?> GetLensByIdAsync(int id)
     {
-        var lens = await _context.Lenses.FindAsync(id);
+        var lens = await _context.Products
+            .OfType<Lens>()
+            .FirstOrDefaultAsync(l => l.ProductId == id);
 
         if (lens == null)
         {
             return null;
         }
 
-        return MapToResponseDto(lens);
+        return await MapToResponseDtoAsync(lens);
     }
 
     /// <inheritdoc />
     public async Task<LensResponseDto?> UpdateLensAsync(int id, UpdateLensDto updateDto)
     {
-        var lens = await _context.Lenses.FindAsync(id);
+        var lens = await _context.Products
+            .OfType<Lens>()
+            .FirstOrDefaultAsync(l => l.ProductId == id);
 
         if (lens == null)
         {
             return null;
         }
 
-        // Update lens properties
-        lens.LensType = updateDto.LensType;
-        lens.IndexValue = updateDto.IndexValue;
-        lens.Coating = updateDto.Coating;
+        // Update base Product properties
+        lens.Sku = updateDto.Sku;
+        lens.Name = updateDto.Name;
+        lens.Description = updateDto.Description;
         lens.Price = updateDto.Price;
-        lens.StockStatus = updateDto.StockStatus;
+        lens.Currency = updateDto.Currency;
+        lens.InventoryQty = updateDto.InventoryQty;
+        lens.IsActive = updateDto.IsActive;
+        lens.UpdatedAt = DateTime.UtcNow;
 
-        _context.Lenses.Update(lens);
+        // Update Lens-specific properties
+        lens.LensType = updateDto.LensType;
+        lens.LensIndex = updateDto.LensIndex;
+        lens.IsPrescription = updateDto.IsPrescription;
+
+        _context.Products.Update(lens);
         await _context.SaveChangesAsync();
 
-        return MapToResponseDto(lens);
+        return await MapToResponseDtoAsync(lens);
     }
 
     /// <inheritdoc />
     public async Task<bool> DeleteLensAsync(int id)
     {
-        var lens = await _context.Lenses.FindAsync(id);
+        var lens = await _context.Products
+            .OfType<Lens>()
+            .FirstOrDefaultAsync(l => l.ProductId == id);
 
         if (lens == null)
         {
             return false;
         }
 
-        // Soft delete by setting stock status to "out-of-stock"
-        // Valid values per DB constraint: 'in-stock', 'low-stock', 'out-of-stock'
-        lens.StockStatus = "out-of-stock";
+        // Soft delete by setting IsActive to false
+        lens.IsActive = false;
+        lens.UpdatedAt = DateTime.UtcNow;
 
-        _context.Lenses.Update(lens);
+        _context.Products.Update(lens);
         await _context.SaveChangesAsync();
 
         return true;
@@ -181,26 +214,39 @@ public class LensService : ILensService
     #region Private Helper Methods
 
     /// <summary>
-    /// Maps a Lense entity to a LensResponseDto
+    /// Maps a Lens entity to a LensResponseDto
     /// </summary>
-    private static LensResponseDto MapToResponseDto(Lense lens)
+    private async Task<LensResponseDto> MapToResponseDtoAsync(Lens lens)
     {
+        // Get primary image URL
+        var primaryImage = await _context.ProductImages
+            .Where(pi => pi.ProductId == lens.ProductId && pi.IsPrimary && pi.IsActive)
+            .Select(pi => pi.ImageUrl)
+            .FirstOrDefaultAsync();
+
         return new LensResponseDto
         {
-            LensId = lens.LensId,
-            LensType = lens.LensType,
-            IndexValue = lens.IndexValue,
-            Coating = lens.Coating,
+            ProductId = lens.ProductId,
+            Sku = lens.Sku,
+            Name = lens.Name,
+            Description = lens.Description,
             Price = lens.Price,
-            StockStatus = lens.StockStatus,
-            CreatedAt = lens.CreatedAt
+            Currency = lens.Currency,
+            InventoryQty = lens.InventoryQty,
+            IsActive = lens.IsActive,
+            CreatedAt = lens.CreatedAt,
+            UpdatedAt = lens.UpdatedAt,
+            LensType = lens.LensType,
+            LensIndex = lens.LensIndex,
+            IsPrescription = lens.IsPrescription,
+            PrimaryImageUrl = primaryImage
         };
     }
 
     /// <summary>
     /// Applies sorting to the query based on the specified field and order
     /// </summary>
-    private static IQueryable<Lense> ApplySorting(IQueryable<Lense> query, string sortBy, string sortOrder)
+    private static IQueryable<Lens> ApplySorting(IQueryable<Lens> query, string sortBy, string sortOrder)
     {
         var isDescending = sortOrder.ToLower() == "desc";
 
@@ -209,12 +255,15 @@ public class LensService : ILensService
             "price" => isDescending
                 ? query.OrderByDescending(l => l.Price)
                 : query.OrderBy(l => l.Price),
+            "name" => isDescending
+                ? query.OrderByDescending(l => l.Name)
+                : query.OrderBy(l => l.Name),
             "lenstype" => isDescending
                 ? query.OrderByDescending(l => l.LensType)
                 : query.OrderBy(l => l.LensType),
-            "indexvalue" => isDescending
-                ? query.OrderByDescending(l => l.IndexValue)
-                : query.OrderBy(l => l.IndexValue),
+            "lensindex" => isDescending
+                ? query.OrderByDescending(l => l.LensIndex)
+                : query.OrderBy(l => l.LensIndex),
             "createdat" or _ => isDescending
                 ? query.OrderByDescending(l => l.CreatedAt)
                 : query.OrderBy(l => l.CreatedAt)

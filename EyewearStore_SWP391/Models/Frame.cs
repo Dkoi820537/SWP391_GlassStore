@@ -3,31 +3,17 @@ using System.Collections.Generic;
 
 namespace EyewearStore_SWP391.Models;
 
-public partial class Frame
+/// <summary>
+/// Frame entity - inherits from Product (TPT inheritance).
+/// Maps to the 'frames' table.
+/// </summary>
+public class Frame : Product
 {
-    public int FrameId { get; set; }
-
-    public string Name { get; set; } = null!;
+    public string? FrameMaterial { get; set; }
 
     public string? FrameType { get; set; }
 
-    public string? Material { get; set; }
+    public decimal? BridgeWidth { get; set; }
 
-    public string? Color { get; set; }
-
-    public int? SizeWidth { get; set; }
-
-    public int? SizeBridge { get; set; }
-
-    public int? SizeTemple { get; set; }
-
-    public decimal Price { get; set; }
-
-    public int StockQuantity { get; set; }
-
-    public string? StockStatus { get; set; }
-
-    public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
-
-    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+    public decimal? TempleLength { get; set; }
 }

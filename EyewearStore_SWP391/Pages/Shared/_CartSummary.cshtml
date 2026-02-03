@@ -20,9 +20,7 @@
                 subtotal = items.Sum(i =>
                 {
                     decimal unit = 0m;
-                    if (i.Frame != null) unit = i.Frame.Price;
-                    else if (i.Lens != null) unit = i.Lens.Price;
-                    else if (i.Bundle != null) unit = i.Bundle.BundlePrice;
+                    if (i.Product != null) unit = i.Product.Price;
                     else if (i.Service != null) unit = i.Service.Price;
                     return unit * i.Quantity;
                 });
@@ -62,9 +60,7 @@
                 <div style="max-height:240px; overflow:auto;">
                     @foreach (var it in items)
                     {
-                        decimal unit = it.Frame != null ? it.Frame.Price :
-                        it.Lens != null ? it.Lens.Price :
-                        it.Bundle != null ? it.Bundle.BundlePrice :
+                        decimal unit = it.Product != null ? it.Product.Price :
                         it.Service != null ? it.Service.Price : 0m;
 
                         <div class="d-flex align-items-center mb-2">
@@ -73,11 +69,8 @@
                             </div>
                             <div class="flex-grow-1">
                                 <div class="fw-semibold">
-                                    @(
-                                                                it.Frame != null ? it.Frame.Name :
-                                                                it.Lens != null ? it.Lens.LensType :
-                                                                it.Bundle != null ? it.Bundle.Name :
-                                                                it.Service != null ? it.Service.Name : "Sản phẩm")
+                                    @(it.Product != null ? it.Product.Name :
+                                                it.Service != null ? it.Service.Name : "Sản phẩm")
                         </div>
                         <div class="small text-muted">x @it.Quantity • @unit.ToString("N0") VND</div>
                     </div>
@@ -85,7 +78,7 @@
                         <div class="fw-bold">@((unit * it.Quantity).ToString("N0")) VND</div>
                     </div>
                 </div>
-                                }
+                            }
                 </div>
             </li>
 

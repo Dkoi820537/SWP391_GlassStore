@@ -1,0 +1,137 @@
+USE EyewearStore;
+GO
+
+-- =========================
+-- UNIQUE & CHECK CONSTRAINTS
+-- =========================
+ALTER TABLE dbo.users
+ADD CONSTRAINT UQ_users_email UNIQUE (email);
+
+ALTER TABLE dbo.users
+ADD CONSTRAINT CK_users_role CHECK (role IN ('customer','admin'));
+
+ALTER TABLE dbo.product
+ADD CONSTRAINT UQ_product_sku UNIQUE (sku);
+
+ALTER TABLE dbo.product
+ADD CONSTRAINT CK_product_type CHECK (product_type IN ('Frame','Lens','Bundle'));
+
+ALTER TABLE dbo.product
+ADD CONSTRAINT CK_product_attributes_json
+CHECK (attributes IS NULL OR ISJSON(attributes) = 1);
+
+ALTER TABLE dbo.prescription_profiles
+ADD CONSTRAINT CK_prescription_axis
+CHECK (
+    (left_axis BETWEEN 0 AND 180 OR left_axis IS NULL)
+    AND
+    (right_axis BETWEEN 0 AND 180 OR right_axis IS NULL)
+);
+
+ALTER TABLE dbo.wishlist
+ADD CONSTRAINT UQ_wishlist_user_product UNIQUE (user_id, product_id);
+
+ALTER TABLE dbo.bundle_items
+ADD CONSTRAINT UQ_bundle_items UNIQUE (bundle_product_id, product_id);
+
+-- =========================
+-- FOREIGN KEYS
+-- =========================
+ALTER TABLE dbo.addresses
+ADD CONSTRAINT FK_addresses_users
+FOREIGN KEY (user_id) REFERENCES dbo.users(user_id) ON DELETE CASCADE;
+
+ALTER TABLE dbo.frames
+ADD CONSTRAINT FK_frames_product
+FOREIGN KEY (product_id) REFERENCES dbo.product(product_id) ON DELETE CASCADE;
+
+ALTER TABLE dbo.lenses
+ADD CONSTRAINT FK_lenses_product
+FOREIGN KEY (product_id) REFERENCES dbo.product(product_id) ON DELETE CASCADE;
+
+ALTER TABLE dbo.bundles
+ADD CONSTRAINT FK_bundles_product
+FOREIGN KEY (product_id) REFERENCES dbo.product(product_id) ON DELETE CASCADE;
+
+ALTER TABLE dbo.bundle_items
+ADD CONSTRAINT FK_bundle_items_bundle
+FOREIGN KEY (bundle_product_id) REFERENCES dbo.bundles(product_id) ON DELETE CASCADE;
+
+ALTER TABLE dbo.bundle_items
+ADD CONSTRAINT FK_bundle_items_product
+FOREIGN KEY (product_id) REFERENCES dbo.product(product_id);
+
+ALTER TABLE dbo.product_images
+ADD CONSTRAINT FK_product_images_product
+FOREIGN KEY (product_id) REFERENCES dbo.product(product_id) ON DELETE CASCADE;
+
+ALTER TABLE dbo.carts
+ADD CONSTRAINT FK_carts_users
+FOREIGN KEY (user_id) REFERENCES dbo.users(user_id) ON DELETE CASCADE;
+
+ALTER TABLE dbo.cart_items
+ADD CONSTRAINT FK_cart_items_cart
+FOREIGN KEY (cart_id) REFERENCES dbo.carts(cart_id) ON DELETE CASCADE;
+
+ALTER TABLE dbo.cart_items
+ADD CONSTRAINT FK_cart_items_product
+FOREIGN KEY (product_id) REFERENCES dbo.product(product_id);
+
+ALTER TABLE dbo.cart_items
+ADD CONSTRAINT FK_cart_items_service
+FOREIGN KEY (service_id) REFERENCES dbo.services(service_id);
+
+ALTER TABLE dbo.prescription_profiles
+ADD CONSTRAINT FK_prescription_profiles_users
+FOREIGN KEY (user_id) REFERENCES dbo.users(user_id) ON DELETE CASCADE;
+
+ALTER TABLE dbo.orders
+ADD CONSTRAINT FK_orders_users
+FOREIGN KEY (user_id) REFERENCES dbo.users(user_id);
+
+ALTER TABLE dbo.orders
+ADD CONSTRAINT FK_orders_addresses
+FOREIGN KEY (address_id) REFERENCES dbo.addresses(address_id);
+
+ALTER TABLE dbo.order_items
+ADD CONSTRAINT FK_order_items_orders
+FOREIGN KEY (order_id) REFERENCES dbo.orders(order_id) ON DELETE CASCADE;
+
+ALTER TABLE dbo.order_items
+ADD CONSTRAINT FK_order_items_product
+FOREIGN KEY (product_id) REFERENCES dbo.product(product_id);
+
+ALTER TABLE dbo.order_items
+ADD CONSTRAINT FK_order_items_prescription
+FOREIGN KEY (prescription_id) REFERENCES dbo.prescription_profiles(prescription_id);
+
+ALTER TABLE dbo.shipments
+ADD CONSTRAINT FK_shipments_orders
+FOREIGN KEY (order_id) REFERENCES dbo.orders(order_id) ON DELETE CASCADE;
+
+ALTER TABLE dbo.shipment_status_history
+ADD CONSTRAINT FK_shipment_history_shipments
+FOREIGN KEY (shipment_id) REFERENCES dbo.shipments(shipment_id) ON DELETE CASCADE;
+
+ALTER TABLE dbo.returns
+ADD CONSTRAINT FK_returns_order_items
+FOREIGN KEY (order_item_id) REFERENCES dbo.order_items(order_item_id) ON DELETE CASCADE;
+
+ALTER TABLE dbo.wishlist
+ADD CONSTRAINT FK_wishlist_users
+FOREIGN KEY (user_id) REFERENCES dbo.users(user_id) ON DELETE CASCADE;
+
+ALTER TABLE dbo.wishlist
+ADD CONSTRAINT FK_wishlist_product
+FOREIGN KEY (product_id) REFERENCES dbo.product(product_id) ON DELETE CASCADE;
+
+-- =========================
+-- INDEXES
+-- =========================
+CREATE INDEX IX_product_type ON dbo.product(product_type);
+CREATE INDEX IX_product_images_product ON dbo.product_images(product_id);
+CREATE INDEX IX_carts_user ON dbo.carts(user_id);
+CREATE INDEX IX_cart_items_cart ON dbo.cart_items(cart_id);
+CREATE INDEX IX_orders_user ON dbo.orders(user_id);
+CREATE INDEX IX_order_items_order ON dbo.order_items(order_id);
+CREATE INDEX IX_wishlist_user ON dbo.wishlist(user_id);

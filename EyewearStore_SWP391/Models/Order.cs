@@ -11,29 +11,20 @@ public partial class Order
 
     public int AddressId { get; set; }
 
-    public string? OrderType { get; set; }
+    public string Status { get; set; } = null!;
 
     public decimal TotalAmount { get; set; }
 
-    public string PaymentMethod { get; set; } = null!;
-
-    public string Status { get; set; } = null!;
-
-    public string? ShippingStatus { get; set; }
+    public string? PaymentMethod { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
-    public DateTime? UpdatedAt { get; set; }
-
-    public string? ShippingReceiverName { get; set; }
-
-    public string? ShippingPhone { get; set; }
+    // Navigation properties
+    public virtual User User { get; set; } = null!;
 
     public virtual Address Address { get; set; } = null!;
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
     public virtual ICollection<Shipment> Shipments { get; set; } = new List<Shipment>();
-
-    public virtual User User { get; set; } = null!;
 }

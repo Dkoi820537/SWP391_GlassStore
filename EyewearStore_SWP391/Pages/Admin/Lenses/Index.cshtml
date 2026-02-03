@@ -45,11 +45,16 @@
                 <option value="Reading">Reading</option>
             </select>
 
-            <select id="stockStatusFilter" class="filter-select" aria-label="Filter by stock status">
+            <select id="isActiveFilter" class="filter-select" data-filter="isActive" aria-label="Filter by status">
                 <option value="">All Status</option>
-                <option value="in-stock">In Stock</option>
-                <option value="low-stock">Low Stock</option>
-                <option value="out-of-stock">Out of Stock</option>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+            </select>
+
+            <select id="isPrescriptionFilter" class="filter-select" data-filter="isPrescription" aria-label="Filter by prescription">
+                <option value="">All</option>
+                <option value="true">Prescription Required</option>
+                <option value="false">Non-Prescription</option>
             </select>
 
             <select id="sortBySelect" class="filter-select" aria-label="Sort by">
@@ -57,13 +62,13 @@
                 <option value="createdAt-asc">Oldest First</option>
                 <option value="price-asc">Price: Low to High</option>
                 <option value="price-desc">Price: High to Low</option>
-                <option value="lensType-asc">Type: A-Z</option>
+                <option value="name-asc">Name: A-Z</option>
             </select>
 
             <label class="toggle-switch">
                 <input type="checkbox" id="showInactiveToggle">
                 <span class="toggle-slider"></span>
-                <span>Show Inactive</span>
+                <span>Show Inactive Only</span>
             </label>
         </div>
     </div>
@@ -89,7 +94,7 @@
     <div class="modal-content">
         <h2 id="deleteModalTitle" class="modal-title">Confirm Delete</h2>
         <div class="modal-body">
-            <p>Are you sure you want to delete this lens? This action will mark the lens as inactive (out of stock).</p>
+            <p>Are you sure you want to delete this lens? This action will mark the lens as inactive.</p>
         </div>
         <div class="modal-actions">
             <button type="button" class="btn btn-secondary" onclick="LensAdmin.hideDeleteModal()">Cancel</button>

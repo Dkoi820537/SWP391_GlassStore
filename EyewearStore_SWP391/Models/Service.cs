@@ -13,7 +13,6 @@ public partial class Service
 
     public DateTime CreatedAt { get; set; }
 
+    // Navigation properties
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
-
-    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }

@@ -6,26 +6,27 @@
     <members>
         <member name="T:EyewearStore_SWP391.Controllers.ImagesController">
             <summary>
-            API Controller for managing image uploads
+            API Controller for managing product images
             </summary>
         </member>
-        <member name="M:EyewearStore_SWP391.Controllers.ImagesController.UploadImage(Microsoft.AspNetCore.Http.IFormFile,System.String,System.String,System.String)">
+        <member name="M:EyewearStore_SWP391.Controllers.ImagesController.UploadImage(Microsoft.AspNetCore.Http.IFormFile,System.Int32,System.String,System.Boolean,System.Int32)">
             <summary>
-            Uploads an image file and creates an Image record
+            Uploads an image file and creates a ProductImage record
             </summary>
             <param name="file">The image file to upload</param>
-            <param name="imageType">Type of image (e.g., "product", "lens")</param>
-            <param name="context">Context identifier (e.g., "lens:123")</param>
+            <param name="productId">The product ID to associate with the image</param>
             <param name="altText">Alternative text for the image</param>
+            <param name="isPrimary">Whether this is the primary image for the product</param>
+            <param name="sortOrder">Display order for the image</param>
             <returns>The created image record with URL</returns>
         </member>
-        <member name="M:EyewearStore_SWP391.Controllers.ImagesController.GetImages(System.String,System.String)">
+        <member name="M:EyewearStore_SWP391.Controllers.ImagesController.GetImagesByProductId(System.Int32,System.Boolean)">
             <summary>
-            Gets images filtered by context
+            Gets images for a specific product
             </summary>
-            <param name="context">Filter by context (e.g., "lens:123")</param>
-            <param name="imageType">Filter by image type</param>
-            <returns>List of images</returns>
+            <param name="productId">The product ID</param>
+            <param name="activeOnly">Only return active images</param>
+            <returns>List of product images</returns>
         </member>
         <member name="M:EyewearStore_SWP391.Controllers.ImagesController.GetImageById(System.Int32)">
             <summary>
@@ -34,20 +35,19 @@
             <param name="id">The image ID</param>
             <returns>The image record</returns>
         </member>
+        <member name="M:EyewearStore_SWP391.Controllers.ImagesController.SetImageAsPrimary(System.Int32)">
+            <summary>
+            Sets an image as the primary image for its product
+            </summary>
+            <param name="id">The image ID</param>
+            <returns>The updated image</returns>
+        </member>
         <member name="M:EyewearStore_SWP391.Controllers.ImagesController.DeleteImage(System.Int32)">
             <summary>
             Deletes an image (soft delete by setting IsActive to false)
             </summary>
             <param name="id">The image ID to delete</param>
             <returns>No content on success</returns>
-        </member>
-        <member name="M:EyewearStore_SWP391.Controllers.ImagesController.UpdateImageContext(System.Int32,System.String)">
-            <summary>
-            Updates an image's context (for linking to a lens after creation)
-            </summary>
-            <param name="id">The image ID</param>
-            <param name="context">The new context value</param>
-            <returns>The updated image</returns>
         </member>
         <member name="T:EyewearStore_SWP391.Controllers.LensesController">
             <summary>
@@ -70,17 +70,17 @@
             <response code="400">If the lens data is invalid</response>
             <response code="500">If there was an internal server error</response>
         </member>
-        <member name="M:EyewearStore_SWP391.Controllers.LensesController.GetAllLenses(System.String,System.String,System.String,System.Nullable{System.Decimal},System.Nullable{System.Decimal},System.String,System.String,System.String,System.Int32,System.Int32)">
+        <member name="M:EyewearStore_SWP391.Controllers.LensesController.GetAllLenses(System.String,System.String,System.Nullable{System.Decimal},System.Nullable{System.Decimal},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.String,System.String,System.Int32,System.Int32)">
             <summary>
             Gets all lenses with optional filtering, searching, sorting, and pagination
             </summary>
-            <param name="search">Search term for lens type or coating</param>
+            <param name="search">Search term for name, description, or lens type</param>
             <param name="lensType">Filter by lens type</param>
-            <param name="coating">Filter by coating</param>
             <param name="priceMin">Minimum price filter</param>
             <param name="priceMax">Maximum price filter</param>
-            <param name="stockStatus">Filter by stock status</param>
-            <param name="sortBy">Sort field (price, lensType, createdAt)</param>
+            <param name="isActive">Filter by active status</param>
+            <param name="isPrescription">Filter by prescription requirement</param>
+            <param name="sortBy">Sort field (price, name, lensType, createdAt)</param>
             <param name="sortOrder">Sort order (asc, desc)</param>
             <param name="pageNumber">Page number (default: 1)</param>
             <param name="pageSize">Page size (default: 10, max: 100)</param>
@@ -90,9 +90,9 @@
         </member>
         <member name="M:EyewearStore_SWP391.Controllers.LensesController.GetLensById(System.Int32)">
             <summary>
-            Gets a single lens by ID
+            Gets a single lens by ID (ProductId)
             </summary>
-            <param name="id">The lens ID</param>
+            <param name="id">The product ID</param>
             <returns>The lens product</returns>
             <response code="200">Returns the lens</response>
             <response code="404">If the lens is not found</response>
@@ -102,7 +102,7 @@
             <summary>
             Updates an existing lens product
             </summary>
-            <param name="id">The lens ID to update</param>
+            <param name="id">The product ID to update</param>
             <param name="updateDto">The updated lens data</param>
             <returns>The updated lens product</returns>
             <response code="200">Returns the updated lens</response>
@@ -112,17 +112,16 @@
         </member>
         <member name="M:EyewearStore_SWP391.Controllers.LensesController.DeleteLens(System.Int32)">
             <summary>
-            Soft deletes a lens by setting StockStatus to "out-of-stock"
+            Soft deletes a lens by setting IsActive to false
             </summary>
-            <param name="id">The lens ID to delete</param>
+            <param name="id">The product ID to delete</param>
             <returns>No content on success</returns>
             <response code="204">The lens was successfully soft deleted</response>
             <response code="404">If the lens is not found</response>
             <response code="500">If there was an internal server error</response>
             <remarks>
-            Note: The Lense model does not have an IsActive property.
-            Soft delete is implemented by setting StockStatus to "out-of-stock".
-            Valid StockStatus values per DB constraint: "in-stock", "low-stock", "out-of-stock".
+            Soft delete is implemented by setting IsActive to false.
+            The product will no longer appear in active product listings.
             </remarks>
         </member>
         <member name="T:EyewearStore_SWP391.DTOs.Lens.CreateLensDto">
@@ -130,19 +129,19 @@
             Data Transfer Object for creating a new lens product
             </summary>
         </member>
-        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.LensType">
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.Sku">
             <summary>
-            The type of lens (e.g., Single Vision, Bifocal, Progressive)
+            The SKU (Stock Keeping Unit) for the product
             </summary>
         </member>
-        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.IndexValue">
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.Name">
             <summary>
-            The refractive index value of the lens (e.g., 1.50, 1.60, 1.67, 1.74)
+            The name of the lens product
             </summary>
         </member>
-        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.Coating">
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.Description">
             <summary>
-            The coating applied to the lens (e.g., Anti-Reflective, Blue Light Filter)
+            The description of the lens product
             </summary>
         </member>
         <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.Price">
@@ -150,9 +149,34 @@
             The price of the lens product
             </summary>
         </member>
-        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.StockStatus">
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.Currency">
             <summary>
-            The stock status of the lens. Valid values: "in-stock", "low-stock", "out-of-stock"
+            The currency code (e.g., VND, USD)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.InventoryQty">
+            <summary>
+            The inventory quantity (optional)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.IsActive">
+            <summary>
+            Whether the product is active
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.LensType">
+            <summary>
+            The type of lens (e.g., Single Vision, Bifocal, Progressive)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.LensIndex">
+            <summary>
+            The refractive index value of the lens (e.g., 1.50, 1.60, 1.67, 1.74)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.CreateLensDto.IsPrescription">
+            <summary>
+            Whether this lens requires a prescription
             </summary>
         </member>
         <member name="T:EyewearStore_SWP391.DTOs.Lens.LensListResponseDto">
@@ -200,24 +224,24 @@
             Data Transfer Object for returning lens product data
             </summary>
         </member>
-        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.LensId">
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.ProductId">
             <summary>
-            The unique identifier of the lens
+            The unique identifier of the product (ProductId)
             </summary>
         </member>
-        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.LensType">
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.Sku">
             <summary>
-            The type of lens (e.g., Single Vision, Bifocal, Progressive)
+            The SKU (Stock Keeping Unit) for the product
             </summary>
         </member>
-        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.IndexValue">
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.Name">
             <summary>
-            The refractive index value of the lens
+            The name of the lens product
             </summary>
         </member>
-        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.Coating">
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.Description">
             <summary>
-            The coating applied to the lens
+            The description of the lens product
             </summary>
         </member>
         <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.Price">
@@ -225,9 +249,19 @@
             The price of the lens product
             </summary>
         </member>
-        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.StockStatus">
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.Currency">
             <summary>
-            The stock status of the lens
+            The currency code
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.InventoryQty">
+            <summary>
+            The inventory quantity
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.IsActive">
+            <summary>
+            Whether the product is active
             </summary>
         </member>
         <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.CreatedAt">
@@ -235,24 +269,49 @@
             The date and time when the lens was created
             </summary>
         </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.UpdatedAt">
+            <summary>
+            The date and time when the lens was last updated
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.LensType">
+            <summary>
+            The type of lens (e.g., Single Vision, Bifocal, Progressive)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.LensIndex">
+            <summary>
+            The refractive index value of the lens
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.IsPrescription">
+            <summary>
+            Whether this lens requires a prescription
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.LensResponseDto.PrimaryImageUrl">
+            <summary>
+            Primary image URL for the product
+            </summary>
+        </member>
         <member name="T:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto">
             <summary>
             Data Transfer Object for updating an existing lens product
             </summary>
         </member>
-        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.LensType">
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.Sku">
             <summary>
-            The type of lens (e.g., Single Vision, Bifocal, Progressive)
+            The SKU (Stock Keeping Unit) for the product
             </summary>
         </member>
-        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.IndexValue">
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.Name">
             <summary>
-            The refractive index value of the lens (e.g., 1.50, 1.60, 1.67, 1.74)
+            The name of the lens product
             </summary>
         </member>
-        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.Coating">
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.Description">
             <summary>
-            The coating applied to the lens (e.g., Anti-Reflective, Blue Light Filter)
+            The description of the lens product
             </summary>
         </member>
         <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.Price">
@@ -260,27 +319,70 @@
             The price of the lens product
             </summary>
         </member>
-        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.StockStatus">
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.Currency">
             <summary>
-            The stock status of the lens. Valid values: "in-stock", "low-stock", "out-of-stock"
+            The currency code (e.g., VND, USD)
             </summary>
         </member>
-        <member name="T:EyewearStore_SWP391.Models.Image">
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.InventoryQty">
             <summary>
-            Universal image entity for storing all image assets.
-            Supports product images, banners, logos, promotions, and category images.
+            The inventory quantity (optional)
             </summary>
         </member>
-        <member name="T:EyewearStore_SWP391.Models.ImageType">
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.IsActive">
             <summary>
-            Defines the type of image stored in the Images table.
-            Used for filtering and categorizing images across the application.
+            Whether the product is active
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.LensType">
+            <summary>
+            The type of lens (e.g., Single Vision, Bifocal, Progressive)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.LensIndex">
+            <summary>
+            The refractive index value of the lens (e.g., 1.50, 1.60, 1.67, 1.74)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Lens.UpdateLensDto.IsPrescription">
+            <summary>
+            Whether this lens requires a prescription
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.Bundle">
+            <summary>
+            Bundle entity - inherits from Product (TPT inheritance).
+            Maps to the 'bundles' table.
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.Frame">
+            <summary>
+            Frame entity - inherits from Product (TPT inheritance).
+            Maps to the 'frames' table.
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.Lens">
+            <summary>
+            Lens entity - inherits from Product (TPT inheritance).
+            Maps to the 'lenses' table.
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.Product">
+            <summary>
+            Base class for all products (TPT inheritance parent).
+            Maps to the 'product' table.
             </summary>
         </member>
         <member name="T:EyewearStore_SWP391.Models.ProductImage">
             <summary>
-            Link table entity connecting products to images.
-            Allows multiple images per product with primary image designation.
+            ProductImage entity - stores product images directly.
+            Maps to the 'product_images' table.
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.Wishlist">
+            <summary>
+            Wishlist entity - tracks user wishlisted products.
+            Maps to the 'wishlist' table.
             </summary>
         </member>
         <member name="T:EyewearStore_SWP391.Pages.Admin.Lenses.CreateModel">
@@ -300,12 +402,12 @@
         </member>
         <member name="P:EyewearStore_SWP391.Pages.Admin.Lenses.DetailsModel.Id">
             <summary>
-            The lens ID from query parameter
+            The product ID from query parameter
             </summary>
         </member>
-        <member name="P:EyewearStore_SWP391.Pages.Admin.Lenses.DetailsModel.LensId">
+        <member name="P:EyewearStore_SWP391.Pages.Admin.Lenses.DetailsModel.ProductId">
             <summary>
-            Lens ID to pass to the view
+            Product ID to pass to the view
             </summary>
         </member>
         <member name="M:EyewearStore_SWP391.Pages.Admin.Lenses.DetailsModel.OnGet">
@@ -320,12 +422,12 @@
         </member>
         <member name="P:EyewearStore_SWP391.Pages.Admin.Lenses.EditModel.Id">
             <summary>
-            The lens ID from query parameter
+            The product ID from query parameter
             </summary>
         </member>
-        <member name="P:EyewearStore_SWP391.Pages.Admin.Lenses.EditModel.LensId">
+        <member name="P:EyewearStore_SWP391.Pages.Admin.Lenses.EditModel.ProductId">
             <summary>
-            Lens ID to pass to the view
+            Product ID to pass to the view
             </summary>
         </member>
         <member name="M:EyewearStore_SWP391.Pages.Admin.Lenses.EditModel.OnGet">
@@ -355,7 +457,7 @@
             <param name="createDto">The lens data to create</param>
             <returns>The created lens as a response DTO</returns>
         </member>
-        <member name="M:EyewearStore_SWP391.Services.ILensService.GetAllLensesAsync(System.String,System.String,System.String,System.Nullable{System.Decimal},System.Nullable{System.Decimal},System.String,System.String,System.String,System.Int32,System.Int32)">
+        <member name="M:EyewearStore_SWP391.Services.ILensService.GetAllLensesAsync(System.String,System.String,System.Nullable{System.Decimal},System.Nullable{System.Decimal},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.String,System.String,System.Int32,System.Int32)">
             <summary>
             Gets all lenses with optional filtering, searching, sorting, and pagination
             </summary>
@@ -364,27 +466,27 @@
             <summary>
             Gets a single lens by ID
             </summary>
-            <param name="id">The lens ID</param>
+            <param name="id">The product ID</param>
             <returns>The lens if found, null otherwise</returns>
         </member>
         <member name="M:EyewearStore_SWP391.Services.ILensService.UpdateLensAsync(System.Int32,EyewearStore_SWP391.DTOs.Lens.UpdateLensDto)">
             <summary>
             Updates an existing lens product
             </summary>
-            <param name="id">The lens ID to update</param>
+            <param name="id">The product ID to update</param>
             <param name="updateDto">The updated lens data</param>
             <returns>The updated lens if found, null otherwise</returns>
         </member>
         <member name="M:EyewearStore_SWP391.Services.ILensService.DeleteLensAsync(System.Int32)">
             <summary>
-            Soft deletes a lens by setting StockStatus to "out-of-stock"
+            Soft deletes a lens by setting IsActive to false
             </summary>
-            <param name="id">The lens ID to delete</param>
+            <param name="id">The product ID to delete</param>
             <returns>True if the lens was found and deleted, false otherwise</returns>
         </member>
         <member name="T:EyewearStore_SWP391.Services.LensService">
             <summary>
-            Service implementation for lens product operations
+            Service implementation for lens product operations using TPT inheritance
             </summary>
         </member>
         <member name="M:EyewearStore_SWP391.Services.LensService.#ctor(EyewearStore_SWP391.Models.EyewearStoreContext)">
@@ -396,7 +498,7 @@
         <member name="M:EyewearStore_SWP391.Services.LensService.CreateLensAsync(EyewearStore_SWP391.DTOs.Lens.CreateLensDto)">
             <inheritdoc />
         </member>
-        <member name="M:EyewearStore_SWP391.Services.LensService.GetAllLensesAsync(System.String,System.String,System.String,System.Nullable{System.Decimal},System.Nullable{System.Decimal},System.String,System.String,System.String,System.Int32,System.Int32)">
+        <member name="M:EyewearStore_SWP391.Services.LensService.GetAllLensesAsync(System.String,System.String,System.Nullable{System.Decimal},System.Nullable{System.Decimal},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.String,System.String,System.Int32,System.Int32)">
             <inheritdoc />
         </member>
         <member name="M:EyewearStore_SWP391.Services.LensService.GetLensByIdAsync(System.Int32)">
@@ -408,12 +510,12 @@
         <member name="M:EyewearStore_SWP391.Services.LensService.DeleteLensAsync(System.Int32)">
             <inheritdoc />
         </member>
-        <member name="M:EyewearStore_SWP391.Services.LensService.MapToResponseDto(EyewearStore_SWP391.Models.Lense)">
+        <member name="M:EyewearStore_SWP391.Services.LensService.MapToResponseDtoAsync(EyewearStore_SWP391.Models.Lens)">
             <summary>
-            Maps a Lense entity to a LensResponseDto
+            Maps a Lens entity to a LensResponseDto
             </summary>
         </member>
-        <member name="M:EyewearStore_SWP391.Services.LensService.ApplySorting(System.Linq.IQueryable{EyewearStore_SWP391.Models.Lense},System.String,System.String)">
+        <member name="M:EyewearStore_SWP391.Services.LensService.ApplySorting(System.Linq.IQueryable{EyewearStore_SWP391.Models.Lens},System.String,System.String)">
             <summary>
             Applies sorting to the query based on the specified field and order
             </summary>

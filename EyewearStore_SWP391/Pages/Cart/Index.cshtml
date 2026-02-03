@@ -129,19 +129,13 @@
                 <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden;">
                     @foreach (var it in Model.Cart.CartItems)
                     {
-                        var unit = it.Frame != null ? it.Frame.Price :
-                        it.Lens != null ? it.Lens.Price :
-                        it.Bundle != null ? it.Bundle.BundlePrice :
+                        var unit = it.Product != null ? it.Product.Price :
                         it.Service != null ? it.Service.Price : 0m;
 
-                        var productName = it.Frame != null ? it.Frame.Name :
-                        it.Lens != null ? it.Lens.LensType :
-                        it.Bundle != null ? it.Bundle.Name :
+                        var productName = it.Product != null ? it.Product.Name :
                         it.Service != null ? it.Service.Name : "Product";
 
-                        var productType = it.Frame != null ? "Frame" :
-                        it.Lens != null ? "Lens" :
-                        it.Bundle != null ? "Bundle" :
+                        var productType = it.Product != null ? it.Product.ProductType :
                         it.Service != null ? "Service" : "";
 
                         <div style="padding: 1.5rem; border-bottom: 1px solid var(--medium-gray);">
@@ -157,13 +151,13 @@
                                                         justify-content: center;
                                                         border: 2px solid var(--medium-gray);">
                                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                            @if (it.Frame != null || it.Bundle != null)
+                                            @if (productType == "frame" || productType == "bundle")
                                             {
                                                 <rect x="2" y="8" width="8" height="6" rx="2" />
                                                 <rect x="14" y="8" width="8" height="6" rx="2" />
                                                 <path d="M10 11h4" />
                                             }
-                                            else if (it.Lens != null)
+                                            else if (productType == "lens")
                                             {
                                                 <circle cx="12" cy="12" r="10" />
                                                 <circle cx="12" cy="12" r="4" />

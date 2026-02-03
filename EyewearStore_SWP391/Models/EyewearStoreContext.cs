@@ -15,647 +15,629 @@ public partial class EyewearStoreContext : DbContext
     {
     }
 
+    // Core entities
+    public virtual DbSet<User> Users { get; set; }
     public virtual DbSet<Address> Addresses { get; set; }
 
+    // Product hierarchy (TPT inheritance)
+    public virtual DbSet<Product> Products { get; set; }
+    public virtual DbSet<Frame> Frames { get; set; }
+    public virtual DbSet<Lens> Lenses { get; set; }
     public virtual DbSet<Bundle> Bundles { get; set; }
-
     public virtual DbSet<BundleItem> BundleItems { get; set; }
 
-    public virtual DbSet<Cart> Carts { get; set; }
-
-    public virtual DbSet<CartItem> CartItems { get; set; }
-
-    public virtual DbSet<Frame> Frames { get; set; }
-
-    public virtual DbSet<Image> Images { get; set; }
-
-    public virtual DbSet<Lense> Lenses { get; set; }
-
-    public virtual DbSet<Order> Orders { get; set; }
-
-    public virtual DbSet<OrderItem> OrderItems { get; set; }
-
-    public virtual DbSet<PrescriptionProfile> PrescriptionProfiles { get; set; }
-
-    public virtual DbSet<ProductImage> ProductImages { get; set; }
-
-    public virtual DbSet<Return> Returns { get; set; }
-
+    // Services
     public virtual DbSet<Service> Services { get; set; }
 
-    public virtual DbSet<Shipment> Shipments { get; set; }
+    // Product Images
+    public virtual DbSet<ProductImage> ProductImages { get; set; }
 
+    // Cart
+    public virtual DbSet<Cart> Carts { get; set; }
+    public virtual DbSet<CartItem> CartItems { get; set; }
+
+    // Prescriptions
+    public virtual DbSet<PrescriptionProfile> PrescriptionProfiles { get; set; }
+
+    // Orders
+    public virtual DbSet<Order> Orders { get; set; }
+    public virtual DbSet<OrderItem> OrderItems { get; set; }
+
+    // Shipments
+    public virtual DbSet<Shipment> Shipments { get; set; }
     public virtual DbSet<ShipmentStatusHistory> ShipmentStatusHistories { get; set; }
 
-    public virtual DbSet<StockNotification> StockNotifications { get; set; }
+    // Returns
+    public virtual DbSet<Return> Returns { get; set; }
 
-    public virtual DbSet<User> Users { get; set; }
+    // Wishlist
+    public virtual DbSet<Wishlist> Wishlists { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=LAPTOP-UIGSU8B4\\MSSQLSEVER;Database=EyewearStore;Integrated Security=True;TrustServerCertificate=True");
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer("Server=localhost;Database=EyewearStore;Integrated Security=True;TrustServerCertificate=True");
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Address>(entity =>
+        // =========================
+        // USERS
+        // =========================
+        modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.AddressId).HasName("PK__Addresse__26A111AD6A911C52");
+            entity.ToTable("users");
+            entity.HasKey(e => e.UserId);
 
-            entity.HasIndex(e => new { e.UserId, e.IsDefault }, "IX_Addresses_IsDefault");
+            entity.HasIndex(e => e.Email).IsUnique().HasDatabaseName("UQ_users_email");
 
-            entity.HasIndex(e => e.UserId, "IX_Addresses_UserId");
-
-            entity.Property(e => e.AddressId).HasColumnName("addressId");
-            entity.Property(e => e.AddressLine)
-                .HasMaxLength(500)
-                .HasColumnName("addressLine");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("createdAt");
-            entity.Property(e => e.IsDefault).HasColumnName("isDefault");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.Email)
+                .HasMaxLength(255)
+                .IsRequired()
+                .HasColumnName("email");
+            entity.Property(e => e.PasswordHash)
+                .HasMaxLength(255)
+                .IsRequired()
+                .HasColumnName("password_hash");
+            entity.Property(e => e.FullName)
+                .HasMaxLength(100)
+                .IsRequired()
+                .HasColumnName("full_name");
             entity.Property(e => e.Phone)
                 .HasMaxLength(20)
                 .HasColumnName("phone");
-            entity.Property(e => e.ReceiverName)
-                .HasMaxLength(100)
-                .HasColumnName("receiverName");
-            entity.Property(e => e.UserId).HasColumnName("userId");
-
-            entity.HasOne(d => d.User).WithMany(p => p.Addresses)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK_Addresses_Users");
-        });
-
-        modelBuilder.Entity<Bundle>(entity =>
-        {
-            entity.HasKey(e => e.BundleId).HasName("PK__Bundles__2D34FD3178C6B74E");
-
-            entity.HasIndex(e => e.CreatedBy, "IX_Bundles_CreatedBy");
-
-            entity.HasIndex(e => e.IsActive, "IX_Bundles_IsActive");
-
-            entity.Property(e => e.BundleId).HasColumnName("bundleId");
-            entity.Property(e => e.BundlePrice)
-                .HasColumnType("decimal(12, 0)")
-                .HasColumnName("bundlePrice");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("createdAt");
-            entity.Property(e => e.CreatedBy).HasColumnName("createdBy");
-            entity.Property(e => e.Description)
-                .HasMaxLength(1000)
-                .HasColumnName("description");
+            entity.Property(e => e.Role)
+                .HasMaxLength(20)
+                .IsRequired()
+                .HasColumnName("role");
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
-                .HasColumnName("isActive");
-            entity.Property(e => e.Name)
-                .HasMaxLength(200)
-                .HasColumnName("name");
-            entity.Property(e => e.UpdatedAt).HasColumnName("updatedAt");
-
-            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.Bundles)
-                .HasForeignKey(d => d.CreatedBy)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_Bundles_CreatedBy");
-        });
-
-        modelBuilder.Entity<BundleItem>(entity =>
-        {
-            entity.HasKey(e => e.BundleItemId).HasName("PK__BundleIt__123F8BA1EEEC8337");
-
-            entity.HasIndex(e => e.BundleId, "IX_BundleItems_BundleId");
-
-            entity.HasIndex(e => new { e.ItemType, e.ItemId }, "IX_BundleItems_ItemType");
-
-            entity.Property(e => e.BundleItemId).HasColumnName("bundleItemId");
-            entity.Property(e => e.BundleId).HasColumnName("bundleId");
-            entity.Property(e => e.IsRequired)
-                .HasDefaultValue(true)
-                .HasColumnName("isRequired");
-            entity.Property(e => e.ItemId).HasColumnName("itemId");
-            entity.Property(e => e.ItemType)
-                .HasMaxLength(20)
-                .HasColumnName("itemType");
-            entity.Property(e => e.Quantity)
-                .HasDefaultValue(1)
-                .HasColumnName("quantity");
-
-            entity.HasOne(d => d.Bundle).WithMany(p => p.BundleItems)
-                .HasForeignKey(d => d.BundleId)
-                .HasConstraintName("FK_BundleItems_Bundles");
-        });
-
-        modelBuilder.Entity<Cart>(entity =>
-        {
-            entity.HasKey(e => e.CartId).HasName("PK__Carts__415B03B862791906");
-
-            entity.HasIndex(e => e.UserId, "IX_Carts_UserId");
-
-            entity.Property(e => e.CartId).HasColumnName("cartId");
+                .HasColumnName("is_active");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("createdAt");
-            entity.Property(e => e.UserId).HasColumnName("userId");
-
-            entity.HasOne(d => d.User).WithMany(p => p.Carts)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK_Carts_Users");
+                .HasDefaultValueSql("SYSDATETIME()")
+                .HasColumnName("created_at");
         });
 
-        modelBuilder.Entity<CartItem>(entity =>
+        // =========================
+        // ADDRESSES
+        // =========================
+        modelBuilder.Entity<Address>(entity =>
         {
-            entity.HasKey(e => e.CartItemId).HasName("PK__CartItem__283983B6B2A39549");
+            entity.ToTable("addresses");
+            entity.HasKey(e => e.AddressId);
 
-            entity.HasIndex(e => e.CartId, "IX_CartItems_CartId");
+            entity.Property(e => e.AddressId).HasColumnName("address_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.ReceiverName)
+                .HasMaxLength(100)
+                .IsRequired()
+                .HasColumnName("receiver_name");
+            entity.Property(e => e.Phone)
+                .HasMaxLength(20)
+                .IsRequired()
+                .HasColumnName("phone");
+            entity.Property(e => e.AddressLine)
+                .HasMaxLength(500)
+                .IsRequired()
+                .HasColumnName("address_line");
+            entity.Property(e => e.IsDefault)
+                .HasDefaultValue(false)
+                .HasColumnName("is_default");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("SYSDATETIME()")
+                .HasColumnName("created_at");
 
-            entity.Property(e => e.CartItemId).HasColumnName("cartItemId");
-            entity.Property(e => e.BundleId).HasColumnName("bundleId");
-            entity.Property(e => e.CartId).HasColumnName("cartId");
-            entity.Property(e => e.FrameId).HasColumnName("frameId");
-            entity.Property(e => e.IsBundle).HasColumnName("isBundle");
-            entity.Property(e => e.LensId).HasColumnName("lensId");
-            entity.Property(e => e.Quantity)
-                .HasDefaultValue(1)
-                .HasColumnName("quantity");
-            entity.Property(e => e.ServiceId).HasColumnName("serviceId");
-            entity.Property(e => e.TempPrescriptionJson).HasColumnName("tempPrescriptionJson");
-
-            entity.HasOne(d => d.Bundle).WithMany(p => p.CartItems)
-                .HasForeignKey(d => d.BundleId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_CartItems_Bundles");
-
-            entity.HasOne(d => d.Cart).WithMany(p => p.CartItems)
-                .HasForeignKey(d => d.CartId)
-                .HasConstraintName("FK_CartItems_Carts");
-
-            entity.HasOne(d => d.Frame).WithMany(p => p.CartItems)
-                .HasForeignKey(d => d.FrameId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_CartItems_Frames");
-
-            entity.HasOne(d => d.Lens).WithMany(p => p.CartItems)
-                .HasForeignKey(d => d.LensId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_CartItems_Lenses");
-
-            entity.HasOne(d => d.Service).WithMany(p => p.CartItems)
-                .HasForeignKey(d => d.ServiceId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_CartItems_Services");
+            entity.HasOne(d => d.User)
+                .WithMany(p => p.Addresses)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_addresses_users");
         });
 
+        // =========================
+        // PRODUCT (BASE - TPT)
+        // =========================
+        modelBuilder.Entity<Product>(entity =>
+        {
+            entity.ToTable("product");
+            entity.HasKey(e => e.ProductId);
+
+            entity.HasIndex(e => e.Sku).IsUnique().HasDatabaseName("UQ_product_sku");
+            entity.HasIndex(e => e.ProductType).HasDatabaseName("IX_product_type");
+
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.Sku)
+                .HasMaxLength(50)
+                .IsRequired()
+                .HasColumnName("sku");
+            entity.Property(e => e.Name)
+                .HasMaxLength(255)
+                .IsRequired()
+                .HasColumnName("name");
+            entity.Property(e => e.Description)
+                .HasColumnName("description");
+            entity.Property(e => e.ProductType)
+                .HasMaxLength(20)
+                .IsRequired()
+                .HasColumnName("product_type");
+            entity.Property(e => e.Price)
+                .HasColumnType("decimal(18,2)")
+                .IsRequired()
+                .HasColumnName("price");
+            entity.Property(e => e.Currency)
+                .HasMaxLength(3)
+                .IsRequired()
+                .HasColumnName("currency");
+            entity.Property(e => e.InventoryQty)
+                .HasColumnName("inventory_qty");
+            entity.Property(e => e.Attributes)
+                .HasColumnName("attributes");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("SYSDATETIME()")
+                .HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("SYSDATETIME()")
+                .HasColumnName("updated_at");
+        });
+
+        // =========================
+        // FRAMES (TPT)
+        // =========================
         modelBuilder.Entity<Frame>(entity =>
         {
-            entity.HasKey(e => e.FrameId).HasName("PK__Frames__36094A25DF172786");
+            entity.ToTable("frames");
 
-            entity.HasIndex(e => e.FrameType, "IX_Frames_FrameType");
-
-            entity.HasIndex(e => e.Price, "IX_Frames_Price");
-
-            entity.HasIndex(e => e.StockStatus, "IX_Frames_StockStatus");
-
-            entity.Property(e => e.FrameId).HasColumnName("frameId");
-            entity.Property(e => e.Color)
-                .HasMaxLength(50)
-                .HasColumnName("color");
+            entity.Property(e => e.FrameMaterial)
+                .HasMaxLength(100)
+                .HasColumnName("frame_material");
             entity.Property(e => e.FrameType)
                 .HasMaxLength(50)
-                .HasColumnName("frameType");
-            entity.Property(e => e.Material)
-                .HasMaxLength(50)
-                .HasColumnName("material");
-            entity.Property(e => e.Name)
-                .HasMaxLength(200)
-                .HasColumnName("name");
-            entity.Property(e => e.Price)
-                .HasColumnType("decimal(12, 0)")
-                .HasColumnName("price");
-            entity.Property(e => e.SizeBridge).HasColumnName("sizeBridge");
-            entity.Property(e => e.SizeTemple).HasColumnName("sizeTemple");
-            entity.Property(e => e.SizeWidth).HasColumnName("sizeWidth");
-            entity.Property(e => e.StockQuantity).HasColumnName("stockQuantity");
-            entity.Property(e => e.StockStatus)
-                .HasMaxLength(20)
-                .HasColumnName("stockStatus");
+                .HasColumnName("frame_type");
+            entity.Property(e => e.BridgeWidth)
+                .HasColumnType("decimal(5,2)")
+                .HasColumnName("bridge_width");
+            entity.Property(e => e.TempleLength)
+                .HasColumnType("decimal(5,2)")
+                .HasColumnName("temple_length");
         });
 
-        modelBuilder.Entity<Lense>(entity =>
+        // =========================
+        // LENSES (TPT)
+        // =========================
+        modelBuilder.Entity<Lens>(entity =>
         {
-            entity.HasKey(e => e.LensId).HasName("PK__Lenses__BE1FA9A7E0AE8ED6");
+            entity.ToTable("lenses");
 
-            entity.HasIndex(e => e.LensType, "IX_Lenses_LensType");
-
-            entity.HasIndex(e => e.StockStatus, "IX_Lenses_StockStatus");
-
-            entity.Property(e => e.LensId).HasColumnName("lensId");
-            entity.Property(e => e.Coating)
-                .HasMaxLength(100)
-                .HasColumnName("coating");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("createdAt");
-            entity.Property(e => e.IndexValue)
-                .HasColumnType("decimal(3, 2)")
-                .HasColumnName("indexValue");
             entity.Property(e => e.LensType)
                 .HasMaxLength(50)
-                .HasColumnName("lensType");
-            entity.Property(e => e.Price)
-                .HasColumnType("decimal(12, 0)")
-                .HasColumnName("price");
-            entity.Property(e => e.StockStatus)
-                .HasMaxLength(20)
-                .HasColumnName("stockStatus");
+                .HasColumnName("lens_type");
+            entity.Property(e => e.LensIndex)
+                .HasColumnType("decimal(4,2)")
+                .HasColumnName("lens_index");
+            entity.Property(e => e.IsPrescription)
+                .IsRequired()
+                .HasColumnName("is_prescription");
         });
 
+        // =========================
+        // BUNDLES (TPT)
+        // =========================
+        modelBuilder.Entity<Bundle>(entity =>
+        {
+            entity.ToTable("bundles");
+
+            entity.Property(e => e.BundleNote)
+                .HasMaxLength(255)
+                .HasColumnName("bundle_note");
+        });
+
+        // =========================
+        // BUNDLE ITEMS
+        // =========================
+        modelBuilder.Entity<BundleItem>(entity =>
+        {
+            entity.ToTable("bundle_items");
+            entity.HasKey(e => e.BundleItemId);
+
+            entity.HasIndex(e => new { e.BundleProductId, e.ProductId })
+                .IsUnique()
+                .HasDatabaseName("UQ_bundle_items");
+
+            entity.Property(e => e.BundleItemId).HasColumnName("bundle_item_id");
+            entity.Property(e => e.BundleProductId).HasColumnName("bundle_product_id");
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.Quantity)
+                .HasDefaultValue(1)
+                .HasColumnName("quantity");
+
+            entity.HasOne(d => d.BundleProduct)
+                .WithMany(p => p.BundleItems)
+                .HasForeignKey(d => d.BundleProductId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_bundle_items_bundle");
+
+            entity.HasOne(d => d.Product)
+                .WithMany(p => p.ContainedInBundles)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_bundle_items_product");
+        });
+
+        // =========================
+        // SERVICES
+        // =========================
+        modelBuilder.Entity<Service>(entity =>
+        {
+            entity.ToTable("services");
+            entity.HasKey(e => e.ServiceId);
+
+            entity.Property(e => e.ServiceId).HasColumnName("service_id");
+            entity.Property(e => e.Name)
+                .HasMaxLength(200)
+                .IsRequired()
+                .HasColumnName("name");
+            entity.Property(e => e.Price)
+                .HasColumnType("decimal(18,2)")
+                .IsRequired()
+                .HasColumnName("price");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("SYSDATETIME()")
+                .HasColumnName("created_at");
+        });
+
+        // =========================
+        // PRODUCT IMAGES
+        // =========================
+        modelBuilder.Entity<ProductImage>(entity =>
+        {
+            entity.ToTable("product_images");
+            entity.HasKey(e => e.ImageId);
+
+            entity.HasIndex(e => e.ProductId).HasDatabaseName("IX_product_images_product");
+
+            entity.Property(e => e.ImageId).HasColumnName("image_id");
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.ImageUrl)
+                .HasMaxLength(500)
+                .IsRequired()
+                .HasColumnName("image_url");
+            entity.Property(e => e.AltText)
+                .HasMaxLength(255)
+                .HasColumnName("alt_text");
+            entity.Property(e => e.IsPrimary)
+                .HasDefaultValue(false)
+                .HasColumnName("is_primary");
+            entity.Property(e => e.SortOrder)
+                .HasDefaultValue(0)
+                .HasColumnName("sort_order");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("SYSDATETIME()")
+                .HasColumnName("created_at");
+
+            entity.HasOne(d => d.Product)
+                .WithMany(p => p.ProductImages)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_product_images_product");
+        });
+
+        // =========================
+        // CARTS
+        // =========================
+        modelBuilder.Entity<Cart>(entity =>
+        {
+            entity.ToTable("carts");
+            entity.HasKey(e => e.CartId);
+
+            entity.HasIndex(e => e.UserId).HasDatabaseName("IX_carts_user");
+
+            entity.Property(e => e.CartId).HasColumnName("cart_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("SYSDATETIME()")
+                .HasColumnName("created_at");
+
+            entity.HasOne(d => d.User)
+                .WithMany(p => p.Carts)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_carts_users");
+        });
+
+        // =========================
+        // CART ITEMS
+        // =========================
+        modelBuilder.Entity<CartItem>(entity =>
+        {
+            entity.ToTable("cart_items");
+            entity.HasKey(e => e.CartItemId);
+
+            entity.HasIndex(e => e.CartId).HasDatabaseName("IX_cart_items_cart");
+
+            entity.Property(e => e.CartItemId).HasColumnName("cart_item_id");
+            entity.Property(e => e.CartId).HasColumnName("cart_id");
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.ServiceId).HasColumnName("service_id");
+            entity.Property(e => e.Quantity)
+                .HasDefaultValue(1)
+                .HasColumnName("quantity");
+            entity.Property(e => e.TempPrescriptionJson)
+                .HasColumnName("temp_prescription_json");
+
+            entity.HasOne(d => d.Cart)
+                .WithMany(p => p.CartItems)
+                .HasForeignKey(d => d.CartId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_cart_items_cart");
+
+            entity.HasOne(d => d.Product)
+                .WithMany(p => p.CartItems)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_cart_items_product");
+
+            entity.HasOne(d => d.Service)
+                .WithMany(p => p.CartItems)
+                .HasForeignKey(d => d.ServiceId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_cart_items_service");
+        });
+
+        // =========================
+        // PRESCRIPTION PROFILES
+        // =========================
+        modelBuilder.Entity<PrescriptionProfile>(entity =>
+        {
+            entity.ToTable("prescription_profiles");
+            entity.HasKey(e => e.PrescriptionId);
+
+            entity.Property(e => e.PrescriptionId).HasColumnName("prescription_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.ProfileName)
+                .HasMaxLength(100)
+                .HasColumnName("profile_name");
+            entity.Property(e => e.LeftSph)
+                .HasColumnType("decimal(5,2)")
+                .HasColumnName("left_sph");
+            entity.Property(e => e.LeftCyl)
+                .HasColumnType("decimal(5,2)")
+                .HasColumnName("left_cyl");
+            entity.Property(e => e.LeftAxis)
+                .HasColumnName("left_axis");
+            entity.Property(e => e.RightSph)
+                .HasColumnType("decimal(5,2)")
+                .HasColumnName("right_sph");
+            entity.Property(e => e.RightCyl)
+                .HasColumnType("decimal(5,2)")
+                .HasColumnName("right_cyl");
+            entity.Property(e => e.RightAxis)
+                .HasColumnName("right_axis");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(false)
+                .HasColumnName("is_active");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("SYSDATETIME()")
+                .HasColumnName("created_at");
+
+            entity.HasOne(d => d.User)
+                .WithMany(p => p.PrescriptionProfiles)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_prescription_profiles_users");
+        });
+
+        // =========================
+        // ORDERS
+        // =========================
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Orders__0809335DEAB30224");
+            entity.ToTable("orders");
+            entity.HasKey(e => e.OrderId);
 
-            entity.HasIndex(e => e.CreatedAt, "IX_Orders_CreatedAt").IsDescending();
+            entity.HasIndex(e => e.UserId).HasDatabaseName("IX_orders_user");
 
-            entity.HasIndex(e => e.ShippingStatus, "IX_Orders_ShippingStatus");
-
-            entity.HasIndex(e => e.Status, "IX_Orders_Status");
-
-            entity.HasIndex(e => e.UserId, "IX_Orders_UserId");
-
-            entity.Property(e => e.OrderId).HasColumnName("orderId");
-            entity.Property(e => e.AddressId).HasColumnName("addressId");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("createdAt");
-            entity.Property(e => e.OrderType)
+            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.AddressId).HasColumnName("address_id");
+            entity.Property(e => e.Status)
                 .HasMaxLength(20)
-                .HasColumnName("orderType");
+                .IsRequired()
+                .HasColumnName("status");
+            entity.Property(e => e.TotalAmount)
+                .HasColumnType("decimal(18,2)")
+                .IsRequired()
+                .HasColumnName("total_amount");
             entity.Property(e => e.PaymentMethod)
                 .HasMaxLength(50)
-                .HasColumnName("paymentMethod");
-            entity.Property(e => e.ShippingPhone)
-                .HasMaxLength(20)
-                .HasColumnName("shippingPhone");
-            entity.Property(e => e.ShippingReceiverName)
+                .HasColumnName("payment_method");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("SYSDATETIME()")
+                .HasColumnName("created_at");
+
+            entity.HasOne(d => d.User)
+                .WithMany(p => p.Orders)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_orders_users");
+
+            entity.HasOne(d => d.Address)
+                .WithMany(p => p.Orders)
+                .HasForeignKey(d => d.AddressId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_orders_addresses");
+        });
+
+        // =========================
+        // ORDER ITEMS
+        // =========================
+        modelBuilder.Entity<OrderItem>(entity =>
+        {
+            entity.ToTable("order_items");
+            entity.HasKey(e => e.OrderItemId);
+
+            entity.HasIndex(e => e.OrderId).HasDatabaseName("IX_order_items_order");
+
+            entity.Property(e => e.OrderItemId).HasColumnName("order_item_id");
+            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.PrescriptionId).HasColumnName("prescription_id");
+            entity.Property(e => e.UnitPrice)
+                .HasColumnType("decimal(18,2)")
+                .IsRequired()
+                .HasColumnName("unit_price");
+            entity.Property(e => e.Quantity)
+                .IsRequired()
+                .HasColumnName("quantity");
+            entity.Property(e => e.IsBundle)
+                .HasDefaultValue(false)
+                .HasColumnName("is_bundle");
+            entity.Property(e => e.SnapshotJson)
+                .HasColumnName("snapshot_json");
+
+            entity.HasOne(d => d.Order)
+                .WithMany(p => p.OrderItems)
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_order_items_orders");
+
+            entity.HasOne(d => d.Product)
+                .WithMany(p => p.OrderItems)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_order_items_product");
+
+            entity.HasOne(d => d.Prescription)
+                .WithMany(p => p.OrderItems)
+                .HasForeignKey(d => d.PrescriptionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_order_items_prescription");
+        });
+
+        // =========================
+        // SHIPMENTS
+        // =========================
+        modelBuilder.Entity<Shipment>(entity =>
+        {
+            entity.ToTable("shipments");
+            entity.HasKey(e => e.ShipmentId);
+
+            entity.Property(e => e.ShipmentId).HasColumnName("shipment_id");
+            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.Carrier)
                 .HasMaxLength(100)
-                .HasColumnName("shippingReceiverName");
-            entity.Property(e => e.ShippingStatus)
-                .HasMaxLength(20)
-                .HasColumnName("shippingStatus");
+                .HasColumnName("carrier");
+            entity.Property(e => e.TrackingNumber)
+                .HasMaxLength(100)
+                .HasColumnName("tracking_number");
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
                 .HasColumnName("status");
-            entity.Property(e => e.TotalAmount)
-                .HasColumnType("decimal(12, 0)")
-                .HasColumnName("totalAmount");
-            entity.Property(e => e.UpdatedAt).HasColumnName("updatedAt");
-            entity.Property(e => e.UserId).HasColumnName("userId");
+            entity.Property(e => e.ShippedAt)
+                .HasColumnName("shipped_at");
+            entity.Property(e => e.DeliveredAt)
+                .HasColumnName("delivered_at");
 
-            entity.HasOne(d => d.Address).WithMany(p => p.Orders)
-                .HasForeignKey(d => d.AddressId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Orders_Addresses");
-
-            entity.HasOne(d => d.User).WithMany(p => p.Orders)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Orders_Users");
-        });
-
-        modelBuilder.Entity<OrderItem>(entity =>
-        {
-            entity.HasKey(e => e.OrderItemId).HasName("PK__OrderIte__3724BD526043464F");
-
-            entity.HasIndex(e => e.OrderId, "IX_OrderItems_OrderId");
-
-            entity.HasIndex(e => e.PrescriptionId, "IX_OrderItems_PrescriptionId");
-
-            entity.Property(e => e.OrderItemId).HasColumnName("orderItemId");
-            entity.Property(e => e.BundleId).HasColumnName("bundleId");
-            entity.Property(e => e.BundleSnapshot).HasColumnName("bundleSnapshot");
-            entity.Property(e => e.FrameId).HasColumnName("frameId");
-            entity.Property(e => e.IsBundle).HasColumnName("isBundle");
-            entity.Property(e => e.LensId).HasColumnName("lensId");
-            entity.Property(e => e.OrderId).HasColumnName("orderId");
-            entity.Property(e => e.PrescriptionId).HasColumnName("prescriptionId");
-            entity.Property(e => e.Price)
-                .HasColumnType("decimal(12, 0)")
-                .HasColumnName("price");
-            entity.Property(e => e.Quantity)
-                .HasDefaultValue(1)
-                .HasColumnName("quantity");
-            entity.Property(e => e.ServiceId).HasColumnName("serviceId");
-
-            entity.HasOne(d => d.Bundle).WithMany(p => p.OrderItems)
-                .HasForeignKey(d => d.BundleId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_OrderItems_Bundles");
-
-            entity.HasOne(d => d.Frame).WithMany(p => p.OrderItems)
-                .HasForeignKey(d => d.FrameId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_OrderItems_Frames");
-
-            entity.HasOne(d => d.Lens).WithMany(p => p.OrderItems)
-                .HasForeignKey(d => d.LensId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_OrderItems_Lenses");
-
-            entity.HasOne(d => d.Order).WithMany(p => p.OrderItems)
+            entity.HasOne(d => d.Order)
+                .WithMany(p => p.Shipments)
                 .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK_OrderItems_Orders");
-
-            entity.HasOne(d => d.Prescription).WithMany(p => p.OrderItems)
-                .HasForeignKey(d => d.PrescriptionId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_OrderItems_PrescriptionProfiles");
-
-            entity.HasOne(d => d.Service).WithMany(p => p.OrderItems)
-                .HasForeignKey(d => d.ServiceId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_OrderItems_Services");
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_shipments_orders");
         });
 
-        modelBuilder.Entity<PrescriptionProfile>(entity =>
+        // =========================
+        // SHIPMENT STATUS HISTORY
+        // =========================
+        modelBuilder.Entity<ShipmentStatusHistory>(entity =>
         {
-            entity.HasKey(e => e.PrescriptionId).HasName("PK__Prescrip__7920FC24625CC1E9");
+            entity.ToTable("shipment_status_history");
+            entity.HasKey(e => e.HistoryId);
 
-            entity.HasIndex(e => new { e.UserId, e.IsActive }, "IX_PrescriptionProfiles_IsActive");
-
-            entity.HasIndex(e => e.UserId, "IX_PrescriptionProfiles_UserId");
-
-            entity.Property(e => e.PrescriptionId).HasColumnName("prescriptionId");
+            entity.Property(e => e.HistoryId).HasColumnName("history_id");
+            entity.Property(e => e.ShipmentId).HasColumnName("shipment_id");
+            entity.Property(e => e.Status)
+                .HasMaxLength(20)
+                .HasColumnName("status");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("createdAt");
-            entity.Property(e => e.IsActive).HasColumnName("isActive");
-            entity.Property(e => e.LeftAxis).HasColumnName("leftAxis");
-            entity.Property(e => e.LeftCyl)
-                .HasColumnType("decimal(5, 2)")
-                .HasColumnName("leftCYL");
-            entity.Property(e => e.LeftSph)
-                .HasColumnType("decimal(5, 2)")
-                .HasColumnName("leftSPH");
-            entity.Property(e => e.ProfileName)
-                .HasMaxLength(100)
-                .HasColumnName("profileName");
-            entity.Property(e => e.RightAxis).HasColumnName("rightAxis");
-            entity.Property(e => e.RightCyl)
-                .HasColumnType("decimal(5, 2)")
-                .HasColumnName("rightCYL");
-            entity.Property(e => e.RightSph)
-                .HasColumnType("decimal(5, 2)")
-                .HasColumnName("rightSPH");
-            entity.Property(e => e.UserId).HasColumnName("userId");
+                .HasDefaultValueSql("SYSDATETIME()")
+                .HasColumnName("created_at");
 
-            entity.HasOne(d => d.User).WithMany(p => p.PrescriptionProfiles)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK_PrescriptionProfiles_Users");
+            entity.HasOne(d => d.Shipment)
+                .WithMany(p => p.ShipmentStatusHistories)
+                .HasForeignKey(d => d.ShipmentId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_shipment_history_shipments");
         });
 
-        modelBuilder.Entity<Image>(entity =>
-        {
-            entity.HasKey(e => e.ImageId).HasName("PK_Images");
-
-            entity.HasIndex(e => e.ImageType, "IX_Images_ImageType");
-
-            entity.HasIndex(e => e.IsActive, "IX_Images_IsActive");
-
-            entity.Property(e => e.ImageId).HasColumnName("imageId");
-            entity.Property(e => e.ImageUrl)
-                .HasMaxLength(500)
-                .HasColumnName("imageUrl");
-            entity.Property(e => e.AltText)
-                .HasMaxLength(255)
-                .HasColumnName("altText");
-            entity.Property(e => e.ImageType)
-                .HasMaxLength(50)
-                .HasColumnName("imageType");
-            entity.Property(e => e.Context)
-                .HasMaxLength(255)
-                .HasColumnName("context");
-            entity.Property(e => e.Title)
-                .HasMaxLength(200)
-                .HasColumnName("title");
-            entity.Property(e => e.Description)
-                .HasMaxLength(1000)
-                .HasColumnName("description");
-            entity.Property(e => e.LinkUrl)
-                .HasMaxLength(500)
-                .HasColumnName("linkUrl");
-            entity.Property(e => e.DisplayOrder)
-                .HasDefaultValue(0)
-                .HasColumnName("displayOrder");
-            entity.Property(e => e.IsActive)
-                .HasDefaultValue(true)
-                .HasColumnName("isActive");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("createdAt");
-            entity.Property(e => e.UpdatedAt)
-                .HasColumnName("updatedAt");
-        });
-
-        modelBuilder.Entity<ProductImage>(entity =>
-        {
-            entity.HasKey(e => e.ProductImageId).HasName("PK_ProductImages");
-
-            entity.HasIndex(e => e.ProductId, "IX_ProductImages_ProductId");
-
-            entity.HasIndex(e => e.ImageId, "IX_ProductImages_ImageId");
-
-            entity.HasIndex(e => new { e.ProductId, e.IsPrimary }, "IX_ProductImages_IsPrimary")
-                .HasFilter("[isPrimary] = 1")
-                .IsUnique();
-
-            entity.Property(e => e.ProductImageId).HasColumnName("productImageId");
-            entity.Property(e => e.ProductId).HasColumnName("productId");
-            entity.Property(e => e.ImageId).HasColumnName("imageId");
-            entity.Property(e => e.IsPrimary).HasColumnName("isPrimary");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("createdAt");
-
-            entity.HasOne(d => d.Image).WithMany(p => p.ProductImages)
-                .HasForeignKey(d => d.ImageId)
-                .HasConstraintName("FK_ProductImages_Images");
-        });
-
+        // =========================
+        // RETURNS
+        // =========================
         modelBuilder.Entity<Return>(entity =>
         {
-            entity.HasKey(e => e.ReturnId).HasName("PK__Returns__EBA76319A38C3AE8");
+            entity.ToTable("returns");
+            entity.HasKey(e => e.ReturnId);
 
-            entity.HasIndex(e => e.OrderItemId, "IX_Returns_OrderItemId");
-
-            entity.HasIndex(e => e.Status, "IX_Returns_Status");
-
-            entity.Property(e => e.ReturnId).HasColumnName("returnId");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("createdAt");
-            entity.Property(e => e.OrderItemId).HasColumnName("orderItemId");
+            entity.Property(e => e.ReturnId).HasColumnName("return_id");
+            entity.Property(e => e.OrderItemId).HasColumnName("order_item_id");
             entity.Property(e => e.Reason)
                 .HasMaxLength(500)
                 .HasColumnName("reason");
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
                 .HasColumnName("status");
-            entity.Property(e => e.Type)
-                .HasMaxLength(20)
-                .HasColumnName("type");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("SYSDATETIME()")
+                .HasColumnName("created_at");
 
-            entity.HasOne(d => d.OrderItem).WithMany(p => p.Returns)
+            entity.HasOne(d => d.OrderItem)
+                .WithMany(p => p.Returns)
                 .HasForeignKey(d => d.OrderItemId)
-                .HasConstraintName("FK_Returns_OrderItems");
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_returns_order_items");
         });
 
-        modelBuilder.Entity<Service>(entity =>
+        // =========================
+        // WISHLIST
+        // =========================
+        modelBuilder.Entity<Wishlist>(entity =>
         {
-            entity.HasKey(e => e.ServiceId).HasName("PK__Services__455070DF7B5523DC");
+            entity.ToTable("wishlist");
+            entity.HasKey(e => e.WishlistId);
 
-            entity.Property(e => e.ServiceId).HasColumnName("serviceId");
+            entity.HasIndex(e => new { e.UserId, e.ProductId })
+                .IsUnique()
+                .HasDatabaseName("UQ_wishlist_user_product");
+            entity.HasIndex(e => e.UserId).HasDatabaseName("IX_wishlist_user");
+
+            entity.Property(e => e.WishlistId).HasColumnName("wishlist_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.NotifyOnRestock)
+                .HasDefaultValue(true)
+                .HasColumnName("notify_on_restock");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("createdAt");
-            entity.Property(e => e.Name)
-                .HasMaxLength(200)
-                .HasColumnName("name");
-            entity.Property(e => e.Price)
-                .HasColumnType("decimal(12, 0)")
-                .HasColumnName("price");
-        });
+                .HasDefaultValueSql("SYSDATETIME()")
+                .HasColumnName("created_at");
 
-        modelBuilder.Entity<Shipment>(entity =>
-        {
-            entity.HasKey(e => e.ShipmentId).HasName("PK__Shipment__4721780151A41410");
+            entity.HasOne(d => d.User)
+                .WithMany(p => p.Wishlists)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_wishlist_users");
 
-            entity.HasIndex(e => e.OrderId, "IX_Shipments_OrderId");
-
-            entity.HasIndex(e => e.Status, "IX_Shipments_Status");
-
-            entity.HasIndex(e => e.TrackingNumber, "IX_Shipments_TrackingNumber");
-
-            entity.Property(e => e.ShipmentId).HasColumnName("shipmentId");
-            entity.Property(e => e.Carrier)
-                .HasMaxLength(100)
-                .HasColumnName("carrier");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("createdAt");
-            entity.Property(e => e.DeliveredAt).HasColumnName("deliveredAt");
-            entity.Property(e => e.Notes)
-                .HasMaxLength(1000)
-                .HasColumnName("notes");
-            entity.Property(e => e.OrderId).HasColumnName("orderId");
-            entity.Property(e => e.ShippedAt).HasColumnName("shippedAt");
-            entity.Property(e => e.Status)
-                .HasMaxLength(20)
-                .HasColumnName("status");
-            entity.Property(e => e.TrackingNumber)
-                .HasMaxLength(100)
-                .HasColumnName("trackingNumber");
-            entity.Property(e => e.TrackingUrl)
-                .HasMaxLength(500)
-                .HasColumnName("trackingUrl");
-
-            entity.HasOne(d => d.Order).WithMany(p => p.Shipments)
-                .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK_Shipments_Orders");
-        });
-
-        modelBuilder.Entity<ShipmentStatusHistory>(entity =>
-        {
-            entity.HasKey(e => e.HistoryId).HasName("PK__Shipment__19BDBDD3791C9E92");
-
-            entity.ToTable("ShipmentStatusHistory");
-
-            entity.HasIndex(e => e.CreatedAt, "IX_ShipmentStatusHistory_CreatedAt").IsDescending();
-
-            entity.HasIndex(e => e.ShipmentId, "IX_ShipmentStatusHistory_ShipmentId");
-
-            entity.Property(e => e.HistoryId).HasColumnName("historyId");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("createdAt");
-            entity.Property(e => e.Location)
-                .HasMaxLength(200)
-                .HasColumnName("location");
-            entity.Property(e => e.ShipmentId).HasColumnName("shipmentId");
-            entity.Property(e => e.Status)
-                .HasMaxLength(20)
-                .HasColumnName("status");
-            entity.Property(e => e.StatusMessage)
-                .HasMaxLength(500)
-                .HasColumnName("statusMessage");
-            entity.Property(e => e.UpdatedBy)
-                .HasMaxLength(100)
-                .HasColumnName("updatedBy");
-
-            entity.HasOne(d => d.Shipment).WithMany(p => p.ShipmentStatusHistories)
-                .HasForeignKey(d => d.ShipmentId)
-                .HasConstraintName("FK_ShipmentStatusHistory_Shipments");
-        });
-
-        modelBuilder.Entity<StockNotification>(entity =>
-        {
-            entity.HasKey(e => e.NotificationId).HasName("PK__StockNot__4BA5CEA92937B5E1");
-
-            entity.HasIndex(e => e.Email, "IX_StockNotifications_Email");
-
-            entity.HasIndex(e => new { e.ProductType, e.ProductId }, "IX_StockNotifications_ProductType");
-
-            entity.HasIndex(e => e.Status, "IX_StockNotifications_Status");
-
-            entity.Property(e => e.NotificationId).HasColumnName("notificationId");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("createdAt");
-            entity.Property(e => e.Email)
-                .HasMaxLength(255)
-                .HasColumnName("email");
-            entity.Property(e => e.NotifiedAt).HasColumnName("notifiedAt");
-            entity.Property(e => e.ProductId).HasColumnName("productId");
-            entity.Property(e => e.ProductType)
-                .HasMaxLength(20)
-                .HasColumnName("productType");
-            entity.Property(e => e.Status)
-                .HasMaxLength(20)
-                .HasColumnName("status");
-        });
-
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__CB9A1CFF8F989845");
-
-            entity.HasIndex(e => e.Email, "IX_Users_Email");
-
-            entity.HasIndex(e => e.Role, "IX_Users_Role");
-
-            entity.HasIndex(e => e.Status, "IX_Users_Status");
-
-            entity.HasIndex(e => e.Email, "UQ__Users__AB6E6164F0FCC889").IsUnique();
-
-            entity.Property(e => e.UserId).HasColumnName("userId");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("createdAt");
-            entity.Property(e => e.Email)
-                .HasMaxLength(255)
-                .HasColumnName("email");
-            entity.Property(e => e.FullName)
-                .HasMaxLength(100)
-                .HasColumnName("fullName");
-            entity.Property(e => e.PasswordHash)
-                .HasMaxLength(255)
-                .HasColumnName("passwordHash");
-            entity.Property(e => e.Phone)
-                .HasMaxLength(20)
-                .HasColumnName("phone");
-            entity.Property(e => e.Role)
-                .HasMaxLength(20)
-                .HasColumnName("role");
-            entity.Property(e => e.Status)
-                .HasMaxLength(20)
-                .HasColumnName("status");
+            entity.HasOne(d => d.Product)
+                .WithMany(p => p.Wishlists)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_wishlist_product");
         });
 
         OnModelCreatingPartial(modelBuilder);

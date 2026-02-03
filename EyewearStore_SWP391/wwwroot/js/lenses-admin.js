@@ -1,6 +1,7 @@
 /**
  * Lens Admin Module
  * Handles CRUD operations, filtering, pagination, and image uploads
+ * Updated for new TPT schema with Product base entity
  */
 const LensAdmin = (function () {
     'use strict';
@@ -18,8 +19,8 @@ const LensAdmin = (function () {
     let filters = {
         search: '',
         lensType: '',
-        stockStatus: '',
-        coating: '',
+        isActive: null,
+        isPrescription: null,
         priceMin: null,
         priceMax: null,
         sortBy: 'createdAt',
@@ -43,10 +44,10 @@ const LensAdmin = (function () {
             loadLenses();
         } else if (options.page === 'create') {
             initCreateForm();
-        } else if (options.page === 'edit' && options.lensId) {
-            initEditForm(options.lensId);
-        } else if (options.page === 'details' && options.lensId) {
-            loadLensDetails(options.lensId);
+        } else if (options.page === 'edit' && options.productId) {
+            initEditForm(options.productId);
+        } else if (options.page === 'details' && options.productId) {
+            loadLensDetails(options.productId);
         }
     }
 
@@ -55,7 +56,8 @@ const LensAdmin = (function () {
             lensGrid: document.getElementById('lensGrid'),
             searchInput: document.getElementById('searchInput'),
             lensTypeFilter: document.getElementById('lensTypeFilter'),
-            stockStatusFilter: document.getElementById('stockStatusFilter'),
+            isActiveFilter: document.getElementById('isActiveFilter'),
+            isPrescriptionFilter: document.getElementById('isPrescriptionFilter'),
             sortBySelect: document.getElementById('sortBySelect'),
             showInactiveToggle: document.getElementById('showInactiveToggle'),
             pagination: document.getElementById('pagination'),
@@ -80,8 +82,11 @@ const LensAdmin = (function () {
         if (elements.lensTypeFilter) {
             elements.lensTypeFilter.addEventListener('change', handleFilterChange);
         }
-        if (elements.stockStatusFilter) {
-            elements.stockStatusFilter.addEventListener('change', handleFilterChange);
+        if (elements.isActiveFilter) {
+            elements.isActiveFilter.addEventListener('change', handleFilterChange);
+        }
+        if (elements.isPrescriptionFilter) {
+            elements.isPrescriptionFilter.addEventListener('change', handleFilterChange);
         }
         if (elements.sortBySelect) {
             elements.sortBySelect.addEventListener('change', handleSortChange);
@@ -146,8 +151,8 @@ const LensAdmin = (function () {
 
         if (filters.search) params.append('search', filters.search);
         if (filters.lensType) params.append('lensType', filters.lensType);
-        if (filters.stockStatus) params.append('stockStatus', filters.stockStatus);
-        if (filters.coating) params.append('coating', filters.coating);
+        if (filters.isActive !== null) params.append('isActive', filters.isActive);
+        if (filters.isPrescription !== null) params.append('isPrescription', filters.isPrescription);
         if (filters.priceMin) params.append('priceMin', filters.priceMin);
         if (filters.priceMax) params.append('priceMax', filters.priceMax);
 
@@ -179,23 +184,35 @@ const LensAdmin = (function () {
     }
 
     async function restoreLens(id) {
+        const lens = await fetchLensById(id);
         return await apiRequest(`${API.lenses}/${id}`, {
             method: 'PUT',
-            body: JSON.stringify({ stockStatus: 'in-stock' })
+            body: JSON.stringify({
+                sku: lens.sku,
+                name: lens.name,
+                description: lens.description,
+                price: lens.price,
+                currency: lens.currency,
+                inventoryQty: lens.inventoryQty,
+                isActive: true,
+                lensType: lens.lensType,
+                lensIndex: lens.lensIndex,
+                isPrescription: lens.isPrescription
+            })
         });
     }
 
-    async function fetchLensImages(lensId) {
-        return await apiRequest(`${API.images}?context=lens:${lensId}`);
+    async function fetchLensImages(productId) {
+        return await apiRequest(`${API.images}/product/${productId}`);
     }
 
-    async function uploadImage(file, lensId = null) {
+    async function uploadImage(file, productId = null, isPrimary = false) {
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('imageType', 'lens');
-        if (lensId) {
-            formData.append('context', `lens:${lensId}`);
+        if (productId) {
+            formData.append('productId', productId);
         }
+        formData.append('isPrimary', isPrimary);
 
         showLoading();
         try {
@@ -219,11 +236,9 @@ const LensAdmin = (function () {
         }
     }
 
-    async function updateImageContext(imageId, context) {
-        return await fetch(`${API.images}/${imageId}/context`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(context)
+    async function setImageAsPrimary(imageId) {
+        return await fetch(`${API.images}/${imageId}/set-primary`, {
+            method: 'PATCH'
         });
     }
 
@@ -240,21 +255,7 @@ const LensAdmin = (function () {
     async function loadLenses() {
         try {
             const data = await fetchLenses();
-
-            // Fetch images for each lens
-            const lensesWithImages = await Promise.all(
-                data.items.map(async (lens) => {
-                    try {
-                        const images = await fetch(`${API.images}?context=lens:${lens.lensId}`).then(r => r.ok ? r.json() : []);
-                        lens.imageUrl = images && images.length > 0 ? images[0].imageUrl : null;
-                    } catch {
-                        lens.imageUrl = null;
-                    }
-                    return lens;
-                })
-            );
-
-            renderLensGrid(lensesWithImages);
+            renderLensGrid(data.items);
             renderPagination(data);
         } catch (error) {
             if (elements.lensGrid) {
@@ -280,31 +281,32 @@ const LensAdmin = (function () {
     }
 
     function renderLensCard(lens) {
-        const isInactive = lens.stockStatus === 'out-of-stock';
-        const statusClass = lens.stockStatus ? lens.stockStatus.replace(' ', '-') : '';
+        const isInactive = !lens.isActive;
+        const statusClass = lens.isActive ? 'active' : 'inactive';
 
         return `
-            <div class="lens-card ${isInactive ? 'inactive' : ''}" data-id="${lens.lensId}">
-                ${lens.stockStatus ? `<span class="status-badge ${statusClass}">${formatStockStatus(lens.stockStatus)}</span>` : ''}
+            <div class="lens-card ${isInactive ? 'inactive' : ''}" data-id="${lens.productId}">
+                <span class="status-badge ${statusClass}">${lens.isActive ? 'Active' : 'Inactive'}</span>
                 <div class="lens-card-image">
-                    ${lens.imageUrl
-                ? `<img src="${lens.imageUrl}" alt="${escapeHtml(lens.lensType)}" onerror="this.parentElement.innerHTML='<span class=\\'placeholder-icon\\'>🔍</span>'">`
+                    ${lens.primaryImageUrl
+                ? `<img src="${lens.primaryImageUrl}" alt="${escapeHtml(lens.name)}" onerror="this.parentElement.innerHTML='<span class=\\'placeholder-icon\\'>🔍</span>'">`
                 : '<span class="placeholder-icon">🔍</span>'
             }
                 </div>
                 <div class="lens-card-body">
-                    <h3 class="lens-card-title">${escapeHtml(lens.lensType)}</h3>
-                    <p class="lens-card-subtitle">${lens.coating ? escapeHtml(lens.coating) : 'No coating'}</p>
+                    <h3 class="lens-card-title">${escapeHtml(lens.name)}</h3>
+                    <p class="lens-card-subtitle">${lens.lensType ? escapeHtml(lens.lensType) : 'No type specified'}</p>
                     <div class="lens-card-specs">
-                        ${lens.indexValue ? `<span class="lens-card-spec">Index: ${lens.indexValue}</span>` : ''}
+                        ${lens.lensIndex ? `<span class="lens-card-spec">Index: ${lens.lensIndex}</span>` : ''}
+                        ${lens.isPrescription ? '<span class="lens-card-spec">Rx Required</span>' : ''}
                     </div>
-                    <div class="lens-card-price">$${formatPrice(lens.price)}</div>
+                    <div class="lens-card-price">${formatPrice(lens.price)} ${lens.currency}</div>
                     <div class="lens-card-actions">
-                        <a href="/Admin/Lenses/Details?id=${lens.lensId}" class="btn btn-outline-primary">View</a>
-                        <a href="/Admin/Lenses/Edit?id=${lens.lensId}" class="btn btn-primary">Edit</a>
+                        <a href="/Admin/Lenses/Details?id=${lens.productId}" class="btn btn-outline-primary">View</a>
+                        <a href="/Admin/Lenses/Edit?id=${lens.productId}" class="btn btn-primary">Edit</a>
                         ${isInactive
-                ? `<button class="btn btn-secondary" data-action="restore" data-id="${lens.lensId}">Restore</button>`
-                : `<button class="btn btn-outline-primary" data-action="delete" data-id="${lens.lensId}">Delete</button>`
+                ? `<button class="btn btn-secondary" data-action="restore" data-id="${lens.productId}">Restore</button>`
+                : `<button class="btn btn-outline-primary" data-action="delete" data-id="${lens.productId}">Delete</button>`
             }
                     </div>
                 </div>
@@ -399,7 +401,15 @@ const LensAdmin = (function () {
 
     function handleFilterChange(event) {
         const filterName = event.target.dataset.filter || event.target.id.replace('Filter', '');
-        filters[filterName] = event.target.value;
+        const value = event.target.value;
+
+        // Handle boolean filters
+        if (filterName === 'isActive' || filterName === 'isPrescription') {
+            filters[filterName] = value === '' ? null : value === 'true';
+        } else {
+            filters[filterName] = value;
+        }
+
         currentPage = 1;
         loadLenses();
     }
@@ -416,9 +426,9 @@ const LensAdmin = (function () {
     function handleInactiveToggle(event) {
         showInactive = event.target.checked;
         if (showInactive) {
-            filters.stockStatus = 'out-of-stock';
+            filters.isActive = false;
         } else {
-            filters.stockStatus = '';
+            filters.isActive = null;
         }
         currentPage = 1;
         loadLenses();
@@ -432,14 +442,7 @@ const LensAdmin = (function () {
             showDeleteModal(id);
         } else if (action === 'restore') {
             try {
-                const lens = await fetchLensById(id);
-                await updateLens(id, {
-                    lensType: lens.lensType,
-                    indexValue: lens.indexValue,
-                    coating: lens.coating,
-                    price: lens.price,
-                    stockStatus: 'in-stock'
-                });
+                await restoreLens(id);
                 showToast('success', 'Lens restored successfully');
                 loadLenses();
             } catch (error) {
@@ -457,28 +460,34 @@ const LensAdmin = (function () {
 
         const formData = new FormData(event.target);
         const lensData = {
-            lensType: formData.get('lensType'),
-            indexValue: formData.get('indexValue') ? parseFloat(formData.get('indexValue')) : null,
-            coating: formData.get('coating') || null,
+            sku: formData.get('sku'),
+            name: formData.get('name'),
+            description: formData.get('description') || null,
             price: parseFloat(formData.get('price')),
-            stockStatus: formData.get('stockStatus') || 'in-stock'
+            currency: formData.get('currency') || 'VND',
+            inventoryQty: formData.get('inventoryQty') ? parseInt(formData.get('inventoryQty')) : null,
+            isActive: formData.get('isActive') === 'true',
+            lensType: formData.get('lensType') || null,
+            lensIndex: formData.get('lensIndex') ? parseFloat(formData.get('lensIndex')) : null,
+            isPrescription: formData.get('isPrescription') === 'true'
         };
 
-        const lensId = formData.get('lensId');
+        const productId = formData.get('productId');
 
         try {
             let savedLens;
-            if (lensId) {
-                savedLens = await updateLens(lensId, lensData);
+            if (productId) {
+                savedLens = await updateLens(productId, lensData);
                 showToast('success', 'Lens updated successfully');
             } else {
                 savedLens = await createLens(lensData);
                 showToast('success', 'Lens created successfully');
 
-                // Link uploaded images to the new lens
+                // Upload pending images for the new lens
                 if (uploadedImages.length > 0) {
-                    for (const img of uploadedImages) {
-                        await updateImageContext(img.imageId, `lens:${savedLens.lensId}`);
+                    for (let i = 0; i < uploadedImages.length; i++) {
+                        const img = uploadedImages[i];
+                        await uploadImage(img.file, savedLens.productId, i === 0);
                     }
                 }
             }
@@ -500,13 +509,13 @@ const LensAdmin = (function () {
         uploadedImages = [];
     }
 
-    async function initEditForm(lensId) {
+    async function initEditForm(productId) {
         try {
-            const lens = await fetchLensById(lensId);
+            const lens = await fetchLensById(productId);
             populateForm(lens);
 
             // Load existing images
-            const images = await fetchLensImages(lensId);
+            const images = await fetchLensImages(productId);
             if (images && images.length > 0) {
                 uploadedImages = images;
                 renderImagePreviews();
@@ -520,12 +529,17 @@ const LensAdmin = (function () {
         const form = elements.lensForm;
         if (!form) return;
 
-        form.querySelector('[name="lensId"]').value = lens.lensId;
-        form.querySelector('[name="lensType"]').value = lens.lensType || '';
-        form.querySelector('[name="indexValue"]').value = lens.indexValue || '';
-        form.querySelector('[name="coating"]').value = lens.coating || '';
+        form.querySelector('[name="productId"]').value = lens.productId;
+        form.querySelector('[name="sku"]').value = lens.sku || '';
+        form.querySelector('[name="name"]').value = lens.name || '';
+        form.querySelector('[name="description"]').value = lens.description || '';
         form.querySelector('[name="price"]').value = lens.price || '';
-        form.querySelector('[name="stockStatus"]').value = lens.stockStatus || 'in-stock';
+        form.querySelector('[name="currency"]').value = lens.currency || 'VND';
+        form.querySelector('[name="inventoryQty"]').value = lens.inventoryQty || '';
+        form.querySelector('[name="isActive"]').value = lens.isActive ? 'true' : 'false';
+        form.querySelector('[name="lensType"]').value = lens.lensType || '';
+        form.querySelector('[name="lensIndex"]').value = lens.lensIndex || '';
+        form.querySelector('[name="isPrescription"]').value = lens.isPrescription ? 'true' : 'false';
     }
 
     function validateForm() {
@@ -539,21 +553,18 @@ const LensAdmin = (function () {
             group.classList.remove('has-error');
         });
 
-        // Lens Type - required
-        const lensType = form.querySelector('[name="lensType"]');
-        if (!lensType.value.trim()) {
-            showFieldError(lensType, 'Lens type is required');
+        // SKU - required
+        const sku = form.querySelector('[name="sku"]');
+        if (!sku.value.trim()) {
+            showFieldError(sku, 'SKU is required');
             isValid = false;
         }
 
-        // Index Value - optional but must be between 1.0 and 2.0
-        const indexValue = form.querySelector('[name="indexValue"]');
-        if (indexValue.value) {
-            const val = parseFloat(indexValue.value);
-            if (isNaN(val) || val < 1.0 || val > 2.0) {
-                showFieldError(indexValue, 'Index value must be between 1.0 and 2.0');
-                isValid = false;
-            }
+        // Name - required
+        const name = form.querySelector('[name="name"]');
+        if (!name.value.trim()) {
+            showFieldError(name, 'Name is required');
+            isValid = false;
         }
 
         // Price - required and > 0
@@ -561,6 +572,16 @@ const LensAdmin = (function () {
         if (!price.value || parseFloat(price.value) <= 0) {
             showFieldError(price, 'Price must be greater than 0');
             isValid = false;
+        }
+
+        // Lens Index - optional but must be between 1.0 and 2.0
+        const lensIndex = form.querySelector('[name="lensIndex"]');
+        if (lensIndex.value) {
+            const val = parseFloat(lensIndex.value);
+            if (isNaN(val) || val < 1.0 || val > 2.0) {
+                showFieldError(lensIndex, 'Lens index must be between 1.0 and 2.0');
+                isValid = false;
+            }
         }
 
         return isValid;
@@ -611,6 +632,9 @@ const LensAdmin = (function () {
     }
 
     async function handleFileUpload(files) {
+        const formData = new FormData(elements.lensForm);
+        const productId = formData.get('productId');
+
         for (const file of files) {
             // Validate file type
             const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
@@ -626,10 +650,18 @@ const LensAdmin = (function () {
             }
 
             try {
-                const result = await uploadImage(file);
-                uploadedImages.push(result);
-                renderImagePreviews();
-                showToast('success', 'Image uploaded successfully');
+                if (productId) {
+                    // If editing, upload immediately
+                    const result = await uploadImage(file, productId, uploadedImages.length === 0);
+                    uploadedImages.push(result);
+                    renderImagePreviews();
+                    showToast('success', 'Image uploaded successfully');
+                } else {
+                    // If creating, store file for later upload
+                    const previewUrl = URL.createObjectURL(file);
+                    uploadedImages.push({ file, imageUrl: previewUrl, isPending: true });
+                    renderImagePreviews();
+                }
             } catch (error) {
                 // Error already shown
             }
@@ -640,10 +672,11 @@ const LensAdmin = (function () {
         if (!elements.imagePreviewGrid) return;
 
         elements.imagePreviewGrid.innerHTML = uploadedImages.map((img, index) => `
-            <div class="image-preview-item" data-index="${index}">
+            <div class="image-preview-item ${img.isPending ? 'pending' : ''}" data-index="${index}">
                 <img src="${img.imageUrl}" alt="${img.altText || 'Lens image'}">
                 <button type="button" class="remove-btn" onclick="LensAdmin.removeImage(${index})">×</button>
-                ${index === 0 ? '<span class="primary-badge">Primary</span>' : ''}
+                ${img.isPrimary || index === 0 ? '<span class="primary-badge">Primary</span>' : ''}
+                ${img.isPending ? '<span class="pending-badge">Pending</span>' : ''}
             </div>
         `).join('');
     }
@@ -651,7 +684,9 @@ const LensAdmin = (function () {
     async function removeImage(index) {
         const image = uploadedImages[index];
         try {
-            await deleteImage(image.imageId);
+            if (!image.isPending && image.imageId) {
+                await deleteImage(image.imageId);
+            }
             uploadedImages.splice(index, 1);
             renderImagePreviews();
             showToast('success', 'Image removed');
@@ -664,12 +699,12 @@ const LensAdmin = (function () {
     // DETAILS PAGE
     // ==========================================
 
-    async function loadLensDetails(lensId) {
+    async function loadLensDetails(productId) {
         try {
-            const lens = await fetchLensById(lensId);
+            const lens = await fetchLensById(productId);
             renderLensDetails(lens);
 
-            const images = await fetchLensImages(lensId);
+            const images = await fetchLensImages(productId);
             renderDetailsGallery(images);
         } catch (error) {
             showToast('error', 'Failed to load lens details');
@@ -681,35 +716,48 @@ const LensAdmin = (function () {
         if (!detailsInfo) return;
 
         detailsInfo.innerHTML = `
-            <h1 class="details-title">${escapeHtml(lens.lensType)}</h1>
-            <div class="details-price">$${formatPrice(lens.price)}</div>
+            <h1 class="details-title">${escapeHtml(lens.name)}</h1>
+            <div class="details-price">${formatPrice(lens.price)} ${lens.currency}</div>
             <div class="details-specs">
                 <div class="details-spec-row">
+                    <span class="details-spec-label">SKU</span>
+                    <span class="details-spec-value">${escapeHtml(lens.sku)}</span>
+                </div>
+                <div class="details-spec-row">
                     <span class="details-spec-label">Lens Type</span>
-                    <span class="details-spec-value">${escapeHtml(lens.lensType)}</span>
+                    <span class="details-spec-value">${lens.lensType ? escapeHtml(lens.lensType) : 'N/A'}</span>
                 </div>
                 <div class="details-spec-row">
-                    <span class="details-spec-label">Index Value</span>
-                    <span class="details-spec-value">${lens.indexValue || 'N/A'}</span>
+                    <span class="details-spec-label">Lens Index</span>
+                    <span class="details-spec-value">${lens.lensIndex || 'N/A'}</span>
                 </div>
                 <div class="details-spec-row">
-                    <span class="details-spec-label">Coating</span>
-                    <span class="details-spec-value">${lens.coating ? escapeHtml(lens.coating) : 'None'}</span>
+                    <span class="details-spec-label">Prescription Required</span>
+                    <span class="details-spec-value">${lens.isPrescription ? 'Yes' : 'No'}</span>
                 </div>
                 <div class="details-spec-row">
-                    <span class="details-spec-label">Stock Status</span>
+                    <span class="details-spec-label">Status</span>
                     <span class="details-spec-value">
-                        <span class="status-badge ${lens.stockStatus || ''}">${formatStockStatus(lens.stockStatus)}</span>
+                        <span class="status-badge ${lens.isActive ? 'active' : 'inactive'}">${lens.isActive ? 'Active' : 'Inactive'}</span>
                     </span>
+                </div>
+                <div class="details-spec-row">
+                    <span class="details-spec-label">Inventory</span>
+                    <span class="details-spec-value">${lens.inventoryQty !== null ? lens.inventoryQty : 'N/A'}</span>
                 </div>
                 <div class="details-spec-row">
                     <span class="details-spec-label">Created</span>
                     <span class="details-spec-value">${formatDate(lens.createdAt)}</span>
                 </div>
+                <div class="details-spec-row">
+                    <span class="details-spec-label">Updated</span>
+                    <span class="details-spec-value">${formatDate(lens.updatedAt)}</span>
+                </div>
             </div>
+            ${lens.description ? `<div class="details-description"><h3>Description</h3><p>${escapeHtml(lens.description)}</p></div>` : ''}
             <div class="form-actions">
-                <a href="/Admin/Lenses/Edit?id=${lens.lensId}" class="btn btn-primary">Edit Lens</a>
-                <button class="btn btn-outline-primary" onclick="LensAdmin.confirmDelete(${lens.lensId})">Delete</button>
+                <a href="/Admin/Lenses/Edit?id=${lens.productId}" class="btn btn-primary">Edit Lens</a>
+                <button class="btn btn-outline-primary" onclick="LensAdmin.confirmDelete(${lens.productId})">Delete</button>
                 <a href="/Admin/Lenses" class="btn btn-secondary">Back to List</a>
             </div>
         `;
@@ -727,6 +775,9 @@ const LensAdmin = (function () {
             if (thumbnails) thumbnails.style.display = 'none';
             return;
         }
+
+        // Sort by primary first
+        images.sort((a, b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0));
 
         // Set main image
         mainImage.innerHTML = `<img src="${images[0].imageUrl}" alt="${images[0].altText || 'Lens image'}">`;
@@ -866,17 +917,10 @@ const LensAdmin = (function () {
     }
 
     function formatPrice(price) {
-        return parseFloat(price).toLocaleString('en-US', {
-            minimumFractionDigits: 2,
+        return parseFloat(price).toLocaleString('vi-VN', {
+            minimumFractionDigits: 0,
             maximumFractionDigits: 2
         });
-    }
-
-    function formatStockStatus(status) {
-        if (!status) return 'Unknown';
-        return status.split('-').map(word =>
-            word.charAt(0).toUpperCase() + word.slice(1)
-        ).join(' ');
     }
 
     function formatDate(dateString) {

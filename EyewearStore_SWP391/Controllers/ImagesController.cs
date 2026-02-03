@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace EyewearStore_SWP391.Controllers;
 
 /// <summary>
-/// API Controller for managing image uploads
+/// API Controller for managing product images
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
@@ -28,12 +28,13 @@ public class ImagesController : ControllerBase
     }
 
     /// <summary>
-    /// Uploads an image file and creates an Image record
+    /// Uploads an image file and creates a ProductImage record
     /// </summary>
     /// <param name="file">The image file to upload</param>
-    /// <param name="imageType">Type of image (e.g., "product", "lens")</param>
-    /// <param name="context">Context identifier (e.g., "lens:123")</param>
+    /// <param name="productId">The product ID to associate with the image</param>
     /// <param name="altText">Alternative text for the image</param>
+    /// <param name="isPrimary">Whether this is the primary image for the product</param>
+    /// <param name="sortOrder">Display order for the image</param>
     /// <returns>The created image record with URL</returns>
     [HttpPost("upload")]
     [ProducesResponseType(StatusCodes.Status201Created)]
@@ -41,9 +42,10 @@ public class ImagesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UploadImage(
         IFormFile file,
-        [FromForm] string imageType = "product",
-        [FromForm] string? context = null,
-        [FromForm] string? altText = null)
+        [FromForm] int productId,
+        [FromForm] string? altText = null,
+        [FromForm] bool isPrimary = false,
+        [FromForm] int sortOrder = 0)
     {
         try
         {
@@ -66,8 +68,27 @@ public class ImagesController : ControllerBase
                 return BadRequest($"Invalid file type. Allowed types: {string.Join(", ", _allowedExtensions)}");
             }
 
+            // Verify product exists
+            var product = await _context.Products.FindAsync(productId);
+            if (product == null)
+            {
+                return BadRequest($"Product with ID {productId} not found");
+            }
+
+            // If this is set as primary, unset other primary images for this product
+            if (isPrimary)
+            {
+                var existingPrimary = await _context.ProductImages
+                    .Where(pi => pi.ProductId == productId && pi.IsPrimary)
+                    .ToListAsync();
+                foreach (var img in existingPrimary)
+                {
+                    img.IsPrimary = false;
+                }
+            }
+
             // Create upload directory if it doesn't exist
-            var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", imageType);
+            var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "products", productId.ToString());
             if (!Directory.Exists(uploadFolder))
             {
                 Directory.CreateDirectory(uploadFolder);
@@ -86,31 +107,33 @@ public class ImagesController : ControllerBase
             }
 
             // Create image URL (relative path)
-            var imageUrl = $"/uploads/{imageType}/{fileName}";
+            var imageUrl = $"/uploads/products/{productId}/{fileName}";
 
-            // Create Image record in database
-            var image = new Image
+            // Create ProductImage record in database
+            var productImage = new ProductImage
             {
+                ProductId = productId,
                 ImageUrl = imageUrl,
                 AltText = altText,
-                ImageType = imageType,
-                Context = context,
-                DisplayOrder = 0,
+                IsPrimary = isPrimary,
+                SortOrder = sortOrder,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             };
 
-            await _context.Images.AddAsync(image);
+            await _context.ProductImages.AddAsync(productImage);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetImageById), new { id = image.ImageId }, new
+            return CreatedAtAction(nameof(GetImageById), new { id = productImage.ImageId }, new
             {
-                imageId = image.ImageId,
-                imageUrl = image.ImageUrl,
-                altText = image.AltText,
-                imageType = image.ImageType,
-                context = image.Context,
-                createdAt = image.CreatedAt
+                imageId = productImage.ImageId,
+                productId = productImage.ProductId,
+                imageUrl = productImage.ImageUrl,
+                altText = productImage.AltText,
+                isPrimary = productImage.IsPrimary,
+                sortOrder = productImage.SortOrder,
+                isActive = productImage.IsActive,
+                createdAt = productImage.CreatedAt
             });
         }
         catch (Exception ex)
@@ -121,43 +144,37 @@ public class ImagesController : ControllerBase
     }
 
     /// <summary>
-    /// Gets images filtered by context
+    /// Gets images for a specific product
     /// </summary>
-    /// <param name="context">Filter by context (e.g., "lens:123")</param>
-    /// <param name="imageType">Filter by image type</param>
-    /// <returns>List of images</returns>
-    [HttpGet]
+    /// <param name="productId">The product ID</param>
+    /// <param name="activeOnly">Only return active images</param>
+    /// <returns>List of product images</returns>
+    [HttpGet("product/{productId:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetImages(
-        [FromQuery] string? context = null,
-        [FromQuery] string? imageType = null)
+    public async Task<IActionResult> GetImagesByProductId(int productId, [FromQuery] bool activeOnly = true)
     {
         try
         {
-            var query = _context.Images.Where(i => i.IsActive);
+            var query = _context.ProductImages.Where(pi => pi.ProductId == productId);
 
-            if (!string.IsNullOrWhiteSpace(context))
+            if (activeOnly)
             {
-                query = query.Where(i => i.Context == context);
-            }
-
-            if (!string.IsNullOrWhiteSpace(imageType))
-            {
-                query = query.Where(i => i.ImageType == imageType);
+                query = query.Where(pi => pi.IsActive);
             }
 
             var images = await query
-                .OrderBy(i => i.DisplayOrder)
-                .ThenByDescending(i => i.CreatedAt)
-                .Select(i => new
+                .OrderByDescending(pi => pi.IsPrimary)
+                .ThenBy(pi => pi.SortOrder)
+                .Select(pi => new
                 {
-                    imageId = i.ImageId,
-                    imageUrl = i.ImageUrl,
-                    altText = i.AltText,
-                    imageType = i.ImageType,
-                    context = i.Context,
-                    displayOrder = i.DisplayOrder,
-                    createdAt = i.CreatedAt
+                    imageId = pi.ImageId,
+                    productId = pi.ProductId,
+                    imageUrl = pi.ImageUrl,
+                    altText = pi.AltText,
+                    isPrimary = pi.IsPrimary,
+                    sortOrder = pi.SortOrder,
+                    isActive = pi.IsActive,
+                    createdAt = pi.CreatedAt
                 })
                 .ToListAsync();
 
@@ -182,7 +199,7 @@ public class ImagesController : ControllerBase
     {
         try
         {
-            var image = await _context.Images.FindAsync(id);
+            var image = await _context.ProductImages.FindAsync(id);
 
             if (image == null)
             {
@@ -192,11 +209,11 @@ public class ImagesController : ControllerBase
             return Ok(new
             {
                 imageId = image.ImageId,
+                productId = image.ProductId,
                 imageUrl = image.ImageUrl,
                 altText = image.AltText,
-                imageType = image.ImageType,
-                context = image.Context,
-                displayOrder = image.DisplayOrder,
+                isPrimary = image.IsPrimary,
+                sortOrder = image.SortOrder,
                 isActive = image.IsActive,
                 createdAt = image.CreatedAt
             });
@@ -205,6 +222,53 @@ public class ImagesController : ControllerBase
         {
             return StatusCode(StatusCodes.Status500InternalServerError,
                 $"An error occurred while retrieving the image: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Sets an image as the primary image for its product
+    /// </summary>
+    /// <param name="id">The image ID</param>
+    /// <returns>The updated image</returns>
+    [HttpPatch("{id:int}/set-primary")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> SetImageAsPrimary(int id)
+    {
+        try
+        {
+            var image = await _context.ProductImages.FindAsync(id);
+
+            if (image == null)
+            {
+                return NotFound($"Image with ID {id} not found");
+            }
+
+            // Unset other primary images for this product
+            var existingPrimary = await _context.ProductImages
+                .Where(pi => pi.ProductId == image.ProductId && pi.IsPrimary && pi.ImageId != id)
+                .ToListAsync();
+            foreach (var img in existingPrimary)
+            {
+                img.IsPrimary = false;
+            }
+
+            image.IsPrimary = true;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                imageId = image.ImageId,
+                productId = image.ProductId,
+                imageUrl = image.ImageUrl,
+                isPrimary = image.IsPrimary
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                $"An error occurred while updating the image: {ex.Message}");
         }
     }
 
@@ -220,7 +284,7 @@ public class ImagesController : ControllerBase
     {
         try
         {
-            var image = await _context.Images.FindAsync(id);
+            var image = await _context.ProductImages.FindAsync(id);
 
             if (image == null)
             {
@@ -229,9 +293,8 @@ public class ImagesController : ControllerBase
 
             // Soft delete
             image.IsActive = false;
-            image.UpdatedAt = DateTime.UtcNow;
 
-            _context.Images.Update(image);
+            _context.ProductImages.Update(image);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -240,46 +303,6 @@ public class ImagesController : ControllerBase
         {
             return StatusCode(StatusCodes.Status500InternalServerError,
                 $"An error occurred while deleting the image: {ex.Message}");
-        }
-    }
-
-    /// <summary>
-    /// Updates an image's context (for linking to a lens after creation)
-    /// </summary>
-    /// <param name="id">The image ID</param>
-    /// <param name="context">The new context value</param>
-    /// <returns>The updated image</returns>
-    [HttpPatch("{id:int}/context")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateImageContext(int id, [FromBody] string context)
-    {
-        try
-        {
-            var image = await _context.Images.FindAsync(id);
-
-            if (image == null)
-            {
-                return NotFound($"Image with ID {id} not found");
-            }
-
-            image.Context = context;
-            image.UpdatedAt = DateTime.UtcNow;
-
-            _context.Images.Update(image);
-            await _context.SaveChangesAsync();
-
-            return Ok(new
-            {
-                imageId = image.ImageId,
-                imageUrl = image.ImageUrl,
-                context = image.Context
-            });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                $"An error occurred while updating the image: {ex.Message}");
         }
     }
 }

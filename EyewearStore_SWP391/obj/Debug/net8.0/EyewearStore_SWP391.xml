@@ -895,6 +895,11 @@
             BR: Handle actions triggered by status changes
             </summary>
         </member>
+        <member name="T:EyewearStore_SWP391.Pages.Staff.Orders.IndexModel">
+            <summary>
+            Operations Staff Order Management
+            </summary>
+        </member>
         <member name="T:EyewearStore_SWP391.Services.FrameService">
             <summary>
             Service implementation for frame product operations using TPT inheritance

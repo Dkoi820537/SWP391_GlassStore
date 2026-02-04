@@ -3,8 +3,82 @@
   "WorkspaceRootPath": "D:\\SWP391_GlassStore\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\staff\\orders\\details.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\staff\\orders\\details.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\staff\\orders\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\staff\\orders\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\staff\\orders\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\staff\\orders\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\staff\\orders\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\staff\\orders\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\ARK\\Staff_Orders_Details.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\models\\orderitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\models\\orderitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\models\\order.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\models\\order.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\ARK\\Staff_Orders_Index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\sale\\orders\\details.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\sale\\orders\\details.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\sale\\orders\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\sale\\orders\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\sale\\orders\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\sale\\orders\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\sale\\orders\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\sale\\orders\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\profile\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\profile\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\sale\\orders\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\sale\\orders\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\sale\\orders\\delete.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\sale\\orders\\delete.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\sale\\orders\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\sale\\orders\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\sale\\orders\\create.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\sale\\orders\\create.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\sale\\orders\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\sale\\orders\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\customer\\myorders.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -15,12 +89,8 @@
       "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\customer\\myorders.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\sale\\orders\\delete.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\sale\\orders\\delete.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\pages\\sale\\orders\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\pages\\sale\\orders\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|d:\\swp391_glassstore\\eyewearstore_swp391\\models\\eyewearstorecontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE4F1C0F-059E-4706-8D96-CFC1AD218431}|EyewearStore_SWP391\\EyewearStore_SWP391.csproj|solutionrelative:eyewearstore_swp391\\models\\eyewearstorecontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,7 +100,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 8,
           "Children": [
             {
               "$type": "Bookmark",
@@ -50,66 +120,302 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Staff_Orders_Details.cshtml.cs",
+              "DocumentMoniker": "D:\\ARK\\Staff_Orders_Details.cshtml.cs",
+              "RelativeDocumentMoniker": "..\\ARK\\Staff_Orders_Details.cshtml.cs",
+              "ToolTip": "D:\\ARK\\Staff_Orders_Details.cshtml.cs",
+              "RelativeToolTip": "..\\ARK\\Staff_Orders_Details.cshtml.cs",
+              "ViewState": "AgIAADoBAAAAAAAAAADwv2ABAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-04T15:53:54.53Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "OrderItem.cs",
+              "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Models\\OrderItem.cs",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Models\\OrderItem.cs",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Models\\OrderItem.cs",
+              "RelativeToolTip": "EyewearStore_SWP391\\Models\\OrderItem.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAIwCAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-04T15:53:06.038Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Order.cs",
+              "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Models\\Order.cs",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Models\\Order.cs",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Models\\Order.cs",
+              "RelativeToolTip": "EyewearStore_SWP391\\Models\\Order.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-04T15:52:46.085Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Staff_Orders_Index.cshtml.cs",
+              "DocumentMoniker": "D:\\ARK\\Staff_Orders_Index.cshtml.cs",
+              "RelativeDocumentMoniker": "..\\ARK\\Staff_Orders_Index.cshtml.cs",
+              "ToolTip": "D:\\ARK\\Staff_Orders_Index.cshtml.cs",
+              "RelativeToolTip": "..\\ARK\\Staff_Orders_Index.cshtml.cs",
+              "ViewState": "AgIAAIwAAAAAAAAAAAAAAMUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-04T15:52:12.89Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Details.cshtml.cs",
+              "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Staff\\Orders\\Details.cshtml.cs",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Staff\\Orders\\Details.cshtml.cs",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Staff\\Orders\\Details.cshtml.cs*",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Staff\\Orders\\Details.cshtml.cs*",
+              "ViewState": "AgIAANQAAAAAAAAAAADwv/QAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-04T15:21:39.648Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Details.cshtml",
+              "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Staff\\Orders\\Details.cshtml",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Staff\\Orders\\Details.cshtml",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Staff\\Orders\\Details.cshtml*",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Staff\\Orders\\Details.cshtml*",
+              "ViewState": "AgIAAAYCAAAAAAAAAADwvzUCAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-02-04T15:21:24.669Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Index.cshtml.cs",
+              "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Staff\\Orders\\Index.cshtml.cs",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Staff\\Orders\\Index.cshtml.cs",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Staff\\Orders\\Index.cshtml.cs*",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Staff\\Orders\\Index.cshtml.cs*",
+              "ViewState": "AgIAAB4AAAAAAAAAAAA+wLcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-04T15:20:49.633Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Staff\\Orders\\Index.cshtml",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Staff\\Orders\\Index.cshtml",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Staff\\Orders\\Index.cshtml*",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Staff\\Orders\\Index.cshtml*",
+              "ViewState": "AgIAAG4BAAAAAAAAAADwv44BAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-02-04T15:20:30.273Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Index.cshtml.cs",
+              "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Index.cshtml.cs",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Index.cshtml.cs",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Index.cshtml.cs",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Index.cshtml.cs",
+              "ViewState": "AgIAACsAAAAAAAAAAAAuwGQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-04T15:16:31.083Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Index.cshtml",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Index.cshtml",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Index.cshtml",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Index.cshtml",
+              "ViewState": "AgIAAKIAAAAAAAAAAAAAANsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-02-04T15:16:21.48Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "Edit.cshtml",
+              "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Edit.cshtml",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Edit.cshtml",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Edit.cshtml",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Edit.cshtml",
+              "ViewState": "AgIAAOoAAAAAAAAAAAAcwBUBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-02-04T15:16:10.109Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Details.cshtml.cs",
+              "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Details.cshtml.cs",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Details.cshtml.cs",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Details.cshtml.cs",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Details.cshtml.cs",
+              "ViewState": "AgIAADUAAAAAAAAAAAAwwG4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-04T15:16:06.331Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Details.cshtml",
+              "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Details.cshtml",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Details.cshtml",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Details.cshtml",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Details.cshtml",
+              "ViewState": "AgIAABUAAAAAAAAAAAAAAE4AAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-02-04T15:15:58.87Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "Create.cshtml.cs",
+              "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Create.cshtml.cs",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Create.cshtml.cs",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Create.cshtml.cs",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Create.cshtml.cs",
+              "ViewState": "AgIAAMEAAAAAAAAAAAAcwOwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-04T15:15:37.732Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Create.cshtml",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Create.cshtml",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Create.cshtml",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Create.cshtml",
+              "ViewState": "AgIAAIgAAAAAAAAAAAAcwLMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-02-04T15:15:31.873Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Profile\\Index.cshtml",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Profile\\Index.cshtml",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Profile\\Index.cshtml",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Profile\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-02-04T15:15:13.66Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "EyewearStoreContext.cs",
+              "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Models\\EyewearStoreContext.cs",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\Models\\EyewearStoreContext.cs",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Models\\EyewearStoreContext.cs",
+              "RelativeToolTip": "EyewearStore_SWP391\\Models\\EyewearStoreContext.cs",
+              "ViewState": "AgIAADoAAAAAAAAAAAAkwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-04T09:42:23.136Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\appsettings.json",
+              "RelativeDocumentMoniker": "EyewearStore_SWP391\\appsettings.json",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\appsettings.json",
+              "RelativeToolTip": "EyewearStore_SWP391\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAACOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-02-04T09:41:58.731Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
               "Title": "MyOrders.cshtml.cs",
               "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Customer\\MyOrders.cshtml.cs",
               "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Customer\\MyOrders.cshtml.cs",
-              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Customer\\MyOrders.cshtml.cs*",
-              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Customer\\MyOrders.cshtml.cs*",
-              "ViewState": "AgIAAI4AAAAAAAAAAAAAwLsAAAAAAAAAAAAAAA==",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Customer\\MyOrders.cshtml.cs",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Customer\\MyOrders.cshtml.cs",
+              "ViewState": "AgIAAJIAAAAAAAAAAAAIwLsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-02-04T09:41:06.926Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 21,
               "Title": "MyOrders.cshtml",
               "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Customer\\MyOrders.cshtml",
               "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Customer\\MyOrders.cshtml",
-              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Customer\\MyOrders.cshtml*",
-              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Customer\\MyOrders.cshtml*",
-              "ViewState": "AgIAAG8AAAAAAAAAAAAAwFwBAAAAAAAAAAAAAA==",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Customer\\MyOrders.cshtml",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Customer\\MyOrders.cshtml",
+              "ViewState": "AgIAADEBAAAAAAAAAAAcwFwBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-02-04T09:40:56.661Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 17,
               "Title": "Delete.cshtml",
               "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Delete.cshtml",
               "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Delete.cshtml",
               "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Delete.cshtml",
               "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Delete.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAEwAAAAAAAAAAAAcwHcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-02-04T06:47:39.522Z"
+              "WhenOpened": "2026-02-04T06:47:39.522Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 13,
               "Title": "_Layout.cshtml",
               "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Shared\\_Layout.cshtml",
               "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Shared\\_Layout.cshtml",
-              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Shared\\_Layout.cshtml*",
-              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Shared\\_Layout.cshtml*",
-              "ViewState": "AgIAAO4AAAAAAAAAAAAAwBUBAAAAAAAAAAAAAA==",
+              "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAAAGIAAABeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-02-04T06:47:00.842Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 16,
               "Title": "Delete.cshtml.cs",
               "DocumentMoniker": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Delete.cshtml.cs",
               "RelativeDocumentMoniker": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Delete.cshtml.cs",
               "ToolTip": "D:\\SWP391_GlassStore\\EyewearStore_SWP391\\Pages\\Sale\\Orders\\Delete.cshtml.cs",
               "RelativeToolTip": "EyewearStore_SWP391\\Pages\\Sale\\Orders\\Delete.cshtml.cs",
-              "ViewState": "AgIAAD0AAAAAAAAAAAAkwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAADMAAAAAAAAAAAAcwF4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-04T06:41:39.308Z"
+              "WhenOpened": "2026-02-04T06:41:39.308Z",
+              "EditorCaption": ""
             }
           ]
         },

@@ -1,0 +1,399 @@
+﻿@page
+@model EyewearStore_SWP391.Pages.Staff.Orders.IndexModel
+@{
+    ViewData["Title"] = "Operations - Order Management";
+}
+
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
+                <li class="breadcrumb-item active">Operations</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
+                    🔧 Operations Dashboard
+                </h1>
+                <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin: 0;">
+                    Process orders, manage inventory, and handle shipments
+                </p>
+            </div>
+            <button class="btn btn-primary" onclick="window.location.reload()">
+                <span style="margin-right: 0.5rem;">🔄</span> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 8px; border-left: 4px solid var(--success);">
+            <strong>✓</strong> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px; border-left: 4px solid var(--error);">
+            <strong>⚠</strong> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%); color: white;">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Pending</div>
+                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.PendingCount</div>
+                        </div>
+                        <div style="font-size: 3rem; opacity: 0.3;">⏳</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #2196f3 0%, #03a9f4 100%); color: white;">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Processing</div>
+                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.ProcessingCount</div>
+                        </div>
+                        <div style="font-size: 3rem; opacity: 0.3;">⚙️</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%); color: white;">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Prescription</div>
+                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.PrescriptionCount</div>
+                        </div>
+                        <div style="font-size: 3rem; opacity: 0.3;">👓</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); color: white;">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Today's Shipped</div>
+                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.ShippedTodayCount</div>
+                        </div>
+                        <div style="font-size: 3rem; opacity: 0.3;">📦</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
+                        🔍 Search Orders
+                    </label>
+                    <input type="text"
+                           class="form-control"
+                           name="Search"
+                           value="@Model.Search"
+                           placeholder="Order ID, Email, or Name..."
+                           style="border: 2px solid var(--medium-gray); border-radius: 8px; padding: 0.75rem;" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
+                        📊 Status
+                    </label>
+                    <select class="form-select"
+                            name="StatusFilter"
+                            style="border: 2px solid var(--medium-gray); border-radius: 8px; padding: 0.75rem;">
+                        <option value="">All Statuses</option>
+                        @foreach (var s in Model.Statuses)
+                        {
+                            if (Model.StatusFilter == s)
+                            {
+                                <option value="@s" selected="selected">@s</option>
+                            }
+                            else
+                            {
+                                <option value="@s">@s</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
+                        🏷️ Order Type
+                    </label>
+                    <select class="form-select"
+                            name="TypeFilter"
+                            style="border: 2px solid var(--medium-gray); border-radius: 8px; padding: 0.75rem;">
+                        <option value="">All Types</option>
+                        @if (Model.TypeFilter == "Prescription")
+                        {
+                            <option value="Prescription" selected="selected">Prescription Orders</option>
+                        }
+                        else
+                        {
+                            <option value="Prescription">Prescription Orders</option>
+                        }
+
+                        @if (Model.TypeFilter == "ReadyStock")
+                        {
+                            <option value="ReadyStock" selected="selected">Ready Stock</option>
+                        }
+                        else
+                        {
+                            <option value="ReadyStock">Ready Stock</option>
+                        }
+
+                        @if (Model.TypeFilter == "PreOrder")
+                        {
+                            <option value="PreOrder" selected="selected">Pre-Orders</option>
+                        }
+                        else
+                        {
+                            <option value="PreOrder">Pre-Orders</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
+                        ⚡ Priority
+                    </label>
+                    <select class="form-select"
+                            name="PriorityFilter"
+                            style="border: 2px solid var(--medium-gray); border-radius: 8px; padding: 0.75rem;">
+                        <option value="">All</option>
+                        @if (Model.PriorityFilter == "High")
+                        {
+                            <option value="High" selected="selected">High Priority</option>
+                        }
+                        else
+                        {
+                            <option value="High">High Priority</option>
+                        }
+
+                        @if (Model.PriorityFilter == "Normal")
+                        {
+                            <option value="Normal" selected="selected">Normal</option>
+                        }
+                        else
+                        {
+                            <option value="Normal">Normal</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100" style="padding: 0.75rem;">
+                        <span style="margin-right: 0.5rem;">🔍</span> Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-lg);">
+        <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+                    padding: 1.5rem;
+                    border-radius: 12px 12px 0 0;">
+            <h5 style="color: white; margin: 0; font-weight: 600;">
+                📋 Orders Queue (@Model.Orders.Count)
+            </h5>
+        </div>
+
+        <div class="card-body p-0">
+            @if (!Model.Orders.Any())
+            {
+                <div style="text-align: center; padding: 4rem 2rem;">
+                    <div style="font-size: 4rem; opacity: 0.2; margin-bottom: 1rem;">📦</div>
+                    <h4 style="color: var(--primary-navy); margin-bottom: 0.5rem;">No Orders Found</h4>
+                    <p style="color: var(--secondary-warm-gray);">
+                        All orders are processed! Or adjust your filters.
+                    </p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" style="font-size: 0.95rem;">
+                        <thead style="background: var(--light-gray);">
+                            <tr>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Order</th>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Customer</th>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Created</th>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Status</th>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Type</th>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Shipment</th>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy); text-align: right;">Total</th>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy); text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var o in Model.Orders)
+                            {
+                                var isPrescription = o.OrderItems.Any(oi => oi.PrescriptionId != null);
+                                var isPreOrder = o.OrderItems.Any(oi => (oi.Product?.InventoryQty ?? 0) < oi.Quantity);
+                                var isHighPriority = isPrescription || o.CreatedAt < DateTime.UtcNow.AddDays(-2);
+
+                                string badgeClass;
+                                string badgeIcon;
+                                switch (o.Status)
+                                {
+                                    case "Pending Confirmation":
+                                        badgeClass = "bg-warning text-dark";
+                                        badgeIcon = "⏳";
+                                        break;
+                                    case "Confirmed":
+                                        badgeClass = "bg-info text-dark";
+                                        badgeIcon = "✓";
+                                        break;
+                                    case "Processing":
+                                        badgeClass = "bg-primary";
+                                        badgeIcon = "⚙️";
+                                        break;
+                                    case "Shipped":
+                                        badgeClass = "bg-secondary text-white";
+                                        badgeIcon = "📦";
+                                        break;
+                                    case "Delivered":
+                                        badgeClass = "bg-success";
+                                        badgeIcon = "✅";
+                                        break;
+                                    case "Completed":
+                                        badgeClass = "bg-success";
+                                        badgeIcon = "🎉";
+                                        break;
+                                    case "Cancelled":
+                                        badgeClass = "bg-danger";
+                                        badgeIcon = "❌";
+                                        break;
+                                    default:
+                                        badgeClass = "bg-secondary text-white";
+                                        badgeIcon = "";
+                                        break;
+                                }
+
+                                <tr style="border-bottom: 1px solid var(--medium-gray);">
+                                    <td style="padding: 1rem;">
+                                        <div style="font-weight: 700; color: var(--primary-navy); font-size: 1.1rem;">
+                                            #@o.OrderId
+                                        </div>
+                                        @if (isHighPriority)
+                                        {
+                                            <span style="background: #ff5252; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                                                🔥 HIGH
+                                            </span>
+                                        }
+                                    </td>
+                                    <td style="padding: 1rem;">
+                                        <div style="font-weight: 600; color: var(--dark-gray);">
+                                            @o.User?.FullName
+                                        </div>
+                                        <div style="font-size: 0.85rem; color: var(--secondary-warm-gray);">
+                                            @o.User?.Email
+                                        </div>
+                                    </td>
+                                    <td style="padding: 1rem;">
+                                        <div style="color: var(--dark-gray);">
+                                            @o.CreatedAt.ToString("MMM dd, yyyy")
+                                        </div>
+                                        <div style="font-size: 0.85rem; color: var(--secondary-warm-gray);">
+                                            @o.CreatedAt.ToString("hh:mm tt")
+                                        </div>
+                                    </td>
+                                    <td style="padding: 1rem;">
+                                        <span class="badge @badgeClass" style="padding: 0.35rem 0.75rem; border-radius: 6px; font-weight: 600;">
+                                            @badgeIcon @o.Status
+                                        </span>
+                                    </td>
+                                    <td style="padding: 1rem;">
+                                        @if (isPrescription)
+                                        {
+                                            <span style="background: #9c27b0; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-weight: 600;">
+                                                👓 Prescription
+                                            </span>
+                                        }
+                                        else if (isPreOrder)
+                                        {
+                                            <span style="background: #607d8b; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-weight: 600;">
+                                                🕐 Pre-Order
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span style="background: #4caf50; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-weight: 600;">
+                                                ✓ Ready Stock
+                                            </span>
+                                        }
+                                    </td>
+                                    <td style="padding: 1rem;">
+                                        @if (o.Shipments != null && o.Shipments.Any())
+                                        {
+                                            var shipment = o.Shipments.FirstOrDefault();
+                                            <div style="font-size: 0.85rem; color: var(--dark-gray);">
+                                                📦 @(string.IsNullOrWhiteSpace(shipment?.TrackingNumber) ? "n/a" : shipment.TrackingNumber)
+                                            </div>
+                                            <div style="font-size: 0.75rem; color: var(--secondary-warm-gray);">
+                                                @(string.IsNullOrWhiteSpace(shipment?.Carrier) ? "—" : shipment.Carrier)
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span style="color: var(--secondary-warm-gray); font-size: 0.85rem;">—</span>
+                                        }
+                                    </td>
+                                    <td style="padding: 1rem; text-align: right;">
+                                        <div style="font-weight: 700; color: var(--primary-gold); font-size: 1.1rem;">
+                                            @o.TotalAmount.ToString("N0") VND
+                                        </div>
+                                    </td>
+                                    <td style="padding: 1rem; text-align: center;">
+                                        <a asp-page="./Details"
+                                           asp-route-id="@o.OrderId"
+                                           class="btn btn-sm btn-primary"
+                                           style="padding: 0.5rem 1.25rem; border-radius: 6px;">
+                                            <span style="margin-right: 0.25rem;">👁️</span> Process
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .table tbody tr:hover {
+        background-color: rgba(212, 165, 116, 0.05);
+        transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+        transition: all 0.2s ease;
+    }
+</style>

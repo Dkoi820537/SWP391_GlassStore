@@ -1,0 +1,566 @@
+﻿@page "{id:int}"
+@model EyewearStore_SWP391.Pages.Staff.Orders.DetailsModel
+@using EyewearStore_SWP391.Models
+@using System.Linq
+@{
+    ViewData["Title"] = $"Order #{Model.Order?.OrderId} - Operations";
+    var isPrescription = Model.Order?.OrderItems?.Any(oi => oi.PrescriptionId != null) ?? false;
+    var isPreOrder = Model.Order?.OrderItems?.Any(oi => (oi.Product?.InventoryQty ?? 0) < oi.Quantity) ?? false;
+
+    // read internal notes from TempData (we store notes as TempData["InternalNotes_{id}"])
+    var internalNoteKey = $"InternalNotes_{Model.Order?.OrderId}";
+    var internalNotes = TempData[internalNoteKey] as string;
+}
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb & Header -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-page="./Index">Operations</a></li>
+            <li class="breadcrumb-item active">Order #@Model.Order?.OrderId</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
+                Order #@Model.Order?.OrderId
+            </h1>
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+                @if (isPrescription)
+                {
+                    <span style="background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
+                                         color: white;
+                                         padding: 0.5rem 1rem;
+                                         border-radius: 20px;
+                                         font-weight: 600;">
+                        👓 Prescription Order
+                    </span>
+                }
+                else if (isPreOrder)
+                {
+                    <span style="background: linear-gradient(135deg, #607d8b 0%, #90a4ae 100%);
+                                         color: white;
+                                         padding: 0.5rem 1rem;
+                                         border-radius: 20px;
+                                         font-weight: 600;">
+                        🕐 Pre-Order
+                    </span>
+                }
+                else
+                {
+                    <span style="background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+                                         color: white;
+                                         padding: 0.5rem 1rem;
+                                         border-radius: 20px;
+                                         font-weight: 600;">
+                        ✓ Ready Stock
+                    </span>
+                }
+                <span style="color: var(--secondary-warm-gray); font-size: 0.95rem;">
+                    Created: @Model.Order?.CreatedAt.ToString("MMM dd, yyyy hh:mm tt")
+                </span>
+            </div>
+        </div>
+        <div>
+            <a asp-page="./Index" class="btn btn-outline-secondary">
+                ← Back to Queue
+            </a>
+            <button class="btn btn-primary ms-2" onclick="window.location.reload()">
+                🔄 Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 8px; border-left: 4px solid var(--success);">
+            <strong>✓</strong> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px; border-left: 4px solid var(--error);">
+            <strong>⚠</strong> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Left Column - Order Details -->
+        <div class="col-lg-8">
+            <!-- Customer Information -->
+            <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
+                <div style="background: linear-gradient(135deg, var(--secondary-teal) 0%, #4a7c7e 100%);
+                            padding: 1.5rem;
+                            border-radius: 12px 12px 0 0;">
+                    <h5 style="color: white; margin: 0; font-weight: 600;">
+                        👤 Customer Information
+                    </h5>
+                </div>
+                <div class="card-body" style="padding: 2rem;">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                Full Name
+                            </label>
+                            <div style="font-size: 1.1rem; color: var(--dark-gray);">
+                                @Model.Order?.User?.FullName
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                Email
+                            </label>
+                            <div style="font-size: 1.1rem; color: var(--dark-gray);">
+                                <a href="mailto:@Model.Order?.User?.Email" style="color: var(--secondary-teal); text-decoration: none;">
+                                    @Model.Order?.User?.Email
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                Phone
+                            </label>
+                            <div style="font-size: 1.1rem; color: var(--dark-gray);">
+                                📱 @Model.Order?.Address?.Phone
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                Payment Method
+                            </label>
+                            <div style="font-size: 1.1rem; color: var(--dark-gray);">
+                                💳 @Model.Order?.PaymentMethod
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                Shipping Address
+                            </label>
+                            <div style="padding: 1rem;
+                                        background: var(--light-gray);
+                                        border-radius: 8px;
+                                        border-left: 4px solid var(--secondary-teal);
+                                        font-size: 1.05rem;
+                                        color: var(--dark-gray);">
+                                📍 @Model.Order?.Address?.AddressLine
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
+                <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+                            padding: 1.5rem;
+                            border-radius: 12px 12px 0 0;">
+                    <h5 style="color: white; margin: 0; font-weight: 600;">
+                        📦 Order Items
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead style="background: var(--light-gray);">
+                                <tr>
+                                    <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Product</th>
+                                    <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">SKU</th>
+                                    <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy); text-align: center;">Qty</th>
+                                    <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy); text-align: right;">Unit Price</th>
+                                    <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy); text-align: right;">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Order?.OrderItems ?? Enumerable.Empty<OrderItem>())
+                                {
+                                    <tr style="border-bottom: 1px solid var(--medium-gray);">
+                                        <td style="padding: 1rem;">
+                                            <div style="font-weight: 600; color: var(--dark-gray); margin-bottom: 0.25rem;">
+                                                @item.Product?.Name
+                                            </div>
+                                            @* Show prescription details if present (use fields available in PrescriptionProfile) *@
+                                            @if (item.PrescriptionId != null && item.Prescription != null)
+                                            {
+                                                <div style="margin-top: 0.75rem;
+                                                                            padding: 0.75rem;
+                                                                            background: rgba(156, 39, 176, 0.05);
+                                                                            border-left: 3px solid #9c27b0;
+                                                                            border-radius: 4px;">
+                                                    <div style="font-weight: 600; color: #9c27b0; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                                                        👓 Prescription Details:
+                                                    </div>
+                                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.85rem;">
+                                                        <div>
+                                                            <strong>Right Eye (OD):</strong><br />
+                                                            SPH: @(item.Prescription?.RightSph?.ToString() ?? "—"),
+                                                            CYL: @(item.Prescription?.RightCyl?.ToString() ?? "—"),
+                                                            AXIS: @(item.Prescription?.RightAxis?.ToString() ?? "—")
+                                                        </div>
+                                                        <div>
+                                                            <strong>Left Eye (OS):</strong><br />
+                                                            SPH: @(item.Prescription?.LeftSph?.ToString() ?? "—"),
+                                                            CYL: @(item.Prescription?.LeftCyl?.ToString() ?? "—"),
+                                                            AXIS: @(item.Prescription?.LeftAxis?.ToString() ?? "—")
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </td>
+                                        <td style="padding: 1rem; color: var(--secondary-warm-gray);">
+                                            @item.Product?.Sku
+                                        </td>
+                                        <td style="padding: 1rem; text-align: center; font-weight: 600;">
+                                            @item.Quantity
+                                        </td>
+                                        <td style="padding: 1rem; text-align: right; color: var(--dark-gray);">
+                                            @item.UnitPrice.ToString("N0") VND
+                                        </td>
+                                        <td style="padding: 1rem; text-align: right; font-weight: 700; color: var(--primary-navy);">
+                                            @((item.UnitPrice * item.Quantity).ToString("N0")) VND
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot style="background: var(--light-gray);">
+                                <tr>
+                                    <td colspan="4" style="padding: 1.25rem; text-align: right; font-weight: 700; font-size: 1.1rem; color: var(--primary-navy);">
+                                        TOTAL:
+                                    </td>
+                                    <td style="padding: 1.25rem; text-align: right; font-weight: 700; font-size: 1.25rem; color: var(--primary-gold);">
+                                        @Model.Order?.TotalAmount.ToString("N0") VND
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipment Information -->
+            <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
+                <div style="background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-light) 100%);
+                            padding: 1.5rem;
+                            border-radius: 12px 12px 0 0;">
+                    <h5 style="color: white; margin: 0; font-weight: 600;">
+                        🚚 Shipment Tracking
+                    </h5>
+                </div>
+                <div class="card-body" style="padding: 2rem;">
+                    @if (Model.Order?.Shipments != null && Model.Order.Shipments.Any())
+                    {
+                        foreach (var shipment in Model.Order.Shipments)
+                        {
+                            <div style="padding: 1.5rem;
+                                                        background: var(--light-gray);
+                                                        border-radius: 8px;
+                                                        margin-bottom: 1rem;">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.9rem;">
+                                            Tracking Number
+                                        </label>
+                                        <div style="font-size: 1.1rem; font-weight: 700; color: var(--primary-gold);">
+                                            @shipment.TrackingNumber
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.9rem;">
+                                            Carrier
+                                        </label>
+                                        <div style="font-size: 1.1rem; color: var(--dark-gray);">
+                                            @(shipment.Carrier ?? "N/A")
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.9rem;">
+                                            Status
+                                        </label>
+                                        <div>
+                                            <span style="background: var(--info);
+                                                                         color: white;
+                                                                         padding: 0.35rem 0.75rem;
+                                                                         border-radius: 6px;
+                                                                         font-size: 0.9rem;
+                                                                         font-weight: 600;">
+                                                @shipment.Status
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.9rem;">
+                                            Shipped At
+                                        </label>
+                                        <div style="font-size: 1.05rem; color: var(--dark-gray);">
+                                            @(shipment.ShippedAt?.ToString("MMM dd, yyyy hh:mm tt") ?? "Not yet shipped")
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div style="text-align: center; padding: 2rem; color: var(--secondary-warm-gray);">
+                            <div style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;">📦</div>
+                            <p style="margin: 0;">No shipment created yet</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Actions & Workflow -->
+        <div class="col-lg-4">
+            <!-- Current Status -->
+            <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
+                <div class="card-body" style="padding: 2rem; text-align: center;">
+                    <div style="font-size: 0.9rem; color: var(--secondary-warm-gray); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">
+                        Current Status
+                    </div>
+                    @{
+                        var statusColor = Model.Order?.Status switch
+                        {
+                            "Pending Confirmation" => "#ff9800",
+                            "Confirmed" => "#2196f3",
+                            "Processing" => "#9c27b0",
+                            "Shipped" => "#607d8b",
+                            "Delivered" => "#4caf50",
+                            "Completed" => "#4caf50",
+                            "Cancelled" => "#f44336",
+                            _ => "#9e9e9e"
+                        };
+                    }
+                    <div style="background: @statusColor;
+                                color: white;
+                                padding: 1rem 1.5rem;
+                                border-radius: 10px;
+                                font-size: 1.5rem;
+                                font-weight: 700;
+                                margin: 1rem 0;">
+                        @Model.Order?.Status
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflow Management -->
+            @if (isPrescription)
+            {
+                <!-- Prescription Workflow (BR-OP004, BR-OP005) -->
+                <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-lg); border: 2px solid #9c27b0;">
+                    <div style="background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
+                                        padding: 1.5rem;
+                                        border-radius: 10px 10px 0 0;">
+                        <h5 style="color: white; margin: 0; font-weight: 600;">
+                            👓 Prescription Workflow
+                        </h5>
+                        <small style="color: rgba(255,255,255,0.8);">BR-OP004: Processing time 3-7 days</small>
+                    </div>
+                    <div class="card-body" style="padding: 1.5rem;">
+                        <form method="post" asp-page-handler="UpdatePrescriptionWorkflow">
+                            <input type="hidden" name="id" value="@Model.Order?.OrderId" />
+
+                            <!-- Workflow Steps -->
+                            <div style="margin-bottom: 1.5rem;">
+                                <div class="form-check" style="padding: 1rem; border-radius: 8px; background: var(--light-gray); margin-bottom: 0.5rem;">
+                                    <input class="form-check-input" type="radio" name="WorkflowStep" value="Confirmed" id="step1"
+                                           checked="@(Model.Order?.Status == "Confirmed")" />
+                                    <label class="form-check-label" for="step1" style="font-weight: 600;">
+                                        ✓ Confirmed
+                                    </label>
+                                </div>
+                                <div class="form-check" style="padding: 1rem; border-radius: 8px; background: var(--light-gray); margin-bottom: 0.5rem;">
+                                    <input class="form-check-input" type="radio" name="WorkflowStep" value="Processing - Lens Ordered" id="step2" />
+                                    <label class="form-check-label" for="step2" style="font-weight: 600;">
+                                        📋 Lens Ordered
+                                    </label>
+                                </div>
+                                <div class="form-check" style="padding: 1rem; border-radius: 8px; background: var(--light-gray); margin-bottom: 0.5rem;">
+                                    <input class="form-check-input" type="radio" name="WorkflowStep" value="Processing - Lens Received" id="step3" />
+                                    <label class="form-check-label" for="step3" style="font-weight: 600;">
+                                        📦 Lens Received
+                                    </label>
+                                </div>
+                                <div class="form-check" style="padding: 1rem; border-radius: 8px; background: var(--light-gray); margin-bottom: 0.5rem;">
+                                    <input class="form-check-input" type="radio" name="WorkflowStep" value="Processing - Fitting" id="step4" />
+                                    <label class="form-check-label" for="step4" style="font-weight: 600;">
+                                        🔧 Fitting (Gia công)
+                                    </label>
+                                </div>
+                                <div class="form-check" style="padding: 1rem; border-radius: 8px; background: var(--light-gray); margin-bottom: 0.5rem;">
+                                    <input class="form-check-input" type="radio" name="WorkflowStep" value="Processing - QC" id="step5" />
+                                    <label class="form-check-label" for="step5" style="font-weight: 600;">
+                                        ✅ QC Check
+                                    </label>
+                                </div>
+                                <div class="form-check" style="padding: 1rem; border-radius: 8px; background: var(--light-gray); margin-bottom: 0.5rem;">
+                                    <input class="form-check-input" type="radio" name="WorkflowStep" value="Processing - Packed" id="step6" />
+                                    <label class="form-check-label" for="step6" style="font-weight: 600;">
+                                        📦 Packed
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn w-100"
+                                    style="background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
+                                                   color: white;
+                                                   padding: 1rem;
+                                                   border: none;
+                                                   border-radius: 8px;
+                                                   font-weight: 600;">
+                                💾 Update Workflow Step
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- Ready Stock Workflow (BR-OP003) -->
+                <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-lg);">
+                    <div style="background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+                                        padding: 1.5rem;
+                                        border-radius: 10px 10px 0 0;">
+                        <h5 style="color: white; margin: 0; font-weight: 600;">
+                            📦 Ready Stock Workflow
+                        </h5>
+                        <small style="color: rgba(255,255,255,0.8);">BR-OP003: Pack → Ship → Deliver</small>
+                    </div>
+                    <div class="card-body" style="padding: 1.5rem;">
+                        <form method="post" asp-page-handler="UpdateStatus">
+                            <input type="hidden" name="id" value="@Model.Order?.OrderId" />
+
+                            <div class="mb-3">
+                                <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
+                                    Update Status
+                                </label>
+                                <select class="form-select" name="NewStatus" required
+                                        style="border: 2px solid var(--medium-gray); border-radius: 8px; padding: 0.75rem;">
+                                    <option value="">-- Select Status --</option>
+                                    <option value="Confirmed">Confirmed</option>
+                                    <option value="Processing">Processing - Packing</option>
+                                    <option value="Shipped">Shipped</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100" style="padding: 1rem; font-weight: 600;">
+                                💾 Update Status
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+
+            <!-- Create/Update Shipment (unchanged) -->
+            <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
+                <div style="background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-light) 100%);
+                            padding: 1.5rem;
+                            border-radius: 10px 10px 0 0;">
+                    <h5 style="color: white; margin: 0; font-weight: 600;">
+                        🚚 Create Shipment
+                    </h5>
+                </div>
+                <div class="card-body" style="padding: 1.5rem;">
+                    <form method="post" asp-page-handler="CreateShipment">
+                        <input type="hidden" name="id" value="@Model.Order?.OrderId" />
+
+                        <div class="mb-3">
+                            <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
+                                Tracking Number
+                            </label>
+                            <input type="text" class="form-control" name="TrackingNumber" required
+                                   placeholder="Enter tracking number"
+                                   style="border: 2px solid var(--medium-gray); border-radius: 8px; padding: 0.75rem;" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
+                                Carrier
+                            </label>
+                            <select class="form-select" name="Carrier" required
+                                    style="border: 2px solid var(--medium-gray); border-radius: 8px; padding: 0.75rem;">
+                                <option value="">-- Select Carrier --</option>
+                                <option value="GHTK">GHTK</option>
+                                <option value="VNPost">VNPost</option>
+                                <option value="J&T Express">J&T Express</option>
+                                <option value="Ninja Van">Ninja Van</option>
+                                <option value="Grab Express">Grab Express</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn w-100"
+                                style="background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-light) 100%);
+                                       color: white;
+                                       padding: 1rem;
+                                       border: none;
+                                       border-radius: 8px;
+                                       font-weight: 600;">
+                            📦 Create Shipment
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Internal Notes (uses TempData, not DB) -->
+            <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
+                <div style="background: linear-gradient(135deg, var(--secondary-warm-gray) 0%, #757575 100%);
+                            padding: 1.5rem;
+                            border-radius: 10px 10px 0 0;">
+                    <h5 style="color: white; margin: 0; font-weight: 600;">
+                        📝 Internal Notes
+                    </h5>
+                </div>
+                <div class="card-body" style="padding: 1.5rem;">
+                    <form method="post" asp-page-handler="AddNote">
+                        <input type="hidden" name="id" value="@Model.Order?.OrderId" />
+
+                        <div class="mb-3">
+                            <textarea class="form-control" name="Note" rows="4" placeholder="Add internal note..."
+                                      style="border: 2px solid var(--medium-gray); border-radius: 8px; padding: 0.75rem;"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-secondary w-100" style="padding: 0.75rem; font-weight: 600;">
+                            💬 Add Note
+                        </button>
+                    </form>
+
+                    @if (!string.IsNullOrWhiteSpace(internalNotes))
+                    {
+                        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid var(--medium-gray);">
+                            <div style="background: var(--light-gray);
+                                                padding: 1rem;
+                                                border-radius: 8px;
+                                                font-size: 0.95rem;
+                                                white-space: pre-wrap;">
+                                @internalNotes
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div style="margin-top: 1.5rem; color: var(--secondary-warm-gray);">No internal notes.</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-check-input:checked {
+        background-color: var(--success);
+        border-color: var(--success);
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-lg);
+    }
+</style>

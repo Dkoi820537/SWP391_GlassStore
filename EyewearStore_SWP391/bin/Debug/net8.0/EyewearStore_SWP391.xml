@@ -445,6 +445,16 @@
             Handles GET request - page content is loaded via JavaScript/API
             </summary>
         </member>
+        <member name="M:EyewearStore_SWP391.Pages.Sale.Orders.EditModel.ValidateStatusTransition(System.String,System.String)">
+            <summary>
+            BR: Validate if status transition is allowed
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Sale.Orders.EditModel.HandleStatusChangeActions(EyewearStore_SWP391.Models.Order,System.String,System.String)">
+            <summary>
+            BR: Handle actions triggered by status changes
+            </summary>
+        </member>
         <member name="T:EyewearStore_SWP391.Services.ILensService">
             <summary>
             Interface for lens product operations

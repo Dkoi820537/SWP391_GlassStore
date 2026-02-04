@@ -1,0 +1,277 @@
+﻿@page "{id:int}"
+@model EyewearStore_SWP391.Pages.Sale.Orders.DetailsModel
+@{
+    ViewData["Title"] = $"Order #{Model.Order.OrderId} Details";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                <i class="bi bi-receipt me-2"></i>Order #@Model.Order.OrderId
+            </h2>
+            <p class="text-muted mb-0">
+                <i class="bi bi-calendar me-1"></i>Created: @Model.Order.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy 'at' hh:mm tt")
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-page="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back to List
+            </a>
+            <a asp-page="Edit" asp-route-id="@Model.Order.OrderId" class="btn btn-outline-primary">
+                <i class="bi bi-pencil me-1"></i>Edit Order
+            </a>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Left Column: Customer & Shipping Info -->
+        <div class="col-lg-4">
+            <!-- Customer Information -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>Customer Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small d-block mb-1">Full Name</label>
+                        <p class="mb-0 fw-semibold">@Model.Order.UserFullName</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small d-block mb-1">Email</label>
+                        <p class="mb-0">
+                            <a href="mailto:@Model.Order.UserEmail" class="text-decoration-none">
+                                <i class="bi bi-envelope me-1"></i>@Model.Order.UserEmail
+                            </a>
+                        </p>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.Order.UserPhone))
+                    {
+                        <div class="mb-0">
+                            <label class="text-muted small d-block mb-1">Phone</label>
+                            <p class="mb-0">
+                                <a href="tel:@Model.Order.UserPhone" class="text-decoration-none">
+                                    <i class="bi bi-telephone me-1"></i>@Model.Order.UserPhone
+                                </a>
+                            </p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Shipping Address</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">@Model.Order.AddressLine</p>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-file-text me-2"></i>Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Payment Method:</span>
+                        <span class="fw-semibold">
+                            @if (Model.Order.PaymentMethod == "COD")
+                            {
+                                <i class="bi bi-cash-coin me-1"></i>
+                                @Model.Order.PaymentMethod
+                            }
+                            else
+                            {
+                                <i class="bi bi-credit-card me-1"></i>
+                                @Model.Order.PaymentMethod
+                            }
+                        </span>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.Order.TrackingNumber))
+                    {
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Tracking #:</span>
+                            <span class="fw-semibold font-monospace">@Model.Order.TrackingNumber</span>
+                        </div>
+                    }
+                    <hr class="my-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="h5 mb-0">Total Amount:</span>
+                        <span class="h4 mb-0 text-success fw-bold">@String.Format("{0:N0} ₫", Model.Order.TotalAmount)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Status & Items -->
+        <div class="col-lg-8">
+            <!-- Order Status Management -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Order Status</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="ChangeStatus" asp-route-id="@Model.Order.OrderId">
+                        <div class="row align-items-end">
+                            <div class="col-md-8">
+                                <label for="newStatus" class="form-label fw-semibold">Current Status</label>
+                                <select name="newStatus" id="newStatus" class="form-select form-select-lg">
+                                    @foreach (var status in Model.AllStatuses)
+                                    {
+                                        <option value="@status" selected="@(status == Model.Order.Status)">
+                                            @status
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-arrow-repeat me-1"></i>Update Status
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Status Timeline -->
+                    <div class="mt-4">
+                        <h6 class="text-muted mb-3">Status Timeline:</h6>
+                        <div class="progress" style="height: 30px;">
+                            @{
+                                var statusIndex = Model.AllStatuses.IndexOf(Model.Order.Status);
+                                var progressPercent = statusIndex >= 0 ? ((statusIndex + 1.0) / Model.AllStatuses.Count * 100) : 0;
+                                var statusColor = Model.Order.Status switch
+                                {
+                                    "Cancelled" => "danger",
+                                    "Completed" => "success",
+                                    "Delivered" => "info",
+                                    "Shipped" => "primary",
+                                    _ => "warning"
+                                };
+                            }
+                            <div class="progress-bar bg-@statusColor progress-bar-striped progress-bar-animated"
+                                 role="progressbar"
+                                 style="width: @progressPercent%"
+                                 aria-valuenow="@progressPercent"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                                @Model.Order.Status
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-cart3 me-2"></i>Order Items
+                        <span class="badge bg-light text-dark ms-2">@Model.Items.Count items</span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="py-3">Product</th>
+                                    <th class="py-3">SKU</th>
+                                    <th class="py-3 text-center">Quantity</th>
+                                    <th class="py-3 text-end">Unit Price</th>
+                                    <th class="py-3 text-end">Subtotal</th>
+                                    <th class="py-3 text-center">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Items)
+                                {
+                                    <tr>
+                                        <td class="align-middle">
+                                            <div class="fw-semibold">@item.ProductName</div>
+                                            <small class="text-muted">ID: @item.OrderItemId</small>
+                                        </td>
+                                        <td class="align-middle">
+                                            <span class="badge bg-secondary font-monospace">@item.Sku</span>
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            <span class="badge bg-primary">×@item.Quantity</span>
+                                        </td>
+                                        <td class="align-middle text-end">
+                                            @String.Format("{0:N0} ₫", item.UnitPrice)
+                                        </td>
+                                        <td class="align-middle text-end fw-semibold">
+                                            @String.Format("{0:N0} ₫", item.UnitPrice * item.Quantity)
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            @if (!string.IsNullOrWhiteSpace(item.SnapshotJson))
+                                            {
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-info"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#snapshotModal@item.OrderItemId">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+
+                                                <!-- Modal for Snapshot -->
+                                                <div class="modal fade" id="snapshotModal@item.OrderItemId" tabindex="-1">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Product Snapshot</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <pre class="bg-light p-3 rounded"><code>@item.SnapshotJson</code></pre>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td colspan="4" class="text-end fw-bold py-3">Total:</td>
+                                    <td class="text-end fw-bold py-3 text-success h5 mb-0">
+                                        @String.Format("{0:N0} ₫", Model.Order.TotalAmount)
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Confirmation for status change
+        document.querySelector('form[asp-page-handler="ChangeStatus"]')?.addEventListener('submit', function(e) {
+            if (!confirm('Are you sure you want to change the order status?')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}

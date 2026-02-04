@@ -1,0 +1,179 @@
+﻿@page
+@model EyewearStore_SWP391.Pages.Sale.Orders.CreateModel
+@{
+    ViewData["Title"] = "Create New Order";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1"><i class="bi bi-plus-circle me-2"></i>Create New Order</h2>
+                    <p class="text-muted mb-0">Fill in customer and order details below</p>
+                </div>
+                <a asp-page="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Orders
+                </a>
+            </div>
+
+            <!-- Alert Messages -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (!ModelState.IsValid && ModelState.ErrorCount > 0)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Please correct the following errors:</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Main Form Card -->
+            <form method="post" id="createOrderForm">
+                <div class="row g-4">
+                    <!-- Customer Information Section -->
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>Customer Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label asp-for="Input.Email" class="form-label fw-semibold">
+                                        Customer Email <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                        <input asp-for="Input.Email"
+                                               class="form-control"
+                                               placeholder="customer@example.com"
+                                               required />
+                                    </div>
+                                    <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                                    <small class="form-text text-muted">
+                                        <i class="bi bi-info-circle me-1"></i>If customer doesn't exist, a new account will be created
+                                    </small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Input.Address" class="form-label fw-semibold">
+                                        Shipping Address <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                        <textarea asp-for="Input.Address"
+                                                  class="form-control"
+                                                  rows="3"
+                                                  placeholder="Enter full shipping address..."
+                                                  required></textarea>
+                                    </div>
+                                    <span asp-validation-for="Input.Address" class="text-danger small"></span>
+                                </div>
+
+                                <div class="mb-0">
+                                    <label asp-for="Input.PaymentMethod" class="form-label fw-semibold">
+                                        Payment Method <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="btn-group w-100" role="group">
+                                        <input type="radio" class="btn-check" name="Input.PaymentMethod" id="paymentCOD" value="COD" checked>
+                                        <label class="btn btn-outline-primary" for="paymentCOD">
+                                            <i class="bi bi-cash-coin me-1"></i>Cash on Delivery
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="Input.PaymentMethod" id="paymentOnline" value="Online">
+                                        <label class="btn btn-outline-primary" for="paymentOnline">
+                                            <i class="bi bi-credit-card me-1"></i>Online Payment
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Items Section -->
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="bi bi-cart-plus me-2"></i>Order Items</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label asp-for="Input.ItemsRaw" class="form-label fw-semibold">
+                                        Product List <span class="text-danger">*</span>
+                                    </label>
+                                    <textarea asp-for="Input.ItemsRaw"
+                                              class="form-control font-monospace"
+                                              rows="10"
+                                              placeholder="Enter products in format:&#10;ProductID:Quantity&#10;&#10;Example:&#10;101:2&#10;205:1&#10;308:3"
+                                              required></textarea>
+                                    <span asp-validation-for="Input.ItemsRaw" class="text-danger small"></span>
+                                </div>
+
+                                <div class="alert alert-info mb-0">
+                                    <h6 class="alert-heading"><i class="bi bi-lightbulb me-2"></i>Format Guide:</h6>
+                                    <ul class="mb-0 small">
+                                        <li>Each line should be: <code>ProductID:Quantity</code></li>
+                                        <li>One product per line</li>
+                                        <li>ProductID must be valid and active</li>
+                                        <li>Quantity must be greater than 0</li>
+                                        <li>Empty lines are ignored</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="card shadow-sm mt-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-page="Index" class="btn btn-secondary px-4">
+                                <i class="bi bi-x-circle me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-check-circle me-1"></i>Create Order
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Form validation feedback
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
+}

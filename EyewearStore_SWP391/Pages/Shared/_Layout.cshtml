@@ -60,7 +60,8 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Orders/Index">
+                                <!-- ✅ CHANGED: Updated link to point to Customer/MyOrders -->
+                                <a class="nav-link text-dark" asp-page="/Customer/MyOrders">
                                     <i class="bi bi-box-seam me-1"></i>My Orders
                                 </a>
                             </li>
@@ -168,7 +169,8 @@
                                     </li>
 
                                     <li>
-                                        <a class="dropdown-item d-flex align-items-center" asp-page="/Orders/Index">
+                                        <!-- ✅ CHANGED: Updated link in dropdown menu too -->
+                                        <a class="dropdown-item d-flex align-items-center" asp-page="/Customer/MyOrders">
                                             <i class="bi bi-box-seam me-2"></i> My Orders
                                         </a>
                                     </li>
@@ -256,17 +258,17 @@
             document.addEventListener('DOMContentLoaded', function() {
                 @if (TempData["Success"] != null)
                 {
-                        <text>
-                        // Show success toast/alert
-                        console.log('Success: @TempData["Success"]');
-                        </text>
+                                <text>
+                                // Show success toast/alert
+                                console.log('Success: @TempData["Success"]');
+                                </text>
                 }
                 @if (TempData["Error"] != null)
                 {
-                        <text>
-                        // Show error toast/alert
-                        console.log('Error: @TempData["Error"]');
-                        </text>
+                                <text>
+                                // Show error toast/alert
+                                console.log('Error: @TempData["Error"]');
+                                </text>
                 }
             });
         </script>

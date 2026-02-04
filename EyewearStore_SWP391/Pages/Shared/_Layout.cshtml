@@ -48,8 +48,17 @@
                         }
                         @if (User.IsInRole("admin"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-danger" asp-page="/Admin/Index">Admin</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-danger" href="#" id="adminDropdown" role="button"
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    Admin
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
+                                    <li><a class="dropdown-item" asp-page="/Admin/SaleStaff">Sale Staff</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/Staff">Staff</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/Operational">Operational Staff</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/Manager">Manager</a></li>
+                                </ul>
                             </li>
                         }
                     </ul>

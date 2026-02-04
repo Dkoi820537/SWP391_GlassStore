@@ -1,33 +1,6 @@
 [
   {
     "ContainingType": "EyewearStore_SWP391.Controllers.ImagesController",
-    "Method": "GetImages",
-    "RelativePath": "api/Images",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "context",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "imageType",
-        "Type": "System.String",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "System.Void",
-        "MediaTypes": [],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "EyewearStore_SWP391.Controllers.ImagesController",
     "Method": "GetImageById",
     "RelativePath": "api/Images/{id}",
     "HttpMethod": "GET",
@@ -86,8 +59,8 @@
   },
   {
     "ContainingType": "EyewearStore_SWP391.Controllers.ImagesController",
-    "Method": "UpdateImageContext",
-    "RelativePath": "api/Images/{id}/context",
+    "Method": "SetImageAsPrimary",
+    "RelativePath": "api/Images/{id}/set-primary",
     "HttpMethod": "PATCH",
     "IsController": true,
     "Order": 0,
@@ -95,11 +68,6 @@
       {
         "Name": "id",
         "Type": "System.Int32",
-        "IsRequired": true
-      },
-      {
-        "Name": "context",
-        "Type": "System.String",
         "IsRequired": true
       }
     ],
@@ -120,6 +88,33 @@
   },
   {
     "ContainingType": "EyewearStore_SWP391.Controllers.ImagesController",
+    "Method": "GetImagesByProductId",
+    "RelativePath": "api/Images/product/{productId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "productId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "activeOnly",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "EyewearStore_SWP391.Controllers.ImagesController",
     "Method": "UploadImage",
     "RelativePath": "api/Images/upload",
     "HttpMethod": "POST",
@@ -132,18 +127,23 @@
         "IsRequired": false
       },
       {
-        "Name": "imageType",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "context",
-        "Type": "System.String",
+        "Name": "productId",
+        "Type": "System.Int32",
         "IsRequired": false
       },
       {
         "Name": "altText",
         "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "isPrimary",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "sortOrder",
+        "Type": "System.Int32",
         "IsRequired": false
       }
     ],
@@ -222,11 +222,6 @@
         "IsRequired": false
       },
       {
-        "Name": "coating",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
         "Name": "priceMin",
         "Type": "System.Nullable\u00601[[System.Decimal, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "IsRequired": false
@@ -237,8 +232,13 @@
         "IsRequired": false
       },
       {
-        "Name": "stockStatus",
-        "Type": "System.String",
+        "Name": "isActive",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "isPrescription",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "IsRequired": false
       },
       {

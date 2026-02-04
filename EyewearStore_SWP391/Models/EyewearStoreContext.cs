@@ -57,7 +57,7 @@ public partial class EyewearStoreContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseSqlServer("Server=localhost;Database=EyewearStore;Integrated Security=True;TrustServerCertificate=True");
+            optionsBuilder.UseSqlServer("Server=LAPTOP-UIGSU8B4\\MSSQLSEVER;Database=EyewearStore;Integrated Security=True;TrustServerCertificate=True");
         }
     }
 

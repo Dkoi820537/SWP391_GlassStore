@@ -259,6 +259,131 @@
             The temple length in millimeters
             </summary>
         </member>
+        <member name="T:EyewearStore_SWP391.DTOs.Frame.FrameFilterDto">
+            <summary>
+            Data Transfer Object for filtering and searching frames
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameFilterDto.Search">
+            <summary>
+            Search term to filter by name, description, or SKU
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameFilterDto.MinPrice">
+            <summary>
+            Minimum price filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameFilterDto.MaxPrice">
+            <summary>
+            Maximum price filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameFilterDto.FrameMaterial">
+            <summary>
+            Filter by frame material (e.g., Titanium, Acetate, Metal)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameFilterDto.FrameType">
+            <summary>
+            Filter by frame type (e.g., Full-Rim, Half-Rim, Rimless)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameFilterDto.MinBridgeWidth">
+            <summary>
+            Minimum bridge width filter in millimeters
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameFilterDto.MaxBridgeWidth">
+            <summary>
+            Maximum bridge width filter in millimeters
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameFilterDto.MinTempleLength">
+            <summary>
+            Minimum temple length filter in millimeters
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameFilterDto.MaxTempleLength">
+            <summary>
+            Maximum temple length filter in millimeters
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameFilterDto.IsActive">
+            <summary>
+            Filter by active status
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameFilterDto.Page">
+            <summary>
+            Page number for pagination (1-indexed)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameFilterDto.PageSize">
+            <summary>
+            Number of items per page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameFilterDto.SortBy">
+            <summary>
+            Field to sort by (e.g., Name, Price, CreatedAt)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameFilterDto.SortOrder">
+            <summary>
+            Sort order (asc or desc)
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.DTOs.Frame.FrameListItemDto">
+            <summary>
+            Lightweight Data Transfer Object for frame list views
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameListItemDto.ProductId">
+            <summary>
+            The unique identifier of the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameListItemDto.Sku">
+            <summary>
+            The SKU (Stock Keeping Unit) for the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameListItemDto.Name">
+            <summary>
+            The name of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameListItemDto.Price">
+            <summary>
+            The price of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameListItemDto.Currency">
+            <summary>
+            The currency code
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameListItemDto.InventoryQty">
+            <summary>
+            The inventory quantity
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameListItemDto.FrameMaterial">
+            <summary>
+            The material of the frame (e.g., Titanium, Acetate, Metal)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameListItemDto.FrameType">
+            <summary>
+            The type of frame (e.g., Full-Rim, Half-Rim, Rimless)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameListItemDto.IsActive">
+            <summary>
+            Whether the product is active
+            </summary>
+        </member>
         <member name="T:EyewearStore_SWP391.DTOs.Frame.FrameListResponseDto">
             <summary>
             Data Transfer Object for paginated frame list responses

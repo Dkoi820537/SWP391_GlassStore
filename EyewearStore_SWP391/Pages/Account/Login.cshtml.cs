@@ -43,10 +43,9 @@ namespace EyewearStore_SWP391.Pages.Account
 
         public void OnGet()
         {
-            // nếu cần, có thể set TempData -> SuccessMessage sẽ tự map.
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
             if (!ModelState.IsValid) return Page();
 
@@ -70,12 +69,14 @@ namespace EyewearStore_SWP391.Pages.Account
                 return Page();
             }
 
+            // tạo claims (lấy role từ user.Role)
+            var role = (user.Role ?? "customer").Trim();
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new Claim(ClaimTypes.Name, user.FullName ?? user.Email),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.Role, role)
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -85,7 +86,7 @@ namespace EyewearStore_SWP391.Pages.Account
             {
                 IsPersistent = Input.RememberMe,
                 ExpiresUtc = Input.RememberMe
-                    ? DateTimeOffset.UtcNow.AddDays(7)   // remember for 7 days (tùy bạn chỉnh)
+                    ? DateTimeOffset.UtcNow.AddDays(7)
                     : DateTimeOffset.UtcNow.AddHours(8),
                 AllowRefresh = true,
                 IssuedUtc = DateTimeOffset.UtcNow
@@ -93,7 +94,35 @@ namespace EyewearStore_SWP391.Pages.Account
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
 
-            return RedirectToPage("/Index");
+            // redirect theo role (lowercase compare)
+            var r = role.ToLowerInvariant();
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return LocalRedirect(returnUrl);
+            }
+
+            if (r == "admin")
+            {
+                return LocalRedirect("/Admin");
+            }
+            if (r == "sale" || r == "sale staff")
+            {
+                return LocalRedirect("/Admin/SaleStaff");
+            }
+            if (r == "operational" || r == "operational staff")
+            {
+                return LocalRedirect("/Admin/Operational");
+            }
+            if (r == "staff")
+            {
+                return LocalRedirect("/Admin/Staff");
+            }
+            if (r == "manager")
+            {
+                return LocalRedirect("/Admin/Manager");
+            }
+            // default for customer
+            return LocalRedirect("/Profile/Index");
         }
     }
 }

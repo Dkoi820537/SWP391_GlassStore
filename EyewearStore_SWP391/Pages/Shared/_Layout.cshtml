@@ -28,24 +28,17 @@
 
                 <div class="collapse navbar-collapse" id="mainNavbar">
                     <ul class="navbar-nav me-auto mb-2 mb-sm-0">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Products">Shop</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#services">Services</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#footer">Contact</a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link" asp-page="/Index">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Products">Shop</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#footer">Contact</a></li>
+
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Orders/Index">My Orders</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-page="/Orders/Index">My Orders</a></li>
                         }
+
+                        @* Admin dropdown only visible to admin role *@
                         @if (User.IsInRole("admin"))
                         {
                             <li class="nav-item dropdown">
@@ -54,17 +47,19 @@
                                     Admin
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
-                                    <li><a class="dropdown-item" asp-page="/Admin/SaleStaff">Sale Staff</a></li>
-                                    <li><a class="dropdown-item" asp-page="/Admin/Staff">Staff</a></li>
-                                    <li><a class="dropdown-item" asp-page="/Admin/Operational">Operational Staff</a></li>
-                                    <li><a class="dropdown-item" asp-page="/Admin/Manager">Manager</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/Index">Admin Dashboard</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/SaleStaff">Sale Staff Page</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/Staff">Staff Page</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/Operational">Operational Staff Page</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/Manager">Manager Page</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/AdminRole">Admin Role Page</a></li>
                                 </ul>
                             </li>
                         }
                     </ul>
 
                     <ul class="navbar-nav align-items-center">
-                        @* Cart summary partial (badge + dropdown). Ensure Pages/Shared/_CartSummary.cshtml exists *@
                         @await Html.PartialAsync("_CartSummary")
 
                         @if (User.Identity.IsAuthenticated)
@@ -111,13 +106,8 @@
                         }
                         else
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-page="/Account/Login">Login</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" asp-page="/Account/Register">Register</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link" asp-page="/Account/Login">Login</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-page="/Account/Register">Register</a></li>
                         }
                     </ul>
                 </div>
@@ -125,7 +115,7 @@
         </nav>
     </header>
 
-    <main role="main">
+    <main role="main" class="flex-grow-1">
         @RenderBody()
     </main>
 

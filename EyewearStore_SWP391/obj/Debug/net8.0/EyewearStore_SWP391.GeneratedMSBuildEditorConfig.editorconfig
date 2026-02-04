@@ -56,6 +56,22 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cTGVuc2VzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Admin/Manager.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cTWFuYWdlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Admin/Operational.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cT3BlcmF0aW9uYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Admin/SaleStaff.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cU2FsZVN0YWZmLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Admin/Staff.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cU3RhZmYuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Cart/Add.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2FydFxBZGQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

@@ -55,10 +55,7 @@ public partial class EyewearStoreContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        if (!optionsBuilder.IsConfigured)
-        {
-            optionsBuilder.UseSqlServer("Server=LAPTOP-UIGSU8B4\\MSSQLSEVER;Database=EyewearStore;Integrated Security=True;TrustServerCertificate=True");
-        }
+        // Connection string is configured via appsettings.json and DI in Program.cs
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

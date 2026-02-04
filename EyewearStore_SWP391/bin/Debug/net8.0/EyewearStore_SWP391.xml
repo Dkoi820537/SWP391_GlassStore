@@ -4,6 +4,81 @@
         <name>EyewearStore_SWP391</name>
     </assembly>
     <members>
+        <member name="T:EyewearStore_SWP391.Controllers.FramesController">
+            <summary>
+            API Controller for managing frame products
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.FramesController.#ctor(EyewearStore_SWP391.Services.IFrameService)">
+            <summary>
+            Initializes a new instance of the FramesController
+            </summary>
+            <param name="frameService">The frame service</param>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.FramesController.CreateFrame(EyewearStore_SWP391.DTOs.Frame.CreateFrameDto)">
+            <summary>
+            Creates a new frame product
+            </summary>
+            <param name="createDto">The frame data to create</param>
+            <returns>The created frame product</returns>
+            <response code="201">Returns the newly created frame</response>
+            <response code="400">If the frame data is invalid</response>
+            <response code="500">If there was an internal server error</response>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.FramesController.GetAllFrames(System.String,System.String,System.String,System.Nullable{System.Decimal},System.Nullable{System.Decimal},System.Nullable{System.Boolean},System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Gets all frames with optional filtering, searching, sorting, and pagination
+            </summary>
+            <param name="search">Search term for name, description, frame type, or material</param>
+            <param name="frameType">Filter by frame type</param>
+            <param name="frameMaterial">Filter by frame material</param>
+            <param name="priceMin">Minimum price filter</param>
+            <param name="priceMax">Maximum price filter</param>
+            <param name="isActive">Filter by active status</param>
+            <param name="sortBy">Sort field (price, name, frameType, frameMaterial, createdAt)</param>
+            <param name="sortOrder">Sort order (asc, desc)</param>
+            <param name="pageNumber">Page number (default: 1)</param>
+            <param name="pageSize">Page size (default: 10, max: 100)</param>
+            <returns>A paginated list of frames</returns>
+            <response code="200">Returns the list of frames</response>
+            <response code="500">If there was an internal server error</response>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.FramesController.GetFrameById(System.Int32)">
+            <summary>
+            Gets a single frame by ID (ProductId)
+            </summary>
+            <param name="id">The product ID</param>
+            <returns>The frame product</returns>
+            <response code="200">Returns the frame</response>
+            <response code="404">If the frame is not found</response>
+            <response code="500">If there was an internal server error</response>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.FramesController.UpdateFrame(System.Int32,EyewearStore_SWP391.DTOs.Frame.UpdateFrameDto)">
+            <summary>
+            Updates an existing frame product
+            </summary>
+            <param name="id">The product ID to update</param>
+            <param name="updateDto">The updated frame data</param>
+            <returns>The updated frame product</returns>
+            <response code="200">Returns the updated frame</response>
+            <response code="400">If the frame data is invalid</response>
+            <response code="404">If the frame is not found</response>
+            <response code="500">If there was an internal server error</response>
+        </member>
+        <member name="M:EyewearStore_SWP391.Controllers.FramesController.DeleteFrame(System.Int32)">
+            <summary>
+            Soft deletes a frame by setting IsActive to false
+            </summary>
+            <param name="id">The product ID to delete</param>
+            <returns>No content on success</returns>
+            <response code="204">The frame was successfully soft deleted</response>
+            <response code="404">If the frame is not found</response>
+            <response code="500">If there was an internal server error</response>
+            <remarks>
+            Soft delete is implemented by setting IsActive to false.
+            The product will no longer appear in active product listings.
+            </remarks>
+        </member>
         <member name="T:EyewearStore_SWP391.Controllers.ImagesController">
             <summary>
             API Controller for managing product images
@@ -123,6 +198,246 @@
             Soft delete is implemented by setting IsActive to false.
             The product will no longer appear in active product listings.
             </remarks>
+        </member>
+        <member name="T:EyewearStore_SWP391.DTOs.Frame.CreateFrameDto">
+            <summary>
+            Data Transfer Object for creating a new frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.CreateFrameDto.Sku">
+            <summary>
+            The SKU (Stock Keeping Unit) for the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.CreateFrameDto.Name">
+            <summary>
+            The name of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.CreateFrameDto.Description">
+            <summary>
+            The description of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.CreateFrameDto.Price">
+            <summary>
+            The price of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.CreateFrameDto.Currency">
+            <summary>
+            The currency code (e.g., VND, USD)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.CreateFrameDto.InventoryQty">
+            <summary>
+            The inventory quantity (optional)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.CreateFrameDto.IsActive">
+            <summary>
+            Whether the product is active
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.CreateFrameDto.FrameMaterial">
+            <summary>
+            The material of the frame (e.g., Titanium, Acetate, Metal)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.CreateFrameDto.FrameType">
+            <summary>
+            The type of frame (e.g., Full-Rim, Half-Rim, Rimless)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.CreateFrameDto.BridgeWidth">
+            <summary>
+            The bridge width in millimeters
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.CreateFrameDto.TempleLength">
+            <summary>
+            The temple length in millimeters
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.DTOs.Frame.FrameListResponseDto">
+            <summary>
+            Data Transfer Object for paginated frame list responses
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameListResponseDto.Items">
+            <summary>
+            The list of frame items for the current page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameListResponseDto.PageNumber">
+            <summary>
+            The current page number (1-indexed)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameListResponseDto.PageSize">
+            <summary>
+            The number of items per page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameListResponseDto.TotalCount">
+            <summary>
+            The total number of items across all pages
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameListResponseDto.TotalPages">
+            <summary>
+            The total number of pages
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameListResponseDto.HasPreviousPage">
+            <summary>
+            Indicates whether there is a previous page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameListResponseDto.HasNextPage">
+            <summary>
+            Indicates whether there is a next page
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.DTOs.Frame.FrameResponseDto">
+            <summary>
+            Data Transfer Object for returning frame product data
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameResponseDto.ProductId">
+            <summary>
+            The unique identifier of the product (ProductId)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameResponseDto.Sku">
+            <summary>
+            The SKU (Stock Keeping Unit) for the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameResponseDto.Name">
+            <summary>
+            The name of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameResponseDto.Description">
+            <summary>
+            The description of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameResponseDto.Price">
+            <summary>
+            The price of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameResponseDto.Currency">
+            <summary>
+            The currency code
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameResponseDto.InventoryQty">
+            <summary>
+            The inventory quantity
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameResponseDto.IsActive">
+            <summary>
+            Whether the product is active
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameResponseDto.CreatedAt">
+            <summary>
+            The date and time when the frame was created
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameResponseDto.UpdatedAt">
+            <summary>
+            The date and time when the frame was last updated
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameResponseDto.FrameMaterial">
+            <summary>
+            The material of the frame (e.g., Titanium, Acetate, Metal)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameResponseDto.FrameType">
+            <summary>
+            The type of frame (e.g., Full-Rim, Half-Rim, Rimless)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameResponseDto.BridgeWidth">
+            <summary>
+            The bridge width in millimeters
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameResponseDto.TempleLength">
+            <summary>
+            The temple length in millimeters
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.FrameResponseDto.PrimaryImageUrl">
+            <summary>
+            Primary image URL for the product
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.DTOs.Frame.UpdateFrameDto">
+            <summary>
+            Data Transfer Object for updating an existing frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.UpdateFrameDto.Sku">
+            <summary>
+            The SKU (Stock Keeping Unit) for the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.UpdateFrameDto.Name">
+            <summary>
+            The name of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.UpdateFrameDto.Description">
+            <summary>
+            The description of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.UpdateFrameDto.Price">
+            <summary>
+            The price of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.UpdateFrameDto.Currency">
+            <summary>
+            The currency code (e.g., VND, USD)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.UpdateFrameDto.InventoryQty">
+            <summary>
+            The inventory quantity (optional)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.UpdateFrameDto.IsActive">
+            <summary>
+            Whether the product is active
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.UpdateFrameDto.FrameMaterial">
+            <summary>
+            The material of the frame (e.g., Titanium, Acetate, Metal)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.UpdateFrameDto.FrameType">
+            <summary>
+            The type of frame (e.g., Full-Rim, Half-Rim, Rimless)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.UpdateFrameDto.BridgeWidth">
+            <summary>
+            The bridge width in millimeters
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.DTOs.Frame.UpdateFrameDto.TempleLength">
+            <summary>
+            The temple length in millimeters
+            </summary>
         </member>
         <member name="T:EyewearStore_SWP391.DTOs.Lens.CreateLensDto">
             <summary>
@@ -454,6 +769,81 @@
             <summary>
             BR: Handle actions triggered by status changes
             </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Services.FrameService">
+            <summary>
+            Service implementation for frame product operations using TPT inheritance
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.FrameService.#ctor(EyewearStore_SWP391.Models.EyewearStoreContext)">
+            <summary>
+            Initializes a new instance of the FrameService
+            </summary>
+            <param name="context">The database context</param>
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.FrameService.CreateFrameAsync(EyewearStore_SWP391.DTOs.Frame.CreateFrameDto)">
+            <inheritdoc />
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.FrameService.GetAllFramesAsync(System.String,System.String,System.String,System.Nullable{System.Decimal},System.Nullable{System.Decimal},System.Nullable{System.Boolean},System.String,System.String,System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.FrameService.GetFrameByIdAsync(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.FrameService.UpdateFrameAsync(System.Int32,EyewearStore_SWP391.DTOs.Frame.UpdateFrameDto)">
+            <inheritdoc />
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.FrameService.DeleteFrameAsync(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.FrameService.MapToResponseDtoAsync(EyewearStore_SWP391.Models.Frame)">
+            <summary>
+            Maps a Frame entity to a FrameResponseDto
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.FrameService.ApplySorting(System.Linq.IQueryable{EyewearStore_SWP391.Models.Frame},System.String,System.String)">
+            <summary>
+            Applies sorting to the query based on the specified field and order
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Services.IFrameService">
+            <summary>
+            Interface for frame product operations
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.IFrameService.CreateFrameAsync(EyewearStore_SWP391.DTOs.Frame.CreateFrameDto)">
+            <summary>
+            Creates a new frame product
+            </summary>
+            <param name="createDto">The frame data to create</param>
+            <returns>The created frame as a response DTO</returns>
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.IFrameService.GetAllFramesAsync(System.String,System.String,System.String,System.Nullable{System.Decimal},System.Nullable{System.Decimal},System.Nullable{System.Boolean},System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Gets all frames with optional filtering, searching, sorting, and pagination
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.IFrameService.GetFrameByIdAsync(System.Int32)">
+            <summary>
+            Gets a single frame by ID
+            </summary>
+            <param name="id">The product ID</param>
+            <returns>The frame if found, null otherwise</returns>
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.IFrameService.UpdateFrameAsync(System.Int32,EyewearStore_SWP391.DTOs.Frame.UpdateFrameDto)">
+            <summary>
+            Updates an existing frame product
+            </summary>
+            <param name="id">The product ID to update</param>
+            <param name="updateDto">The updated frame data</param>
+            <returns>The updated frame if found, null otherwise</returns>
+        </member>
+        <member name="M:EyewearStore_SWP391.Services.IFrameService.DeleteFrameAsync(System.Int32)">
+            <summary>
+            Soft deletes a frame by setting IsActive to false
+            </summary>
+            <param name="id">The product ID to delete</param>
+            <returns>True if the frame was found and deleted, false otherwise</returns>
         </member>
         <member name="T:EyewearStore_SWP391.Services.ILensService">
             <summary>

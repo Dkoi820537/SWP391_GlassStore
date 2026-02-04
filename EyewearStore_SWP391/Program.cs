@@ -43,6 +43,7 @@ builder.Services.AddSwaggerGen(options =>
 // Register application services
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ILensService, LensService>();
+builder.Services.AddScoped<IFrameService, FrameService>();
 
 // Authentication (cookie) - secure defaults and RememberMe handling
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

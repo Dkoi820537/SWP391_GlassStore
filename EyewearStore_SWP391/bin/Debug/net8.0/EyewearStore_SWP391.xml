@@ -900,6 +900,44 @@
             Operations Staff Order Management
             </summary>
         </member>
+        <member name="T:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel">
+            <summary>
+            Support Staff Order Details - Process individual orders
+            Handles prescription verification, customer communication, and order confirmation
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostUpdateStatusAsync(System.Int32,System.String,System.String)">
+            <summary>
+            BR: Update order status with validation
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostVerifyPrescriptionAsync(System.Int32)">
+            <summary>
+            BR: Verify prescription data for an order item
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostConfirmAsync(System.Int32)">
+            <summary>
+            BR: Quick confirm order (for non-prescription orders)
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.HandleStatusChangeActions(EyewearStore_SWP391.Models.Order,System.String,System.String)">
+            <summary>
+            BR: Handle post-status-change actions
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Support.Orders.IndexModel">
+            <summary>
+            Support Staff Order Management - Main Dashboard
+            Handles order verification, prescription checking, and customer support
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.IndexModel.OnPostQuickConfirmAsync(System.Int32)">
+            <summary>
+            Quick confirm order without prescription verification
+            BR: Support staff can quickly confirm simple orders
+            </summary>
+        </member>
         <member name="T:EyewearStore_SWP391.Services.FrameService">
             <summary>
             Service implementation for frame product operations using TPT inheritance

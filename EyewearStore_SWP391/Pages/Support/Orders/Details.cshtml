@@ -1,4 +1,446 @@
-﻿@page
+﻿@page "{id:int}"
 @model EyewearStore_SWP391.Pages.Support.Orders.DetailsModel
 @{
+    ViewData["Title"] = $"Process Order #{Model.OrderId}";
+}
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-page="./Index">Support Dashboard</a></li>
+            <li class="breadcrumb-item active">Order #@Model.OrderId</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>
+                <i class="bi bi-clipboard-check me-2"></i>Process Order #@Model.OrderId
+                @if (Model.IsHighPriority)
+                {
+                    <span class="badge bg-danger ms-2">
+                        <i class="bi bi-exclamation-triangle"></i> HIGH PRIORITY
+                    </span>
+                }
+            </h2>
+            <p class="text-muted mb-0">
+                Created: @Model.Order.CreatedAt.ToString("MMMM dd, yyyy 'at' hh:mm tt")
+            </p>
+        </div>
+        <a asp-page="./Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back to Queue
+        </a>
+    </div>
+
+    <!-- Alert Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Left Column: Order Information -->
+        <div class="col-lg-8">
+            <!-- Order Items Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-cart3 me-2"></i>Order Items</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>SKU</th>
+                                    <th class="text-center">Quantity</th>
+                                    <th class="text-end">Price</th>
+                                    <th class="text-end">Subtotal</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.OrderItems)
+                                {
+                                    var hasReturn = item.HasReturn;
+                                    var hasPrescription = item.PrescriptionId != null;
+                                    var inStock = (item.ProductInventory ?? 0) >= item.Quantity;
+
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold">@item.ProductName</div>
+                                            @if (hasPrescription)
+                                            {
+                                                <span class="badge bg-purple">
+                                                    <i class="bi bi-eyeglasses"></i> Prescription Required
+                                                </span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="font-monospace text-muted">@item.Sku</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-secondary">×@item.Quantity</span>
+                                        </td>
+                                        <td class="text-end">@item.UnitPrice.ToString("N0") ₫</td>
+                                        <td class="text-end fw-bold">@((item.UnitPrice * item.Quantity).ToString("N0")) ₫</td>
+                                        <td class="text-center">
+                                            @if (hasReturn)
+                                            {
+                                                <span class="badge bg-warning text-dark">
+                                                    <i class="bi bi-arrow-return-left"></i> Return
+                                                </span>
+                                            }
+                                            else if (!inStock)
+                                            {
+                                                <span class="badge bg-danger">
+                                                    <i class="bi bi-exclamation-circle"></i> Out of Stock
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success">
+                                                    <i class="bi bi-check-circle"></i> Available
+                                                </span>
+                                            }
+                                        </td>
+                                    </tr>
+
+                                    @* Show prescription details if present *@
+                                    @if (hasPrescription && item.PrescriptionDetails != null)
+                                    {
+                                        <tr class="bg-light">
+                                            <td colspan="6" style="padding: 1rem;">
+                                                <div class="ms-4">
+                                                    <h6 class="mb-2">
+                                                        <i class="bi bi-file-medical me-2"></i>Prescription Details
+                                                        @if (!item.IsPrescriptionVerified)
+                                                        {
+                                                            <span class="badge bg-warning text-dark">Needs Verification</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-success">Verified</span>
+                                                        }
+                                                    </h6>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <strong>Left Eye (OS):</strong><br>
+                                                            SPH: @item.PrescriptionDetails.LeftSph ?? 0<br>
+                                                            CYL: @item.PrescriptionDetails.LeftCyl ?? 0<br>
+                                                            AXIS: @item.PrescriptionDetails.LeftAxis ?? 0°
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <strong>Right Eye (OD):</strong><br>
+                                                            SPH: @item.PrescriptionDetails.RightSph ?? 0<br>
+                                                            CYL: @item.PrescriptionDetails.RightCyl ?? 0<br>
+                                                            AXIS: @item.PrescriptionDetails.RightAxis ?? 0°
+                                                        </div>
+                                                    </div>
+                                                    @if (!item.IsPrescriptionVerified)
+                                                    {
+                                                        <form method="post" asp-page-handler="VerifyPrescription" class="mt-3">
+                                                            <input type="hidden" name="orderItemId" value="@item.OrderItemId" />
+                                                            <button type="submit" class="btn btn-sm btn-success">
+                                                                <i class="bi bi-check-circle me-1"></i>Verify Prescription
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-warning" onclick="requestPrescriptionCorrection(@item.OrderItemId)">
+                                                                <i class="bi bi-envelope me-1"></i>Request Correction
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td colspan="4" class="text-end fw-bold">Total:</td>
+                                    <td class="text-end fw-bold text-success fs-5">@Model.Order.TotalAmount.ToString("N0") ₫</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Actions Card -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0"><i class="bi bi-tools me-2"></i>Support Actions</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="UpdateStatus">
+                        <input type="hidden" name="orderId" value="@Model.OrderId" />
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Change Order Status</label>
+                                <select name="newStatus" class="form-select form-select-lg">
+                                    @foreach (var status in Model.AllStatuses)
+                                    {
+                                        <option value="@status" selected="@(status == Model.Order.Status)">@status</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-arrow-repeat me-1"></i>Update Status
+                                </button>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Support Notes (Internal)</label>
+                                <textarea name="supportNotes"
+                                          class="form-control"
+                                          rows="3"
+                                          placeholder="Add notes about this order, customer communication, or issues..."></textarea>
+                            </div>
+                        </div>
+
+                        <hr class="my-3">
+
+                        <div class="d-flex gap-2 flex-wrap">
+                            @if (Model.Order.Status == "Pending Confirmation")
+                            {
+                                <button type="button" class="btn btn-success" onclick="confirmOrder()">
+                                    <i class="bi bi-check-circle me-1"></i>Confirm Order
+                                </button>
+                            }
+
+                            <button type="button" class="btn btn-info" onclick="contactCustomer()">
+                                <i class="bi bi-envelope me-1"></i>Contact Customer
+                            </button>
+
+                            <button type="button" class="btn btn-secondary" onclick="escalateToManager()">
+                                <i class="bi bi-arrow-up-circle me-1"></i>Escalate to Manager
+                            </button>
+
+                            @if (Model.Order.Status != "Cancelled")
+                            {
+                                <button type="button" class="btn btn-danger" onclick="cancelOrder()">
+                                    <i class="bi bi-x-circle me-1"></i>Cancel Order
+                                </button>
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Customer & Order Info -->
+        <div class="col-lg-4">
+            <!-- Customer Info Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>Customer Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Full Name</label>
+                        <div class="fw-bold">@Model.CustomerName</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small">Email</label>
+                        <div>
+                            <a href="mailto:@Model.CustomerEmail" class="text-decoration-none">
+                                <i class="bi bi-envelope me-1"></i>@Model.CustomerEmail
+                            </a>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.CustomerPhone))
+                    {
+                        <div class="mb-3">
+                            <label class="text-muted small">Phone</label>
+                            <div>
+                                <a href="tel:@Model.CustomerPhone" class="text-decoration-none">
+                                    <i class="bi bi-telephone me-1"></i>@Model.CustomerPhone
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    <div class="mb-0">
+                        <label class="text-muted small">Customer Since</label>
+                        <div>@Model.CustomerSince.ToString("MMMM yyyy")</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-sm btn-outline-primary w-100" onclick="viewCustomerHistory()">
+                        <i class="bi bi-clock-history me-1"></i>View Order History
+                    </button>
+                </div>
+            </div>
+
+            <!-- Shipping Address Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Shipping Address</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">@Model.ShippingAddress</p>
+                </div>
+            </div>
+
+            <!-- Order Summary Card -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-file-text me-2"></i>Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Status</label>
+                        <div>
+                            @{
+                                var statusBadge = Model.Order.Status switch
+                                {
+                                    "Pending Confirmation" => "bg-danger",
+                                    "Confirmed" => "bg-success",
+                                    "Processing" => "bg-primary",
+                                    "Shipped" => "bg-info",
+                                    "Delivered" => "bg-secondary",
+                                    "Completed" => "bg-dark",
+                                    "Cancelled" => "bg-warning text-dark",
+                                    _ => "bg-secondary"
+                                };
+                            }
+                            <span class="badge @statusBadge fs-6">@Model.Order.Status</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small">Payment Method</label>
+                        <div>
+                            @if (Model.Order.PaymentMethod == "COD")
+                            {
+                                <i class="bi bi-cash-coin me-1"></i>
+                            
+                                <span>Cash on Delivery</span>
+                            }
+                            else
+                            {
+                                <i class="bi bi-credit-card me-1"></i>
+                            
+                                <span>Online Payment</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small">Order Type</label>
+                        <div>
+                            @if (Model.HasPrescriptionItems)
+                            {
+                                <span class="badge bg-purple">
+                                    <i class="bi bi-eyeglasses"></i> Prescription Order
+                                </span>
+                            }
+                            else if (Model.IsPreOrder)
+                            {
+                                <span class="badge bg-secondary">
+                                    <i class="bi bi-hourglass-split"></i> Pre-Order
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> Ready Stock
+                                </span>
+                            }
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong>Total Amount:</strong>
+                        <span class="fs-4 fw-bold text-success">@Model.Order.TotalAmount.ToString("N0") ₫</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmOrder() {
+            if (confirm('Confirm this order?\n\nThis will notify the customer and send the order to Operations team for processing.')) {
+                fetch('/Support/Orders/Confirm?orderId=@Model.OrderId', {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Error confirming order. Please try again.');
+                    }
+                });
+            }
+        }
+
+        function cancelOrder() {
+            const reason = prompt('Please enter cancellation reason:');
+            if (reason && reason.trim()) {
+                if (confirm(`Cancel Order #@Model.OrderId?\n\nReason: ${reason}\n\nThis action cannot be undone.`)) {
+                    // Implement cancel order logic
+                    alert('Order cancellation feature - To be implemented');
+                }
+            }
+        }
+
+        function contactCustomer() {
+            window.location.href = 'mailto:@Model.CustomerEmail?subject=Regarding Order #@Model.OrderId';
+        }
+
+        function requestPrescriptionCorrection(itemId) {
+            alert(`Request prescription correction for item ${itemId}\n\nThis will send an email to the customer.`);
+            // Implement prescription correction request
+        }
+
+        function escalateToManager() {
+            if (confirm('Escalate this order to Manager?\n\nA notification will be sent to the manager.')) {
+                alert('Escalation feature - To be implemented');
+            }
+        }
+
+        function viewCustomerHistory() {
+            alert('Customer order history - To be implemented');
+        }
+    </script>
+}
+
+@section Styles {
+    <style>
+        .bg-purple {
+            background-color: #9c27b0 !important;
+            color: white;
+        }
+
+        .btn-outline-purple {
+            color: #9c27b0;
+            border-color: #9c27b0;
+        }
+
+            .btn-outline-purple:hover {
+                background-color: #9c27b0;
+                color: white;
+            }
+    </style>
 }

@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EyewearStore_SWP391")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e98d3e05cf3c03b3cf578675fd7b9791a4258454")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7799cc0e9e781a5f50b52b53eac737b62b967871")]
 [assembly: System.Reflection.AssemblyProductAttribute("EyewearStore_SWP391")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EyewearStore_SWP391")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

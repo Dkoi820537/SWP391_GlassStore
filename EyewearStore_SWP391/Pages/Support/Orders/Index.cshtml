@@ -1,4 +1,461 @@
 ﻿@page
 @model EyewearStore_SWP391.Pages.Support.Orders.IndexModel
 @{
+    ViewData["Title"] = "Support Staff - Order Management";
+}
+
+<div class="container-fluid py-4">
+    <!-- Page Header with Breadcrumb -->
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
+                <li class="breadcrumb-item active">Support Dashboard</li>
+            </ol>
+        </nav>
+
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
+                    💬 Support Dashboard
+                </h1>
+                <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin: 0;">
+                    Process orders, verify prescriptions, and handle customer support requests
+                </p>
+            </div>
+            <div>
+                <button class="btn btn-outline-primary me-2" onclick="window.location.reload()">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+                </button>
+                <a asp-page="/Support/Returns/Index" class="btn btn-warning">
+                    <i class="bi bi-arrow-return-left me-1"></i> Returns Queue
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i><strong>Success!</strong> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i><strong>Error!</strong> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Dashboard Stats Cards -->
+    <div class="row g-3 mb-4">
+        <!-- Pending Verification -->
+        <div class="col-md-3">
+            <div class="card border-0" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">
+                                <i class="bi bi-hourglass-split me-1"></i>Pending Verification
+                            </div>
+                            <div style="font-size: 2.25rem; font-weight: 700;">@Model.Stats.PendingCount</div>
+                        </div>
+                        <div style="font-size: 3.5rem; opacity: 0.25;">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center" style="padding: 0.5rem;">
+                    <small style="opacity: 0.85;">Requires immediate attention</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prescription Orders -->
+        <div class="col-md-3">
+            <div class="card border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">
+                                <i class="bi bi-eyeglasses me-1"></i>Prescription Orders
+                            </div>
+                            <div style="font-size: 2.25rem; font-weight: 700;">@Model.Stats.PrescriptionCount</div>
+                        </div>
+                        <div style="font-size: 3.5rem; opacity: 0.25;">
+                            <i class="bi bi-prescription2"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center" style="padding: 0.5rem;">
+                    <small style="opacity: 0.85;">Need verification</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Returns/Refunds -->
+        <div class="col-md-3">
+            <div class="card border-0" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">
+                                <i class="bi bi-arrow-return-left me-1"></i>Returns Queue
+                            </div>
+                            <div style="font-size: 2.25rem; font-weight: 700;">@Model.Stats.ReturnCount</div>
+                        </div>
+                        <div style="font-size: 3.5rem; opacity: 0.25;">
+                            <i class="bi bi-box-arrow-in-left"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center" style="padding: 0.5rem;">
+                    <small style="opacity: 0.85;">Pending processing</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Inquiries -->
+        <div class="col-md-3">
+            <div class="card border-0" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">
+                                <i class="bi bi-chat-dots me-1"></i>Today's Confirmed
+                            </div>
+                            <div style="font-size: 2.25rem; font-weight: 700;">@Model.Stats.TodayConfirmedCount</div>
+                        </div>
+                        <div style="font-size: 3.5rem; opacity: 0.25;">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center" style="padding: 0.5rem;">
+                    <small style="opacity: 0.85;">Orders processed today</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Panel -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h6 class="text-muted mb-3"><i class="bi bi-lightning-charge me-2"></i>Quick Actions</h6>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="?StatusFilter=Pending+Confirmation" class="btn btn-outline-danger">
+                    <i class="bi bi-exclamation-circle me-1"></i>Pending Verification
+                </a>
+                <a href="?TypeFilter=Prescription" class="btn btn-outline-purple">
+                    <i class="bi bi-eyeglasses me-1"></i>Prescription Orders
+                </a>
+                <a href="?TypeFilter=PreOrder" class="btn btn-outline-secondary">
+                    <i class="bi bi-hourglass me-1"></i>Pre-Orders
+                </a>
+                <a asp-page="/Support/Returns/Index" class="btn btn-outline-warning">
+                    <i class="bi bi-arrow-return-left me-1"></i>Process Returns
+                </a>
+                <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#statsModal">
+                    <i class="bi bi-graph-up me-1"></i>View Statistics
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-funnel me-2"></i>Search & Filter Orders</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-search me-1"></i>Search
+                    </label>
+                    <input type="text"
+                           class="form-control"
+                           name="Search"
+                           value="@Model.Search"
+                           placeholder="Order ID, Email, Customer Name..." />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-tags me-1"></i>Status
+                    </label>
+                    <select class="form-select" name="StatusFilter">
+                        <option value="">All Statuses</option>
+                        @foreach (var status in Model.Statuses)
+                        {
+                            <option value="@status" selected="@(Model.StatusFilter == status)">@status</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-box me-1"></i>Order Type
+                    </label>
+                    <select class="form-select" name="TypeFilter">
+                        <option value="">All Types</option>
+                        <option value="Prescription" selected="@(Model.TypeFilter == "Prescription")">Prescription</option>
+                        <option value="ReadyStock" selected="@(Model.TypeFilter == "ReadyStock")">Ready Stock</option>
+                        <option value="PreOrder" selected="@(Model.TypeFilter == "PreOrder")">Pre-Order</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-flag me-1"></i>Priority
+                    </label>
+                    <select class="form-select" name="PriorityFilter">
+                        <option value="">All</option>
+                        <option value="High" selected="@(Model.PriorityFilter == "High")">🔥 High Priority</option>
+                        <option value="Normal" selected="@(Model.PriorityFilter == "Normal")">Normal</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-funnel-fill me-1"></i>Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="bi bi-list-check me-2"></i>Support Queue (@Model.Orders.Count orders)
+            </h5>
+            <span class="badge bg-light text-dark">Last updated: @DateTime.Now.ToString("HH:mm:ss")</span>
+        </div>
+        <div class="card-body p-0">
+            @if (!Model.Orders.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox display-1 text-muted" style="opacity: 0.2;"></i>
+                    <h4 class="mt-3 text-muted">No Orders in Queue</h4>
+                    <p class="text-muted">All caught up! Great job! 🎉</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="padding: 1rem;">Order</th>
+                                <th style="padding: 1rem;">Customer</th>
+                                <th style="padding: 1rem;">Created</th>
+                                <th style="padding: 1rem;">Status</th>
+                                <th style="padding: 1rem;">Type & Priority</th>
+                                <th style="padding: 1rem;">Total</th>
+                                <th style="padding: 1rem; text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model.Orders)
+                            {
+                                var isPrescription = order.OrderItems.Any(oi => oi.PrescriptionId != null);
+                                var isPreOrder = order.OrderItems.Any(oi => (oi.Product?.InventoryQty ?? 0) < oi.Quantity);
+                                var isHighPriority = isPrescription || order.CreatedAt < DateTime.UtcNow.AddDays(-2);
+                                var hasReturns = order.OrderItems.Any(oi => oi.Returns.Any());
+
+                                string badgeClass = order.Status switch
+                                {
+                                    "Pending Confirmation" => "bg-danger",
+                                    "Confirmed" => "bg-success",
+                                    "Processing" => "bg-primary",
+                                    "Shipped" => "bg-info",
+                                    "Delivered" => "bg-secondary",
+                                    "Completed" => "bg-dark",
+                                    "Cancelled" => "bg-warning text-dark",
+                                    _ => "bg-secondary"
+                                };
+
+                                <tr style="@(isHighPriority ? "background-color: rgba(255, 107, 107, 0.05);" : "")">
+                                    <td style="padding: 1rem;">
+                                        <div class="fw-bold text-primary">#@order.OrderId</div>
+                                        @if (isHighPriority)
+                                        {
+                                            <span class="badge bg-danger" style="font-size: 0.7rem;">
+                                                <i class="bi bi-exclamation-triangle"></i> URGENT
+                                            </span>
+                                        }
+                                        @if (hasReturns)
+                                        {
+                                            <span class="badge bg-warning text-dark" style="font-size: 0.7rem;">
+                                                <i class="bi bi-arrow-return-left"></i> Return
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <td style="padding: 1rem;">
+                                        <div class="fw-semibold">@order.User?.FullName</div>
+                                        <small class="text-muted">@order.User?.Email</small>
+                                    </td>
+
+                                    <td style="padding: 1rem;">
+                                        <div>@order.CreatedAt.ToString("MMM dd, yyyy")</div>
+                                        <small class="text-muted">@order.CreatedAt.ToString("hh:mm tt")</small>
+                                    </td>
+
+                                    <td style="padding: 1rem;">
+                                        <span class="badge @badgeClass">@order.Status</span>
+                                    </td>
+
+                                    <td style="padding: 1rem;">
+                                        @if (isPrescription)
+                                        {
+                                            <span class="badge" style="background: #9c27b0; color: white;">
+                                                <i class="bi bi-eyeglasses"></i> Prescription
+                                            </span>
+                                        }
+                                        else if (isPreOrder)
+                                        {
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-hourglass-split"></i> Pre-Order
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> Ready
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <td style="padding: 1rem;">
+                                        <div class="fw-bold text-success">
+                                            @order.TotalAmount.ToString("N0") ₫
+                                        </div>
+                                    </td>
+
+                                    <td style="padding: 1rem; text-align: center;">
+                                        <div class="btn-group" role="group">
+                                            <a asp-page="./Details"
+                                               asp-route-id="@order.OrderId"
+                                               class="btn btn-sm btn-primary"
+                                               title="Process Order">
+                                                <i class="bi bi-eye"></i> Process
+                                            </a>
+
+                                            @if (order.Status == "Pending Confirmation")
+                                            {
+                                                <button type="button"
+                                                        class="btn btn-sm btn-success"
+                                                        onclick="quickConfirm(@order.OrderId)"
+                                                        title="Quick Confirm">
+                                                    <i class="bi bi-check-lg"></i>
+                                                </button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Modal -->
+<div class="modal fade" id="statsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-graph-up me-2"></i>Support Statistics</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted">Total Orders Today</h6>
+                                <h2 class="text-primary">@Model.Stats.TodayConfirmedCount</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted">Avg. Processing Time</h6>
+                                <h2 class="text-success">~15 min</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function quickConfirm(orderId) {
+            if (confirm(`Quick confirm Order #${orderId}?\n\nThis will change status to "Confirmed" and notify Operations team.`)) {
+                fetch(`/Support/Orders/QuickConfirm?orderId=${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Error confirming order. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error confirming order. Please try again.');
+                });
+            }
+        }
+
+        // Auto-refresh every 2 minutes
+        setTimeout(() => {
+            location.reload();
+        }, 120000);
+    </script>
+}
+
+@section Styles {
+    <style>
+        .btn-outline-purple {
+            color: #9c27b0;
+            border-color: #9c27b0;
+        }
+
+            .btn-outline-purple:hover {
+                background-color: #9c27b0;
+                color: white;
+            }
+
+        .table tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            }
+    </style>
 }

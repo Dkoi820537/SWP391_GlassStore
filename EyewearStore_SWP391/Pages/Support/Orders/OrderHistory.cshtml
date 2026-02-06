@@ -1,0 +1,194 @@
+﻿@page "{userId:int}"
+@model EyewearStore_SWP391.Pages.Support.Customers.OrderHistoryModel
+@{
+    ViewData["Title"] = $"Order History - {Model.CustomerName}";
+}
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-page="/Support/Orders/Index">Support Dashboard</a></li>
+            <li class="breadcrumb-item active">Customer Order History</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
+                🕐 Order History
+            </h1>
+            <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin: 0;">
+                Customer: <strong>@Model.CustomerName</strong> (@Model.CustomerEmail)
+            </p>
+        </div>
+        <button class="btn btn-outline-secondary" onclick="window.history.back()">
+            <span style="margin-right: 0.5rem;">←</span> Back
+        </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #2196f3 0%, #03a9f4 100%); color: white;">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Total Orders</div>
+                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.TotalOrders</div>
+                        </div>
+                        <div style="font-size: 3rem; opacity: 0.3;">📦</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); color: white;">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Completed</div>
+                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.CompletedOrders</div>
+                        </div>
+                        <div style="font-size: 3rem; opacity: 0.3;">✅</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #f44336 0%, #e57373 100%); color: white;">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Cancelled</div>
+                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.CancelledOrders</div>
+                        </div>
+                        <div style="font-size: 3rem; opacity: 0.3;">❌</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-light) 100%); color: white;">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Total Spent</div>
+                            <div style="font-size: 1.5rem; font-weight: 700;">@Model.Stats.TotalSpent.ToString("N0") VND</div>
+                        </div>
+                        <div style="font-size: 3rem; opacity: 0.3;">💰</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    @if (!Model.Orders.Any())
+    {
+        <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
+            <div class="card-body" style="padding: 4rem 2rem; text-align: center;">
+                <div style="font-size: 4rem; opacity: 0.2; margin-bottom: 1rem;">📦</div>
+                <h4 style="color: var(--primary-navy); margin-bottom: 0.5rem;">No Order History</h4>
+                <p style="color: var(--secondary-warm-gray);">
+                    This customer has not placed any orders yet.
+                </p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-lg);">
+            <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+                            padding: 1.5rem;
+                            border-radius: 12px 12px 0 0;">
+                <h5 style="color: white; margin: 0; font-weight: 600;">
+                    📋 All Orders (@Model.Orders.Count)
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead style="background: var(--light-gray);">
+                            <tr>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Order ID</th>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Date</th>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Status</th>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Items</th>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy); text-align: right;">Total</th>
+                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy); text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model.Orders)
+                            {
+                                <tr style="border-bottom: 1px solid var(--medium-gray);">
+                                    <td style="padding: 1rem;">
+                                        <span style="font-weight: 700; color: var(--primary-navy); font-size: 1.1rem;">
+                                            #@order.OrderId
+                                        </span>
+                                    </td>
+                                    <td style="padding: 1rem;">
+                                        <div style="color: var(--dark-gray);">
+                                            @order.CreatedAt.ToString("MMM dd, yyyy")
+                                        </div>
+                                        <div style="font-size: 0.85rem; color: var(--secondary-warm-gray);">
+                                            @order.CreatedAt.ToString("hh:mm tt")
+                                        </div>
+                                    </td>
+                                    <td style="padding: 1rem;">
+                                        @{
+                                            var statusColor = order.Status switch
+                                            {
+                                                "Pending Confirmation" => "#ff9800",
+                                                "Confirmed" => "#4caf50",
+                                                "Processing" => "#2196f3",
+                                                "Shipped" => "#607d8b",
+                                                "Delivered" => "#4caf50",
+                                                "Completed" => "#4caf50",
+                                                "Cancelled" => "#f44336",
+                                                _ => "#9e9e9e"
+                                            };
+                                        }
+                                        <span style="background: @statusColor;
+                                                             color: white;
+                                                             padding: 0.35rem 0.75rem;
+                                                             border-radius: 6px;
+                                                             font-size: 0.85rem;
+                                                             font-weight: 600;
+                                                             display: inline-block;">
+                                            @order.Status
+                                        </span>
+                                    </td>
+                                    <td style="padding: 1rem; color: var(--dark-gray);">
+                                        @order.ItemCount item(s)
+                                    </td>
+                                    <td style="padding: 1rem; text-align: right; font-weight: 700; color: var(--primary-gold); font-size: 1.1rem;">
+                                        @order.TotalAmount.ToString("N0") VND
+                                    </td>
+                                    <td style="padding: 1rem; text-align: center;">
+                                        <a asp-page="/Support/Orders/Details"
+                                           asp-route-id="@order.OrderId"
+                                           class="btn btn-sm btn-primary"
+                                           style="padding: 0.5rem 1.25rem; border-radius: 6px;">
+                                            <span style="margin-right: 0.25rem;">👁️</span> View
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .table tbody tr:hover {
+        background-color: rgba(212, 165, 116, 0.05);
+        transition: all 0.2s ease;
+    }
+</style>

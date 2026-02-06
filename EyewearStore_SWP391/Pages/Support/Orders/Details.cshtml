@@ -17,152 +17,165 @@
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2>
-                <i class="bi bi-clipboard-check me-2"></i>Process Order #@Model.OrderId
+            <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
+                💼 Process Order #@Model.OrderId
+            </h1>
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
                 @if (Model.IsHighPriority)
                 {
-                    <span class="badge bg-danger ms-2">
-                        <i class="bi bi-exclamation-triangle"></i> HIGH PRIORITY
+                    <span style="background: linear-gradient(135deg, #f44336 0%, #e57373 100%);
+                                     color: white;
+                                     padding: 0.5rem 1rem;
+                                     border-radius: 20px;
+                                     font-weight: 600;">
+                        ⚠️ HIGH PRIORITY
                     </span>
                 }
-            </h2>
-            <p class="text-muted mb-0">
-                Created: @Model.Order.CreatedAt.ToString("MMMM dd, yyyy 'at' hh:mm tt")
-            </p>
+                <span style="color: var(--secondary-warm-gray); font-size: 0.95rem;">
+                    Created: @Model.Order.CreatedAt.ToString("MMM dd, yyyy hh:mm tt")
+                </span>
+            </div>
         </div>
         <a asp-page="./Index" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i>Back to Queue
+            <span style="margin-right: 0.5rem;">←</span> Back to Queue
         </a>
     </div>
 
     <!-- Alert Messages -->
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show">
-            <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 8px; border-left: 4px solid var(--success);">
+            <strong>✓</strong> @TempData["Success"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
-
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show">
-            <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Error"]
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px; border-left: 4px solid var(--error);">
+            <strong>⚠</strong> @TempData["Error"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
     <div class="row g-4">
-        <!-- Left Column: Order Information -->
+        <!-- Left Column -->
         <div class="col-lg-8">
-            <!-- Order Items Card (unchanged) -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-cart3 me-2"></i>Order Items</h5>
+            <!-- Order Items Card -->
+            <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
+                <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+                            padding: 1.5rem;
+                            border-radius: 12px 12px 0 0;">
+                    <h5 style="color: white; margin: 0; font-weight: 600;">
+                        🛒 Order Items (@Model.OrderItems.Count)
+                    </h5>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
+                        <table class="table mb-0">
+                            <thead style="background: var(--light-gray);">
                                 <tr>
-                                    <th>Product</th>
-                                    <th>SKU</th>
-                                    <th class="text-center">Quantity</th>
-                                    <th class="text-end">Price</th>
-                                    <th class="text-end">Subtotal</th>
-                                    <th class="text-center">Status</th>
+                                    <th style="padding: 1rem; font-weight: 600;">Product</th>
+                                    <th style="padding: 1rem; font-weight: 600;">SKU</th>
+                                    <th style="padding: 1rem; font-weight: 600; text-align: center;">Qty</th>
+                                    <th style="padding: 1rem; font-weight: 600; text-align: right;">Price</th>
+                                    <th style="padding: 1rem; font-weight: 600; text-align: right;">Subtotal</th>
+                                    <th style="padding: 1rem; font-weight: 600; text-align: center;">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var item in Model.OrderItems)
                                 {
-                                    var hasReturn = item.HasReturn;
-                                    var hasPrescription = item.PrescriptionId != null;
-                                    var inStock = (item.ProductInventory ?? 0) >= item.Quantity;
-
-                                    <tr>
-                                        <td>
-                                            <div class="fw-semibold">@item.ProductName</div>
-                                            @if (hasPrescription)
+                                    <tr style="border-bottom: 1px solid var(--medium-gray);">
+                                        <td style="padding: 1rem;">
+                                            <div style="font-weight: 600; color: var(--dark-gray);">@item.ProductName</div>
+                                            @if (item.PrescriptionId != null)
                                             {
-                                                <span class="badge bg-purple">
-                                                    <i class="bi bi-eyeglasses"></i> Prescription Required
+                                                <span style="background: #9c27b0; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                                                    👓 Prescription
                                                 </span>
                                             }
                                         </td>
-                                        <td>
-                                            <span class="font-monospace text-muted">@item.Sku</span>
+                                        <td style="padding: 1rem; color: var(--secondary-warm-gray);">@item.Sku</td>
+                                        <td style="padding: 1rem; text-align: center;">
+                                            <span style="background: var(--medium-gray); padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 600;">
+                                                ×@item.Quantity
+                                            </span>
                                         </td>
-                                        <td class="text-center">
-                                            <span class="badge bg-secondary">×@item.Quantity</span>
-                                        </td>
-                                        <td class="text-end">@item.UnitPrice.ToString("N0") ₫</td>
-                                        <td class="text-end fw-bold">@((item.UnitPrice * item.Quantity).ToString("N0")) ₫</td>
-                                        <td class="text-center">
-                                            @if (hasReturn)
+                                        <td style="padding: 1rem; text-align: right;">@item.UnitPrice.ToString("N0") VND</td>
+                                        <td style="padding: 1rem; text-align: right; font-weight: 700;">@((item.UnitPrice * item.Quantity).ToString("N0")) VND</td>
+                                        <td style="padding: 1rem; text-align: center;">
+                                            @if (item.HasReturn)
                                             {
-                                                <span class="badge bg-warning text-dark">
-                                                    <i class="bi bi-arrow-return-left"></i> Return
+                                                <span style="background: #ff9800; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.85rem;">
+                                                    🔄 Return
                                                 </span>
                                             }
-                                            else if (!inStock)
+                                            else if ((item.ProductInventory ?? 0) < item.Quantity)
                                             {
-                                                <span class="badge bg-danger">
-                                                    <i class="bi bi-exclamation-circle"></i> Out of Stock
+                                                <span style="background: #f44336; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.85rem;">
+                                                    ⚠️ Out of Stock
                                                 </span>
                                             }
                                             else
                                             {
-                                                <span class="badge bg-success">
-                                                    <i class="bi bi-check-circle"></i> Available
+                                                <span style="background: #4caf50; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.85rem;">
+                                                    ✓ Available
                                                 </span>
                                             }
                                         </td>
                                     </tr>
 
-                                    @* Show prescription details if present *@
-                                    @if (hasPrescription && item.PrescriptionDetails != null)
+                                    @if (item.PrescriptionDetails != null)
                                     {
-                                        <tr class="bg-light">
-                                            <td colspan="6" style="padding: 1rem;">
-                                                <div class="ms-4">
-                                                    <h6 class="mb-2">
-                                                        <i class="bi bi-file-medical me-2"></i>Prescription Details
+                                        <tr style="background: rgba(156, 39, 176, 0.05);">
+                                            <td colspan="6" style="padding: 1.5rem;">
+                                                <div style="margin-left: 2rem;">
+                                                    <h6 style="color: #9c27b0; font-weight: 600; margin-bottom: 1rem;">
+                                                        👓 Prescription Details
                                                         @if (!item.IsPrescriptionVerified)
                                                         {
-                                                            <span class="badge bg-warning text-dark">Needs Verification</span>
+                                                            <span style="background: #ff9800; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem;">
+                                                                Needs Verification
+                                                            </span>
                                                         }
                                                         else
                                                         {
-                                                            <span class="badge bg-success">Verified</span>
+                                                            <span style="background: #4caf50; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem;">
+                                                                ✓ Verified
+                                                            </span>
                                                         }
                                                     </h6>
                                                     <div class="row">
                                                         <div class="col-md-6">
-                                                            <strong>Left Eye (OS):</strong><br>
-                                                            SPH: @item.PrescriptionDetails.LeftSph ?? 0<br>
-                                                            CYL: @item.PrescriptionDetails.LeftCyl ?? 0<br>
-                                                            AXIS: @item.PrescriptionDetails.LeftAxis ?? 0°
+                                                            <div style="padding: 1rem; background: white; border-radius: 8px; border-left: 3px solid #9c27b0;">
+                                                                <strong style="color: #9c27b0;">Left Eye (OS):</strong><br />
+                                                                SPH: @item.PrescriptionDetails.LeftSph<br />
+                                                                CYL: @item.PrescriptionDetails.LeftCyl<br />
+                                                                AXIS: @item.PrescriptionDetails.LeftAxis°
+                                                            </div>
                                                         </div>
                                                         <div class="col-md-6">
-                                                            <strong>Right Eye (OD):</strong><br>
-                                                            SPH: @item.PrescriptionDetails.RightSph ?? 0<br>
-                                                            CYL: @item.PrescriptionDetails.RightCyl ?? 0<br>
-                                                            AXIS: @item.PrescriptionDetails.RightAxis ?? 0°
+                                                            <div style="padding: 1rem; background: white; border-radius: 8px; border-left: 3px solid #9c27b0;">
+                                                                <strong style="color: #9c27b0;">Right Eye (OD):</strong><br />
+                                                                SPH: @item.PrescriptionDetails.RightSph<br />
+                                                                CYL: @item.PrescriptionDetails.RightCyl<br />
+                                                                AXIS: @item.PrescriptionDetails.RightAxis°
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     @if (!item.IsPrescriptionVerified)
                                                     {
-                                                        <form method="post" asp-page-handler="VerifyPrescription" class="mt-3">
-                                                            @Html.AntiForgeryToken()
-                                                            <input type="hidden" name="orderItemId" value="@item.OrderItemId" />
-                                                            <button type="submit" class="btn btn-sm btn-success">
-                                                                <i class="bi bi-check-circle me-1"></i>Verify Prescription
+                                                        <div style="margin-top: 1rem;">
+                                                            <form method="post" asp-page-handler="VerifyPrescription" style="display: inline;">
+                                                                <input type="hidden" name="orderItemId" value="@item.OrderItemId" />
+                                                                <button type="submit" class="btn btn-success">
+                                                                    <span style="margin-right: 0.5rem;">✓</span> Verify Prescription
+                                                                </button>
+                                                            </form>
+                                                            <button type="button" class="btn btn-warning ms-2" onclick="contactCustomerAboutPrescription(@item.OrderItemId)">
+                                                                <span style="margin-right: 0.5rem;">📧</span> Request Correction
                                                             </button>
-                                                            <button type="button" class="btn btn-sm btn-warning" onclick="requestPrescriptionCorrection(@item.OrderItemId)">
-                                                                <i class="bi bi-envelope me-1"></i>Request Correction
-                                                            </button>
-                                                        </form>
+                                                        </div>
                                                     }
                                                 </div>
                                             </td>
@@ -170,11 +183,14 @@
                                     }
                                 }
                             </tbody>
-                            <tfoot class="table-light">
+                            <tfoot style="background: var(--light-gray);">
                                 <tr>
-                                    <td colspan="4" class="text-end fw-bold">Total:</td>
-                                    <td class="text-end fw-bold text-success fs-5">@Model.Order.TotalAmount.ToString("N0") ₫</td>
-                                    <td></td>
+                                    <td colspan="4" style="padding: 1.25rem; text-align: right; font-weight: 700; font-size: 1.1rem;">
+                                        TOTAL:
+                                    </td>
+                                    <td colspan="2" style="padding: 1.25rem; text-align: right; font-weight: 700; font-size: 1.5rem; color: var(--primary-gold);">
+                                        @Model.Order.TotalAmount.ToString("N0") VND
+                                    </td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -183,208 +199,204 @@
             </div>
 
             <!-- Support Actions Card -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-warning">
-                    <h5 class="mb-0"><i class="bi bi-tools me-2"></i>Support Actions</h5>
+            <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
+                <div style="background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
+                            padding: 1.5rem;
+                            border-radius: 12px 12px 0 0;">
+                    <h5 style="color: white; margin: 0; font-weight: 600;">
+                        🛠️ Support Actions
+                    </h5>
                 </div>
-                <div class="card-body">
-                    <!-- UPDATE STATUS form posts to OnPostUpdateStatusAsync -->
+                <div class="card-body" style="padding: 2rem;">
                     <form method="post" asp-page-handler="UpdateStatus">
-                        @Html.AntiForgeryToken()
                         <input type="hidden" name="orderId" value="@Model.OrderId" />
 
-                        <div class="row g-3">
+                        <div class="row g-3 mb-4">
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Change Order Status</label>
-                                <select name="newStatus" class="form-select form-select-lg">
+                                <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
+                                    Change Order Status
+                                </label>
+                                <select name="newStatus" class="form-select form-select-lg" style="border: 2px solid var(--medium-gray); border-radius: 8px;">
                                     @foreach (var status in Model.AllStatuses)
                                     {
                                         <option value="@status" selected="@(status == Model.Order.Status)">@status</option>
                                     }
                                 </select>
                             </div>
-
                             <div class="col-md-6 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="bi bi-arrow-repeat me-1"></i>Update Status
+                                <button type="submit" class="btn btn-primary w-100" style="padding: 0.75rem; font-weight: 600;">
+                                    <span style="margin-right: 0.5rem;">🔄</span> Update Status
                                 </button>
-                            </div>
-
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">Support Notes (Internal)</label>
-                                <textarea name="supportNotes"
-                                          class="form-control"
-                                          rows="3"
-                                          placeholder="Add notes about this order, customer communication, or issues..."></textarea>
                             </div>
                         </div>
-                    </form>
 
-                    <hr class="my-3">
+                        <hr style="margin: 2rem 0;">
 
-                    <div class="d-flex gap-2 flex-wrap">
-                        @* Confirm Order -> use form POST to handler "Confirm" *@
-                        @if (Model.Order.Status == "Pending Confirmation")
-                        {
-                            <form method="post" asp-page-handler="Confirm" style="display:inline;">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="orderId" value="@Model.OrderId" />
-                                <button type="submit" class="btn btn-success">
-                                    <i class="bi bi-check-circle me-1"></i>Confirm Order
+                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                            @if (Model.Order.Status == "Pending Confirmation")
+                            {
+                                <button type="button" class="btn btn-success" onclick="confirmOrder()" style="flex: 1; padding: 0.75rem;">
+                                    <span style="margin-right: 0.5rem;">✓</span> Confirm Order
                                 </button>
-                            </form>
-                        }
-
-                        <a class="btn btn-info" href="mailto:@Model.CustomerEmail?subject=Regarding Order #@Model.OrderId">
-                            <i class="bi bi-envelope me-1"></i>Contact Customer
-                        </a>
-
-                        @* Escalate: POST to handler Escalate (server will handle) *@
-                        <form method="post" asp-page-handler="Escalate" style="display:inline;">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="orderId" value="@Model.OrderId" />
-                            <input type="hidden" name="escalateNote" value="Escalated from support page" />
-                            <button type="submit" class="btn btn-secondary">
-                                <i class="bi bi-arrow-up-circle me-1"></i>Escalate to Manager
+                            }
+                            <button type="button" class="btn btn-info" onclick="contactCustomer()" style="flex: 1; padding: 0.75rem;">
+                                <span style="margin-right: 0.5rem;">📧</span> Contact Customer
                             </button>
-                        </form>
-
-                        @if (Model.Order.Status != "Cancelled")
-                        {
-                            <button type="button" class="btn btn-danger" onclick="cancelOrder()">
-                                <i class="bi bi-x-circle me-1"></i>Cancel Order
+                            <button type="button" class="btn btn-secondary" onclick="escalateToManager()" style="flex: 1; padding: 0.75rem;">
+                                <span style="margin-right: 0.5rem;">⬆️</span> Escalate to Manager
                             </button>
-                        }
-
-                        @* View Order History - link to CustomerHistory page *@
-                        <a asp-page="/Support/Orders/CustomerHistory" asp-route-userId="@Model.Order.UserId" class="btn btn-outline-dark">
-                            <i class="bi bi-clock-history me-1"></i>View Order History
-                        </a>
-                    </div>
+                            @if (Model.Order.Status != "Cancelled")
+                            {
+                                <button type="button" class="btn btn-danger" onclick="cancelOrder()" style="flex: 1; padding: 0.75rem;">
+                                    <span style="margin-right: 0.5rem;">❌</span> Cancel Order
+                                </button>
+                            }
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
 
-        <!-- Right Column: Customer & Order Info (unchanged) -->
+        <!-- Right Column -->
         <div class="col-lg-4">
             <!-- Customer Info Card -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>Customer Information</h5>
+            <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
+                <div style="background: linear-gradient(135deg, var(--secondary-teal) 0%, #4a7c7e 100%);
+                            padding: 1.5rem;
+                            border-radius: 12px 12px 0 0;">
+                    <h5 style="color: white; margin: 0; font-weight: 600;">
+                        👤 Customer Information
+                    </h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="padding: 1.5rem;">
                     <div class="mb-3">
-                        <label class="text-muted small">Full Name</label>
-                        <div class="fw-bold">@Model.CustomerName</div>
+                        <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.85rem;">Full Name</label>
+                        <div style="font-size: 1.1rem; color: var(--dark-gray);">@Model.CustomerName</div>
                     </div>
                     <div class="mb-3">
-                        <label class="text-muted small">Email</label>
+                        <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.85rem;">Email</label>
                         <div>
-                            <a href="mailto:@Model.CustomerEmail" class="text-decoration-none">
-                                <i class="bi bi-envelope me-1"></i>@Model.CustomerEmail
+                            <a href="mailto:@Model.CustomerEmail" style="color: var(--secondary-teal); text-decoration: none;">
+                                📧 @Model.CustomerEmail
                             </a>
                         </div>
                     </div>
                     @if (!string.IsNullOrWhiteSpace(Model.CustomerPhone))
                     {
                         <div class="mb-3">
-                            <label class="text-muted small">Phone</label>
+                            <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.85rem;">Phone</label>
                             <div>
-                                <a href="tel:@Model.CustomerPhone" class="text-decoration-none">
-                                    <i class="bi bi-telephone me-1"></i>@Model.CustomerPhone
+                                <a href="tel:@Model.CustomerPhone" style="color: var(--secondary-teal); text-decoration: none;">
+                                    📱 @Model.CustomerPhone
                                 </a>
                             </div>
                         </div>
                     }
-                    <div class="mb-0">
-                        <label class="text-muted small">Customer Since</label>
-                        <div>@Model.CustomerSince.ToString("MMMM yyyy")</div>
+                    <div>
+                        <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.85rem;">Customer Since</label>
+                        <div style="color: var(--dark-gray);">@Model.CustomerSince.ToString("MMMM yyyy")</div>
                     </div>
                 </div>
-                <div class="card-footer">
-                    <a asp-page="/Support/Orders/CustomerHistory" asp-route-userId="@Model.Order.UserId" class="btn btn-sm btn-outline-primary w-100">
-                        <i class="bi bi-clock-history me-1"></i>View Order History
+                <div class="card-footer" style="background: var(--light-gray); padding: 1rem; border-radius: 0 0 12px 12px;">
+                    <a asp-page="/Support/Customers/OrderHistory" asp-route-userId="@Model.Order.UserId" class="btn btn-outline-primary w-100">
+                        <span style="margin-right: 0.5rem;">🕐</span> View Order History
                     </a>
                 </div>
             </div>
 
             <!-- Shipping Address Card -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Shipping Address</h5>
+            <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
+                <div style="background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+                            padding: 1.5rem;
+                            border-radius: 12px 12px 0 0;">
+                    <h5 style="color: white; margin: 0; font-weight: 600;">
+                        📍 Shipping Address
+                    </h5>
                 </div>
-                <div class="card-body">
-                    <p class="mb-0">@Model.ShippingAddress</p>
+                <div class="card-body" style="padding: 1.5rem;">
+                    <p style="margin: 0; line-height: 1.6; color: var(--dark-gray);">@Model.ShippingAddress</p>
                 </div>
             </div>
 
             <!-- Order Summary Card -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0"><i class="bi bi-file-text me-2"></i>Order Summary</h5>
+            <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
+                <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+                            padding: 1.5rem;
+                            border-radius: 12px 12px 0 0;">
+                    <h5 style="color: white; margin: 0; font-weight: 600;">
+                        📄 Order Summary
+                    </h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="padding: 1.5rem;">
                     <div class="mb-3">
-                        <label class="text-muted small">Status</label>
+                        <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.85rem;">Status</label>
                         <div>
                             @{
-                                var statusBadge = Model.Order.Status switch
+                                var statusColor = Model.Order.Status switch
                                 {
-                                    "Pending Confirmation" => "bg-danger",
-                                    "Confirmed" => "bg-success",
-                                    "Processing" => "bg-primary",
-                                    "Shipped" => "bg-info",
-                                    "Delivered" => "bg-secondary",
-                                    "Completed" => "bg-dark",
-                                    "Cancelled" => "bg-warning text-dark",
-                                    _ => "bg-secondary"
+                                    "Pending Confirmation" => "#ff9800",
+                                    "Confirmed" => "#4caf50",
+                                    "Processing" => "#2196f3",
+                                    "Shipped" => "#607d8b",
+                                    "Delivered" => "#4caf50",
+                                    "Completed" => "#4caf50",
+                                    "Cancelled" => "#f44336",
+                                    _ => "#9e9e9e"
                                 };
                             }
-                            <span class="badge @statusBadge fs-6">@Model.Order.Status</span>
+                            <span style="background: @statusColor;
+                                         color: white;
+                                         padding: 0.5rem 1rem;
+                                         border-radius: 8px;
+                                         font-size: 1rem;
+                                         font-weight: 600;
+                                         display: inline-block;">
+                                @Model.Order.Status
+                            </span>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="text-muted small">Payment Method</label>
-                        <div>
+                        <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.85rem;">Payment Method</label>
+                        <div style="color: var(--dark-gray);">
                             @if (Model.Order.PaymentMethod == "COD")
                             {
-                                <i class="bi bi-cash-coin me-1"></i>
-                                <span>Cash on Delivery</span>
+                                <span>💵 Cash on Delivery</span>
                             }
                             else
                             {
-                                <i class="bi bi-credit-card me-1"></i>
-                                <span>Online Payment</span>
+                                <span>💳 @Model.Order.PaymentMethod</span>
                             }
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="text-muted small">Order Type</label>
+                        <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.85rem;">Order Type</label>
                         <div>
                             @if (Model.HasPrescriptionItems)
                             {
-                                <span class="badge bg-purple">
-                                    <i class="bi bi-eyeglasses"></i> Prescription Order
+                                <span style="background: #9c27b0; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
+                                    👓 Prescription Order
                                 </span>
                             }
                             else if (Model.IsPreOrder)
                             {
-                                <span class="badge bg-secondary">
-                                    <i class="bi bi-hourglass-split"></i> Pre-Order
+                                <span style="background: #607d8b; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
+                                    🕐 Pre-Order
                                 </span>
                             }
                             else
                             {
-                                <span class="badge bg-success">
-                                    <i class="bi bi-check-circle"></i> Ready Stock
+                                <span style="background: #4caf50; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
+                                    ✓ Ready Stock
                                 </span>
                             }
                         </div>
                     </div>
                     <hr>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <strong>Total Amount:</strong>
-                        <span class="fs-4 fw-bold text-success">@Model.Order.TotalAmount.ToString("N0") ₫</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong style="color: var(--primary-navy);">Total Amount:</strong>
+                        <span style="font-size: 1.5rem; font-weight: 700; color: var(--primary-gold);">
+                            @Model.Order.TotalAmount.ToString("N0") VND
+                        </span>
                     </div>
                 </div>
             </div>
@@ -392,67 +404,44 @@
     </div>
 </div>
 
+<!-- Hidden Forms -->
+<form id="confirmForm" method="post" asp-page-handler="Confirm" style="display:none;">
+    <input type="hidden" name="orderId" value="@Model.OrderId" />
+</form>
+
+<form id="escalateForm" method="post" asp-page-handler="Escalate" style="display:none;">
+    <input type="hidden" name="orderId" value="@Model.OrderId" />
+</form>
+
 @section Scripts {
     <script>
-        function cancelOrder() {
-            const reason = prompt('Please enter cancellation reason:');
-            if (reason && reason.trim()) {
-                if (confirm(`Cancel Order #@Model.OrderId?\n\nReason: ${reason}\n\nThis action cannot be undone.`)) {
-                    // Post to Cancel handler: create a small form and submit
-                    const form = document.createElement('form');
-                    form.method = 'post';
-                    form.action = '?handler=Cancel';
-                    const idInput = document.createElement('input');
-                    idInput.type = 'hidden';
-                    idInput.name = 'orderId';
-                    idInput.value = '@Model.OrderId';
-                    form.appendChild(idInput);
-
-                    const noteInput = document.createElement('input');
-                    noteInput.type = 'hidden';
-                    noteInput.name = 'cancelReason';
-                    noteInput.value = reason;
-                    form.appendChild(noteInput);
-
-                    document.body.appendChild(form);
-                    form.submit();
-                }
+        function confirmOrder() {
+            if (confirm('✓ Confirm this order?\n\nThis will notify the customer and send to Operations team.')) {
+                document.getElementById('confirmForm').submit();
             }
         }
 
-        function requestPrescriptionCorrection(itemId) {
-            if (confirm('Send prescription correction request to customer?')) {
-                // Build and submit a tiny form to handler "RequestCorrection"
-                const form = document.createElement('form');
-                form.method = 'post';
-                form.action = '?handler=RequestCorrection';
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'orderItemId';
-                input.value = itemId;
-                form.appendChild(input);
-                document.body.appendChild(form);
-                form.submit();
+        function contactCustomer() {
+            window.location.href = 'mailto:@Model.CustomerEmail?subject=Regarding Order #@Model.OrderId';
+        }
+
+        function contactCustomerAboutPrescription(itemId) {
+            const subject = encodeURIComponent('Prescription Correction Needed - Order #@Model.OrderId');
+            const body = encodeURIComponent('Dear Customer,\n\nWe need clarification on your prescription values for Order #@Model.OrderId.\n\nPlease reply with the correct prescription.\n\nThank you!');
+            window.location.href = 'mailto:@Model.CustomerEmail?subject=' + subject + '&body=' + body;
+        }
+
+        function escalateToManager() {
+            if (confirm('⬆️ Escalate to Manager?\n\nThis order will be flagged for manager review.')) {
+                document.getElementById('escalateForm').submit();
+            }
+        }
+
+        function cancelOrder() {
+            if (confirm('❌ Cancel Order #@Model.OrderId?\n\nThis action cannot be undone!')) {
+                // TODO: Implement cancel handler
+                alert('Cancel order feature - To be implemented');
             }
         }
     </script>
-}
-
-@section Styles {
-    <style>
-        .bg-purple {
-            background-color: #9c27b0 !important;
-            color: white;
-        }
-
-        .btn-outline-purple {
-            color: #9c27b0;
-            border-color: #9c27b0;
-        }
-
-            .btn-outline-purple:hover {
-                background-color: #9c27b0;
-                color: white;
-            }
-    </style>
 }

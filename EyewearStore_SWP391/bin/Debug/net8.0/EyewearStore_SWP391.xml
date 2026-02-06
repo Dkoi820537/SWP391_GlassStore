@@ -1948,19 +1948,24 @@
             Operations Staff Order Management
             </summary>
         </member>
-        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostEscalateAsync(System.Int32,System.String)">
+        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostUpdateStatusAsync(System.Int32,System.String)">
             <summary>
-            Escalate to Manager (simple implementation: create TempData message and (TODO) send notification)
+            Update order status
             </summary>
         </member>
-        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostCancelAsync(System.Int32,System.String)">
+        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostVerifyPrescriptionAsync(System.Int32)">
             <summary>
-            Cancel order (simple: set status = Cancelled and optionally save reason)
+            Verify prescription values
             </summary>
         </member>
-        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostRequestCorrectionAsync(System.Int32)">
+        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostConfirmAsync(System.Int32)">
             <summary>
-            Request prescription correction (placeholder) - currently will create a notification (TODO).
+            Quick confirm order
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostEscalateAsync(System.Int32)">
+            <summary>
+            Escalate to Manager - Creates a new Order entry or uses separate Escalation table
             </summary>
         </member>
         <member name="T:EyewearStore_SWP391.Pages.Support.Orders.IndexModel">

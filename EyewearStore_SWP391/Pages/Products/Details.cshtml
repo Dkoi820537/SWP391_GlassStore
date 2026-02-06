@@ -1,0 +1,408 @@
+@page "{id:int}"
+@model EyewearStore_SWP391.Pages.Products.DetailsModel
+@{
+    ViewData["Title"] = Model.Product?.Name ?? "Product Details";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <style>
+        .product-details-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .product-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            margin-top: 24px;
+        }
+
+        .product-gallery {
+            position: relative;
+        }
+
+        .main-image {
+            width: 100%;
+            aspect-ratio: 1;
+            background: var(--shop-light-gray);
+            border-radius: var(--shop-radius-md);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .main-image-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .main-image-placeholder i {
+            font-size: 120px;
+            color: var(--shop-text-muted);
+            opacity: 0.3;
+        }
+
+        .thumbnail-grid {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .thumbnail:hover,
+        .thumbnail.active {
+            border-color: var(--shop-primary-teal);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-details-info {
+            padding-top: 16px;
+        }
+
+        .product-badge-detail {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--shop-primary-teal);
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+        }
+
+        .product-badge-detail.lens {
+            background: #6366F1;
+        }
+
+        .product-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--shop-text-primary);
+            margin: 0 0 16px;
+            line-height: 1.3;
+        }
+
+        .product-sku {
+            font-size: 14px;
+            color: var(--shop-text-muted);
+            margin-bottom: 24px;
+        }
+
+        .product-price-detail {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--shop-primary-teal);
+            margin-bottom: 24px;
+        }
+
+        .product-price-detail .currency {
+            font-size: 1.5rem;
+        }
+
+        .product-description-detail {
+            color: var(--shop-text-secondary);
+            line-height: 1.8;
+            margin-bottom: 32px;
+            font-size: 16px;
+        }
+
+        .product-specs {
+            background: var(--shop-light-gray);
+            border-radius: var(--shop-radius-md);
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .product-specs h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--shop-text-primary);
+            margin: 0 0 16px;
+        }
+
+        .spec-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .spec-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--shop-text-secondary);
+        }
+
+        .spec-item i {
+            color: var(--shop-primary-teal);
+            font-size: 16px;
+        }
+
+        .spec-item strong {
+            color: var(--shop-text-primary);
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn-add-cart {
+            flex: 1;
+            min-width: 200px;
+            padding: 16px 32px;
+            background: var(--shop-cta-blue);
+            color: white;
+            border: none;
+            border-radius: var(--shop-radius-sm);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-add-cart:hover {
+            background: var(--shop-cta-blue-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-wishlist {
+            padding: 16px;
+            background: white;
+            border: 2px solid var(--shop-border-gray);
+            border-radius: var(--shop-radius-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-wishlist:hover {
+            border-color: var(--shop-primary-teal);
+            color: var(--shop-primary-teal);
+        }
+
+        .btn-wishlist i {
+            font-size: 20px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--shop-text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--shop-primary-teal);
+        }
+
+        @@media (max-width: 991px) {
+            .product-details-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .product-title {
+                font-size: 1.5rem;
+            }
+
+            .product-price-detail {
+                font-size: 1.75rem;
+            }
+
+            .spec-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+}
+
+<div class="product-details-container">
+    <!-- Back Link -->
+    <a asp-page="/Products/Index" class="back-link">
+        <i class="bi bi-arrow-left"></i> Back to Shop
+    </a>
+
+    @if (Model.Product != null)
+    {
+        <div class="product-details-grid">
+            <!-- Product Gallery -->
+            <div class="product-gallery">
+                <div class="main-image" id="mainImage">
+                    @if (!string.IsNullOrEmpty(Model.Product.PrimaryImageUrl))
+                    {
+                        <img src="@Model.Product.PrimaryImageUrl" alt="@Model.Product.Name" id="mainProductImage" />
+                    }
+                    else
+                    {
+                        <div class="main-image-placeholder">
+                            <i class="bi bi-eyeglasses"></i>
+                        </div>
+                    }
+                </div>
+
+                @if (Model.ProductImages.Count > 1)
+                {
+                    <div class="thumbnail-grid">
+                        @foreach (var image in Model.ProductImages)
+                        {
+                            <div class="thumbnail @(image.IsPrimary ? "active" : "")" 
+                                 onclick="changeImage('@image.ImageUrl', this)">
+                                <img src="@image.ImageUrl" alt="@(image.AltText ?? Model.Product.Name)" />
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Product Info -->
+            <div class="product-details-info">
+                <span class="product-badge-detail @Model.Product.ProductType.ToLower()">
+                    @Model.Product.ProductType
+                </span>
+
+                <h1 class="product-title">@Model.Product.Name</h1>
+
+                <p class="product-sku">SKU: @Model.Product.Sku</p>
+
+                <p class="product-price-detail">
+                    <span class="currency">@Model.Product.Currency</span>
+                    @Model.Product.Price.ToString("N0")
+                </p>
+
+                @if (!string.IsNullOrEmpty(Model.Product.Description))
+                {
+                    <p class="product-description-detail">@Model.Product.Description</p>
+                }
+
+                <!-- Product Specifications -->
+                <div class="product-specs">
+                    <h3>Specifications</h3>
+                    <div class="spec-list">
+                        @if (Model.Product.ProductType == "Frame")
+                        {
+                            @if (!string.IsNullOrEmpty(Model.Product.FrameMaterial))
+                            {
+                                <div class="spec-item">
+                                    <i class="bi bi-gem"></i>
+                                    <span>Material: <strong>@Model.Product.FrameMaterial</strong></span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Product.FrameType))
+                            {
+                                <div class="spec-item">
+                                    <i class="bi bi-tag"></i>
+                                    <span>Type: <strong>@Model.Product.FrameType</strong></span>
+                                </div>
+                            }
+                        }
+                        else if (Model.Product.ProductType == "Lens")
+                        {
+                            @if (!string.IsNullOrEmpty(Model.Product.LensType))
+                            {
+                                <div class="spec-item">
+                                    <i class="bi bi-circle"></i>
+                                    <span>Lens Type: <strong>@Model.Product.LensType</strong></span>
+                                </div>
+                            }
+                            @if (Model.Product.LensIndex.HasValue)
+                            {
+                                <div class="spec-item">
+                                    <i class="bi bi-bullseye"></i>
+                                    <span>Lens Index: <strong>@Model.Product.LensIndex.Value</strong></span>
+                                </div>
+                            }
+                            <div class="spec-item">
+                                <i class="bi bi-check-circle"></i>
+                                <span>Prescription: <strong>@(Model.Product.IsPrescription == true ? "Yes" : "No")</strong></span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Product Actions -->
+                <div class="product-actions">
+                    <button class="btn-add-cart" type="button">
+                        <i class="bi bi-cart-plus"></i> Add to Cart
+                    </button>
+                    <button class="btn-wishlist" type="button" aria-label="Add to wishlist">
+                        <i class="bi bi-heart"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state" style="margin-top: 48px;">
+            <div class="empty-state-icon">
+                <i class="bi bi-exclamation-circle"></i>
+            </div>
+            <h2>Product Not Found</h2>
+            <p>The product you're looking for doesn't exist or has been removed.</p>
+            <a asp-page="/Products/Index" class="btn-clear-filters">
+                <i class="bi bi-arrow-left"></i> Back to Shop
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function changeImage(imageUrl, thumbnailElement) {
+            // Update main image
+            const mainImage = document.getElementById('mainProductImage');
+            if (mainImage) {
+                mainImage.src = imageUrl;
+            }
+
+            // Update active thumbnail
+            document.querySelectorAll('.thumbnail').forEach(thumb => {
+                thumb.classList.remove('active');
+            });
+            thumbnailElement.classList.add('active');
+        }
+    </script>
+}

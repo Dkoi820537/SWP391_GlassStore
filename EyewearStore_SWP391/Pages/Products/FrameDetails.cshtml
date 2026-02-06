@@ -1,0 +1,1130 @@
+@page "{id:int}"
+@model EyewearStore_SWP391.Pages.Products.FrameDetailsModel
+@{
+    ViewData["Title"] = Model.Frame?.Name ?? "Frame Details";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <style>
+        /* ==========================================
+           FRAME DETAILS PAGE STYLES
+           ========================================== */
+
+        /* Breadcrumb Section */
+        .frame-breadcrumb-section {
+            background: #F8F9FA;
+            padding: 16px 0;
+        }
+
+        .frame-breadcrumb {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 14px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .frame-breadcrumb li {
+            display: flex;
+            align-items: center;
+        }
+
+        .frame-breadcrumb a {
+            color: #666666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .frame-breadcrumb a:hover {
+            color: var(--shop-primary-teal);
+        }
+
+        .frame-breadcrumb .separator {
+            margin: 0 8px;
+            color: #999999;
+            font-size: 12px;
+        }
+
+        .frame-breadcrumb .current {
+            color: var(--shop-primary-teal);
+            font-weight: 500;
+        }
+
+        /* Main Container */
+        .frame-details-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            background: var(--shop-white);
+        }
+
+        /* Two Column Layout */
+        .frame-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+        }
+
+        /* Left Column - Images */
+        .frame-gallery {
+            position: relative;
+        }
+
+        .main-image-container {
+            aspect-ratio: 1;
+            background: var(--shop-white);
+            border-radius: 12px;
+            border: 1px solid #E0E0E0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+
+        .main-image-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .main-image-placeholder i {
+            font-size: 120px;
+            color: var(--shop-primary-teal);
+            opacity: 0.3;
+        }
+
+        .thumbnail-gallery {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .thumbnail-item {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .thumbnail-item:hover,
+        .thumbnail-item.active {
+            border-color: var(--shop-primary-teal);
+        }
+
+        .thumbnail-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Right Column - Product Info */
+        .frame-info {
+            padding-top: 16px;
+        }
+
+        .frame-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333333;
+            margin: 0 0 12px;
+            line-height: 1.3;
+        }
+
+        .frame-sku {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 16px;
+        }
+
+        .frame-price {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--shop-primary-teal);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .frame-price .currency {
+            font-size: 24px;
+        }
+
+        /* Stock Status Badge */
+        .stock-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .stock-badge.in-stock {
+            background: #28A745;
+            color: white;
+        }
+
+        .stock-badge.low-stock {
+            background: #FFA500;
+            color: white;
+        }
+
+        .stock-badge.out-of-stock {
+            background: #DC3545;
+            color: white;
+        }
+
+        /* Description Box */
+        .frame-description-box {
+            margin: 24px 0;
+            padding: 24px;
+            background: #F5E6D3;
+            border-radius: 12px;
+        }
+
+        .frame-description-box p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333333;
+            margin: 0;
+        }
+
+        /* Specifications Section */
+        .specs-section {
+            margin: 24px 0;
+        }
+
+        .specs-heading {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--shop-primary-teal);
+            margin: 0 0 16px;
+        }
+
+        .specs-table {
+            width: 100%;
+        }
+
+        .specs-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #E0E0E0;
+        }
+
+        .specs-row:last-child {
+            border-bottom: none;
+        }
+
+        .specs-label {
+            width: 140px;
+            font-weight: 600;
+            color: #333333;
+            flex-shrink: 0;
+        }
+
+        .specs-value {
+            color: #666666;
+            flex: 1;
+        }
+
+        /* Quantity Selector */
+        .quantity-section {
+            margin-top: 32px;
+        }
+
+        .quantity-label {
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .quantity-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quantity-btn {
+            width: 40px;
+            height: 48px;
+            border: 2px solid #E0E0E0;
+            background: var(--shop-white);
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--shop-primary-teal);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-btn:hover:not(:disabled) {
+            border-color: var(--shop-primary-teal);
+            background: var(--shop-warm-peach-light);
+        }
+
+        .quantity-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .quantity-input {
+            width: 80px;
+            height: 48px;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: var(--shop-primary-teal);
+        }
+
+        /* Add to Cart Button */
+        .btn-add-to-cart {
+            margin-top: 24px;
+            width: 100%;
+            background: #0066CC;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 16px 32px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-add-to-cart:hover:not(:disabled) {
+            background: #0052A3;
+            transform: translateY(-2px);
+        }
+
+        .btn-add-to-cart:active:not(:disabled) {
+            transform: translateY(0);
+            background: #003d7a;
+        }
+
+        .btn-add-to-cart:disabled {
+            background: #CCCCCC;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Add to Wishlist Button */
+        .btn-add-wishlist {
+            margin-top: 12px;
+            width: 100%;
+            background: white;
+            color: var(--shop-primary-teal);
+            font-size: 16px;
+            font-weight: 600;
+            padding: 14px 32px;
+            border-radius: 8px;
+            border: 2px solid var(--shop-primary-teal);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-add-wishlist:hover {
+            background: #F5E6D3;
+        }
+
+        /* Error Message */
+        .error-alert {
+            background: #FFF5F5;
+            border: 1px solid #DC3545;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            color: #DC3545;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Success Message */
+        .success-alert {
+            background: #F0FFF4;
+            border: 1px solid #28A745;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            color: #28A745;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Tabs Section */
+        .details-tabs-section {
+            margin-top: 48px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 24px;
+        }
+
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid #E0E0E0;
+            gap: 4px;
+        }
+
+        .tab-button {
+            padding: 16px 24px;
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--shop-primary-teal);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            background: var(--shop-warm-peach-light);
+        }
+
+        .tab-button.active {
+            font-weight: 600;
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--shop-primary-teal);
+        }
+
+        .tab-content {
+            display: none;
+            background: var(--shop-white);
+            padding: 32px;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--shop-primary-teal);
+            margin: 0 0 16px;
+        }
+
+        .tab-content p {
+            color: #666666;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .care-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .care-list li {
+            padding: 12px 0;
+            padding-left: 32px;
+            position: relative;
+            color: #666666;
+            border-bottom: 1px solid #E0E0E0;
+        }
+
+        .care-list li:last-child {
+            border-bottom: none;
+        }
+
+        .care-list li::before {
+            content: '\F26A';
+            font-family: 'bootstrap-icons';
+            position: absolute;
+            left: 0;
+            color: var(--shop-primary-teal);
+        }
+
+        /* Related Products Section */
+        .related-products-section {
+            margin-top: 64px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 24px 48px;
+        }
+
+        .related-heading {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--shop-primary-teal);
+            margin: 0 0 32px;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .related-card {
+            background: var(--shop-white);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .related-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .related-card-image {
+            aspect-ratio: 1;
+            background: var(--shop-light-gray);
+            overflow: hidden;
+        }
+
+        .related-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .related-card:hover .related-card-image img {
+            transform: scale(1.05);
+        }
+
+        .related-card-image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .related-card-image-placeholder i {
+            font-size: 40px;
+            color: var(--shop-text-muted);
+            opacity: 0.5;
+        }
+
+        .related-card-info {
+            padding: 16px;
+        }
+
+        .related-card-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333333;
+            margin: 0 0 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .related-card-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--shop-primary-teal);
+        }
+
+        .related-card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        /* Mobile Sticky Bar */
+        .mobile-sticky-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+            padding: 12px 16px;
+            z-index: 1000;
+        }
+
+        .mobile-sticky-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .mobile-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--shop-primary-teal);
+        }
+
+        .mobile-add-btn {
+            flex: 1;
+            background: #0066CC;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 991px) {
+            .frame-details-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .related-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .mobile-sticky-bar {
+                display: block;
+            }
+
+            .frame-details-container {
+                padding-bottom: 100px;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .frame-name {
+                font-size: 24px;
+            }
+
+            .frame-price {
+                font-size: 28px;
+            }
+
+            .frame-price .currency {
+                font-size: 18px;
+            }
+
+            .related-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs-header {
+                flex-wrap: wrap;
+            }
+
+            .tab-button {
+                flex: 1;
+                min-width: 100px;
+                text-align: center;
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
+}
+
+<!-- Breadcrumb -->
+<div class="frame-breadcrumb-section">
+    <ol class="frame-breadcrumb">
+        <li><a asp-page="/Index">Home</a></li>
+        <li><span class="separator"><i class="bi bi-chevron-right"></i></span></li>
+        <li><a asp-page="/Products/Index">Shop</a></li>
+        <li><span class="separator"><i class="bi bi-chevron-right"></i></span></li>
+        <li><a asp-page="/Products/Index" asp-route-productType="Frames">Frames</a></li>
+        <li><span class="separator"><i class="bi bi-chevron-right"></i></span></li>
+        <li><span class="current">@Model.Frame?.Name</span></li>
+    </ol>
+</div>
+
+@if (Model.Frame != null)
+{
+    <div class="frame-details-container">
+        <!-- Success/Error Messages -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="success-alert">
+                <i class="bi bi-check-circle"></i>
+                <span>@TempData["SuccessMessage"]</span>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="error-alert">
+                <i class="bi bi-exclamation-circle"></i>
+                <span>@Model.ErrorMessage</span>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="error-alert">
+                <i class="bi bi-exclamation-circle"></i>
+                <span>@TempData["ErrorMessage"]</span>
+            </div>
+        }
+
+        <div class="frame-details-grid">
+            <!-- Left Column - Product Images -->
+            <div class="frame-gallery">
+                <div class="main-image-container">
+                    @if (!string.IsNullOrEmpty(Model.Frame.PrimaryImageUrl))
+                    {
+                        <img id="mainProductImage" src="@Model.Frame.PrimaryImageUrl" alt="@Model.Frame.Name" />
+                    }
+                    else
+                    {
+                        <div class="main-image-placeholder">
+                            <i class="bi bi-eyeglasses"></i>
+                        </div>
+                    }
+                </div>
+
+                @if (Model.Frame.Images.Count > 1)
+                {
+                    <div class="thumbnail-gallery">
+                        @foreach (var image in Model.Frame.Images)
+                        {
+                            <div class="thumbnail-item @(image.IsPrimary ? "active" : "")"
+                                 onclick="changeMainImage('@image.ImageUrl', this)">
+                                <img src="@image.ImageUrl" alt="@(image.AltText ?? Model.Frame.Name)" />
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Right Column - Product Information -->
+            <div class="frame-info">
+                <h1 class="frame-name">@Model.Frame.Name</h1>
+
+                <p class="frame-sku">SKU: @Model.Frame.Sku</p>
+
+                <div class="frame-price">
+                    <span class="currency">@Model.Frame.Currency</span>
+                    <span>@Model.Frame.Price.ToString("N0")</span>
+                </div>
+
+                <!-- Stock Status Badge -->
+                <div class="stock-badge @Model.Frame.StockStatus.ToLower().Replace("stock", "-stock")">
+                    @switch (Model.Frame.StockStatus)
+                    {
+                        case "InStock":
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>In Stock</span>
+                            break;
+                        case "LowStock":
+                            <i class="bi bi-exclamation-circle-fill"></i>
+                            <span>@Model.Frame.StockMessage</span>
+                            break;
+                        case "OutOfStock":
+                            <i class="bi bi-x-circle-fill"></i>
+                            <span>Out of Stock</span>
+                            break;
+                    }
+                </div>
+
+                <!-- Description Box -->
+                @if (!string.IsNullOrEmpty(Model.Frame.Description))
+                {
+                    <div class="frame-description-box">
+                        <p>@Model.Frame.Description</p>
+                    </div>
+                }
+
+                <!-- Specifications -->
+                <div class="specs-section">
+                    <h3 class="specs-heading">Specifications</h3>
+                    <div class="specs-table">
+                        <div class="specs-row">
+                            <span class="specs-label">Material:</span>
+                            <span class="specs-value">@(Model.Frame.FrameMaterial ?? "—")</span>
+                        </div>
+                        <div class="specs-row">
+                            <span class="specs-label">Frame Type:</span>
+                            <span class="specs-value">@(Model.Frame.FrameType ?? "—")</span>
+                        </div>
+                        <div class="specs-row">
+                            <span class="specs-label">Bridge Width:</span>
+                            <span class="specs-value">@(Model.Frame.BridgeWidth.HasValue ? $"{Model.Frame.BridgeWidth.Value:N1} mm" : "—")</span>
+                        </div>
+                        <div class="specs-row">
+                            <span class="specs-label">Temple Length:</span>
+                            <span class="specs-value">@(Model.Frame.TempleLength.HasValue ? $"{Model.Frame.TempleLength.Value:N1} mm" : "—")</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add to Cart Form -->
+                <form method="post" asp-page-handler="AddToCart" id="addToCartForm">
+                    <input type="hidden" asp-for="AddToCartInput.ProductId" />
+
+                    <!-- Quantity Selector -->
+                    <div class="quantity-section">
+                        <label class="quantity-label">Quantity</label>
+                        <div class="quantity-input-wrapper">
+                            <button type="button" class="quantity-btn" id="decreaseQty" onclick="decreaseQuantity()">
+                                <i class="bi bi-dash"></i>
+                            </button>
+                            <input type="number" asp-for="AddToCartInput.Quantity"
+                                   class="quantity-input" id="quantityInput"
+                                   min="1" max="@(Model.Frame.InventoryQty ?? 10)"
+                                   value="1" />
+                            <button type="button" class="quantity-btn" id="increaseQty" onclick="increaseQuantity()">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Add to Cart Button -->
+                    <button type="submit" class="btn-add-to-cart" @(Model.Frame.IsInStock ? "" : "disabled")>
+                        @if (Model.Frame.IsInStock)
+                        {
+                            <i class="bi bi-cart-plus"></i>
+                            <span>Add to Cart</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-cart-x"></i>
+                            <span>Out of Stock</span>
+                        }
+                    </button>
+                </form>
+
+                <!-- Add to Wishlist Button (placeholder for future) -->
+                <button type="button" class="btn-add-wishlist" id="wishlistBtn">
+                    <i class="bi bi-heart"></i>
+                    <span>Add to Wishlist</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs Section -->
+    <div class="details-tabs-section">
+        <div class="tabs-header">
+            <button class="tab-button active" onclick="showTab('description')">Full Description</button>
+            <button class="tab-button" onclick="showTab('specifications')">Specifications</button>
+            <button class="tab-button" onclick="showTab('care')">Care Instructions</button>
+        </div>
+
+        <div id="tab-description" class="tab-content active">
+            <h3>About This Frame</h3>
+            <p>
+                @if (!string.IsNullOrEmpty(Model.Frame.Description))
+                {
+                    @Model.Frame.Description
+                }
+                else
+                {
+                    <text>Discover exceptional quality and timeless design with this premium eyewear frame. Crafted with precision and attention to detail, this frame offers both style and comfort for everyday wear.</text>
+                }
+            </p>
+        </div>
+
+        <div id="tab-specifications" class="tab-content">
+            <h3>Technical Specifications</h3>
+            <div class="specs-table">
+                <div class="specs-row">
+                    <span class="specs-label">SKU:</span>
+                    <span class="specs-value">@Model.Frame.Sku</span>
+                </div>
+                <div class="specs-row">
+                    <span class="specs-label">Material:</span>
+                    <span class="specs-value">@(Model.Frame.FrameMaterial ?? "—")</span>
+                </div>
+                <div class="specs-row">
+                    <span class="specs-label">Frame Type:</span>
+                    <span class="specs-value">@(Model.Frame.FrameType ?? "—")</span>
+                </div>
+                <div class="specs-row">
+                    <span class="specs-label">Bridge Width:</span>
+                    <span class="specs-value">@(Model.Frame.BridgeWidth.HasValue ? $"{Model.Frame.BridgeWidth.Value:N1} mm" : "—")</span>
+                </div>
+                <div class="specs-row">
+                    <span class="specs-label">Temple Length:</span>
+                    <span class="specs-value">@(Model.Frame.TempleLength.HasValue ? $"{Model.Frame.TempleLength.Value:N1} mm" : "—")</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-care" class="tab-content">
+            <h3>Care & Maintenance</h3>
+            <ul class="care-list">
+                @if (!string.IsNullOrEmpty(Model.Frame.CareInstructions))
+                {
+                    @foreach (var instruction in Model.Frame.CareInstructions.Split('.').Where(s => !string.IsNullOrWhiteSpace(s)))
+                    {
+                        <li>@instruction.Trim().</li>
+                    }
+                }
+                else
+                {
+                    <li>Clean gently with a microfiber cloth.</li>
+                    <li>Store in the provided case when not in use.</li>
+                    <li>Avoid dropping or sitting on your eyewear.</li>
+                    <li>Keep away from extreme temperatures.</li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <!-- Related Products Section -->
+    @if (Model.Frame.RelatedProducts.Any())
+    {
+        <div class="related-products-section">
+            <h2 class="related-heading">You May Also Like</h2>
+            <div class="related-grid">
+                @foreach (var related in Model.Frame.RelatedProducts)
+                {
+                    <a asp-page="/Products/FrameDetails" asp-route-id="@related.ProductId" class="related-card-link">
+                        <div class="related-card">
+                            <div class="related-card-image">
+                                @if (!string.IsNullOrEmpty(related.PrimaryImageUrl))
+                                {
+                                    <img src="@related.PrimaryImageUrl" alt="@related.Name" />
+                                }
+                                else
+                                {
+                                    <div class="related-card-image-placeholder">
+                                        <i class="bi bi-eyeglasses"></i>
+                                    </div>
+                                }
+                            </div>
+                            <div class="related-card-info">
+                                <h4 class="related-card-name">@related.Name</h4>
+                                <p class="related-card-price">
+                                    @related.Currency @related.Price.ToString("N0")
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Mobile Sticky Bar -->
+    <div class="mobile-sticky-bar" id="mobileStickyBar">
+        <div class="mobile-sticky-content">
+            <div class="mobile-price">
+                @Model.Frame.Currency @Model.Frame.Price.ToString("N0")
+            </div>
+            <button type="button" class="mobile-add-btn" onclick="submitAddToCart()" @(Model.Frame.IsInStock ? "" : "disabled")>
+                @if (Model.Frame.IsInStock)
+                {
+                    <text><i class="bi bi-cart-plus"></i> Add to Cart</text>
+                }
+                else
+                {
+                    <text>Out of Stock</text>
+                }
+            </button>
+        </div>
+    </div>
+}
+else
+{
+    <div class="frame-details-container">
+        <div class="empty-state" style="margin-top: 48px;">
+            <div class="empty-state-icon">
+                <i class="bi bi-exclamation-circle"></i>
+            </div>
+            <h2>Product Not Found</h2>
+            <p>The frame you're looking for doesn't exist or has been removed.</p>
+            <a asp-page="/Products/Index" class="btn-clear-filters">
+                <i class="bi bi-arrow-left"></i> Back to Shop
+            </a>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Image Gallery - Change main image on thumbnail click
+        function changeMainImage(imageUrl, thumbnailElement) {
+            const mainImage = document.getElementById('mainProductImage');
+            if (mainImage) {
+                // Fade out effect
+                mainImage.style.opacity = '0';
+                setTimeout(() => {
+                    mainImage.src = imageUrl;
+                    mainImage.style.opacity = '1';
+                }, 150);
+            }
+
+            // Update active thumbnail
+            document.querySelectorAll('.thumbnail-item').forEach(thumb => {
+                thumb.classList.remove('active');
+            });
+            thumbnailElement.classList.add('active');
+        }
+
+        // Quantity Selector - Decrease
+        function decreaseQuantity() {
+            const input = document.getElementById('quantityInput');
+            const currentValue = parseInt(input.value) || 1;
+            if (currentValue > 1) {
+                input.value = currentValue - 1;
+                updateQuantityButtons();
+            }
+        }
+
+        // Quantity Selector - Increase
+        function increaseQuantity() {
+            const input = document.getElementById('quantityInput');
+            const maxValue = parseInt(input.max) || 10;
+            const currentValue = parseInt(input.value) || 1;
+            if (currentValue < maxValue) {
+                input.value = currentValue + 1;
+                updateQuantityButtons();
+            }
+        }
+
+        // Update quantity buttons state
+        function updateQuantityButtons() {
+            const input = document.getElementById('quantityInput');
+            const decreaseBtn = document.getElementById('decreaseQty');
+            const increaseBtn = document.getElementById('increaseQty');
+            const currentValue = parseInt(input.value) || 1;
+            const maxValue = parseInt(input.max) || 10;
+
+            if (decreaseBtn) {
+                decreaseBtn.disabled = currentValue <= 1;
+            }
+            if (increaseBtn) {
+                increaseBtn.disabled = currentValue >= maxValue;
+            }
+        }
+
+        // Validate quantity input
+        document.getElementById('quantityInput')?.addEventListener('change', function () {
+            const maxValue = parseInt(this.max) || 10;
+            let value = parseInt(this.value) || 1;
+
+            if (value < 1) value = 1;
+            if (value > maxValue) value = maxValue;
+
+            this.value = value;
+            updateQuantityButtons();
+        });
+
+        // Tab Navigation
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab content
+            const tabContent = document.getElementById('tab-' + tabName);
+            if (tabContent) {
+                tabContent.classList.add('active');
+            }
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Mobile Sticky Bar - Show/Hide on scroll
+        let lastScrollTop = 0;
+        const stickyBar = document.getElementById('mobileStickyBar');
+
+        window.addEventListener('scroll', function () {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const formPosition = document.getElementById('addToCartForm')?.getBoundingClientRect().bottom || 0;
+
+            if (window.innerWidth <= 991) {
+                if (formPosition < 0) {
+                    stickyBar.style.display = 'block';
+                } else {
+                    stickyBar.style.display = 'none';
+                }
+            }
+
+            lastScrollTop = scrollTop;
+        });
+
+        // Submit Add to Cart from mobile sticky bar
+        function submitAddToCart() {
+            document.getElementById('addToCartForm').submit();
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            updateQuantityButtons();
+        });
+
+        // Wishlist button placeholder
+        document.getElementById('wishlistBtn')?.addEventListener('click', function () {
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <text>
+                alert('Wishlist feature coming soon!');
+                </text>
+            }
+            else
+            {
+                <text>
+                window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                </text>
+            }
+        });
+    </script>
+}

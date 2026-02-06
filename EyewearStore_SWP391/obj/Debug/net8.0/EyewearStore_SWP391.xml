@@ -1233,6 +1233,333 @@
             List of all product image URLs
             </summary>
         </member>
+        <member name="T:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel">
+            <summary>
+            View model for displaying detailed frame information on the product details page.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.ProductId">
+            <summary>
+            The unique product identifier
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.Sku">
+            <summary>
+            Product SKU code
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.Name">
+            <summary>
+            Product display name
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.Description">
+            <summary>
+            Full product description
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.Price">
+            <summary>
+            Product price
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.Currency">
+            <summary>
+            Currency code (e.g., "USD", "VND")
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.FrameMaterial">
+            <summary>
+            Frame material (e.g., "Metal", "Plastic", "Titanium")
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.FrameType">
+            <summary>
+            Frame type (e.g., "Full-rim", "Semi-rimless", "Rimless")
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.BridgeWidth">
+            <summary>
+            Bridge width in mm
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.TempleLength">
+            <summary>
+            Temple length in mm
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.InventoryQty">
+            <summary>
+            Current inventory quantity
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.IsInStock">
+            <summary>
+            Whether the product is currently in stock
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.StockStatus">
+            <summary>
+            Stock status: "InStock", "LowStock", "OutOfStock"
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.StockMessage">
+            <summary>
+            Human-readable stock message
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.Images">
+            <summary>
+            List of product images
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.PrimaryImageUrl">
+            <summary>
+            URL to the primary product image
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.RelatedProducts">
+            <summary>
+            Related frames (same material or type)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.CareInstructions">
+            <summary>
+            Care instructions for the frame
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel.CreatedAt">
+            <summary>
+            Product creation date
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.ViewModels.Shop.ProductImageViewModel">
+            <summary>
+            View model for a product image.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductImageViewModel.ImageId">
+            <summary>
+            Image identifier
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductImageViewModel.ImageUrl">
+            <summary>
+            URL to the image
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductImageViewModel.AltText">
+            <summary>
+            Alternative text for accessibility
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductImageViewModel.IsPrimary">
+            <summary>
+            Whether this is the primary/featured image
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductImageViewModel.SortOrder">
+            <summary>
+            Display order for the image
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.ViewModels.Shop.AddToCartInputModel">
+            <summary>
+            Input model for adding a product to cart.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.AddToCartInputModel.ProductId">
+            <summary>
+            The product ID to add to cart
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.AddToCartInputModel.Quantity">
+            <summary>
+            Quantity to add (default: 1)
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogItemViewModel">
+            <summary>
+            View model for a single product item in the catalog grid.
+            Represents either a Frame or Lens product.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogItemViewModel.ProductId">
+            <summary>
+            The unique product identifier
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogItemViewModel.ProductType">
+            <summary>
+            Product type: "Frame" or "Lens"
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogItemViewModel.Sku">
+            <summary>
+            Product SKU code
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogItemViewModel.Name">
+            <summary>
+            Product display name
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogItemViewModel.Description">
+            <summary>
+            Product description (may be truncated for display)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogItemViewModel.Price">
+            <summary>
+            Product price
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogItemViewModel.Currency">
+            <summary>
+            Currency code (e.g., "USD", "VND")
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogItemViewModel.PrimaryImageUrl">
+            <summary>
+            URL to the primary product image
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogItemViewModel.FrameMaterial">
+            <summary>
+            Frame material (e.g., "Metal", "Plastic", "Titanium")
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogItemViewModel.FrameType">
+            <summary>
+            Frame type (e.g., "Full-rim", "Semi-rimless", "Rimless")
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogItemViewModel.LensType">
+            <summary>
+            Lens type (e.g., "Single Vision", "Progressive", "Bifocal")
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogItemViewModel.IsPrescription">
+            <summary>
+            Whether the lens is prescription
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogItemViewModel.LensIndex">
+            <summary>
+            Lens index value
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogItemViewModel.CreatedAt">
+            <summary>
+            Product creation date for sorting
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel">
+            <summary>
+            View model for the product catalog page.
+            Contains the list of products, filter options, and pagination data.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.Products">
+            <summary>
+            List of products to display in the grid
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.ProductTypeFilter">
+            <summary>
+            Current product type filter: "All", "Frame", or "Lens"
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.SearchTerm">
+            <summary>
+            Current search term for filtering by name, description, or SKU
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.MinPrice">
+            <summary>
+            Minimum price filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.MaxPrice">
+            <summary>
+            Maximum price filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.FrameMaterialFilter">
+            <summary>
+            Frame material filter (for frames only)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.FrameTypeFilter">
+            <summary>
+            Frame type filter (for frames only)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.LensTypeFilter">
+            <summary>
+            Lens type filter (for lenses only)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.SortBy">
+            <summary>
+            Sort option: "name", "price-low", "price-high", "newest"
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.CurrentPage">
+            <summary>
+            Current page number (1-indexed)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.TotalPages">
+            <summary>
+            Total number of pages
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.PageSize">
+            <summary>
+            Number of items per page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.TotalItems">
+            <summary>
+            Total number of items matching the current filters
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.AvailableFrameMaterials">
+            <summary>
+            Available frame materials for filter dropdown
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.AvailableFrameTypes">
+            <summary>
+            Available frame types for filter dropdown
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.AvailableLensTypes">
+            <summary>
+            Available lens types for filter dropdown
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.HasPreviousPage">
+            <summary>
+            Whether there is a previous page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.HasNextPage">
+            <summary>
+            Whether there is a next page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.StartItem">
+            <summary>
+            Starting item number for current page (for display)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Shop.ProductCatalogViewModel.EndItem">
+            <summary>
+            Ending item number for current page (for display)
+            </summary>
+        </member>
         <member name="T:EyewearStore_SWP391.Models.Wishlist">
             <summary>
             Wishlist entity - tracks user wishlisted products.
@@ -1467,6 +1794,143 @@
         <member name="M:EyewearStore_SWP391.Pages.Frames.IndexModel.OnGetAsync">
             <summary>
             Handles GET request - loads frames with filtering and pagination
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Products.DetailsModel">
+            <summary>
+            Page model for displaying product details.
+            Handles both Frame and Lens products.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.DetailsModel.Product">
+            <summary>
+            The product details to display
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.DetailsModel.ProductImages">
+            <summary>
+            List of product images
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.DetailsModel.Type">
+            <summary>
+            The product type (Frame or Lens)
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Products.DetailsModel.OnGetAsync(System.Int32)">
+            <summary>
+            Handles GET request - loads product details by ID
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Products.FrameDetailsModel">
+            <summary>
+            Page model for displaying frame details and handling add to cart functionality.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.FrameDetailsModel.Frame">
+            <summary>
+            The frame details to display
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.FrameDetailsModel.AddToCartInput">
+            <summary>
+            Input model for adding to cart
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.FrameDetailsModel.ErrorMessage">
+            <summary>
+            Error message to display
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Products.FrameDetailsModel.OnGetAsync(System.Nullable{System.Int32})">
+            <summary>
+            Handles GET request - loads frame details by ID
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Products.FrameDetailsModel.OnPostAddToCartAsync">
+            <summary>
+            Handles POST request - adds frame to cart
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Products.FrameDetailsModel.LoadRelatedFramesAsync(EyewearStore_SWP391.Models.Frame)">
+            <summary>
+            Loads related frames based on material or type
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Products.FrameDetailsModel.ReloadFrameAsync(System.Int32)">
+            <summary>
+            Reloads frame data for POST operations
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Products.FrameDetailsModel.GetCareInstructions(System.String)">
+            <summary>
+            Gets care instructions based on frame material
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Products.IndexModel">
+            <summary>
+            Page model for the customer-facing product catalog.
+            Allows browsing all available frames and lenses with filtering, sorting, and pagination.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.IndexModel.Catalog">
+            <summary>
+            The view model containing product catalog data
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.IndexModel.ProductTypeFilter">
+            <summary>
+            Product type filter: "All", "Frame", or "Lens"
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.IndexModel.SearchTerm">
+            <summary>
+            Search term to filter by name, description, or SKU
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.IndexModel.MinPrice">
+            <summary>
+            Minimum price filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.IndexModel.MaxPrice">
+            <summary>
+            Maximum price filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.IndexModel.FrameMaterialFilter">
+            <summary>
+            Frame material filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.IndexModel.FrameTypeFilter">
+            <summary>
+            Frame type filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.IndexModel.LensTypeFilter">
+            <summary>
+            Lens type filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.IndexModel.SortBy">
+            <summary>
+            Sort option: "name", "price-low", "price-high", "newest"
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.IndexModel.CurrentPage">
+            <summary>
+            Current page number (1-indexed)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Products.IndexModel.PageSize">
+            <summary>
+            Number of items per page
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Products.IndexModel.OnGetAsync">
+            <summary>
+            Handles GET request - loads products with filtering, sorting, and pagination
             </summary>
         </member>
         <member name="M:EyewearStore_SWP391.Pages.Sale.Orders.EditModel.ValidateStatusTransition(System.String,System.String)">

@@ -1,0 +1,519 @@
+@page "{id:int}"
+@model EyewearStore_SWP391.Pages.Frames.DetailsModel
+@{
+    ViewData["Title"] = $"Frame Details - {Model.Frame.Name}";
+    Layout = "_Layout";
+}
+
+<style>
+    .details-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin: 0;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+        background: #f0f0f5;
+        color: #4a4a68;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e8;
+    }
+
+    .btn-warning {
+        background: #ffc107;
+        color: #212529;
+    }
+
+    .btn-warning:hover {
+        background: #e0a800;
+    }
+
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 2rem;
+    }
+
+    /* Image Section */
+    .image-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .main-image {
+        width: 100%;
+        aspect-ratio: 1;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #f8f9fc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .main-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .no-image {
+        color: #6c757d;
+        font-size: 4rem;
+    }
+
+    .thumbnail-gallery {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .thumbnail {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: border-color 0.2s;
+    }
+
+    .thumbnail:hover,
+    .thumbnail.active {
+        border-color: #667eea;
+    }
+
+    .thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Details Section */
+    .details-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #f0f0f5;
+    }
+
+    .details-list {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .details-list dl {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 1rem 2rem;
+        margin: 0;
+    }
+
+    .details-list dt {
+        font-weight: 600;
+        color: #4a4a68;
+        font-size: 0.9rem;
+    }
+
+    .details-list dd {
+        margin: 0;
+        color: #1a1a2e;
+        font-size: 0.95rem;
+    }
+
+    .sku-badge {
+        font-family: 'Courier New', monospace;
+        background: #e8eaff;
+        color: #667eea;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .price-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #28a745;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.35rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-inactive {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .material-badge,
+    .type-badge {
+        display: inline-block;
+        padding: 0.3rem 0.8rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .material-badge {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .type-badge {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .dimension-value {
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .dimension-unit {
+        color: #6c757d;
+        font-size: 0.85rem;
+        margin-left: 0.25rem;
+    }
+
+    .na-text {
+        color: #6c757d;
+        font-style: italic;
+    }
+
+    .timestamp {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .description-text {
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+
+    .stock-value {
+        font-weight: 600;
+    }
+
+    .stock-in {
+        color: #28a745;
+    }
+
+    .stock-low {
+        color: #ffc107;
+    }
+
+    .stock-out {
+        color: #dc3545;
+    }
+
+    /* Actions */
+    .actions-section {
+        margin-top: 2rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    /* Responsive */
+    @@media (max-width: 992px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .details-container {
+            padding: 1rem;
+        }
+
+        .details-list dl {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+
+        .details-list dt {
+            margin-top: 1rem;
+        }
+
+        .details-list dt:first-child {
+            margin-top: 0;
+        }
+    }
+</style>
+
+<div class="details-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>🕶️ @Model.Frame.Name</h1>
+        <div style="display: flex; gap: 0.5rem;">
+            <a asp-page="/Frames/Edit" asp-route-id="@Model.Frame.ProductId" class="btn btn-warning">
+                ✏️ Edit
+            </a>
+            <a asp-page="/Frames/Index" class="btn btn-secondary">
+                ← Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+        <!-- Image Section -->
+        <div class="image-section">
+            <div class="main-image" id="mainImage">
+                @if (!string.IsNullOrEmpty(Model.Frame.PrimaryImageUrl))
+                {
+                    <img src="@Model.Frame.PrimaryImageUrl" alt="@Model.Frame.Name" id="mainImageElement" />
+                }
+                else
+                {
+                    <span class="no-image">🕶️</span>
+                }
+            </div>
+
+            @if (Model.Frame.ImageUrls.Any())
+            {
+                <div class="thumbnail-gallery">
+                    @foreach (var imageUrl in Model.Frame.ImageUrls)
+                    {
+                        <div class="thumbnail @(imageUrl == Model.Frame.PrimaryImageUrl ? "active" : "")" 
+                             onclick="changeMainImage(this, '@imageUrl')">
+                            <img src="@imageUrl" alt="Frame thumbnail" />
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Details Section -->
+        <div class="details-section">
+            <!-- Product Information -->
+            <h3 class="section-title">📦 Product Information</h3>
+            <div class="details-list">
+                <dl>
+                    <dt>SKU</dt>
+                    <dd><span class="sku-badge">@Model.Frame.Sku</span></dd>
+
+                    <dt>Name</dt>
+                    <dd><strong>@Model.Frame.Name</strong></dd>
+
+                    <dt>Description</dt>
+                    <dd>
+                        @if (!string.IsNullOrEmpty(Model.Frame.Description))
+                        {
+                            <span class="description-text">@Model.Frame.Description</span>
+                        }
+                        else
+                        {
+                            <span class="na-text">N/A</span>
+                        }
+                    </dd>
+
+                    <dt>Price</dt>
+                    <dd>
+                        <span class="price-value">@Model.Frame.Price.ToString("N0")</span>
+                        <span>@Model.Frame.Currency</span>
+                    </dd>
+
+                    <dt>Inventory</dt>
+                    <dd>
+                        @{
+                            var stockValue = Model.Frame.InventoryQty ?? 0;
+                            var stockClass = "stock-in";
+                            if (stockValue == 0)
+                            {
+                                stockClass = "stock-out";
+                            }
+                            else if (stockValue < 10)
+                            {
+                                stockClass = "stock-low";
+                            }
+                        }
+                        <span class="stock-value @stockClass">@stockValue units</span>
+                    </dd>
+                </dl>
+            </div>
+
+            <!-- Frame-Specific Properties -->
+            <h3 class="section-title" style="margin-top: 2rem;">🔧 Frame Specifications</h3>
+            <div class="details-list">
+                <dl>
+                    <dt>Frame Material</dt>
+                    <dd>
+                        @if (!string.IsNullOrEmpty(Model.Frame.FrameMaterial))
+                        {
+                            <span class="material-badge">@Model.Frame.FrameMaterial</span>
+                        }
+                        else
+                        {
+                            <span class="na-text">N/A</span>
+                        }
+                    </dd>
+
+                    <dt>Frame Type</dt>
+                    <dd>
+                        @if (!string.IsNullOrEmpty(Model.Frame.FrameType))
+                        {
+                            <span class="type-badge">@Model.Frame.FrameType</span>
+                        }
+                        else
+                        {
+                            <span class="na-text">N/A</span>
+                        }
+                    </dd>
+
+                    <dt>Bridge Width</dt>
+                    <dd>
+                        @if (Model.Frame.BridgeWidth.HasValue)
+                        {
+                            <span class="dimension-value">@Model.Frame.BridgeWidth.Value.ToString("0.##")</span>
+                            <span class="dimension-unit">mm</span>
+                        }
+                        else
+                        {
+                            <span class="na-text">N/A</span>
+                        }
+                    </dd>
+
+                    <dt>Temple Length</dt>
+                    <dd>
+                        @if (Model.Frame.TempleLength.HasValue)
+                        {
+                            <span class="dimension-value">@Model.Frame.TempleLength.Value.ToString("0.##")</span>
+                            <span class="dimension-unit">mm</span>
+                        }
+                        else
+                        {
+                            <span class="na-text">N/A</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+
+            <!-- Status and Metadata -->
+            <h3 class="section-title" style="margin-top: 2rem;">📋 Status & Metadata</h3>
+            <div class="details-list">
+                <dl>
+                    <dt>Status</dt>
+                    <dd>
+                        @if (Model.Frame.IsActive)
+                        {
+                            <span class="status-badge status-active">Active</span>
+                        }
+                        else
+                        {
+                            <span class="status-badge status-inactive">Inactive</span>
+                        }
+                    </dd>
+
+                    <dt>Created</dt>
+                    <dd>
+                        <span class="timestamp">@Model.Frame.CreatedAt.ToString("MMMM dd, yyyy 'at' hh:mm tt")</span>
+                    </dd>
+
+                    <dt>Last Updated</dt>
+                    <dd>
+                        <span class="timestamp">@Model.Frame.UpdatedAt.ToString("MMMM dd, yyyy 'at' hh:mm tt")</span>
+                    </dd>
+                </dl>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="actions-section">
+                <a asp-page="/Frames/Edit" asp-route-id="@Model.Frame.ProductId" class="btn btn-warning">
+                    ✏️ Edit Frame
+                </a>
+                <a asp-page="/Frames/Index" class="btn btn-secondary">
+                    ← Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function changeMainImage(thumbnail, imageUrl) {
+            // Update main image
+            var mainImageContainer = document.getElementById('mainImage');
+            var existingImg = document.getElementById('mainImageElement');
+            
+            if (existingImg) {
+                existingImg.src = imageUrl;
+            } else {
+                mainImageContainer.innerHTML = '<img src="' + imageUrl + '" alt="Frame image" id="mainImageElement" />';
+            }
+
+            // Update active thumbnail
+            var thumbnails = document.querySelectorAll('.thumbnail');
+            thumbnails.forEach(function(t) {
+                t.classList.remove('active');
+            });
+            thumbnail.classList.add('active');
+        }
+    </script>
+}

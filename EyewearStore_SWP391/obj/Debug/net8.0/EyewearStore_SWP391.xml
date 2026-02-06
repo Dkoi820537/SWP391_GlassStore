@@ -819,6 +819,420 @@
             Maps to the 'product_images' table.
             </summary>
         </member>
+        <member name="T:EyewearStore_SWP391.Models.ViewModels.Frame.CreateFrameViewModel">
+            <summary>
+            View model for creating a new frame product.
+            Contains all required and optional fields with validation attributes.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.CreateFrameViewModel.ImageFile">
+            <summary>
+            The image file to upload (optional)
+            Allowed types: .jpg, .jpeg, .png, .webp
+            Maximum size: 5 MB
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.CreateFrameViewModel.ImageAltText">
+            <summary>
+            Alternative text for the image (optional)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.CreateFrameViewModel.Sku">
+            <summary>
+            The SKU (Stock Keeping Unit) for the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.CreateFrameViewModel.Name">
+            <summary>
+            The name of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.CreateFrameViewModel.Description">
+            <summary>
+            The description of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.CreateFrameViewModel.Price">
+            <summary>
+            The price of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.CreateFrameViewModel.Currency">
+            <summary>
+            The currency code (e.g., VND, USD)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.CreateFrameViewModel.InventoryQty">
+            <summary>
+            The inventory quantity (optional)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.CreateFrameViewModel.Attributes">
+            <summary>
+            JSON attributes for additional product data (optional)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.CreateFrameViewModel.IsActive">
+            <summary>
+            Whether the product is active
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.CreateFrameViewModel.FrameMaterial">
+            <summary>
+            The material of the frame (e.g., Titanium, Acetate, Metal)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.CreateFrameViewModel.FrameType">
+            <summary>
+            The type of frame (e.g., Full-Rim, Half-Rim, Rimless)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.CreateFrameViewModel.BridgeWidth">
+            <summary>
+            The bridge width in millimeters
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.CreateFrameViewModel.TempleLength">
+            <summary>
+            The temple length in millimeters
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel">
+            <summary>
+            View model for editing an existing frame product.
+            Contains ProductId and all editable fields with validation attributes.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel.ImageFile">
+            <summary>
+            The image file to upload (optional)
+            Allowed types: .jpg, .jpeg, .png, .webp
+            Maximum size: 5 MB
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel.ImageAltText">
+            <summary>
+            Alternative text for the image (optional)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel.ExistingImageUrl">
+            <summary>
+            Existing primary image URL (for display in the form)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel.ProductId">
+            <summary>
+            The unique identifier of the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel.Sku">
+            <summary>
+            The SKU (Stock Keeping Unit) for the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel.Name">
+            <summary>
+            The name of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel.Description">
+            <summary>
+            The description of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel.Price">
+            <summary>
+            The price of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel.Currency">
+            <summary>
+            The currency code (e.g., VND, USD)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel.InventoryQty">
+            <summary>
+            The inventory quantity (optional)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel.Attributes">
+            <summary>
+            JSON attributes for additional product data (optional)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel.IsActive">
+            <summary>
+            Whether the product is active
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel.FrameMaterial">
+            <summary>
+            The material of the frame (e.g., Titanium, Acetate, Metal)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel.FrameType">
+            <summary>
+            The type of frame (e.g., Full-Rim, Half-Rim, Rimless)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel.BridgeWidth">
+            <summary>
+            The bridge width in millimeters
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.EditFrameViewModel.TempleLength">
+            <summary>
+            The temple length in millimeters
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.ViewModels.Frame.FrameItemViewModel">
+            <summary>
+            Lightweight view model for frame list items.
+            Contains only essential fields for displaying in lists/tables.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameItemViewModel.ProductId">
+            <summary>
+            The unique identifier of the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameItemViewModel.Sku">
+            <summary>
+            The SKU (Stock Keeping Unit) for the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameItemViewModel.Name">
+            <summary>
+            The name of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameItemViewModel.Price">
+            <summary>
+            The price of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameItemViewModel.Currency">
+            <summary>
+            The currency code (e.g., VND, USD)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameItemViewModel.InventoryQty">
+            <summary>
+            The inventory quantity
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameItemViewModel.FrameMaterial">
+            <summary>
+            The material of the frame (e.g., Titanium, Acetate, Metal)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameItemViewModel.FrameType">
+            <summary>
+            The type of frame (e.g., Full-Rim, Half-Rim, Rimless)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameItemViewModel.IsActive">
+            <summary>
+            Whether the product is active
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameItemViewModel.PrimaryImageUrl">
+            <summary>
+            Primary image URL for the product thumbnail
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel">
+            <summary>
+            View model for the frame index/list page.
+            Contains list of frame items, search/filter properties, pagination, and sorting.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.Items">
+            <summary>
+            The list of frame items for the current page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.SearchTerm">
+            <summary>
+            Search term to filter by name, description, or SKU
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.FilterMaterial">
+            <summary>
+            Filter by frame material (e.g., Titanium, Acetate, Metal)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.FilterType">
+            <summary>
+            Filter by frame type (e.g., Full-Rim, Half-Rim, Rimless)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.MinPrice">
+            <summary>
+            Minimum price filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.MaxPrice">
+            <summary>
+            Maximum price filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.IsActive">
+            <summary>
+            Filter by active status
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.CurrentPage">
+            <summary>
+            The current page number (1-indexed)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.TotalPages">
+            <summary>
+            The total number of pages
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.PageSize">
+            <summary>
+            The number of items per page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.TotalCount">
+            <summary>
+            The total number of items across all pages
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.HasPreviousPage">
+            <summary>
+            Indicates whether there is a previous page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.HasNextPage">
+            <summary>
+            Indicates whether there is a next page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.SortBy">
+            <summary>
+            Field to sort by (e.g., Name, Price, CreatedAt, FrameMaterial, FrameType)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.SortOrder">
+            <summary>
+            Sort order (asc or desc)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.AvailableMaterials">
+            <summary>
+            Available frame materials for filter dropdown
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.AvailableTypes">
+            <summary>
+            Available frame types for filter dropdown
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameListViewModel.AvailableSortOptions">
+            <summary>
+            Available sort options
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel">
+            <summary>
+            View model for displaying frame product details.
+            Contains all Product and Frame-specific properties.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.ProductId">
+            <summary>
+            The unique identifier of the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.Sku">
+            <summary>
+            The SKU (Stock Keeping Unit) for the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.Name">
+            <summary>
+            The name of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.Description">
+            <summary>
+            The description of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.ProductType">
+            <summary>
+            The product type discriminator
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.Price">
+            <summary>
+            The price of the frame product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.Currency">
+            <summary>
+            The currency code (e.g., VND, USD)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.InventoryQty">
+            <summary>
+            The inventory quantity
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.Attributes">
+            <summary>
+            JSON attributes for additional product data
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.IsActive">
+            <summary>
+            Whether the product is active
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.CreatedAt">
+            <summary>
+            The date and time when the frame was created
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.UpdatedAt">
+            <summary>
+            The date and time when the frame was last updated
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.FrameMaterial">
+            <summary>
+            The material of the frame (e.g., Titanium, Acetate, Metal)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.FrameType">
+            <summary>
+            The type of frame (e.g., Full-Rim, Half-Rim, Rimless)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.BridgeWidth">
+            <summary>
+            The bridge width in millimeters
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.TempleLength">
+            <summary>
+            The temple length in millimeters
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.PrimaryImageUrl">
+            <summary>
+            Primary image URL for the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Frame.FrameViewModel.ImageUrls">
+            <summary>
+            List of all product image URLs
+            </summary>
+        </member>
         <member name="T:EyewearStore_SWP391.Models.Wishlist">
             <summary>
             Wishlist entity - tracks user wishlisted products.
@@ -883,6 +1297,176 @@
         <member name="M:EyewearStore_SWP391.Pages.Admin.Lenses.IndexModel.OnGet">
             <summary>
             Handles GET request - page content is loaded via JavaScript/API
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Frames.CreateModel">
+            <summary>
+            Page model for creating a new frame product.
+            Handles form display and submission with SKU uniqueness validation and image upload.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Frames.CreateModel.Input">
+            <summary>
+            The input view model bound to the form
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Frames.CreateModel.OnGet">
+            <summary>
+            Handles GET request - initializes the form with default values
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Frames.CreateModel.OnPostAsync">
+            <summary>
+            Handles POST request - validates and saves the new frame with optional image
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Frames.CreateModel.SaveProductImageAsync(System.Int32,Microsoft.AspNetCore.Http.IFormFile,System.String)">
+            <summary>
+            Saves the uploaded image to disk and creates a ProductImage record
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Frames.DeleteModel">
+            <summary>
+            Page model for deleting a frame product.
+            Displays confirmation and handles soft delete operation.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Frames.DeleteModel.Frame">
+            <summary>
+            The frame view model to display for confirmation
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Frames.DeleteModel.ErrorMessage">
+            <summary>
+            Error message to display when deletion fails
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Frames.DeleteModel.OnGetAsync(System.Nullable{System.Int32},System.Nullable{System.Boolean})">
+            <summary>
+            Handles GET request - loads frame details for confirmation
+            </summary>
+            <param name="id">The product ID of the frame to delete</param>
+            <param name="saveChangesError">Indicates if there was an error during save</param>
+            <returns>The page or NotFound result</returns>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Frames.DeleteModel.OnPostAsync(System.Nullable{System.Int32})">
+            <summary>
+            Handles POST request - performs soft delete of the frame
+            </summary>
+            <param name="id">The product ID of the frame to delete</param>
+            <returns>Redirect to Index on success, or Delete page with error</returns>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Frames.DetailsModel">
+            <summary>
+            Page model for viewing frame product details.
+            Displays complete information about a single frame.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Frames.DetailsModel.Frame">
+            <summary>
+            The frame view model containing all frame data
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Frames.DetailsModel.OnGetAsync(System.Nullable{System.Int32})">
+            <summary>
+            Handles GET request - loads frame details from database
+            </summary>
+            <param name="id">The product ID of the frame to display</param>
+            <returns>The page or NotFound result</returns>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Frames.EditModel">
+            <summary>
+            Page model for editing an existing frame product.
+            Handles form display with pre-populated data, update with concurrency handling, and image upload.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Frames.EditModel.Input">
+            <summary>
+            The input view model bound to the form
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Frames.EditModel.ExistingImages">
+            <summary>
+            List of existing images for this product
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Frames.EditModel.OnGetAsync(System.Nullable{System.Int32})">
+            <summary>
+            Handles GET request - loads frame data for editing
+            </summary>
+            <param name="id">The ProductId of the frame to edit</param>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Frames.EditModel.OnPostAsync">
+            <summary>
+            Handles POST request - validates and updates the frame with optional new image
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Frames.EditModel.OnPostDeleteImageAsync(System.Int32,System.Int32)">
+            <summary>
+            Handles POST request to delete a specific image
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Frames.EditModel.OnPostSetPrimaryImageAsync(System.Int32,System.Int32)">
+            <summary>
+            Handles POST request to set an image as primary
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Frames.EditModel.SaveProductImageAsync(System.Int32,Microsoft.AspNetCore.Http.IFormFile,System.String)">
+            <summary>
+            Saves the uploaded image to disk and creates a ProductImage record
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Frames.EditModel.FrameExists(System.Int32)">
+            <summary>
+            Helper method to check if a frame exists
+            </summary>
+            <param name="id">The ProductId to check</param>
+            <returns>True if the frame exists, false otherwise</returns>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Frames.IndexModel">
+            <summary>
+            Page model for listing and filtering frame products.
+            Provides server-side search, filtering, and pagination.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Frames.IndexModel.FrameList">
+            <summary>
+            The view model containing frame list data and pagination info
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Frames.IndexModel.SearchTerm">
+            <summary>
+            Search term to filter by name, SKU, or description
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Frames.IndexModel.FilterMaterial">
+            <summary>
+            Filter by frame material
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Frames.IndexModel.FilterType">
+            <summary>
+            Filter by frame type
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Frames.IndexModel.MinPrice">
+            <summary>
+            Minimum price filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Frames.IndexModel.MaxPrice">
+            <summary>
+            Maximum price filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Frames.IndexModel.CurrentPage">
+            <summary>
+            Current page number (1-indexed)
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Frames.IndexModel.OnGetAsync">
+            <summary>
+            Handles GET request - loads frames with filtering and pagination
             </summary>
         </member>
         <member name="M:EyewearStore_SWP391.Pages.Sale.Orders.EditModel.ValidateStatusTransition(System.String,System.String)">

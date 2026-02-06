@@ -55,7 +55,7 @@
     <div class="row g-4">
         <!-- Left Column: Order Information -->
         <div class="col-lg-8">
-            <!-- Order Items Card -->
+            <!-- Order Items Card (unchanged) -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0"><i class="bi bi-cart3 me-2"></i>Order Items</h5>
@@ -154,6 +154,7 @@
                                                     @if (!item.IsPrescriptionVerified)
                                                     {
                                                         <form method="post" asp-page-handler="VerifyPrescription" class="mt-3">
+                                                            @Html.AntiForgeryToken()
                                                             <input type="hidden" name="orderItemId" value="@item.OrderItemId" />
                                                             <button type="submit" class="btn btn-sm btn-success">
                                                                 <i class="bi bi-check-circle me-1"></i>Verify Prescription
@@ -187,7 +188,9 @@
                     <h5 class="mb-0"><i class="bi bi-tools me-2"></i>Support Actions</h5>
                 </div>
                 <div class="card-body">
+                    <!-- UPDATE STATUS form posts to OnPostUpdateStatusAsync -->
                     <form method="post" asp-page-handler="UpdateStatus">
+                        @Html.AntiForgeryToken()
                         <input type="hidden" name="orderId" value="@Model.OrderId" />
 
                         <div class="row g-3">
@@ -215,38 +218,54 @@
                                           placeholder="Add notes about this order, customer communication, or issues..."></textarea>
                             </div>
                         </div>
+                    </form>
 
-                        <hr class="my-3">
+                    <hr class="my-3">
 
-                        <div class="d-flex gap-2 flex-wrap">
-                            @if (Model.Order.Status == "Pending Confirmation")
-                            {
-                                <button type="button" class="btn btn-success" onclick="confirmOrder()">
+                    <div class="d-flex gap-2 flex-wrap">
+                        @* Confirm Order -> use form POST to handler "Confirm" *@
+                        @if (Model.Order.Status == "Pending Confirmation")
+                        {
+                            <form method="post" asp-page-handler="Confirm" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="orderId" value="@Model.OrderId" />
+                                <button type="submit" class="btn btn-success">
                                     <i class="bi bi-check-circle me-1"></i>Confirm Order
                                 </button>
-                            }
+                            </form>
+                        }
 
-                            <button type="button" class="btn btn-info" onclick="contactCustomer()">
-                                <i class="bi bi-envelope me-1"></i>Contact Customer
-                            </button>
+                        <a class="btn btn-info" href="mailto:@Model.CustomerEmail?subject=Regarding Order #@Model.OrderId">
+                            <i class="bi bi-envelope me-1"></i>Contact Customer
+                        </a>
 
-                            <button type="button" class="btn btn-secondary" onclick="escalateToManager()">
+                        @* Escalate: POST to handler Escalate (server will handle) *@
+                        <form method="post" asp-page-handler="Escalate" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="orderId" value="@Model.OrderId" />
+                            <input type="hidden" name="escalateNote" value="Escalated from support page" />
+                            <button type="submit" class="btn btn-secondary">
                                 <i class="bi bi-arrow-up-circle me-1"></i>Escalate to Manager
                             </button>
+                        </form>
 
-                            @if (Model.Order.Status != "Cancelled")
-                            {
-                                <button type="button" class="btn btn-danger" onclick="cancelOrder()">
-                                    <i class="bi bi-x-circle me-1"></i>Cancel Order
-                                </button>
-                            }
-                        </div>
-                    </form>
+                        @if (Model.Order.Status != "Cancelled")
+                        {
+                            <button type="button" class="btn btn-danger" onclick="cancelOrder()">
+                                <i class="bi bi-x-circle me-1"></i>Cancel Order
+                            </button>
+                        }
+
+                        @* View Order History - link to CustomerHistory page *@
+                        <a asp-page="/Support/Orders/CustomerHistory" asp-route-userId="@Model.Order.UserId" class="btn btn-outline-dark">
+                            <i class="bi bi-clock-history me-1"></i>View Order History
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Right Column: Customer & Order Info -->
+        <!-- Right Column: Customer & Order Info (unchanged) -->
         <div class="col-lg-4">
             <!-- Customer Info Card -->
             <div class="card shadow-sm mb-4">
@@ -283,9 +302,9 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    <button class="btn btn-sm btn-outline-primary w-100" onclick="viewCustomerHistory()">
+                    <a asp-page="/Support/Orders/CustomerHistory" asp-route-userId="@Model.Order.UserId" class="btn btn-sm btn-outline-primary w-100">
                         <i class="bi bi-clock-history me-1"></i>View Order History
-                    </button>
+                    </a>
                 </div>
             </div>
 
@@ -330,13 +349,11 @@
                             @if (Model.Order.PaymentMethod == "COD")
                             {
                                 <i class="bi bi-cash-coin me-1"></i>
-                            
                                 <span>Cash on Delivery</span>
                             }
                             else
                             {
                                 <i class="bi bi-credit-card me-1"></i>
-                            
                                 <span>Online Payment</span>
                             }
                         </div>
@@ -377,51 +394,46 @@
 
 @section Scripts {
     <script>
-        function confirmOrder() {
-            if (confirm('Confirm this order?\n\nThis will notify the customer and send the order to Operations team for processing.')) {
-                fetch('/Support/Orders/Confirm?orderId=@Model.OrderId', {
-                    method: 'POST',
-                    headers: {
-                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
-                    }
-                })
-                .then(response => {
-                    if (response.ok) {
-                        window.location.reload();
-                    } else {
-                        alert('Error confirming order. Please try again.');
-                    }
-                });
-            }
-        }
-
         function cancelOrder() {
             const reason = prompt('Please enter cancellation reason:');
             if (reason && reason.trim()) {
                 if (confirm(`Cancel Order #@Model.OrderId?\n\nReason: ${reason}\n\nThis action cannot be undone.`)) {
-                    // Implement cancel order logic
-                    alert('Order cancellation feature - To be implemented');
+                    // Post to Cancel handler: create a small form and submit
+                    const form = document.createElement('form');
+                    form.method = 'post';
+                    form.action = '?handler=Cancel';
+                    const idInput = document.createElement('input');
+                    idInput.type = 'hidden';
+                    idInput.name = 'orderId';
+                    idInput.value = '@Model.OrderId';
+                    form.appendChild(idInput);
+
+                    const noteInput = document.createElement('input');
+                    noteInput.type = 'hidden';
+                    noteInput.name = 'cancelReason';
+                    noteInput.value = reason;
+                    form.appendChild(noteInput);
+
+                    document.body.appendChild(form);
+                    form.submit();
                 }
             }
         }
 
-        function contactCustomer() {
-            window.location.href = 'mailto:@Model.CustomerEmail?subject=Regarding Order #@Model.OrderId';
-        }
-
         function requestPrescriptionCorrection(itemId) {
-            alert(`Request prescription correction for item ${itemId}\n\nThis will send an email to the customer.`);
-            // Implement prescription correction request
-        }
-
-        function escalateToManager() {
-            if (confirm('Escalate this order to Manager?\n\nA notification will be sent to the manager.')) {
-                alert('Escalation feature - To be implemented');
+            if (confirm('Send prescription correction request to customer?')) {
+                // Build and submit a tiny form to handler "RequestCorrection"
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = '?handler=RequestCorrection';
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'orderItemId';
+                input.value = itemId;
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
             }
-        }
-
-        function viewCustomerHistory() {
-            alert('Customer order history - To be implemented');
         }
     </script>
 }

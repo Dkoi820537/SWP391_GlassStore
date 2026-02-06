@@ -1948,30 +1948,19 @@
             Operations Staff Order Management
             </summary>
         </member>
-        <member name="T:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel">
+        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostEscalateAsync(System.Int32,System.String)">
             <summary>
-            Support Staff Order Details - Process individual orders
-            Handles prescription verification, customer communication, and order confirmation
+            Escalate to Manager (simple implementation: create TempData message and (TODO) send notification)
             </summary>
         </member>
-        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostUpdateStatusAsync(System.Int32,System.String,System.String)">
+        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostCancelAsync(System.Int32,System.String)">
             <summary>
-            BR: Update order status with validation
+            Cancel order (simple: set status = Cancelled and optionally save reason)
             </summary>
         </member>
-        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostVerifyPrescriptionAsync(System.Int32)">
+        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostRequestCorrectionAsync(System.Int32)">
             <summary>
-            BR: Verify prescription data for an order item
-            </summary>
-        </member>
-        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostConfirmAsync(System.Int32)">
-            <summary>
-            BR: Quick confirm order (for non-prescription orders)
-            </summary>
-        </member>
-        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.HandleStatusChangeActions(EyewearStore_SWP391.Models.Order,System.String,System.String)">
-            <summary>
-            BR: Handle post-status-change actions
+            Request prescription correction (placeholder) - currently will create a notification (TODO).
             </summary>
         </member>
         <member name="T:EyewearStore_SWP391.Pages.Support.Orders.IndexModel">

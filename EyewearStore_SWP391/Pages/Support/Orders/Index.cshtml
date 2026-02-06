@@ -75,7 +75,7 @@
             </div>
         </div>
 
-        <!-- Prescription Orders -->
+        <!-- other cards omitted for brevity, keep your original markup -->
         <div class="col-md-3">
             <div class="card border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                 <div class="card-body">
@@ -97,7 +97,6 @@
             </div>
         </div>
 
-        <!-- Returns/Refunds -->
         <div class="col-md-3">
             <div class="card border-0" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
                 <div class="card-body">
@@ -119,7 +118,6 @@
             </div>
         </div>
 
-        <!-- Customer Inquiries -->
         <div class="col-md-3">
             <div class="card border-0" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
                 <div class="card-body">
@@ -369,7 +367,7 @@
     </div>
 </div>
 
-<!-- Statistics Modal -->
+<!-- Statistics Modal (same as before) -->
 <div class="modal fade" id="statsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -401,28 +399,20 @@
     </div>
 </div>
 
+@* Hidden quick confirm form (submit to OnPostQuickConfirmAsync) *@
+<form id="quickConfirmForm" method="post" asp-page-handler="QuickConfirm" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="orderId" id="quickConfirmOrderId" value="" />
+</form>
+
 @section Scripts {
     <script>
         function quickConfirm(orderId) {
-            if (confirm(`Quick confirm Order #${orderId}?\n\nThis will change status to "Confirmed" and notify Operations team.`)) {
-                fetch(`/Support/Orders/QuickConfirm?orderId=${orderId}`, {
-                    method: 'POST',
-                    headers: {
-                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
-                    }
-                })
-                .then(response => {
-                    if (response.ok) {
-                        location.reload();
-                    } else {
-                        alert('Error confirming order. Please try again.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error confirming order. Please try again.');
-                });
-            }
+            if (!confirm(`Quick confirm Order #${orderId}?\n\nThis will change status to "Confirmed" and notify Operations team.`)) return;
+
+            const input = document.getElementById('quickConfirmOrderId');
+            input.value = orderId;
+            document.getElementById('quickConfirmForm').submit();
         }
 
         // Auto-refresh every 2 minutes

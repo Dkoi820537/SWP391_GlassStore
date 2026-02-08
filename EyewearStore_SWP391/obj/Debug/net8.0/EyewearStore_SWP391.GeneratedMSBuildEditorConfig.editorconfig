@@ -9,169 +9,171 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = EyewearStore_SWP391
 build_property.RootNamespace = EyewearStore_SWP391
-build_property.ProjectDir = D:\SWP391_GlassStore\EyewearStore_SWP391\
+build_property.ProjectDir = D:\SWP\SWP391_GlassStore\EyewearStore_SWP391\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = D:\SWP391_GlassStore\EyewearStore_SWP391
+build_property.MSBuildProjectDirectory = D:\SWP\SWP391_GlassStore\EyewearStore_SWP391
 build_property._RazorSourceGeneratorDebug = 
-build_property.EffectiveAnalysisLevelStyle = 8.0
-build_property.EnableCodeStyleSeverity = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Account/AccessDenied.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Account/AccessDenied.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxBY2Nlc3NEZW5pZWQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Account/Login.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Account/Logout.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Account/Logout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxMb2dvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Account/Register.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Account/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Admin/Index.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Admin/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Admin/Lenses/Create.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cTGVuc2VzXENyZWF0ZS5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Admin/Lenses/Details.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cTGVuc2VzXERldGFpbHMuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Admin/Lenses/Edit.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cTGVuc2VzXEVkaXQuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Admin/Lenses/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cTGVuc2VzXEluZGV4LmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Cart/Add.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Cart/Add.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2FydFxBZGQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Cart/Index.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Cart/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2FydFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Customer/MyOrders.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Customer/MyOrders.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3VzdG9tZXJcTXlPcmRlcnMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Error.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Frames/Create.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Frames/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRnJhbWVzXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Frames/Delete.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Frames/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRnJhbWVzXERlbGV0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Frames/Details.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Frames/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRnJhbWVzXERldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Frames/Edit.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Frames/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRnJhbWVzXEVkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Frames/Index.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Frames/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRnJhbWVzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Index.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Privacy.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Lenses/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTGVuc2VzXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Lenses/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTGVuc2VzXERlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Lenses/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTGVuc2VzXERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Lenses/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTGVuc2VzXEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Lenses/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTGVuc2VzXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJpdmFjeS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Products/Details.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Products/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdHNcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Products/FrameDetails.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Products/FrameDetails.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdHNcRnJhbWVEZXRhaWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Products/Index.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Products/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdHNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Profile/Index.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Profile/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZmlsZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Sale/Orders/Create.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Sale/Orders/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2FsZVxPcmRlcnNcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Sale/Orders/Delete.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Sale/Orders/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2FsZVxPcmRlcnNcRGVsZXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Sale/Orders/Details.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Sale/Orders/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2FsZVxPcmRlcnNcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Sale/Orders/Edit.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Sale/Orders/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2FsZVxPcmRlcnNcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Sale/Orders/Index.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Sale/Orders/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2FsZVxPcmRlcnNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Shared/_CartSummary.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Shared/_CartSummary.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9DYXJ0U3VtbWFyeS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Shared/_ValidationScriptsPartial.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Staff/Orders/Details.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Staff/Orders/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3RhZmZcT3JkZXJzXERldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Staff/Orders/Index.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Staff/Orders/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3RhZmZcT3JkZXJzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Support/Orders/Details.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Support/Orders/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3VwcG9ydFxPcmRlcnNcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Support/Orders/Index.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Support/Orders/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3VwcG9ydFxPcmRlcnNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Support/Orders/OrderHistory.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Support/Orders/OrderHistory.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3VwcG9ydFxPcmRlcnNcT3JkZXJIaXN0b3J5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/_ViewImports.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/_ViewStart.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/SWP391_GlassStore/EyewearStore_SWP391/Pages/Shared/_Layout.cshtml]
+[D:/SWP/SWP391_GlassStore/EyewearStore_SWP391/Pages/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-f8spfvd58m

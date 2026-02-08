@@ -124,81 +124,6 @@
             <param name="id">The image ID to delete</param>
             <returns>No content on success</returns>
         </member>
-        <member name="T:EyewearStore_SWP391.Controllers.LensesController">
-            <summary>
-            API Controller for managing lens products
-            </summary>
-        </member>
-        <member name="M:EyewearStore_SWP391.Controllers.LensesController.#ctor(EyewearStore_SWP391.Services.ILensService)">
-            <summary>
-            Initializes a new instance of the LensesController
-            </summary>
-            <param name="lensService">The lens service</param>
-        </member>
-        <member name="M:EyewearStore_SWP391.Controllers.LensesController.CreateLens(EyewearStore_SWP391.DTOs.Lens.CreateLensDto)">
-            <summary>
-            Creates a new lens product
-            </summary>
-            <param name="createDto">The lens data to create</param>
-            <returns>The created lens product</returns>
-            <response code="201">Returns the newly created lens</response>
-            <response code="400">If the lens data is invalid</response>
-            <response code="500">If there was an internal server error</response>
-        </member>
-        <member name="M:EyewearStore_SWP391.Controllers.LensesController.GetAllLenses(System.String,System.String,System.Nullable{System.Decimal},System.Nullable{System.Decimal},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.String,System.String,System.Int32,System.Int32)">
-            <summary>
-            Gets all lenses with optional filtering, searching, sorting, and pagination
-            </summary>
-            <param name="search">Search term for name, description, or lens type</param>
-            <param name="lensType">Filter by lens type</param>
-            <param name="priceMin">Minimum price filter</param>
-            <param name="priceMax">Maximum price filter</param>
-            <param name="isActive">Filter by active status</param>
-            <param name="isPrescription">Filter by prescription requirement</param>
-            <param name="sortBy">Sort field (price, name, lensType, createdAt)</param>
-            <param name="sortOrder">Sort order (asc, desc)</param>
-            <param name="pageNumber">Page number (default: 1)</param>
-            <param name="pageSize">Page size (default: 10, max: 100)</param>
-            <returns>A paginated list of lenses</returns>
-            <response code="200">Returns the list of lenses</response>
-            <response code="500">If there was an internal server error</response>
-        </member>
-        <member name="M:EyewearStore_SWP391.Controllers.LensesController.GetLensById(System.Int32)">
-            <summary>
-            Gets a single lens by ID (ProductId)
-            </summary>
-            <param name="id">The product ID</param>
-            <returns>The lens product</returns>
-            <response code="200">Returns the lens</response>
-            <response code="404">If the lens is not found</response>
-            <response code="500">If there was an internal server error</response>
-        </member>
-        <member name="M:EyewearStore_SWP391.Controllers.LensesController.UpdateLens(System.Int32,EyewearStore_SWP391.DTOs.Lens.UpdateLensDto)">
-            <summary>
-            Updates an existing lens product
-            </summary>
-            <param name="id">The product ID to update</param>
-            <param name="updateDto">The updated lens data</param>
-            <returns>The updated lens product</returns>
-            <response code="200">Returns the updated lens</response>
-            <response code="400">If the lens data is invalid</response>
-            <response code="404">If the lens is not found</response>
-            <response code="500">If there was an internal server error</response>
-        </member>
-        <member name="M:EyewearStore_SWP391.Controllers.LensesController.DeleteLens(System.Int32)">
-            <summary>
-            Soft deletes a lens by setting IsActive to false
-            </summary>
-            <param name="id">The product ID to delete</param>
-            <returns>No content on success</returns>
-            <response code="204">The lens was successfully soft deleted</response>
-            <response code="404">If the lens is not found</response>
-            <response code="500">If there was an internal server error</response>
-            <remarks>
-            Soft delete is implemented by setting IsActive to false.
-            The product will no longer appear in active product listings.
-            </remarks>
-        </member>
         <member name="T:EyewearStore_SWP391.DTOs.Frame.CreateFrameDto">
             <summary>
             Data Transfer Object for creating a new frame product
@@ -1233,6 +1158,400 @@
             List of all product image URLs
             </summary>
         </member>
+        <member name="T:EyewearStore_SWP391.Models.ViewModels.Lens.CreateLensViewModel">
+            <summary>
+            View model for creating a new lens product.
+            Contains all required and optional fields with validation attributes.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.CreateLensViewModel.ImageFile">
+            <summary>
+            The image file to upload (optional)
+            Allowed types: .jpg, .jpeg, .png, .webp
+            Maximum size: 5 MB
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.CreateLensViewModel.ImageAltText">
+            <summary>
+            Alternative text for the image (optional)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.CreateLensViewModel.Sku">
+            <summary>
+            The SKU (Stock Keeping Unit) for the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.CreateLensViewModel.Name">
+            <summary>
+            The name of the lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.CreateLensViewModel.Description">
+            <summary>
+            The description of the lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.CreateLensViewModel.Price">
+            <summary>
+            The price of the lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.CreateLensViewModel.Currency">
+            <summary>
+            The currency code (e.g., VND, USD)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.CreateLensViewModel.InventoryQty">
+            <summary>
+            The inventory quantity (optional)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.CreateLensViewModel.Attributes">
+            <summary>
+            JSON attributes for additional product data (optional)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.CreateLensViewModel.IsActive">
+            <summary>
+            Whether the product is active
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.CreateLensViewModel.LensType">
+            <summary>
+            The type of lens (e.g., Single Vision, Bifocal, Progressive)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.CreateLensViewModel.LensIndex">
+            <summary>
+            The refractive index of the lens (e.g., 1.50, 1.67, 1.74)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.CreateLensViewModel.IsPrescription">
+            <summary>
+            Whether this lens requires a prescription
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.ViewModels.Lens.EditLensViewModel">
+            <summary>
+            View model for editing an existing lens product.
+            Contains ProductId and all editable fields with validation attributes.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.EditLensViewModel.ImageFile">
+            <summary>
+            The image file to upload (optional)
+            Allowed types: .jpg, .jpeg, .png, .webp
+            Maximum size: 5 MB
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.EditLensViewModel.ImageAltText">
+            <summary>
+            Alternative text for the image (optional)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.EditLensViewModel.ExistingImageUrl">
+            <summary>
+            Existing primary image URL (for display in the form)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.EditLensViewModel.ProductId">
+            <summary>
+            The unique identifier of the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.EditLensViewModel.Sku">
+            <summary>
+            The SKU (Stock Keeping Unit) for the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.EditLensViewModel.Name">
+            <summary>
+            The name of the lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.EditLensViewModel.Description">
+            <summary>
+            The description of the lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.EditLensViewModel.Price">
+            <summary>
+            The price of the lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.EditLensViewModel.Currency">
+            <summary>
+            The currency code (e.g., VND, USD)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.EditLensViewModel.InventoryQty">
+            <summary>
+            The inventory quantity (optional)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.EditLensViewModel.Attributes">
+            <summary>
+            JSON attributes for additional product data (optional)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.EditLensViewModel.IsActive">
+            <summary>
+            Whether the product is active
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.EditLensViewModel.LensType">
+            <summary>
+            The type of lens (e.g., Single Vision, Bifocal, Progressive)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.EditLensViewModel.LensIndex">
+            <summary>
+            The refractive index of the lens (e.g., 1.50, 1.67, 1.74)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.EditLensViewModel.IsPrescription">
+            <summary>
+            Whether this lens requires a prescription
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.ViewModels.Lens.LensItemViewModel">
+            <summary>
+            Lightweight view model for lens list items.
+            Contains only essential fields for displaying in lists/tables.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensItemViewModel.ProductId">
+            <summary>
+            The unique identifier of the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensItemViewModel.Sku">
+            <summary>
+            The SKU (Stock Keeping Unit) for the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensItemViewModel.Name">
+            <summary>
+            The name of the lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensItemViewModel.Price">
+            <summary>
+            The price of the lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensItemViewModel.Currency">
+            <summary>
+            The currency code (e.g., VND, USD)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensItemViewModel.InventoryQty">
+            <summary>
+            The inventory quantity
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensItemViewModel.LensType">
+            <summary>
+            The type of lens (e.g., Single Vision, Bifocal, Progressive)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensItemViewModel.IsPrescription">
+            <summary>
+            Whether this lens requires a prescription
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensItemViewModel.IsActive">
+            <summary>
+            Whether the product is active
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensItemViewModel.PrimaryImageUrl">
+            <summary>
+            Primary image URL for the product thumbnail
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel">
+            <summary>
+            View model for the lens index/list page.
+            Contains list of lens items, search/filter properties, pagination, and sorting.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.Items">
+            <summary>
+            The list of lens items for the current page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.SearchTerm">
+            <summary>
+            Search term to filter by name, description, or SKU
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.FilterLensType">
+            <summary>
+            Filter by lens type (e.g., Single Vision, Bifocal, Progressive)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.FilterIsPrescription">
+            <summary>
+            Filter by prescription requirement
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.MinPrice">
+            <summary>
+            Minimum price filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.MaxPrice">
+            <summary>
+            Maximum price filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.IsActive">
+            <summary>
+            Filter by active status
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.CurrentPage">
+            <summary>
+            The current page number (1-indexed)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.TotalPages">
+            <summary>
+            The total number of pages
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.PageSize">
+            <summary>
+            The number of items per page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.TotalCount">
+            <summary>
+            The total number of items across all pages
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.HasPreviousPage">
+            <summary>
+            Indicates whether there is a previous page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.HasNextPage">
+            <summary>
+            Indicates whether there is a next page
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.SortBy">
+            <summary>
+            Field to sort by (e.g., Name, Price, CreatedAt, LensType)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.SortOrder">
+            <summary>
+            Sort order (asc or desc)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.AvailableLensTypes">
+            <summary>
+            Available lens types for filter dropdown
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensListViewModel.AvailableSortOptions">
+            <summary>
+            Available sort options
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel">
+            <summary>
+            View model for displaying lens product details.
+            Contains all Product and Lens-specific properties.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.ProductId">
+            <summary>
+            The unique identifier of the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.Sku">
+            <summary>
+            The SKU (Stock Keeping Unit) for the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.Name">
+            <summary>
+            The name of the lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.Description">
+            <summary>
+            The description of the lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.ProductType">
+            <summary>
+            The product type discriminator
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.Price">
+            <summary>
+            The price of the lens product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.Currency">
+            <summary>
+            The currency code (e.g., VND, USD)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.InventoryQty">
+            <summary>
+            The inventory quantity
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.Attributes">
+            <summary>
+            JSON attributes for additional product data
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.IsActive">
+            <summary>
+            Whether the product is active
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.CreatedAt">
+            <summary>
+            The date and time when the lens was created
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.UpdatedAt">
+            <summary>
+            The date and time when the lens was last updated
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.LensType">
+            <summary>
+            The type of lens (e.g., Single Vision, Bifocal, Progressive)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.LensIndex">
+            <summary>
+            The refractive index of the lens (e.g., 1.50, 1.67, 1.74)
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.IsPrescription">
+            <summary>
+            Whether this lens requires a prescription
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.PrimaryImageUrl">
+            <summary>
+            Primary image URL for the product
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Models.ViewModels.Lens.LensViewModel.ImageUrls">
+            <summary>
+            List of all product image URLs
+            </summary>
+        </member>
         <member name="T:EyewearStore_SWP391.Models.ViewModels.Shop.FrameDetailsViewModel">
             <summary>
             View model for displaying detailed frame information on the product details page.
@@ -1566,66 +1885,6 @@
             Maps to the 'wishlist' table.
             </summary>
         </member>
-        <member name="T:EyewearStore_SWP391.Pages.Admin.Lenses.CreateModel">
-            <summary>
-            Page model for creating a new lens product
-            </summary>
-        </member>
-        <member name="M:EyewearStore_SWP391.Pages.Admin.Lenses.CreateModel.OnGet">
-            <summary>
-            Handles GET request - form submission is handled via JavaScript/API
-            </summary>
-        </member>
-        <member name="T:EyewearStore_SWP391.Pages.Admin.Lenses.DetailsModel">
-            <summary>
-            Page model for viewing lens product details
-            </summary>
-        </member>
-        <member name="P:EyewearStore_SWP391.Pages.Admin.Lenses.DetailsModel.Id">
-            <summary>
-            The product ID from query parameter
-            </summary>
-        </member>
-        <member name="P:EyewearStore_SWP391.Pages.Admin.Lenses.DetailsModel.ProductId">
-            <summary>
-            Product ID to pass to the view
-            </summary>
-        </member>
-        <member name="M:EyewearStore_SWP391.Pages.Admin.Lenses.DetailsModel.OnGet">
-            <summary>
-            Handles GET request - data is loaded via JavaScript/API
-            </summary>
-        </member>
-        <member name="T:EyewearStore_SWP391.Pages.Admin.Lenses.EditModel">
-            <summary>
-            Page model for editing an existing lens product
-            </summary>
-        </member>
-        <member name="P:EyewearStore_SWP391.Pages.Admin.Lenses.EditModel.Id">
-            <summary>
-            The product ID from query parameter
-            </summary>
-        </member>
-        <member name="P:EyewearStore_SWP391.Pages.Admin.Lenses.EditModel.ProductId">
-            <summary>
-            Product ID to pass to the view
-            </summary>
-        </member>
-        <member name="M:EyewearStore_SWP391.Pages.Admin.Lenses.EditModel.OnGet">
-            <summary>
-            Handles GET request - form data is loaded via JavaScript/API
-            </summary>
-        </member>
-        <member name="T:EyewearStore_SWP391.Pages.Admin.Lenses.IndexModel">
-            <summary>
-            Page model for listing and managing lens products
-            </summary>
-        </member>
-        <member name="M:EyewearStore_SWP391.Pages.Admin.Lenses.IndexModel.OnGet">
-            <summary>
-            Handles GET request - page content is loaded via JavaScript/API
-            </summary>
-        </member>
         <member name="T:EyewearStore_SWP391.Pages.Frames.CreateModel">
             <summary>
             Page model for creating a new frame product.
@@ -1794,6 +2053,181 @@
         <member name="M:EyewearStore_SWP391.Pages.Frames.IndexModel.OnGetAsync">
             <summary>
             Handles GET request - loads frames with filtering and pagination
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Lenses.CreateModel">
+            <summary>
+            Page model for creating a new lens product.
+            Handles form display and submission with SKU uniqueness validation and image upload.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Lenses.CreateModel.Input">
+            <summary>
+            The input view model bound to the form
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Lenses.CreateModel.OnGet">
+            <summary>
+            Handles GET request - initializes the form with default values
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Lenses.CreateModel.OnPostAsync">
+            <summary>
+            Handles POST request - validates and saves the new lens with optional image
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Lenses.CreateModel.SaveProductImageAsync(System.Int32,Microsoft.AspNetCore.Http.IFormFile,System.String)">
+            <summary>
+            Saves the uploaded image to disk and creates a ProductImage record
+            </summary>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Lenses.DeleteModel">
+            <summary>
+            Page model for deleting a lens product.
+            Displays confirmation and handles soft delete operation.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Lenses.DeleteModel.Lens">
+            <summary>
+            The lens view model to display for confirmation
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Lenses.DeleteModel.ErrorMessage">
+            <summary>
+            Error message to display when deletion fails
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Lenses.DeleteModel.OnGetAsync(System.Nullable{System.Int32},System.Nullable{System.Boolean})">
+            <summary>
+            Handles GET request - loads lens details for confirmation
+            </summary>
+            <param name="id">The product ID of the lens to delete</param>
+            <param name="saveChangesError">Indicates if there was an error during save</param>
+            <returns>The page or NotFound result</returns>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Lenses.DeleteModel.OnPostAsync(System.Nullable{System.Int32})">
+            <summary>
+            Handles POST request - performs soft delete of the lens
+            </summary>
+            <param name="id">The product ID of the lens to delete</param>
+            <returns>Redirect to Index on success, or Delete page with error</returns>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Lenses.DetailsModel">
+            <summary>
+            Page model for viewing lens product details.
+            Displays comprehensive information about a single lens.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Lenses.DetailsModel.Lens">
+            <summary>
+            The lens view model to display
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Lenses.DetailsModel.ProductImages">
+            <summary>
+            List of product images
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Lenses.DetailsModel.OnGetAsync(System.Nullable{System.Int32})">
+            <summary>
+            Handles GET request - loads lens details
+            </summary>
+            <param name="id">The product ID of the lens to view</param>
+            <returns>The page or NotFound result</returns>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Lenses.EditModel">
+            <summary>
+            Page model for editing an existing lens product.
+            Handles form display with pre-populated data, update with concurrency handling, and image upload.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Lenses.EditModel.Input">
+            <summary>
+            The input view model bound to the form
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Lenses.EditModel.ExistingImages">
+            <summary>
+            List of existing images for this product
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Lenses.EditModel.OnGetAsync(System.Nullable{System.Int32})">
+            <summary>
+            Handles GET request - loads lens data for editing
+            </summary>
+            <param name="id">The ProductId of the lens to edit</param>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Lenses.EditModel.OnPostAsync">
+            <summary>
+            Handles POST request - validates and updates the lens with optional new image
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Lenses.EditModel.OnPostDeleteImageAsync(System.Int32,System.Int32)">
+            <summary>
+            Handles POST request to delete a specific image
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Lenses.EditModel.OnPostSetPrimaryImageAsync(System.Int32,System.Int32)">
+            <summary>
+            Handles POST request to set an image as primary
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Lenses.EditModel.SaveProductImageAsync(System.Int32,Microsoft.AspNetCore.Http.IFormFile,System.String)">
+            <summary>
+            Saves the uploaded image to disk and creates a ProductImage record
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Lenses.EditModel.LensExists(System.Int32)">
+            <summary>
+            Helper method to check if a lens exists
+            </summary>
+            <param name="id">The ProductId to check</param>
+            <returns>True if the lens exists, false otherwise</returns>
+        </member>
+        <member name="T:EyewearStore_SWP391.Pages.Lenses.IndexModel">
+            <summary>
+            Page model for listing and filtering lens products.
+            Provides server-side search, filtering, and pagination.
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Lenses.IndexModel.LensList">
+            <summary>
+            The view model containing lens list data and pagination info
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Lenses.IndexModel.SearchTerm">
+            <summary>
+            Search term to filter by name, SKU, or description
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Lenses.IndexModel.FilterLensType">
+            <summary>
+            Filter by lens type
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Lenses.IndexModel.FilterIsPrescription">
+            <summary>
+            Filter by prescription requirement
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Lenses.IndexModel.MinPrice">
+            <summary>
+            Minimum price filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Lenses.IndexModel.MaxPrice">
+            <summary>
+            Maximum price filter
+            </summary>
+        </member>
+        <member name="P:EyewearStore_SWP391.Pages.Lenses.IndexModel.CurrentPage">
+            <summary>
+            Current page number (1-indexed)
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Lenses.IndexModel.OnGetAsync">
+            <summary>
+            Handles GET request - loads lenses with filtering and pagination
             </summary>
         </member>
         <member name="T:EyewearStore_SWP391.Pages.Products.DetailsModel">

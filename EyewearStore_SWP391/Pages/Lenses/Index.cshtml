@@ -1,0 +1,705 @@
+@page
+@model EyewearStore_SWP391.Pages.Lenses.IndexModel
+@{
+    ViewData["Title"] = "Manage Lenses";
+    Layout = "_Layout";
+}
+
+<style>
+    .lenses-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin: 0;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+        background: #f0f0f5;
+        color: #4a4a68;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e8;
+    }
+
+    .btn-sm {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-info {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .btn-info:hover {
+        background: #138496;
+    }
+
+    .btn-warning {
+        background: #ffc107;
+        color: #212529;
+    }
+
+    .btn-warning:hover {
+        background: #e0a800;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #c82333;
+    }
+
+    /* Filter Form */
+    .filter-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #4a4a68;
+    }
+
+    .form-control {
+        padding: 0.75rem 1rem;
+        border: 1px solid #e0e0e8;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        width: 100%;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
+
+    .price-range {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .price-range input {
+        width: 100px;
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: end;
+    }
+
+    /* Table Styles */
+    .table-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .lenses-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .lenses-table th,
+    .lenses-table td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid #f0f0f5;
+    }
+
+    .lenses-table th {
+        background: #f8f9fc;
+        font-weight: 600;
+        color: #4a4a68;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .lenses-table tbody tr:hover {
+        background: #f8f9fc;
+    }
+
+    .lenses-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .sku-badge {
+        font-family: 'Courier New', monospace;
+        background: #e8eaff;
+        color: #667eea;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .price-cell {
+        font-weight: 600;
+        color: #28a745;
+    }
+
+    .stock-cell {
+        font-weight: 600;
+    }
+
+    .stock-in {
+        color: #28a745;
+    }
+
+    .stock-low {
+        color: #ffc107;
+    }
+
+    .stock-out {
+        color: #dc3545;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-inactive {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .lens-type-badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .prescription-badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .prescription-yes {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .prescription-no {
+        background: #f0f0f5;
+        color: #6c757d;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    /* Pagination */
+    .pagination-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-top: 1px solid #f0f0f5;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .pagination-info {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 0.25rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .page-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 0.75rem;
+        border: 1px solid #e0e0e8;
+        border-radius: 8px;
+        background: white;
+        color: #4a4a68;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .page-link:hover:not(.disabled):not(.active) {
+        background: #f8f9fc;
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    .page-link.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #667eea;
+    }
+
+    .page-link.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #6c757d;
+    }
+
+    .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        margin-bottom: 0.5rem;
+        color: #4a4a68;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .lenses-container {
+            padding: 1rem;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .filter-form {
+            grid-template-columns: 1fr;
+        }
+
+        .lenses-table th,
+        .lenses-table td {
+            padding: 0.75rem 0.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="lenses-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>👓 Lens Products</h1>
+        <a asp-page="/Lenses/Create" class="btn btn-primary">
+            <span>+</span> Create New Lens
+        </a>
+    </div>
+
+    <!-- Search and Filter Form -->
+    <div class="filter-card">
+        <form method="get" class="filter-form">
+            <!-- Search Input -->
+            <div class="form-group">
+                <label for="SearchTerm">Search</label>
+                <input type="text" 
+                       class="form-control" 
+                       id="SearchTerm" 
+                       name="SearchTerm" 
+                       value="@Model.SearchTerm" 
+                       placeholder="Search by name, SKU, or description..." />
+            </div>
+
+            <!-- Lens Type Filter -->
+            <div class="form-group">
+                <label for="FilterLensType">Lens Type</label>
+                <select class="form-control" id="FilterLensType" name="FilterLensType">
+                    <option value="">All Types</option>
+                    @foreach (var type in Model.LensList.AvailableLensTypes)
+                    {
+                        <option value="@type" selected="@(Model.FilterLensType == type)">@type</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Prescription Filter -->
+            <div class="form-group">
+                <label for="FilterIsPrescription">Prescription</label>
+                <select class="form-control" id="FilterIsPrescription" name="FilterIsPrescription">
+                    <option value="">All</option>
+                    <option value="true" selected="@(Model.FilterIsPrescription == true)">Yes</option>
+                    <option value="false" selected="@(Model.FilterIsPrescription == false)">No</option>
+                </select>
+            </div>
+
+            <!-- Min Price -->
+            <div class="form-group">
+                <label for="MinPrice">Min Price</label>
+                <input type="number" 
+                       class="form-control" 
+                       id="MinPrice" 
+                       name="MinPrice" 
+                       value="@Model.MinPrice" 
+                       min="0" 
+                       step="0.01" 
+                       placeholder="0" />
+            </div>
+
+            <!-- Max Price -->
+            <div class="form-group">
+                <label for="MaxPrice">Max Price</label>
+                <input type="number" 
+                       class="form-control" 
+                       id="MaxPrice" 
+                       name="MaxPrice" 
+                       value="@Model.MaxPrice" 
+                       min="0" 
+                       step="0.01" 
+                       placeholder="Any" />
+            </div>
+
+            <!-- Filter Actions -->
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary">
+                    🔍 Filter
+                </button>
+                <a asp-page="/Lenses/Index" class="btn btn-secondary">
+                    ↻ Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lenses Table -->
+    <div class="table-card">
+        @if (Model.LensList.Items.Any())
+        {
+            <div class="table-responsive">
+                <table class="lenses-table">
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Name</th>
+                            <th>Lens Type</th>
+                            <th>Prescription</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var lens in Model.LensList.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="sku-badge">@lens.Sku</span>
+                                </td>
+                                <td>
+                                    <strong>@lens.Name</strong>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(lens.LensType))
+                                    {
+                                        <span class="lens-type-badge">@lens.LensType</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (lens.IsPrescription)
+                                    {
+                                        <span class="prescription-badge prescription-yes">Required</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="prescription-badge prescription-no">Not Required</span>
+                                    }
+                                </td>
+                                <td class="price-cell">
+                                    @lens.Price.ToString("N0") @lens.Currency
+                                </td>
+                                <td>
+                                    @{
+                                        var stockClass = "stock-in";
+                                        var stockValue = lens.InventoryQty ?? 0;
+                                        if (stockValue == 0)
+                                        {
+                                            stockClass = "stock-out";
+                                        }
+                                        else if (stockValue < 10)
+                                        {
+                                            stockClass = "stock-low";
+                                        }
+                                    }
+                                    <span class="stock-cell @stockClass">@stockValue</span>
+                                </td>
+                                <td>
+                                    @if (lens.IsActive)
+                                    {
+                                        <span class="status-badge status-active">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-inactive">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a asp-page="/Lenses/Details" 
+                                           asp-route-id="@lens.ProductId" 
+                                           class="btn btn-sm btn-info"
+                                           title="View Details">
+                                            Details
+                                        </a>
+                                        <a asp-page="/Lenses/Edit" 
+                                           asp-route-id="@lens.ProductId" 
+                                           class="btn btn-sm btn-warning"
+                                           title="Edit Lens">
+                                            Edit
+                                        </a>
+                                        <a asp-page="/Lenses/Delete" 
+                                           asp-route-id="@lens.ProductId" 
+                                           class="btn btn-sm btn-danger"
+                                           title="Delete Lens">
+                                            Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-wrapper">
+                <div class="pagination-info">
+                    Showing @(((Model.CurrentPage - 1) * Model.LensList.PageSize) + 1) 
+                    to @Math.Min(Model.CurrentPage * Model.LensList.PageSize, Model.LensList.TotalCount) 
+                    of @Model.LensList.TotalCount lenses
+                </div>
+
+                <nav class="pagination" aria-label="Lens pagination">
+                    @* Previous Button *@
+                    @if (Model.LensList.HasPreviousPage)
+                    {
+                        <a asp-page="/Lenses/Index"
+                           asp-route-SearchTerm="@Model.SearchTerm"
+                           asp-route-FilterLensType="@Model.FilterLensType"
+                           asp-route-FilterIsPrescription="@Model.FilterIsPrescription"
+                           asp-route-MinPrice="@Model.MinPrice"
+                           asp-route-MaxPrice="@Model.MaxPrice"
+                           asp-route-CurrentPage="@(Model.CurrentPage - 1)"
+                           class="page-link">
+                            ← Prev
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="page-link disabled">← Prev</span>
+                    }
+
+                    @* Page Numbers *@
+                    @{
+                        var startPage = Math.Max(1, Model.CurrentPage - 2);
+                        var endPage = Math.Min(Model.LensList.TotalPages, Model.CurrentPage + 2);
+                        
+                        if (startPage > 1)
+                        {
+                            <a asp-page="/Lenses/Index"
+                               asp-route-SearchTerm="@Model.SearchTerm"
+                               asp-route-FilterLensType="@Model.FilterLensType"
+                               asp-route-FilterIsPrescription="@Model.FilterIsPrescription"
+                               asp-route-MinPrice="@Model.MinPrice"
+                               asp-route-MaxPrice="@Model.MaxPrice"
+                               asp-route-CurrentPage="1"
+                               class="page-link">
+                                1
+                            </a>
+                            if (startPage > 2)
+                            {
+                                <span class="page-link disabled">...</span>
+                            }
+                        }
+
+                        for (var i = startPage; i <= endPage; i++)
+                        {
+                            if (i == Model.CurrentPage)
+                            {
+                                <span class="page-link active">@i</span>
+                            }
+                            else
+                            {
+                                <a asp-page="/Lenses/Index"
+                                   asp-route-SearchTerm="@Model.SearchTerm"
+                                   asp-route-FilterLensType="@Model.FilterLensType"
+                                   asp-route-FilterIsPrescription="@Model.FilterIsPrescription"
+                                   asp-route-MinPrice="@Model.MinPrice"
+                                   asp-route-MaxPrice="@Model.MaxPrice"
+                                   asp-route-CurrentPage="@i"
+                                   class="page-link">
+                                    @i
+                                </a>
+                            }
+                        }
+
+                        if (endPage < Model.LensList.TotalPages)
+                        {
+                            if (endPage < Model.LensList.TotalPages - 1)
+                            {
+                                <span class="page-link disabled">...</span>
+                            }
+                            <a asp-page="/Lenses/Index"
+                               asp-route-SearchTerm="@Model.SearchTerm"
+                               asp-route-FilterLensType="@Model.FilterLensType"
+                               asp-route-FilterIsPrescription="@Model.FilterIsPrescription"
+                               asp-route-MinPrice="@Model.MinPrice"
+                               asp-route-MaxPrice="@Model.MaxPrice"
+                               asp-route-CurrentPage="@Model.LensList.TotalPages"
+                               class="page-link">
+                                @Model.LensList.TotalPages
+                            </a>
+                        }
+                    }
+
+                    @* Next Button *@
+                    @if (Model.LensList.HasNextPage)
+                    {
+                        <a asp-page="/Lenses/Index"
+                           asp-route-SearchTerm="@Model.SearchTerm"
+                           asp-route-FilterLensType="@Model.FilterLensType"
+                           asp-route-FilterIsPrescription="@Model.FilterIsPrescription"
+                           asp-route-MinPrice="@Model.MinPrice"
+                           asp-route-MaxPrice="@Model.MaxPrice"
+                           asp-route-CurrentPage="@(Model.CurrentPage + 1)"
+                           class="page-link">
+                            Next →
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="page-link disabled">Next →</span>
+                    }
+                </nav>
+            </div>
+        }
+        else
+        {
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-state-icon">👓</div>
+                <h3>No lenses found</h3>
+                <p>
+                    @if (!string.IsNullOrEmpty(Model.SearchTerm) || !string.IsNullOrEmpty(Model.FilterLensType) || 
+                         Model.FilterIsPrescription.HasValue || Model.MinPrice.HasValue || Model.MaxPrice.HasValue)
+                    {
+                        <text>Try adjusting your search or filter criteria.</text>
+                    }
+                    else
+                    {
+                        <text>Get started by creating your first lens product.</text>
+                    }
+                </p>
+                @if (string.IsNullOrEmpty(Model.SearchTerm) && string.IsNullOrEmpty(Model.FilterLensType) && 
+                     !Model.FilterIsPrescription.HasValue && !Model.MinPrice.HasValue && !Model.MaxPrice.HasValue)
+                {
+                    <a asp-page="/Lenses/Create" class="btn btn-primary" style="margin-top: 1rem;">
+                        + Create Your First Lens
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div>

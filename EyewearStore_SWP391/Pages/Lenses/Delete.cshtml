@@ -1,0 +1,329 @@
+@page
+@model EyewearStore_SWP391.Pages.Lenses.DeleteModel
+@{
+    ViewData["Title"] = "Delete Lens";
+    Layout = "_Layout";
+}
+
+<style>
+    .delete-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .breadcrumb {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .breadcrumb a {
+        color: #667eea;
+        text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+        text-decoration: underline;
+    }
+
+    .breadcrumb .separator {
+        color: #adb5bd;
+    }
+
+    .breadcrumb .current {
+        color: #6c757d;
+    }
+
+    .alert-warning {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 2rem;
+        color: #856404;
+        display: flex;
+        gap: 1rem;
+        align-items: start;
+    }
+
+    .alert-warning .icon {
+        font-size: 1.5rem;
+    }
+
+    .alert-error {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 2rem;
+        color: #721c24;
+    }
+
+    .detail-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .detail-section {
+        padding: 2rem;
+        border-bottom: 1px solid #f0f0f5;
+    }
+
+    .detail-section:last-child {
+        border-bottom: none;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1a1a2e;
+        margin: 0 0 1.5rem 0;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #667eea;
+        display: inline-block;
+    }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+
+    .detail-value {
+        font-size: 1rem;
+        color: #1a1a2e;
+    }
+
+    .detail-value.empty {
+        color: #adb5bd;
+        font-style: italic;
+    }
+
+    .prescription-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .prescription-yes {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .prescription-no {
+        background: #f0f0f5;
+        color: #6c757d;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+    }
+
+    .btn-secondary {
+        background: #f0f0f5;
+        color: #4a4a68;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e8;
+    }
+
+    @@media (max-width: 768px) {
+        .delete-container {
+            padding: 1rem;
+        }
+
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="delete-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" aria-label="breadcrumb">
+        <a href="/">Home</a>
+        <span class="separator">›</span>
+        <a asp-page="/Lenses/Index">Lenses</a>
+        <span class="separator">›</span>
+        <span class="current">Delete</span>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>🗑️ Delete Lens</h1>
+    </div>
+
+    <!-- Warning Alert -->
+    <div class="alert-warning">
+        <div class="icon">⚠️</div>
+        <div>
+            <strong>Warning:</strong> You are about to deactivate this lens product. 
+            This will perform a soft delete by setting the product as inactive. 
+            The product will no longer appear in active listings but will remain in the database.
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert-error">
+            <strong>Error:</strong> @Model.ErrorMessage
+        </div>
+    }
+
+    <!-- Lens Details Card -->
+    <div class="detail-card">
+        <div class="detail-section">
+            <h2 class="section-title">Product Information</h2>
+            
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">SKU</span>
+                    <span class="detail-value">@Model.Lens.Sku</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Name</span>
+                    <span class="detail-value">@Model.Lens.Name</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Price</span>
+                    <span class="detail-value">@Model.Lens.Price.ToString("N0") @Model.Lens.Currency</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Inventory</span>
+                    <span class="detail-value">@(Model.Lens.InventoryQty ?? 0) units</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h2 class="section-title">Lens Details</h2>
+            
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Lens Type</span>
+                    @if (!string.IsNullOrEmpty(Model.Lens.LensType))
+                    {
+                        <span class="detail-value">@Model.Lens.LensType</span>
+                    }
+                    else
+                    {
+                        <span class="detail-value empty">Not specified</span>
+                    }
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Lens Index</span>
+                    @if (Model.Lens.LensIndex.HasValue)
+                    {
+                        <span class="detail-value">@Model.Lens.LensIndex.Value.ToString("F2")</span>
+                    }
+                    else
+                    {
+                        <span class="detail-value empty">Not specified</span>
+                    }
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Prescription Required</span>
+                    <span class="detail-value">
+                        @if (Model.Lens.IsPrescription)
+                        {
+                            <span class="prescription-badge prescription-yes">Required</span>
+                        }
+                        else
+                        {
+                            <span class="prescription-badge prescription-no">Not Required</span>
+                        }
+                    </span>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Lens.Description))
+            {
+                <div class="detail-item" style="margin-top: 1.5rem;">
+                    <span class="detail-label">Description</span>
+                    <span class="detail-value">@Model.Lens.Description</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Delete Form -->
+    <form method="post">
+        <div class="form-actions">
+            <a asp-page="/Lenses/Index" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </div>
+    </form>
+</div>

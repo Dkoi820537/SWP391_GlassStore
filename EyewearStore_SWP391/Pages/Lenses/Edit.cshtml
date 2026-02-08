@@ -1,0 +1,771 @@
+@page "{id:int}"
+@model EyewearStore_SWP391.Pages.Lenses.EditModel
+@{
+    ViewData["Title"] = "Edit Lens";
+    Layout = "_Layout";
+}
+
+<style>
+    .edit-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .page-header p {
+        color: #6c757d;
+        margin: 0;
+    }
+
+    .breadcrumb {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .breadcrumb a {
+        color: #667eea;
+        text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+        text-decoration: underline;
+    }
+
+    .breadcrumb .separator {
+        color: #adb5bd;
+    }
+
+    .breadcrumb .current {
+        color: #6c757d;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .form-section {
+        padding: 2rem;
+        border-bottom: 1px solid #f0f0f5;
+    }
+
+    .form-section:last-of-type {
+        border-bottom: none;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1a1a2e;
+        margin: 0 0 1.5rem 0;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #667eea;
+        display: inline-block;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-row.single {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #4a4a68;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group label .required {
+        color: #dc3545;
+    }
+
+    .form-control {
+        padding: 0.75rem 1rem;
+        border: 1px solid #e0e0e8;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
+
+    .form-control.input-validation-error {
+        border-color: #dc3545;
+    }
+
+    .form-control.input-validation-error:focus {
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .field-validation-error {
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 0.35rem;
+    }
+
+    .validation-summary-errors {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        color: #721c24;
+    }
+
+    .validation-summary-errors ul {
+        margin: 0;
+        padding-left: 1.5rem;
+    }
+
+    .helper-text {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 0.35rem;
+    }
+
+    /* Checkbox */
+    .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    .checkbox-wrapper label {
+        margin-bottom: 0;
+        cursor: pointer;
+    }
+
+    /* Image Upload Styles */
+    .image-upload-area {
+        border: 2px dashed #e0e0e8;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        background: #fafafa;
+        cursor: pointer;
+    }
+
+    .image-upload-area:hover,
+    .image-upload-area.drag-over {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    .image-upload-area .upload-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .image-upload-area h4 {
+        margin: 0 0 0.5rem 0;
+        color: #4a4a68;
+        font-weight: 600;
+    }
+
+    .image-upload-area p {
+        margin: 0;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .image-upload-area input[type="file"] {
+        display: none;
+    }
+
+    .image-preview-container {
+        display: none;
+        margin-top: 1.5rem;
+        text-align: center;
+    }
+
+    .image-preview-container.has-image {
+        display: block;
+    }
+
+    .image-preview {
+        max-width: 300px;
+        max-height: 200px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        object-fit: cover;
+    }
+
+    .image-preview-info {
+        margin-top: 0.75rem;
+        padding: 0.75rem;
+        background: #f0f0f5;
+        border-radius: 8px;
+        display: inline-block;
+    }
+
+    .image-preview-info .file-name {
+        font-weight: 600;
+        color: #4a4a68;
+    }
+
+    .image-preview-info .file-size {
+        color: #6c757d;
+        font-size: 0.85rem;
+        margin-left: 0.5rem;
+    }
+
+    .btn-remove-image {
+        margin-top: 0.75rem;
+        background: #dc3545;
+        color: white;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: background 0.2s;
+    }
+
+    .btn-remove-image:hover {
+        background: #c82333;
+    }
+
+    /* Existing Images Grid */
+    .existing-images-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .existing-image-card {
+        background: white;
+        border: 1px solid #e0e0e8;
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        transition: all 0.2s;
+    }
+
+    .existing-image-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .existing-image-card.is-primary {
+        border-color: #667eea;
+        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+    }
+
+    .existing-image-card img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    .existing-image-card .image-actions {
+        padding: 0.75rem;
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .existing-image-card .btn-sm {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.8rem;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-set-primary {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-set-primary:hover {
+        background: #5a6fd6;
+    }
+
+    .btn-delete-image {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-delete-image:hover {
+        background: #c82333;
+    }
+
+    .primary-badge {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        background: #667eea;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .no-images-message {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+        background: #f8f9fc;
+        border-radius: 8px;
+        border: 1px dashed #e0e0e8;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        padding: 1.5rem 2rem;
+        background: #f8f9fc;
+        border-top: 1px solid #f0f0f5;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+        background: #f0f0f5;
+        color: #4a4a68;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e8;
+    }
+
+    .product-id-badge {
+        display: inline-block;
+        background: #e8eaff;
+        color: #667eea;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .edit-container {
+            padding: 1rem;
+        }
+
+        .form-section {
+            padding: 1.5rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="edit-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" aria-label="breadcrumb">
+        <a href="/">Home</a>
+        <span class="separator">›</span>
+        <a asp-page="/Lenses/Index">Lenses</a>
+        <span class="separator">›</span>
+        <span class="current">Edit</span>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            👓 Edit Lens
+            <span class="product-id-badge">ID: @Model.Input.ProductId</span>
+        </h1>
+        <p>Update the lens product details</p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+        <form method="post" enctype="multipart/form-data">
+            <!-- Hidden input for ProductId -->
+            <input type="hidden" asp-for="Input.ProductId" />
+
+            <!-- Validation Summary -->
+            <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+            <!-- Basic Information Section -->
+            <div class="form-section">
+                <h2 class="section-title">Basic Information</h2>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Input.Sku">
+                            SKU <span class="required">*</span>
+                        </label>
+                        <input asp-for="Input.Sku" 
+                               class="form-control" 
+                               placeholder="e.g., LENS-PROG-001" />
+                        <span asp-validation-for="Input.Sku" class="field-validation-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Input.Name">
+                            Product Name <span class="required">*</span>
+                        </label>
+                        <input asp-for="Input.Name" 
+                               class="form-control" 
+                               placeholder="e.g., Progressive HD Lens" />
+                        <span asp-validation-for="Input.Name" class="field-validation-error"></span>
+                    </div>
+                </div>
+
+                <div class="form-row single">
+                    <div class="form-group">
+                        <label asp-for="Input.Description">Description</label>
+                        <textarea asp-for="Input.Description" 
+                                  class="form-control" 
+                                  rows="3"
+                                  placeholder="Enter lens description..."></textarea>
+                        <span asp-validation-for="Input.Description" class="field-validation-error"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lens Details Section -->
+            <div class="form-section">
+                <h2 class="section-title">Lens Details</h2>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Input.LensType">Lens Type</label>
+                        <input asp-for="Input.LensType" 
+                               class="form-control" 
+                               placeholder="e.g., Single Vision, Bifocal, Progressive" />
+                        <span asp-validation-for="Input.LensType" class="field-validation-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Input.LensIndex">Lens Index</label>
+                        <input asp-for="Input.LensIndex" 
+                               type="number"
+                               step="0.01"
+                               min="0"
+                               class="form-control" 
+                               placeholder="e.g., 1.67" />
+                        <span class="helper-text">Refractive index (e.g., 1.50, 1.67, 1.74)</span>
+                        <span asp-validation-for="Input.LensIndex" class="field-validation-error"></span>
+                    </div>
+                </div>
+
+                <div class="form-row single">
+                    <div class="form-group">
+                        <label>Prescription Requirement</label>
+                        <div class="checkbox-wrapper">
+                            <input asp-for="Input.IsPrescription" 
+                                   type="checkbox" 
+                                   id="isPrescription" />
+                            <label for="isPrescription">This lens requires a prescription</label>
+                        </div>
+                        <span asp-validation-for="Input.IsPrescription" class="field-validation-error"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing & Inventory Section -->
+            <div class="form-section">
+                <h2 class="section-title">Pricing & Inventory</h2>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Input.Price">
+                            Price <span class="required">*</span>
+                        </label>
+                        <input asp-for="Input.Price" 
+                               type="number"
+                               step="0.01"
+                               min="0.01"
+                               class="form-control" 
+                               placeholder="0.00" />
+                        <span asp-validation-for="Input.Price" class="field-validation-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Input.Currency">Currency</label>
+                        <input asp-for="Input.Currency" 
+                               class="form-control" 
+                               maxlength="3"
+                               placeholder="VND" />
+                        <span class="helper-text">3-character currency code (e.g., USD, VND)</span>
+                        <span asp-validation-for="Input.Currency" class="field-validation-error"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Input.InventoryQty">Inventory Quantity</label>
+                        <input asp-for="Input.InventoryQty" 
+                               type="number"
+                               min="0"
+                               class="form-control" 
+                               placeholder="0" />
+                        <span asp-validation-for="Input.InventoryQty" class="field-validation-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Input.IsActive">Status</label>
+                        <select asp-for="Input.IsActive" class="form-control">
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                        <span asp-validation-for="Input.IsActive" class="field-validation-error"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Images Section -->
+            <div class="form-section">
+                <h2 class="section-title">Product Images</h2>
+
+                <!-- Existing Images -->
+                @if (Model.ExistingImages.Any())
+                {
+                    <h4 style="margin-bottom: 1rem; color: #4a4a68;">Current Images</h4>
+                    <div class="existing-images-grid">
+                        @foreach (var image in Model.ExistingImages)
+                        {
+                            <div class="existing-image-card @(image.IsPrimary ? "is-primary" : "")">
+                                @if (image.IsPrimary)
+                                {
+                                    <span class="primary-badge">★ Primary</span>
+                                }
+                                <img src="@image.ImageUrl" alt="@(image.AltText ?? "Product Image")" />
+                                <div class="image-actions">
+                                    @if (!image.IsPrimary)
+                                    {
+                                        <form method="post" asp-page-handler="SetPrimaryImage" style="display: inline;">
+                                            <input type="hidden" name="imageId" value="@image.ImageId" />
+                                            <input type="hidden" name="productId" value="@Model.Input.ProductId" />
+                                            <button type="submit" class="btn-sm btn-set-primary">Set Primary</button>
+                                        </form>
+                                    }
+                                    <form method="post" asp-page-handler="DeleteImage" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this image?');">
+                                        <input type="hidden" name="imageId" value="@image.ImageId" />
+                                        <input type="hidden" name="productId" value="@Model.Input.ProductId" />
+                                        <button type="submit" class="btn-sm btn-delete-image">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="no-images-message">
+                        <p>🖼️ No images uploaded yet. Add an image below.</p>
+                    </div>
+                }
+
+                <!-- Upload New Image -->
+                <h4 style="margin: 1.5rem 0 1rem 0; color: #4a4a68;">Add New Image</h4>
+                <div class="form-row single">
+                    <div class="form-group">
+                        <label id="imageUploadArea" class="image-upload-area" for="imageFileInput">
+                            <div class="upload-icon">📷</div>
+                            <h4>Upload Product Image</h4>
+                            <p>Drag and drop an image here, or click to select</p>
+                            <p class="helper-text">Supported formats: JPG, JPEG, PNG, WEBP (Max 5 MB)</p>
+                            <input type="file" 
+                                   id="imageFileInput" 
+                                   name="Input.ImageFile" 
+                                   accept=".jpg,.jpeg,.png,.webp" />
+                        </label>
+                        <span asp-validation-for="Input.ImageFile" class="field-validation-error"></span>
+
+                        <div id="imagePreviewContainer" class="image-preview-container">
+                            <img id="imagePreview" class="image-preview" src="" alt="Preview" />
+                            <div class="image-preview-info">
+                                <span id="fileName" class="file-name"></span>
+                                <span id="fileSize" class="file-size"></span>
+                            </div>
+                            <br />
+                            <button type="button" id="removeImageBtn" class="btn-remove-image">Remove Image</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row single">
+                    <div class="form-group">
+                        <label asp-for="Input.ImageAltText">Image Alt Text</label>
+                        <input asp-for="Input.ImageAltText" 
+                               class="form-control" 
+                               placeholder="Describe the image for accessibility" />
+                        <span class="helper-text">Optional. Used for accessibility and SEO.</span>
+                        <span asp-validation-for="Input.ImageAltText" class="field-validation-error"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a asp-page="/Lenses/Index" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageInput = document.getElementById('imageFileInput');
+            const uploadArea = document.getElementById('imageUploadArea');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const imagePreview = document.getElementById('imagePreview');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const removeBtn = document.getElementById('removeImageBtn');
+
+            // Handle file selection
+            imageInput.addEventListener('change', function(e) {
+                handleFile(e.target.files[0]);
+            });
+
+            // Handle drag and drop
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.classList.add('drag-over');
+            });
+
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+            });
+
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+                const file = e.dataTransfer.files[0];
+                if (file && isValidImageFile(file)) {
+                    imageInput.files = e.dataTransfer.files;
+                    handleFile(file);
+                }
+            });
+
+            // Remove image button
+            removeBtn.addEventListener('click', function() {
+                imageInput.value = '';
+                previewContainer.classList.remove('has-image');
+                imagePreview.src = '';
+                fileName.textContent = '';
+                fileSize.textContent = '';
+            });
+
+            function handleFile(file) {
+                if (!file) return;
+
+                if (!isValidImageFile(file)) {
+                    alert('Invalid file type. Please select a JPG, JPEG, PNG, or WEBP image.');
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size exceeds 5 MB limit.');
+                    return;
+                }
+
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    previewContainer.classList.add('has-image');
+                    fileName.textContent = file.name;
+                    fileSize.textContent = formatFileSize(file.size);
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function isValidImageFile(file) {
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+                return allowedTypes.includes(file.type);
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes < 1024) return bytes + ' B';
+                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+            }
+        });
+    </script>
+}

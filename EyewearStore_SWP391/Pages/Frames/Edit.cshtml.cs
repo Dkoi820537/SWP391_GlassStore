@@ -209,9 +209,9 @@ public class EditModel : PageModel
     }
 
     /// <summary>
-    /// Handles POST request to delete a specific image
+    /// Handles GET request to delete a specific image
     /// </summary>
-    public async Task<IActionResult> OnPostDeleteImageAsync(int imageId, int productId)
+    public async Task<IActionResult> OnGetDeleteImageAsync(int imageId, int productId)
     {
         var image = await _context.ProductImages.FindAsync(imageId);
         if (image != null && image.ProductId == productId)
@@ -225,9 +225,9 @@ public class EditModel : PageModel
     }
 
     /// <summary>
-    /// Handles POST request to set an image as primary
+    /// Handles GET request to set an image as primary
     /// </summary>
-    public async Task<IActionResult> OnPostSetPrimaryImageAsync(int imageId, int productId)
+    public async Task<IActionResult> OnGetSetPrimaryImageAsync(int imageId, int productId)
     {
         // Unset all primary images for this product
         var existingPrimary = await _context.ProductImages

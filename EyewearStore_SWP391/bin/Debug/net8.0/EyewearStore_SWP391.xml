@@ -1987,14 +1987,14 @@
             Handles POST request - validates and updates the frame with optional new image
             </summary>
         </member>
-        <member name="M:EyewearStore_SWP391.Pages.Frames.EditModel.OnPostDeleteImageAsync(System.Int32,System.Int32)">
+        <member name="M:EyewearStore_SWP391.Pages.Frames.EditModel.OnGetDeleteImageAsync(System.Int32,System.Int32)">
             <summary>
-            Handles POST request to delete a specific image
+            Handles GET request to delete a specific image
             </summary>
         </member>
-        <member name="M:EyewearStore_SWP391.Pages.Frames.EditModel.OnPostSetPrimaryImageAsync(System.Int32,System.Int32)">
+        <member name="M:EyewearStore_SWP391.Pages.Frames.EditModel.OnGetSetPrimaryImageAsync(System.Int32,System.Int32)">
             <summary>
-            Handles POST request to set an image as primary
+            Handles GET request to set an image as primary
             </summary>
         </member>
         <member name="M:EyewearStore_SWP391.Pages.Frames.EditModel.SaveProductImageAsync(System.Int32,Microsoft.AspNetCore.Http.IFormFile,System.String)">
@@ -2162,14 +2162,14 @@
             Handles POST request - validates and updates the lens with optional new image
             </summary>
         </member>
-        <member name="M:EyewearStore_SWP391.Pages.Lenses.EditModel.OnPostDeleteImageAsync(System.Int32,System.Int32)">
+        <member name="M:EyewearStore_SWP391.Pages.Lenses.EditModel.OnGetDeleteImageAsync(System.Int32,System.Int32)">
             <summary>
-            Handles POST request to delete a specific image
+            Handles GET request to delete a specific image
             </summary>
         </member>
-        <member name="M:EyewearStore_SWP391.Pages.Lenses.EditModel.OnPostSetPrimaryImageAsync(System.Int32,System.Int32)">
+        <member name="M:EyewearStore_SWP391.Pages.Lenses.EditModel.OnGetSetPrimaryImageAsync(System.Int32,System.Int32)">
             <summary>
-            Handles POST request to set an image as primary
+            Handles GET request to set an image as primary
             </summary>
         </member>
         <member name="M:EyewearStore_SWP391.Pages.Lenses.EditModel.SaveProductImageAsync(System.Int32,Microsoft.AspNetCore.Http.IFormFile,System.String)">

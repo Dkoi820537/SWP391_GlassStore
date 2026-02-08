@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "2C6poBolsampg5EkQw9OsTR59+DSpzrHL3TYdt43o/g=",
+  "Hash": "ZkWET74VCqY3hmOXMGxxNm5Mk4a8+Snt7Gr5XCmoDHE=",
   "Source": "EyewearStore_SWP391",
   "BasePath": "_content/EyewearStore_SWP391",
   "Mode": "Default",
@@ -1383,6 +1383,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\uploads\\products\\1\\20260206030811_14db0fa8.jpg"
+    },
+    {
+      "Identity": "D:\\SWP\\SWP391_GlassStore\\EyewearStore_SWP391\\wwwroot\\uploads\\products\\1\\20260208163355_0fb26b75.jpg",
+      "SourceId": "EyewearStore_SWP391",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\SWP\\SWP391_GlassStore\\EyewearStore_SWP391\\wwwroot\\",
+      "BasePath": "_content/EyewearStore_SWP391",
+      "RelativePath": "uploads/products/1/20260208163355_0fb26b75.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\products\\1\\20260208163355_0fb26b75.jpg"
     },
     {
       "Identity": "D:\\SWP\\SWP391_GlassStore\\EyewearStore_SWP391\\wwwroot\\uploads\\products\\5\\20260204065342_dc0dea9c.png",

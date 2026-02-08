@@ -98,6 +98,8 @@
 .shop-header {
     text-align: center;
     margin: 40px 0 32px;
+    position: relative;
+    z-index: 1;
 }
 
 .shop-header h1 {
@@ -136,6 +138,7 @@
     height: fit-content;
     position: sticky;
     top: 100px;
+    z-index: 10;
 }
 
 .filter-header {

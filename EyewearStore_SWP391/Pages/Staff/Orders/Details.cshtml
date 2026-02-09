@@ -6,10 +6,6 @@
     ViewData["Title"] = $"Order #{Model.Order?.OrderId} - Operations";
     var isPrescription = Model.Order?.OrderItems?.Any(oi => oi.PrescriptionId != null) ?? false;
     var isPreOrder = Model.Order?.OrderItems?.Any(oi => (oi.Product?.InventoryQty ?? 0) < oi.Quantity) ?? false;
-
-    // read internal notes from TempData (we store notes as TempData["InternalNotes_{id}"])
-    var internalNoteKey = $"InternalNotes_{Model.Order?.OrderId}";
-    var internalNotes = TempData[internalNoteKey] as string;
 }
 
 <div class="container-fluid py-4">
@@ -31,30 +27,30 @@
                 @if (isPrescription)
                 {
                     <span style="background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
-                                         color: white;
-                                         padding: 0.5rem 1rem;
-                                         border-radius: 20px;
-                                         font-weight: 600;">
+                                     color: white;
+                                     padding: 0.5rem 1rem;
+                                     border-radius: 20px;
+                                     font-weight: 600;">
                         👓 Prescription Order
                     </span>
                 }
                 else if (isPreOrder)
                 {
                     <span style="background: linear-gradient(135deg, #607d8b 0%, #90a4ae 100%);
-                                         color: white;
-                                         padding: 0.5rem 1rem;
-                                         border-radius: 20px;
-                                         font-weight: 600;">
+                                     color: white;
+                                     padding: 0.5rem 1rem;
+                                     border-radius: 20px;
+                                     font-weight: 600;">
                         🕐 Pre-Order
                     </span>
                 }
                 else
                 {
                     <span style="background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
-                                         color: white;
-                                         padding: 0.5rem 1rem;
-                                         border-radius: 20px;
-                                         font-weight: 600;">
+                                     color: white;
+                                     padding: 0.5rem 1rem;
+                                     border-radius: 20px;
+                                     font-weight: 600;">
                         ✓ Ready Stock
                     </span>
                 }
@@ -183,14 +179,13 @@
                                             <div style="font-weight: 600; color: var(--dark-gray); margin-bottom: 0.25rem;">
                                                 @item.Product?.Name
                                             </div>
-                                            @* Show prescription details if present (use fields available in PrescriptionProfile) *@
                                             @if (item.PrescriptionId != null && item.Prescription != null)
                                             {
                                                 <div style="margin-top: 0.75rem;
-                                                                            padding: 0.75rem;
-                                                                            background: rgba(156, 39, 176, 0.05);
-                                                                            border-left: 3px solid #9c27b0;
-                                                                            border-radius: 4px;">
+                                                                    padding: 0.75rem;
+                                                                    background: rgba(156, 39, 176, 0.05);
+                                                                    border-left: 3px solid #9c27b0;
+                                                                    border-radius: 4px;">
                                                     <div style="font-weight: 600; color: #9c27b0; margin-bottom: 0.5rem; font-size: 0.9rem;">
                                                         👓 Prescription Details:
                                                     </div>
@@ -256,9 +251,9 @@
                         foreach (var shipment in Model.Order.Shipments)
                         {
                             <div style="padding: 1.5rem;
-                                                        background: var(--light-gray);
-                                                        border-radius: 8px;
-                                                        margin-bottom: 1rem;">
+                                                background: var(--light-gray);
+                                                border-radius: 8px;
+                                                margin-bottom: 1rem;">
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.9rem;">
@@ -282,11 +277,11 @@
                                         </label>
                                         <div>
                                             <span style="background: var(--info);
-                                                                         color: white;
-                                                                         padding: 0.35rem 0.75rem;
-                                                                         border-radius: 6px;
-                                                                         font-size: 0.9rem;
-                                                                         font-weight: 600;">
+                                                                 color: white;
+                                                                 padding: 0.35rem 0.75rem;
+                                                                 border-radius: 6px;
+                                                                 font-size: 0.9rem;
+                                                                 font-weight: 600;">
                                                 @shipment.Status
                                             </span>
                                         </div>
@@ -350,11 +345,10 @@
             <!-- Workflow Management -->
             @if (isPrescription)
             {
-                <!-- Prescription Workflow (BR-OP004, BR-OP005) -->
                 <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-lg); border: 2px solid #9c27b0;">
                     <div style="background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
-                                        padding: 1.5rem;
-                                        border-radius: 10px 10px 0 0;">
+                                    padding: 1.5rem;
+                                    border-radius: 10px 10px 0 0;">
                         <h5 style="color: white; margin: 0; font-weight: 600;">
                             👓 Prescription Workflow
                         </h5>
@@ -364,7 +358,6 @@
                         <form method="post" asp-page-handler="UpdatePrescriptionWorkflow">
                             <input type="hidden" name="id" value="@Model.Order?.OrderId" />
 
-                            <!-- Workflow Steps -->
                             <div style="margin-bottom: 1.5rem;">
                                 <div class="form-check" style="padding: 1rem; border-radius: 8px; background: var(--light-gray); margin-bottom: 0.5rem;">
                                     <input class="form-check-input" type="radio" name="WorkflowStep" value="Confirmed" id="step1"
@@ -407,11 +400,11 @@
 
                             <button type="submit" class="btn w-100"
                                     style="background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
-                                                   color: white;
-                                                   padding: 1rem;
-                                                   border: none;
-                                                   border-radius: 8px;
-                                                   font-weight: 600;">
+                                               color: white;
+                                               padding: 1rem;
+                                               border: none;
+                                               border-radius: 8px;
+                                               font-weight: 600;">
                                 💾 Update Workflow Step
                             </button>
                         </form>
@@ -420,11 +413,10 @@
             }
             else
             {
-                <!-- Ready Stock Workflow (BR-OP003) -->
                 <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-lg);">
                     <div style="background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
-                                        padding: 1.5rem;
-                                        border-radius: 10px 10px 0 0;">
+                                    padding: 1.5rem;
+                                    border-radius: 10px 10px 0 0;">
                         <h5 style="color: white; margin: 0; font-weight: 600;">
                             📦 Ready Stock Workflow
                         </h5>
@@ -457,8 +449,8 @@
                 </div>
             }
 
-            <!-- Create/Update Shipment (unchanged) -->
-            <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
+            <!-- Create Shipment -->
+            <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
                 <div style="background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-light) 100%);
                             padding: 1.5rem;
                             border-radius: 10px 10px 0 0;">
@@ -504,48 +496,6 @@
                             📦 Create Shipment
                         </button>
                     </form>
-                </div>
-            </div>
-
-            <!-- Internal Notes (uses TempData, not DB) -->
-            <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
-                <div style="background: linear-gradient(135deg, var(--secondary-warm-gray) 0%, #757575 100%);
-                            padding: 1.5rem;
-                            border-radius: 10px 10px 0 0;">
-                    <h5 style="color: white; margin: 0; font-weight: 600;">
-                        📝 Internal Notes
-                    </h5>
-                </div>
-                <div class="card-body" style="padding: 1.5rem;">
-                    <form method="post" asp-page-handler="AddNote">
-                        <input type="hidden" name="id" value="@Model.Order?.OrderId" />
-
-                        <div class="mb-3">
-                            <textarea class="form-control" name="Note" rows="4" placeholder="Add internal note..."
-                                      style="border: 2px solid var(--medium-gray); border-radius: 8px; padding: 0.75rem;"></textarea>
-                        </div>
-
-                        <button type="submit" class="btn btn-secondary w-100" style="padding: 0.75rem; font-weight: 600;">
-                            💬 Add Note
-                        </button>
-                    </form>
-
-                    @if (!string.IsNullOrWhiteSpace(internalNotes))
-                    {
-                        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid var(--medium-gray);">
-                            <div style="background: var(--light-gray);
-                                                padding: 1rem;
-                                                border-radius: 8px;
-                                                font-size: 0.95rem;
-                                                white-space: pre-wrap;">
-                                @internalNotes
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        <div style="margin-top: 1.5rem; color: var(--secondary-warm-gray);">No internal notes.</div>
-                    }
                 </div>
             </div>
         </div>

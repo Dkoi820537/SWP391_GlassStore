@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
-using System.Collections.Generic;
 
 namespace EyewearStore_SWP391.Pages.Staff.Orders
 {
@@ -39,6 +38,9 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             return Page();
         }
 
+        /// <summary>
+        /// Update prescription workflow step (BR-OP004, BR-OP005)
+        /// </summary>
         public async Task<IActionResult> OnPostUpdatePrescriptionWorkflowAsync(int id, string WorkflowStep)
         {
             var order = await _context.Orders
@@ -70,15 +72,19 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             }
 
             order.Status = WorkflowStep;
-            // Không ghi UpdatedAt (không thay DB)
-
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"Workflow updated to: {WorkflowStep}";
+            // TODO: Send notification email (BR-OP006)
+            // await _emailService.SendPrescriptionWorkflowUpdateEmail(order, WorkflowStep);
+
+            TempData["Success"] = $"✓ Workflow updated to: {WorkflowStep}";
             return RedirectToPage(new { id });
         }
 
+        /// <summary>
+        /// Update ready stock order status (BR-OP003)
+        /// </summary>
         public async Task<IActionResult> OnPostUpdateStatusAsync(int id, string NewStatus)
         {
             var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == id);
@@ -100,6 +106,7 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             var prev = order.Status;
             order.Status = NewStatus;
 
+            // Restore inventory if cancelled (BR-INV001)
             if (NewStatus == "Cancelled" && prev != "Cancelled")
             {
                 await RestoreInventoryAsync(order);
@@ -108,10 +115,16 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"Order status updated to: {NewStatus}";
+            // TODO: Send notification email (BR-OP006)
+            // await _emailService.SendStatusUpdateEmail(order, NewStatus);
+
+            TempData["Success"] = $"✓ Order status updated to: {NewStatus}";
             return RedirectToPage(new { id });
         }
 
+        /// <summary>
+        /// Create or update shipment
+        /// </summary>
         public async Task<IActionResult> OnPostCreateShipmentAsync(int id, string TrackingNumber, string Carrier)
         {
             var order = await _context.Orders.Include(o => o.Shipments).FirstOrDefaultAsync(o => o.OrderId == id);
@@ -131,6 +144,7 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             var existing = order.Shipments?.FirstOrDefault();
             if (existing == null)
             {
+                // Create new shipment
                 var shipment = new Shipment
                 {
                     OrderId = order.OrderId,
@@ -142,6 +156,7 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                 _context.Shipments.Add(shipment);
                 await _context.SaveChangesAsync();
 
+                // Add history entry
                 _context.ShipmentStatusHistories.Add(new ShipmentStatusHistory
                 {
                     ShipmentId = shipment.ShipmentId,
@@ -149,16 +164,19 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                     CreatedAt = DateTime.UtcNow
                 });
 
-                TempData["Success"] = "Shipment created successfully!";
+                TempData["Success"] = "✓ Shipment created successfully!";
             }
             else
             {
+                // Update existing shipment
                 existing.TrackingNumber = TrackingNumber.Trim();
                 existing.Carrier = Carrier.Trim();
                 existing.Status = "Shipped";
                 existing.ShippedAt = DateTime.UtcNow;
 
                 _context.Shipments.Update(existing);
+
+                // Add history entry
                 _context.ShipmentStatusHistories.Add(new ShipmentStatusHistory
                 {
                     ShipmentId = existing.ShipmentId,
@@ -166,9 +184,10 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                     CreatedAt = DateTime.UtcNow
                 });
 
-                TempData["Success"] = "Shipment updated successfully!";
+                TempData["Success"] = "✓ Shipment updated successfully!";
             }
 
+            // Update order status to Shipped
             if (order.Status != "Shipped")
             {
                 order.Status = "Shipped";
@@ -176,35 +195,22 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             }
 
             await _context.SaveChangesAsync();
+
+            // TODO: Send shipping notification email (BR-OP006)
+            // await _emailService.SendShippingEmail(order, TrackingNumber, Carrier);
+
             return RedirectToPage(new { id });
         }
 
-        // Add note: store into TempData (temporary; not persisted)
-        public async Task<IActionResult> OnPostAddNoteAsync(int id, string Note)
-        {
-            if (string.IsNullOrWhiteSpace(Note))
-            {
-                TempData["Error"] = "Note cannot be empty!";
-                return RedirectToPage(new { id });
-            }
-
-            var key = $"InternalNotes_{id}";
-            var existing = TempData.ContainsKey(key) ? TempData[key] as string ?? string.Empty : string.Empty;
-            var userName = User.Identity?.Name ?? "Staff";
-            var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm");
-            var newNote = $"{existing}[{timestamp}] {userName}:\n{Note.Trim()}\n\n";
-
-            // Put back to TempData (survives one redirect)
-            TempData[key] = newNote;
-
-            TempData["Success"] = "Note added (temporary).";
-            return RedirectToPage(new { id });
-        }
-
+        /// <summary>
+        /// Restore inventory when order is cancelled (BR-INV001)
+        /// </summary>
         private async Task RestoreInventoryAsync(Order order)
         {
-            var orderItems = await _context.OrderItems.Include(oi => oi.Product)
-                .Where(oi => oi.OrderId == order.OrderId).ToListAsync();
+            var orderItems = await _context.OrderItems
+                .Include(oi => oi.Product)
+                .Where(oi => oi.OrderId == order.OrderId)
+                .ToListAsync();
 
             foreach (var item in orderItems)
             {
@@ -218,26 +224,30 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             await _context.SaveChangesAsync();
         }
 
-        // Validate prescription values (use PrescriptionProfile fields that exist)
+        /// <summary>
+        /// Validate prescription values (BR-S003)
+        /// </summary>
         private bool ValidatePrescriptionValues(PrescriptionProfile prescription)
         {
             if (prescription == null) return false;
 
-            // SPH and CYL fields are decimal? — check value ranges if present
+            // SPH: -20.00 to +20.00
             if (prescription.RightSph.HasValue && (prescription.RightSph < -20.00m || prescription.RightSph > 20.00m))
                 return false;
             if (prescription.LeftSph.HasValue && (prescription.LeftSph < -20.00m || prescription.LeftSph > 20.00m))
                 return false;
+
+            // CYL: -6.00 to +6.00
             if (prescription.RightCyl.HasValue && (prescription.RightCyl < -6.00m || prescription.RightCyl > 6.00m))
                 return false;
             if (prescription.LeftCyl.HasValue && (prescription.LeftCyl < -6.00m || prescription.LeftCyl > 6.00m))
                 return false;
+
+            // AXIS: 0 to 180
             if (prescription.RightAxis.HasValue && (prescription.RightAxis < 0 || prescription.RightAxis > 180))
                 return false;
             if (prescription.LeftAxis.HasValue && (prescription.LeftAxis < 0 || prescription.LeftAxis > 180))
                 return false;
-
-            // PD / ADD fields are not present in your PrescriptionProfile model, so we skip those checks.
 
             return true;
         }

@@ -2377,6 +2377,31 @@
             BR: Handle actions triggered by status changes
             </summary>
         </member>
+        <member name="M:EyewearStore_SWP391.Pages.Staff.Orders.DetailsModel.OnPostUpdatePrescriptionWorkflowAsync(System.Int32,System.String)">
+            <summary>
+            Update prescription workflow step (BR-OP004, BR-OP005)
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Staff.Orders.DetailsModel.OnPostUpdateStatusAsync(System.Int32,System.String)">
+            <summary>
+            Update ready stock order status (BR-OP003)
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Staff.Orders.DetailsModel.OnPostCreateShipmentAsync(System.Int32,System.String,System.String)">
+            <summary>
+            Create or update shipment
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Staff.Orders.DetailsModel.RestoreInventoryAsync(EyewearStore_SWP391.Models.Order)">
+            <summary>
+            Restore inventory when order is cancelled (BR-INV001)
+            </summary>
+        </member>
+        <member name="M:EyewearStore_SWP391.Pages.Staff.Orders.DetailsModel.ValidatePrescriptionValues(EyewearStore_SWP391.Models.PrescriptionProfile)">
+            <summary>
+            Validate prescription values (BR-S003)
+            </summary>
+        </member>
         <member name="T:EyewearStore_SWP391.Pages.Staff.Orders.IndexModel">
             <summary>
             Operations Staff Order Management

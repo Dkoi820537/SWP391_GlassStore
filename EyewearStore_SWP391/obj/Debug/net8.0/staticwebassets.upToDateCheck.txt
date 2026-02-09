@@ -68,4 +68,6 @@ wwwroot\uploads\lens\20260130143702_18b8803e.jpg
 wwwroot\uploads\lens\20260130143847_1f1900d6.jpg
 wwwroot\uploads\products\1\20260204044345_3a5ed7ec.png
 wwwroot\uploads\products\1\20260206030811_14db0fa8.jpg
+wwwroot\uploads\products\1\20260208163355_0fb26b75.jpg
+wwwroot\uploads\products\2\20260208164244_826afbab.jpg
 wwwroot\uploads\products\5\20260204065342_dc0dea9c.png

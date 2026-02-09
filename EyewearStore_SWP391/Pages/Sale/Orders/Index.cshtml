@@ -31,7 +31,7 @@
     <!-- Search and Filter Card -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <form method="get" class="row g-3">
+            <form method="get" class="row g-3 align-items-end">
                 <div class="col-md-6">
                     <label for="searchQuery" class="form-label fw-semibold">
                         <i class="bi bi-search me-1"></i>Search Orders
@@ -43,7 +43,7 @@
                            value="@Model.SearchQuery"
                            placeholder="Search by Order ID, Customer Name, or Email..." />
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="statusFilter" class="form-label fw-semibold">
                         <i class="bi bi-funnel me-1"></i>Filter by Status
                     </label>
@@ -57,6 +57,16 @@
                         }
                     </select>
                 </div>
+
+                <div class="col-md-1">
+                    <label class="form-label fw-semibold">Size</label>
+                    <select class="form-select" name="PageSize">
+                        <option value="10" selected="@(Model.PageSize == 10)">10</option>
+                        <option value="25" selected="@(Model.PageSize == 25)">25</option>
+                        <option value="50" selected="@(Model.PageSize == 50)">50</option>
+                    </select>
+                </div>
+
                 <div class="col-md-2 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-funnel-fill me-1"></i>Apply Filter
@@ -72,7 +82,9 @@
             <h5 class="mb-0">
                 <i class="bi bi-list-ul me-2"></i>Orders List
             </h5>
-            <span class="badge bg-light text-dark">@Model.Orders.Count orders</span>
+            <div>
+                <span class="badge bg-light text-dark">@Model.TotalOrders orders</span>
+            </div>
         </div>
         <div class="card-body p-0">
             @if (!Model.Orders.Any())
@@ -120,7 +132,7 @@
                                     <td class="align-middle">
                                         <div class="d-flex align-items-center">
                                             <div class="avatar-circle bg-primary text-white me-2">
-                                                @order.UserName.Substring(0, 1).ToUpper()
+                                                @(!string.IsNullOrEmpty(order.UserName) ? order.UserName.Substring(0, 1).ToUpper() : "?")
                                             </div>
                                             <span class="fw-semibold">@order.UserName</span>
                                         </div>
@@ -165,6 +177,10 @@
                                         <div class="btn-group" role="group">
                                             <a asp-page="Details"
                                                asp-route-id="@order.OrderId"
+                                               asp-route-pageNumber="@Model.PageNumber"
+                                               asp-route-pageSize="@Model.PageSize"
+                                               asp-route-SearchQuery="@Model.SearchQuery"
+                                               asp-route-StatusFilter="@Model.StatusFilter"
                                                class="btn btn-sm btn-outline-primary"
                                                title="View Details">
                                                 <i class="bi bi-eye"></i>
@@ -187,6 +203,66 @@
                             }
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center p-3">
+                    <div>
+                        <small class="text-muted">
+                            Showing
+                            <strong>@(((Model.PageNumber - 1) * Model.PageSize) + 1)</strong>
+                            -
+                            <strong>@(Math.Min(Model.PageNumber * Model.PageSize, Model.TotalOrders))</strong>
+                            of <strong>@Model.TotalOrders</strong>
+                        </small>
+                    </div>
+
+                    <nav aria-label="Orders pagination">
+                        <ul class="pagination mb-0">
+                            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Index"
+                                   asp-route-pageNumber="1"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-SearchQuery="@Model.SearchQuery"
+                                   asp-route-StatusFilter="@Model.StatusFilter">« First</a>
+                            </li>
+
+                            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Index"
+                                   asp-route-pageNumber="@(Model.PageNumber - 1)"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-SearchQuery="@Model.SearchQuery"
+                                   asp-route-StatusFilter="@Model.StatusFilter">‹ Prev</a>
+                            </li>
+
+                            @foreach (var p in Model.DisplayPageNumbers)
+                            {
+                                <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                                    <a class="page-link" asp-page="./Index"
+                                       asp-route-pageNumber="@p"
+                                       asp-route-pageSize="@Model.PageSize"
+                                       asp-route-SearchQuery="@Model.SearchQuery"
+                                       asp-route-StatusFilter="@Model.StatusFilter">@p</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Index"
+                                   asp-route-pageNumber="@(Model.PageNumber + 1)"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-SearchQuery="@Model.SearchQuery"
+                                   asp-route-StatusFilter="@Model.StatusFilter">Next ›</a>
+                            </li>
+
+                            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Index"
+                                   asp-route-pageNumber="@Model.TotalPages"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-SearchQuery="@Model.SearchQuery"
+                                   asp-route-StatusFilter="@Model.StatusFilter">Last »</a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             }
         </div>
@@ -212,8 +288,22 @@
 
             .table tbody tr:hover {
                 background-color: rgba(0, 123, 255, 0.05);
-                transform: scale(1.01);
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                transform: translateY(-2px);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             }
+
+        .pagination .page-item .page-link {
+            border-radius: 8px;
+            margin: 0 3px;
+            min-width: 40px;
+            text-align: center;
+            padding: 6px 10px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(90deg, #2b6cb0, #2c5282);
+            border-color: #2c5282;
+            color: #fff;
+        }
     </style>
 }

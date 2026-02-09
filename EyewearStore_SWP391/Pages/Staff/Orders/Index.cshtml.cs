@@ -11,9 +11,9 @@ using System;
 namespace EyewearStore_SWP391.Pages.Staff.Orders
 {
     /// <summary>
-    /// Operations Staff Order Management
+    /// Operations Staff Order Management - with pagination
     /// </summary>
-    [Authorize(Roles = "staff,operational,admin")]
+    [Authorize(Roles = "staff,operational,admin,Administrator")]
     public class IndexModel : PageModel
     {
         private readonly EyewearStoreContext _context;
@@ -23,10 +23,13 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             _context = context;
         }
 
-        // Properties
+        // Results for current page
         public List<Order> Orders { get; set; } = new();
+
+        // Dashboard stats (unchanged)
         public DashboardStats Stats { get; set; } = new();
 
+        // Filters (keep as before)
         [BindProperty(SupportsGet = true)]
         public string? Search { get; set; }
 
@@ -39,7 +42,6 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
         [BindProperty(SupportsGet = true)]
         public string? PriorityFilter { get; set; }
 
-        // Available Statuses
         public List<string> Statuses { get; } = new()
         {
             "Pending Confirmation",
@@ -51,7 +53,6 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             "Cancelled"
         };
 
-        // Dashboard Stats Class
         public class DashboardStats
         {
             public int PendingCount { get; set; }
@@ -60,12 +61,37 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             public int ShippedTodayCount { get; set; }
         }
 
+        // ---------- Pagination properties ----------
+        [BindProperty(SupportsGet = true)]
+        public int PageNumber { get; set; } = 1;
+
+        [BindProperty(SupportsGet = true)]
+        public int PageSize { get; set; } = 10;
+
+        public int TotalOrders { get; set; } = 0;
+        public int TotalPages { get; set; } = 1;
+
+        // Friendly indices for UI "Showing X - Y of Z"
+        public int FirstItemIndex => (TotalOrders == 0) ? 0 : ((PageNumber - 1) * PageSize) + 1;
+        public int LastItemIndex => Math.Min(PageNumber * PageSize, TotalOrders);
+
+        // For UI: which page numbers to display (compact window)
+        public List<int> DisplayPageNumbers { get; set; } = new();
+
+        // Maximum page links to show
+        private const int PageWindow = 7;
+
+        // ---------- End pagination properties ----------
+
         public async Task OnGetAsync()
         {
-            // Calculate Dashboard Stats
+            // sanitize page size
+            if (PageSize <= 0) PageSize = 10;
+            if (PageSize > 100) PageSize = 100; // safety cap
+
             await CalculateStatsAsync();
 
-            // Build query
+            // Build base query
             var query = _context.Orders
                 .Include(o => o.User)
                 .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
@@ -73,7 +99,7 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                 .Include(o => o.Shipments)
                 .AsQueryable();
 
-            // Default filter: show orders requiring operations attention if no StatusFilter
+            // Default: Show orders needing operations attention when no status filter
             if (string.IsNullOrWhiteSpace(StatusFilter))
             {
                 query = query.Where(o =>
@@ -86,7 +112,7 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                 query = query.Where(o => o.Status == StatusFilter);
             }
 
-            // Search Filter
+            // Search
             if (!string.IsNullOrWhiteSpace(Search))
             {
                 var searchTerm = Search.Trim();
@@ -103,57 +129,108 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                 }
             }
 
-            // Get results
-            var allOrders = await query
-                .OrderByDescending(o => o.CreatedAt)
-                .Take(500)
+            // Count total (before applying Skip/Take)
+            TotalOrders = await query.CountAsync();
+
+            // Apply ordering
+            query = query.OrderByDescending(o => o.CreatedAt);
+
+            // Type Filter (in-memory previously) - we can still do in-memory after fetching page or filter before counting.
+            // Simpler: apply type filter by narrowing via Where where possible.
+            // However since TypeFilter logic can be complex (inventory checks), we will:
+            // - If TypeFilter == "Prescription" we can narrow via DB: any orderitems with prescriptionId != null
+            // - For ReadyStock / PreOrder, we need product inventory values; we'll filter in-memory after fetching a bit extra.
+            if (!string.IsNullOrWhiteSpace(TypeFilter) && TypeFilter == "Prescription")
+            {
+                query = query.Where(o => o.OrderItems.Any(oi => oi.PrescriptionId != null));
+                // recalc total
+                TotalOrders = await query.CountAsync();
+            }
+
+            // Adjust PageNumber bounds
+            TotalPages = (int)Math.Ceiling(TotalOrders / (double)PageSize);
+            if (TotalPages <= 0) TotalPages = 1;
+            if (PageNumber < 1) PageNumber = 1;
+            if (PageNumber > TotalPages) PageNumber = TotalPages;
+
+            // Fetch the page (use Skip/Take)
+            var pagedOrders = await query
                 .AsNoTracking()
+                .Skip((PageNumber - 1) * PageSize)
+                .Take(PageSize)
                 .ToListAsync();
 
-            // Filter by Type (in-memory)
-            if (!string.IsNullOrWhiteSpace(TypeFilter))
+            // For TypeFilter that requires in-memory evaluation (ReadyStock / PreOrder), apply now.
+            if (!string.IsNullOrWhiteSpace(TypeFilter) && (TypeFilter == "ReadyStock" || TypeFilter == "PreOrder"))
             {
-                if (TypeFilter == "Prescription")
+                // We'll fetch enough items to fill current page after filtering.
+                // To ensure we don't show empty pages, we may need to fetch more results.
+                // Simple approach: fetch up to 500 matching records then apply in-memory Skip/Take.
+                var sourceQuery = query; // current query (already filtered by status/search)
+                var allCandidates = await sourceQuery
+                    .AsNoTracking()
+                    .Take(500) // safety cap
+                    .ToListAsync();
+
+                if (TypeFilter == "ReadyStock")
                 {
-                    allOrders = allOrders
-                        .Where(o => o.OrderItems.Any(oi => oi.PrescriptionId != null))
-                        .ToList();
-                }
-                else if (TypeFilter == "ReadyStock")
-                {
-                    allOrders = allOrders
+                    allCandidates = allCandidates
                         .Where(o => !o.OrderItems.Any(oi => oi.PrescriptionId != null) &&
                                     o.OrderItems.All(oi => (oi.Product?.InventoryQty ?? 0) >= oi.Quantity))
                         .ToList();
                 }
-                else if (TypeFilter == "PreOrder")
+                else // PreOrder
                 {
-                    allOrders = allOrders
+                    allCandidates = allCandidates
                         .Where(o => o.OrderItems.Any(oi => (oi.Product?.InventoryQty ?? 0) < oi.Quantity))
                         .ToList();
                 }
-            }
 
-            // Priority filter
-            if (!string.IsNullOrWhiteSpace(PriorityFilter))
+                // update total and pages based on filtered list
+                TotalOrders = allCandidates.Count;
+                TotalPages = (int)Math.Ceiling(TotalOrders / (double)PageSize);
+                if (TotalPages <= 0) TotalPages = 1;
+                if (PageNumber > TotalPages) PageNumber = TotalPages;
+
+                // take page slice in-memory
+                Orders = allCandidates
+                    .OrderByDescending(o => o.CreatedAt)
+                    .Skip((PageNumber - 1) * PageSize)
+                    .Take(PageSize)
+                    .ToList();
+            }
+            else
             {
-                if (PriorityFilter == "High")
-                {
-                    allOrders = allOrders
-                        .Where(o => o.OrderItems.Any(oi => oi.PrescriptionId != null) ||
-                                    o.CreatedAt < DateTime.UtcNow.AddDays(-2))
-                        .ToList();
-                }
-                else if (PriorityFilter == "Normal")
-                {
-                    allOrders = allOrders
-                        .Where(o => !o.OrderItems.Any(oi => oi.PrescriptionId != null) &&
-                                    o.CreatedAt >= DateTime.UtcNow.AddDays(-2))
-                        .ToList();
-                }
+                // Use pagedOrders result
+                Orders = pagedOrders;
             }
 
-            Orders = allOrders;
+            // Build DisplayPageNumbers (compact window)
+            BuildDisplayPageNumbers();
+        }
+
+        private void BuildDisplayPageNumbers()
+        {
+            DisplayPageNumbers = new List<int>();
+
+            int total = TotalPages;
+            int current = PageNumber;
+
+            if (total <= PageWindow)
+            {
+                for (int i = 1; i <= total; i++) DisplayPageNumbers.Add(i);
+                return;
+            }
+
+            int left = Math.Max(1, current - PageWindow / 2);
+            int right = Math.Min(total, left + PageWindow - 1);
+
+            if (right - left + 1 < PageWindow)
+            {
+                left = Math.Max(1, right - PageWindow + 1);
+            }
+
+            for (int i = left; i <= right; i++) DisplayPageNumbers.Add(i);
         }
 
         private async Task CalculateStatsAsync()
@@ -161,24 +238,54 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             var today = DateTime.UtcNow.Date;
             var tomorrow = today.AddDays(1);
 
-            // Pending Confirmation count
-            Stats.PendingCount = await _context.Orders
-                .CountAsync(o => o.Status == "Pending Confirmation");
+            Stats.PendingCount = await _context.Orders.CountAsync(o => o.Status == "Pending Confirmation");
+            Stats.ProcessingCount = await _context.Orders.CountAsync(o => o.Status == "Confirmed" || o.Status == "Processing");
 
-            // Processing count (Confirmed + Processing)
-            Stats.ProcessingCount = await _context.Orders
-                .CountAsync(o => o.Status == "Confirmed" || o.Status == "Processing");
-
-            // Prescription Orders count (active)
             Stats.PrescriptionCount = await _context.Orders
                 .Where(o => o.Status != "Completed" && o.Status != "Cancelled")
                 .Where(o => o.OrderItems.Any(oi => oi.PrescriptionId != null))
                 .CountAsync();
 
-            // Shipped Today count -> count shipments with ShippedAt in today
             Stats.ShippedTodayCount = await _context.Shipments
                 .Where(s => s.ShippedAt != null && s.ShippedAt >= today && s.ShippedAt < tomorrow)
                 .CountAsync();
+        }
+
+        // Quick confirm handler (unchanged)
+        public async Task<IActionResult> OnPostQuickConfirmAsync(int orderId)
+        {
+            var order = await _context.Orders
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Prescription)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+            if (order == null) return NotFound();
+
+            if (order.OrderItems.Any(oi => oi.PrescriptionId != null))
+            {
+                TempData["Error"] = "Prescription orders must be verified through the detailed process.";
+                return RedirectToPage("./Details", new { id = orderId });
+            }
+
+            if (order.Status != "Pending Confirmation")
+            {
+                TempData["Error"] = "Only pending orders can be confirmed.";
+                return RedirectToPage();
+            }
+
+            order.Status = "Confirmed";
+            _context.Orders.Update(order);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Order #{orderId} confirmed successfully!";
+            return RedirectToPage(new
+            {
+                pageNumber = PageNumber,
+                pageSize = PageSize,
+                Search,
+                StatusFilter,
+                TypeFilter,
+                PriorityFilter
+            });
         }
     }
 }

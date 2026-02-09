@@ -2377,6 +2377,7 @@
             BR: Handle actions triggered by status changes
             </summary>
         </member>
+        <!-- Badly formed XML comment ignored for member "T:EyewearStore_SWP391.Pages.Sale.Orders.IndexModel" -->
         <member name="M:EyewearStore_SWP391.Pages.Staff.Orders.DetailsModel.OnPostUpdatePrescriptionWorkflowAsync(System.Int32,System.String)">
             <summary>
             Update prescription workflow step (BR-OP004, BR-OP005)
@@ -2404,7 +2405,7 @@
         </member>
         <member name="T:EyewearStore_SWP391.Pages.Staff.Orders.IndexModel">
             <summary>
-            Operations Staff Order Management
+            Operations Staff Order Management - with pagination
             </summary>
         </member>
         <member name="M:EyewearStore_SWP391.Pages.Support.Orders.DetailsModel.OnPostUpdateStatusAsync(System.Int32,System.String)">
@@ -2429,14 +2430,7 @@
         </member>
         <member name="T:EyewearStore_SWP391.Pages.Support.Orders.IndexModel">
             <summary>
-            Support Staff Order Management - Main Dashboard
-            Handles order verification, prescription checking, and customer support
-            </summary>
-        </member>
-        <member name="M:EyewearStore_SWP391.Pages.Support.Orders.IndexModel.OnPostQuickConfirmAsync(System.Int32)">
-            <summary>
-            Quick confirm order without prescription verification
-            BR: Support staff can quickly confirm simple orders
+            Support Staff Order Management - with pagination
             </summary>
         </member>
         <member name="T:EyewearStore_SWP391.Services.FrameService">

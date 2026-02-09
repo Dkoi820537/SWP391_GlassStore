@@ -44,7 +44,7 @@
         </div>
     }
 
-    <!-- Stats Cards -->
+    <!-- Stats Cards (kept) -->
     <div class="row g-3 mb-4">
         <div class="col-md-3">
             <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%); color: white;">
@@ -100,7 +100,7 @@
         </div>
     </div>
 
-    <!-- Search and Filters -->
+    <!-- Search & Filters (unchanged, but ensure page resets to 1 on search/filter submit) -->
     <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
         <div class="card-body">
             <form method="get" class="row g-3">
@@ -146,32 +146,9 @@
                             name="TypeFilter"
                             style="border: 2px solid var(--medium-gray); border-radius: 8px; padding: 0.75rem;">
                         <option value="">All Types</option>
-                        @if (Model.TypeFilter == "Prescription")
-                        {
-                            <option value="Prescription" selected="selected">Prescription Orders</option>
-                        }
-                        else
-                        {
-                            <option value="Prescription">Prescription Orders</option>
-                        }
-
-                        @if (Model.TypeFilter == "ReadyStock")
-                        {
-                            <option value="ReadyStock" selected="selected">Ready Stock</option>
-                        }
-                        else
-                        {
-                            <option value="ReadyStock">Ready Stock</option>
-                        }
-
-                        @if (Model.TypeFilter == "PreOrder")
-                        {
-                            <option value="PreOrder" selected="selected">Pre-Orders</option>
-                        }
-                        else
-                        {
-                            <option value="PreOrder">Pre-Orders</option>
-                        }
+                        <option value="Prescription" selected="@(Model.TypeFilter == "Prescription")">Prescription Orders</option>
+                        <option value="ReadyStock" selected="@(Model.TypeFilter == "ReadyStock")">Ready Stock</option>
+                        <option value="PreOrder" selected="@(Model.TypeFilter == "PreOrder")">Pre-Orders</option>
                     </select>
                 </div>
 
@@ -183,27 +160,19 @@
                             name="PriorityFilter"
                             style="border: 2px solid var(--medium-gray); border-radius: 8px; padding: 0.75rem;">
                         <option value="">All</option>
-                        @if (Model.PriorityFilter == "High")
-                        {
-                            <option value="High" selected="selected">High Priority</option>
-                        }
-                        else
-                        {
-                            <option value="High">High Priority</option>
-                        }
-
-                        @if (Model.PriorityFilter == "Normal")
-                        {
-                            <option value="Normal" selected="selected">Normal</option>
-                        }
-                        else
-                        {
-                            <option value="Normal">Normal</option>
-                        }
+                        <option value="High" selected="@(Model.PriorityFilter == "High")">High Priority</option>
+                        <option value="Normal" selected="@(Model.PriorityFilter == "Normal")">Normal</option>
                     </select>
                 </div>
 
                 <div class="col-md-2 d-flex align-items-end">
+                    @* Keep page size selection and submit button together: submit resets to page 1 *@
+                    <input type="hidden" name="pageNumber" value="1" />
+                    <select class="form-select me-2" name="pageSize" style="width: 120px;">
+                        <option value="10" selected="@(Model.PageSize == 10)">10</option>
+                        <option value="25" selected="@(Model.PageSize == 25)">25</option>
+                        <option value="50" selected="@(Model.PageSize == 50)">50</option>
+                    </select>
                     <button type="submit" class="btn btn-primary w-100" style="padding: 0.75rem;">
                         <span style="margin-right: 0.5rem;">🔍</span> Filter
                     </button>
@@ -212,14 +181,20 @@
         </div>
     </div>
 
-    <!-- Orders Table -->
+    <!-- Orders Table Card -->
     <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-lg);">
         <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
                     padding: 1.5rem;
                     border-radius: 12px 12px 0 0;">
-            <h5 style="color: white; margin: 0; font-weight: 600;">
-                📋 Orders Queue (@Model.Orders.Count)
-            </h5>
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 style="color: white; margin: 0; font-weight: 600;">
+                    📋 Orders Queue (@Model.TotalOrders orders)
+                </h5>
+                <div class="text-white small">
+                    Showing <strong>@Model.FirstItemIndex</strong> - <strong>@Model.LastItemIndex</strong>
+                    of <strong>@Model.TotalOrders</strong>
+                </div>
+            </div>
         </div>
 
         <div class="card-body p-0">
@@ -381,6 +356,70 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Pagination controls -->
+                <div class="d-flex justify-content-between align-items-center p-3">
+                    <div>
+                        <small class="text-muted">Page @Model.PageNumber of @Model.TotalPages</small>
+                    </div>
+
+                    <nav aria-label="Orders pagination">
+                        <ul class="pagination mb-0">
+                            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Index"
+                                   asp-route-pageNumber="1"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-Search="@Model.Search"
+                                   asp-route-StatusFilter="@Model.StatusFilter"
+                                   asp-route-TypeFilter="@Model.TypeFilter"
+                                   asp-route-PriorityFilter="@Model.PriorityFilter">« First</a>
+                            </li>
+
+                            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Index"
+                                   asp-route-pageNumber="@(Model.PageNumber - 1)"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-Search="@Model.Search"
+                                   asp-route-StatusFilter="@Model.StatusFilter"
+                                   asp-route-TypeFilter="@Model.TypeFilter"
+                                   asp-route-PriorityFilter="@Model.PriorityFilter">‹ Prev</a>
+                            </li>
+
+                            @foreach (var p in Model.DisplayPageNumbers)
+                            {
+                                <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                                    <a class="page-link" asp-page="./Index"
+                                       asp-route-pageNumber="@p"
+                                       asp-route-pageSize="@Model.PageSize"
+                                       asp-route-Search="@Model.Search"
+                                       asp-route-StatusFilter="@Model.StatusFilter"
+                                       asp-route-TypeFilter="@Model.TypeFilter"
+                                       asp-route-PriorityFilter="@Model.PriorityFilter">@p</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Index"
+                                   asp-route-pageNumber="@(Model.PageNumber + 1)"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-Search="@Model.Search"
+                                   asp-route-StatusFilter="@Model.StatusFilter"
+                                   asp-route-TypeFilter="@Model.TypeFilter"
+                                   asp-route-PriorityFilter="@Model.PriorityFilter">Next ›</a>
+                            </li>
+
+                            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Index"
+                                   asp-route-pageNumber="@Model.TotalPages"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-Search="@Model.Search"
+                                   asp-route-StatusFilter="@Model.StatusFilter"
+                                   asp-route-TypeFilter="@Model.TypeFilter"
+                                   asp-route-PriorityFilter="@Model.PriorityFilter">Last »</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             }
         </div>
     </div>
@@ -396,4 +435,25 @@
         transform: translateY(-1px);
         transition: all 0.2s ease;
     }
+
+    /* pagination look */
+    .pagination .page-item .page-link {
+        border-radius: 10px;
+        margin: 0 3px;
+        min-width: 44px;
+        text-align: center;
+        padding: 6px 10px;
+    }
+
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(90deg, #2b6cb0, #2c5282);
+        border-color: #2c5282;
+        color: #fff;
+    }
 </style>
+
+@section Scripts {
+    <script>
+        // nothing needed here for paging (native anchor navigation)
+    </script>
+}

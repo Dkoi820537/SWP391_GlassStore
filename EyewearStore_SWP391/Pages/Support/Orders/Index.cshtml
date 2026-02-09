@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    <!-- Alert Messages -->
+    <!-- Alerts -->
     @if (TempData["Success"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -51,9 +51,8 @@
         </div>
     }
 
-    <!-- Dashboard Stats Cards -->
+    <!-- Stats cards (kept) -->
     <div class="row g-3 mb-4">
-        <!-- Pending Verification -->
         <div class="col-md-3">
             <div class="card border-0" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white;">
                 <div class="card-body">
@@ -75,7 +74,6 @@
             </div>
         </div>
 
-        <!-- other cards omitted for brevity, keep your original markup -->
         <div class="col-md-3">
             <div class="card border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                 <div class="card-body">
@@ -140,7 +138,7 @@
         </div>
     </div>
 
-    <!-- Quick Actions Panel -->
+    <!-- Quick actions -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <h6 class="text-muted mb-3"><i class="bi bi-lightning-charge me-2"></i>Quick Actions</h6>
@@ -164,7 +162,7 @@
         </div>
     </div>
 
-    <!-- Search and Filters -->
+    <!-- Search & Filters -->
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white">
             <h5 class="mb-0"><i class="bi bi-funnel me-2"></i>Search & Filter Orders</h5>
@@ -219,6 +217,12 @@
                 </div>
 
                 <div class="col-md-2 d-flex align-items-end">
+                    <input type="hidden" name="pageNumber" value="1" />
+                    <select class="form-select me-2" name="pageSize" style="width: 120px;">
+                        <option value="10" selected="@(Model.PageSize == 10)">10</option>
+                        <option value="25" selected="@(Model.PageSize == 25)">25</option>
+                        <option value="50" selected="@(Model.PageSize == 50)">50</option>
+                    </select>
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-funnel-fill me-1"></i>Apply Filters
                     </button>
@@ -227,14 +231,17 @@
         </div>
     </div>
 
-    <!-- Orders Table -->
+    <!-- Orders table -->
     <div class="card shadow-sm">
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">
-                <i class="bi bi-list-check me-2"></i>Support Queue (@Model.Orders.Count orders)
+                <i class="bi bi-list-check me-2"></i>Support Queue (@Model.TotalOrders orders)
             </h5>
-            <span class="badge bg-light text-dark">Last updated: @DateTime.Now.ToString("HH:mm:ss")</span>
+            <div class="text-white small">
+                Showing <strong>@Model.FirstItemIndex</strong> - <strong>@Model.LastItemIndex</strong> of <strong>@Model.TotalOrders</strong>
+            </div>
         </div>
+
         <div class="card-body p-0">
             @if (!Model.Orders.Any())
             {
@@ -362,12 +369,76 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Pagination controls -->
+                <div class="d-flex justify-content-between align-items-center p-3">
+                    <div>
+                        <small class="text-muted">Page @Model.PageNumber of @Model.TotalPages</small>
+                    </div>
+
+                    <nav aria-label="Support orders pagination">
+                        <ul class="pagination mb-0">
+                            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Index"
+                                   asp-route-pageNumber="1"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-Search="@Model.Search"
+                                   asp-route-StatusFilter="@Model.StatusFilter"
+                                   asp-route-TypeFilter="@Model.TypeFilter"
+                                   asp-route-PriorityFilter="@Model.PriorityFilter">« First</a>
+                            </li>
+
+                            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Index"
+                                   asp-route-pageNumber="@(Model.PageNumber - 1)"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-Search="@Model.Search"
+                                   asp-route-StatusFilter="@Model.StatusFilter"
+                                   asp-route-TypeFilter="@Model.TypeFilter"
+                                   asp-route-PriorityFilter="@Model.PriorityFilter">‹ Prev</a>
+                            </li>
+
+                            @foreach (var p in Model.DisplayPageNumbers)
+                            {
+                                <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                                    <a class="page-link" asp-page="./Index"
+                                       asp-route-pageNumber="@p"
+                                       asp-route-pageSize="@Model.PageSize"
+                                       asp-route-Search="@Model.Search"
+                                       asp-route-StatusFilter="@Model.StatusFilter"
+                                       asp-route-TypeFilter="@Model.TypeFilter"
+                                       asp-route-PriorityFilter="@Model.PriorityFilter">@p</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Index"
+                                   asp-route-pageNumber="@(Model.PageNumber + 1)"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-Search="@Model.Search"
+                                   asp-route-StatusFilter="@Model.StatusFilter"
+                                   asp-route-TypeFilter="@Model.TypeFilter"
+                                   asp-route-PriorityFilter="@Model.PriorityFilter">Next ›</a>
+                            </li>
+
+                            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Index"
+                                   asp-route-pageNumber="@Model.TotalPages"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-Search="@Model.Search"
+                                   asp-route-StatusFilter="@Model.StatusFilter"
+                                   asp-route-TypeFilter="@Model.TypeFilter"
+                                   asp-route-PriorityFilter="@Model.PriorityFilter">Last »</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             }
         </div>
     </div>
 </div>
 
-<!-- Statistics Modal (same as before) -->
+<!-- Statistics Modal (kept) -->
 <div class="modal fade" id="statsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -399,7 +470,7 @@
     </div>
 </div>
 
-@* Hidden quick confirm form (submit to OnPostQuickConfirmAsync) *@
+@* Hidden quick confirm form *@
 <form id="quickConfirmForm" method="post" asp-page-handler="QuickConfirm" style="display:none;">
     @Html.AntiForgeryToken()
     <input type="hidden" name="orderId" id="quickConfirmOrderId" value="" />
@@ -447,5 +518,20 @@
                 transform: translateY(-2px);
                 box-shadow: 0 8px 20px rgba(0,0,0,0.1);
             }
+
+        /* pagination style */
+        .pagination .page-item .page-link {
+            border-radius: 10px;
+            margin: 0 3px;
+            min-width: 44px;
+            text-align: center;
+            padding: 6px 10px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(90deg, #2b6cb0, #2c5282);
+            border-color: #2c5282;
+            color: #fff;
+        }
     </style>
 }

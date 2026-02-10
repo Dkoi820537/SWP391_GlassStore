@@ -1,0 +1,58 @@
+@page
+@model EyewearStore_SWP391.Pages.Checkout.CancelModel
+@{
+    ViewData["Title"] = "Payment Cancelled";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card" style="border: none; border-radius: 16px; box-shadow: var(--shadow-lg); text-align: center; overflow: hidden;">
+
+                <!-- Cancel Header -->
+                <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 3rem 2rem;">
+                    <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                        <span style="font-size: 2.5rem;">✕</span>
+                    </div>
+                    <h1 style="color: white; font-family: var(--font-secondary); font-size: 2.25rem; margin-bottom: 0.5rem;">
+                        Payment Cancelled
+                    </h1>
+                    <p style="color: rgba(255,255,255,0.85); font-size: 1.1rem; margin: 0;">
+                        Your payment was not processed
+                    </p>
+                </div>
+
+                <div style="padding: 2.5rem;">
+                    <p style="color: var(--dark-gray); font-size: 1.1rem; line-height: 1.7; max-width: 500px; margin: 0 auto 2rem;">
+                        No worries! Your cart items are still saved. You can return to your cart and try again whenever you're ready.
+                    </p>
+
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <a asp-page="/Cart/Index"
+                           class="btn"
+                           style="padding: 0.75rem 2rem;
+                                  background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-light));
+                                  color: white;
+                                  border: none;
+                                  border-radius: 8px;
+                                  font-weight: 600;
+                                  text-decoration: none;">
+                            🛒 Return to Cart
+                        </a>
+                        <a asp-page="/Index"
+                           class="btn"
+                           style="padding: 0.75rem 2rem;
+                                  background: white;
+                                  color: var(--primary-navy);
+                                  border: 2px solid var(--primary-navy);
+                                  border-radius: 8px;
+                                  font-weight: 600;
+                                  text-decoration: none;">
+                            Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -101,7 +101,7 @@ namespace EyewearStore_SWP391.Pages.Profile
             user.Phone = Input.Phone?.Trim();
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Cập nhật thông tin cá nhân thành công.";
+            TempData["SuccessMessage"] = "Profile updated successfully.";
             return RedirectToPage();
         }
 
@@ -109,7 +109,7 @@ namespace EyewearStore_SWP391.Pages.Profile
         {
             if (ChangePassword.NewPassword != ChangePassword.ConfirmPassword)
             {
-                ModelState.AddModelError("", "Mật khẩu mới và xác nhận mật khẩu không khớp.");
+                ModelState.AddModelError("", "New password and confirmation do not match.");
                 return await OnGetAndReturnPage();
             }
 
@@ -120,14 +120,14 @@ namespace EyewearStore_SWP391.Pages.Profile
             var verify = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, ChangePassword.CurrentPassword);
             if (verify == PasswordVerificationResult.Failed)
             {
-                ModelState.AddModelError("", "Mật khẩu hiện tại không đúng.");
+                ModelState.AddModelError("", "Current password is incorrect.");
                 return await OnGetAndReturnPage();
             }
 
             user.PasswordHash = _passwordHasher.HashPassword(user, ChangePassword.NewPassword);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Đổi mật khẩu thành công.";
+            TempData["SuccessMessage"] = "Password changed successfully.";
             return RedirectToPage();
         }
 
@@ -137,7 +137,7 @@ namespace EyewearStore_SWP391.Pages.Profile
                 string.IsNullOrWhiteSpace(AddressInput.Phone) ||
                 string.IsNullOrWhiteSpace(AddressInput.AddressLine))
             {
-                ModelState.AddModelError("", "Vui lòng điền đầy đủ họ tên, số điện thoại và địa chỉ.");
+                ModelState.AddModelError("", "Please fill in all required fields: name, phone, and address.");
                 return await OnGetAndReturnPage();
             }
 
@@ -162,7 +162,7 @@ namespace EyewearStore_SWP391.Pages.Profile
             _context.Addresses.Add(address);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Đã thêm địa chỉ mới.";
+            TempData["SuccessMessage"] = "New address added successfully.";
             return RedirectToPage();
         }
 
@@ -187,7 +187,7 @@ namespace EyewearStore_SWP391.Pages.Profile
      
 
             await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = "Cập nhật địa chỉ thành công.";
+            TempData["SuccessMessage"] = "Address updated successfully.";
             return RedirectToPage();
         }
 
@@ -200,7 +200,7 @@ namespace EyewearStore_SWP391.Pages.Profile
             _context.Addresses.Remove(addr);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Xóa địa chỉ thành công.";
+            TempData["SuccessMessage"] = "Address deleted successfully.";
             return RedirectToPage();
         }
 
@@ -216,7 +216,7 @@ namespace EyewearStore_SWP391.Pages.Profile
             addr.IsDefault = true;
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Đã đặt mặc định địa chỉ.";
+            TempData["SuccessMessage"] = "Default address set successfully.";
             return RedirectToPage();
         }
 

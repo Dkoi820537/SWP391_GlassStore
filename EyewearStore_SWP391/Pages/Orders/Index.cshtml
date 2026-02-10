@@ -1,0 +1,97 @@
+@page
+@model EyewearStore_SWP391.Pages.Orders.IndexModel
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
+            <li class="breadcrumb-item active">My Orders</li>
+        </ol>
+    </nav>
+
+    <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
+        📋 My Orders
+    </h1>
+    <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin-bottom: 2rem;">
+        View and track your order history
+    </p>
+
+    @if (!Model.Orders.Any())
+    {
+        <div class="card" style="border: none; border-radius: 16px; box-shadow: var(--shadow-lg); text-align: center; padding: 4rem 2rem; background: linear-gradient(135deg, var(--white), var(--secondary-cream));">
+            <div style="font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.3;">📦</div>
+            <h3 style="color: var(--primary-navy); margin-bottom: 1rem;">No Orders Yet</h3>
+            <p style="color: var(--secondary-warm-gray); max-width: 400px; margin: 0 auto 2rem;">
+                You haven't placed any orders yet. Start shopping to see your order history here.
+            </p>
+            <a asp-page="/Index" class="btn" style="padding: 0.75rem 2rem; background: linear-gradient(135deg, var(--primary-navy), var(--primary-navy-light)); color: white; border: none; border-radius: 8px; font-weight: 600; text-decoration: none;">
+                Start Shopping
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var order in Model.Orders)
+            {
+                var statusColor = order.Status switch
+                {
+                    "Paid" => "#10b981",
+                    "Pending" => "#f59e0b",
+                    "Processing" => "#3b82f6",
+                    "Shipped" => "#8b5cf6",
+                    "Completed" => "#059669",
+                    "Cancelled" => "#ef4444",
+                    _ => "#6b7280"
+                };
+
+                <div class="col-12">
+                    <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;"
+                         onclick="window.location='/Orders/Detail?id=@order.OrderId'"
+                         onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.12)'"
+                         onmouseout="this.style.transform='none'; this.style.boxShadow='var(--shadow-md)'">
+                        <div style="padding: 1.25rem 1.5rem;">
+                            <div class="row align-items-center g-3">
+                                <div class="col-sm-3">
+                                    <div style="font-size: 0.8rem; color: var(--secondary-warm-gray); margin-bottom: 0.25rem;">Order</div>
+                                    <div style="font-weight: 700; color: var(--primary-navy); font-size: 1.15rem;">#@order.OrderId</div>
+                                    <div style="font-size: 0.8rem; color: var(--secondary-warm-gray);">@order.CreatedAt.ToString("MMM dd, yyyy HH:mm")</div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div style="font-size: 0.8rem; color: var(--secondary-warm-gray); margin-bottom: 0.25rem;">Status</div>
+                                    <span class="badge" style="background: @statusColor; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.85rem;">
+                                        @order.Status
+                                    </span>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div style="font-size: 0.8rem; color: var(--secondary-warm-gray); margin-bottom: 0.25rem;">Items</div>
+                                    <div style="font-weight: 600; color: var(--primary-navy);">@order.OrderItems.Count item(s)</div>
+                                </div>
+                                <div class="col-sm-3 text-sm-end">
+                                    <div style="font-size: 0.8rem; color: var(--secondary-warm-gray); margin-bottom: 0.25rem;">Total</div>
+                                    <div style="font-weight: 700; color: var(--primary-gold); font-size: 1.25rem;">
+                                        @order.TotalAmount.ToString("N0") VND
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="background: var(--light-gray); padding: 0.5rem 1.5rem; font-size: 0.85rem; color: var(--secondary-warm-gray); display: flex; justify-content: space-between; align-items: center;">
+                            <span>Payment: @(order.PaymentMethod ?? "—")</span>
+                            <span style="color: var(--primary-gold); font-weight: 600;">View Details →</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .breadcrumb { background: transparent; padding: 0; margin-bottom: 1rem; }
+    .breadcrumb-item + .breadcrumb-item::before { content: "›"; color: var(--secondary-warm-gray); }
+    .breadcrumb-item a { color: var(--primary-gold); text-decoration: none; }
+    .breadcrumb-item.active { color: var(--dark-gray); }
+</style>

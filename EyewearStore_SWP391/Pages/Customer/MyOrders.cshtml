@@ -1,7 +1,7 @@
 ﻿@page
 @model EyewearStore_SWP391.Pages.Customer.MyOrdersModel
 @{
-    ViewData["Title"] = "Đơn hàng của tôi";
+    ViewData["Title"] = "My Orders";
     Layout = "_Layout";
 }
 
@@ -12,7 +12,7 @@
             <div>
                 <h2 class="mb-2">
                     <i class="bi bi-bag-check me-2 text-primary"></i>
-                    Đơn hàng của tôi
+                    My Orders
                     @if (Model.Orders.Any())
                     {
                         <span class="badge bg-primary ms-2">@Model.Orders.Count</span>
@@ -20,13 +20,13 @@
                 </h2>
                 <p class="text-muted mb-0">
                     <i class="bi bi-info-circle me-1"></i>
-                    Theo dõi trạng thái và lịch sử đơn hàng của bạn
+                    Track the status and history of your orders
                 </p>
                 @if (!string.IsNullOrEmpty(Model.CurrentUserEmail))
                 {
                     <p class="text-muted small mb-0 mt-1">
                         <i class="bi bi-person me-1"></i>
-                        Tài khoản: <strong>@Model.CurrentUserEmail</strong>
+                        Account: <strong>@Model.CurrentUserEmail</strong>
                         @if (!string.IsNullOrEmpty(Model.CurrentUserName))
                         {
                             <span> (@Model.CurrentUserName)</span>
@@ -38,7 +38,7 @@
             {
                 <div>
                     <a href="/Products" class="btn btn-outline-primary">
-                        <i class="bi bi-shop me-1"></i>Tiếp tục mua sắm
+                        <i class="bi bi-shop me-1"></i>Continue Shopping
                     </a>
                 </div>
             }
@@ -51,19 +51,19 @@
         <div class="card shadow-sm">
             <div class="card-body text-center py-5">
                 <i class="bi bi-cart-x display-1 text-muted mb-3"></i>
-                <h4 class="text-muted">Chưa có đơn hàng nào</h4>
+                <h4 class="text-muted">No orders yet</h4>
                 <p class="text-muted mb-4">
                     @if (!string.IsNullOrEmpty(Model.CurrentUserEmail))
                     {
-                        <span>Bạn chưa đặt đơn hàng nào. Hãy bắt đầu mua sắm ngay!</span>
+                        <span>You haven't placed any orders yet. Start shopping now!</span>
                     }
                     else
                     {
-                        <span>Không thể tải thông tin đơn hàng. Vui lòng thử đăng nhập lại.</span>
+                        <span>Unable to load order information. Please try logging in again.</span>
                     }
                 </p>
                 <a href="/Products" class="btn btn-primary btn-lg">
-                    <i class="bi bi-shop me-2"></i>Mua sắm ngay
+                    <i class="bi bi-shop me-2"></i>Shop Now
                 </a>
             </div>
         </div>
@@ -81,17 +81,17 @@
                                 <div class="col-md-6">
                                     <h5 class="mb-1">
                                         <i class="bi bi-receipt text-primary me-2"></i>
-                                        Đơn hàng #@order.OrderId
+                                        Order #@order.OrderId
                                     </h5>
                                     <small class="text-muted">
                                         <i class="bi bi-calendar-event me-1"></i>
-                                        @order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy 'lúc' HH:mm")
+                                        @order.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy 'at' HH:mm")
                                     </small>
                                 </div>
                                 <div class="col-md-6 text-md-end mt-2 mt-md-0">
                                     <span class="badge @MyOrdersModel.GetStatusBadgeClass(order.Status) fs-6 px-3 py-2">
                                         <i class="@MyOrdersModel.GetStatusIcon(order.Status) me-1"></i>
-                                        @MyOrdersModel.GetStatusVietnamese(order.Status)
+                                        @order.Status
                                     </span>
                                 </div>
                             </div>
@@ -103,7 +103,7 @@
                             {
                                 <div class="mb-4">
                                     <div class="d-flex justify-content-between mb-2">
-                                        <small class="text-muted">Tiến độ đơn hàng</small>
+                                        <small class="text-muted">Order Progress</small>
                                         <small class="fw-semibold">@MyOrdersModel.GetStatusProgress(order.Status)%</small>
                                     </div>
                                     <div class="progress" style="height: 8px;">
@@ -124,7 +124,7 @@
                                     <div class="d-flex align-items-start">
                                         <i class="bi bi-geo-alt-fill text-primary me-2 mt-1"></i>
                                         <div>
-                                            <small class="text-muted d-block">Địa chỉ giao hàng</small>
+                                            <small class="text-muted d-block">Shipping Address</small>
                                             <span class="fw-semibold">@order.ShippingAddress</span>
                                         </div>
                                     </div>
@@ -133,9 +133,9 @@
                                     <div class="d-flex align-items-start">
                                         <i class="bi bi-credit-card text-success me-2 mt-1"></i>
                                         <div>
-                                            <small class="text-muted d-block">Thanh toán</small>
+                                            <small class="text-muted d-block">Payment</small>
                                             <span class="fw-semibold">
-                                                @(order.PaymentMethod == "COD" ? "COD (Tiền mặt)" : "Chuyển khoản")
+                                                @(order.PaymentMethod == "COD" ? "COD (Cash)" : "Bank Transfer")
                                             </span>
                                         </div>
                                     </div>
@@ -144,8 +144,8 @@
                                     <div class="d-flex align-items-start">
                                         <i class="bi bi-box-seam text-info me-2 mt-1"></i>
                                         <div>
-                                            <small class="text-muted d-block">Tổng sản phẩm</small>
-                                            <span class="fw-semibold">@order.ItemCount món</span>
+                                            <small class="text-muted d-block">Total Items</small>
+                                            <span class="fw-semibold">@order.ItemCount item(s)</span>
                                         </div>
                                     </div>
                                 </div>
@@ -156,10 +156,10 @@
                             {
                                 <div class="alert alert-info mb-3" role="alert">
                                     <i class="bi bi-truck me-2"></i>
-                                    <strong>Mã vận đơn:</strong>
+                                    <strong>Tracking Number:</strong>
                                     <span class="font-monospace fw-bold ms-2">@order.TrackingNumber</span>
                                     <button class="btn btn-sm btn-outline-info ms-3" onclick="copyTracking('@order.TrackingNumber')">
-                                        <i class="bi bi-clipboard"></i> Sao chép
+                                        <i class="bi bi-clipboard"></i> Copy
                                     </button>
                                 </div>
                             }
@@ -167,7 +167,7 @@
                             <!-- Product List -->
                             <div class="order-products mb-3">
                                 <h6 class="border-bottom pb-2 mb-3">
-                                    <i class="bi bi-bag me-2"></i>Sản phẩm trong đơn hàng
+                                    <i class="bi bi-bag me-2"></i>Products in Order
                                 </h6>
                                 @foreach (var product in order.Products)
                                 {
@@ -175,7 +175,7 @@
                                         <div class="flex-grow-1">
                                             <div class="fw-semibold">@product.Name</div>
                                             <small class="text-muted">
-                                                SKU: @product.Sku | Số lượng: <strong>×@product.Quantity</strong>
+                                                SKU: @product.Sku | Qty: <strong>×@product.Quantity</strong>
                                             </small>
                                         </div>
                                         <div class="text-end">
@@ -192,7 +192,7 @@
 
                             <!-- Order Total -->
                             <div class="d-flex justify-content-between align-items-center border-top pt-3">
-                                <h5 class="mb-0">Tổng cộng:</h5>
+                                <h5 class="mb-0">Total:</h5>
                                 <h4 class="mb-0 text-success fw-bold">
                                     @String.Format("{0:N0} ₫", order.TotalAmount)
                                 </h4>
@@ -203,17 +203,17 @@
                                 @if (order.Status == "Pending Confirmation")
                                 {
                                     <button class="btn btn-outline-danger" onclick="cancelOrder(@order.OrderId)">
-                                        <i class="bi bi-x-circle me-1"></i>Hủy đơn hàng
+                                        <i class="bi bi-x-circle me-1"></i>Cancel Order
                                     </button>
                                 }
                                 @if (order.Status == "Delivered" || order.Status == "Completed")
                                 {
                                     <button class="btn btn-outline-primary">
-                                        <i class="bi bi-arrow-repeat me-1"></i>Mua lại
+                                        <i class="bi bi-arrow-repeat me-1"></i>Reorder
                                     </button>
                                 }
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailModal@(order.OrderId)">
-                                    <i class="bi bi-eye me-1"></i>Chi tiết
+                                    <i class="bi bi-eye me-1"></i>Details
                                 </button>
                             </div>
                         </div>
@@ -226,43 +226,43 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title">
-                                    <i class="bi bi-receipt me-2"></i>Chi tiết đơn hàng #@order.OrderId
+                                    <i class="bi bi-receipt me-2"></i>Order Details #@order.OrderId
                                 </h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
                                 <div class="row mb-3">
                                     <div class="col-6">
-                                        <strong>Ngày đặt:</strong><br />
+                                        <strong>Order Date:</strong><br />
                                         @order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
                                     </div>
                                     <div class="col-6">
-                                        <strong>Trạng thái:</strong><br />
+                                        <strong>Status:</strong><br />
                                         <span class="badge @MyOrdersModel.GetStatusBadgeClass(order.Status)">
-                                            @MyOrdersModel.GetStatusVietnamese(order.Status)
+                                            @order.Status
                                         </span>
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <strong>Địa chỉ giao hàng:</strong><br />
+                                    <strong>Shipping Address:</strong><br />
                                     @order.ShippingAddress
                                 </div>
                                 @if (!string.IsNullOrWhiteSpace(order.TrackingNumber))
                                 {
                                     <div class="mb-3">
-                                        <strong>Mã vận đơn:</strong><br />
+                                        <strong>Tracking Number:</strong><br />
                                         <code>@order.TrackingNumber</code>
                                     </div>
                                 }
                                 <hr />
-                                <h6>Sản phẩm:</h6>
+                                <h6>Products:</h6>
                                 <table class="table table-sm">
                                     <thead>
                                         <tr>
-                                            <th>Tên sản phẩm</th>
-                                            <th class="text-center">SL</th>
-                                            <th class="text-end">Đơn giá</th>
-                                            <th class="text-end">Thành tiền</th>
+                                            <th>Product Name</th>
+                                            <th class="text-center">Qty</th>
+                                            <th class="text-end">Unit Price</th>
+                                            <th class="text-end">Subtotal</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -281,14 +281,14 @@
                                     </tbody>
                                     <tfoot>
                                         <tr class="fw-bold">
-                                            <td colspan="3" class="text-end">Tổng cộng:</td>
+                                            <td colspan="3" class="text-end">Total:</td>
                                             <td class="text-end text-success">@String.Format("{0:N0} ₫", order.TotalAmount)</td>
                                         </tr>
                                     </tfoot>
                                 </table>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
@@ -302,16 +302,16 @@
     <script>
         function copyTracking(trackingNumber) {
             navigator.clipboard.writeText(trackingNumber).then(function() {
-                alert('Đã sao chép mã vận đơn: ' + trackingNumber);
+                alert('Tracking number copied: ' + trackingNumber);
             }, function() {
-                alert('Không thể sao chép mã vận đơn');
+                alert('Unable to copy tracking number');
             });
         }
 
         function cancelOrder(orderId) {
-            if (confirm('Bạn có chắc chắn muốn hủy đơn hàng #' + orderId + '?')) {
+            if (confirm('Are you sure you want to cancel order #' + orderId + '?')) {
                 // TODO: Implement cancel order API call
-                alert('Tính năng hủy đơn hàng sẽ được triển khai sau');
+                alert('Order cancellation feature will be implemented soon');
             }
         }
     </script>

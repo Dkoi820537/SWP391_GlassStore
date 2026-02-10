@@ -24,7 +24,7 @@ public class CartService : ICartService
 
     public async Task AddToCartAsync(int userId, int productId, int quantity = 1, int? serviceId = null, string? tempPrescriptionJson = null)
     {
-        if (quantity <= 0) throw new ArgumentException("Quantity phải lớn hơn 0");
+        if (quantity <= 0) throw new ArgumentException("Quantity must be greater than 0");
 
         using var tx = await _context.Database.BeginTransactionAsync();
         try
@@ -42,20 +42,20 @@ public class CartService : ICartService
 
             // Verify product exists and is active
             var product = await _context.Products.FindAsync(productId);
-            if (product == null) throw new InvalidOperationException("Product không tồn tại");
-            if (!product.IsActive) throw new InvalidOperationException("Product không còn hoạt động");
+            if (product == null) throw new InvalidOperationException("Product does not exist");
+            if (!product.IsActive) throw new InvalidOperationException("Product is no longer active");
 
             // Check inventory if applicable
             if (product.InventoryQty.HasValue && product.InventoryQty < quantity)
             {
-                throw new InvalidOperationException("Số lượng vượt quá tồn kho");
+                throw new InvalidOperationException("Quantity exceeds available stock");
             }
 
             // Verify service if provided
             if (serviceId.HasValue)
             {
                 var service = await _context.Services.FindAsync(serviceId.Value);
-                if (service == null) throw new InvalidOperationException("Service không tồn tại");
+                if (service == null) throw new InvalidOperationException("Service does not exist");
             }
 
             // Check if item already exists in cart
@@ -98,7 +98,7 @@ public class CartService : ICartService
             .Include(ci => ci.Product)
             .FirstOrDefaultAsync(ci => ci.CartItemId == cartItemId);
             
-        if (item == null) throw new InvalidOperationException("Cart item không tồn tại");
+        if (item == null) throw new InvalidOperationException("Cart item does not exist");
 
         if (newQuantity <= 0)
         {
@@ -109,7 +109,7 @@ public class CartService : ICartService
             // Check inventory if applicable
             if (item.Product.InventoryQty.HasValue && item.Product.InventoryQty < newQuantity)
             {
-                throw new InvalidOperationException("Số lượng vượt quá tồn kho");
+                throw new InvalidOperationException("Quantity exceeds available stock");
             }
             item.Quantity = newQuantity;
             _context.CartItems.Update(item);
@@ -120,7 +120,7 @@ public class CartService : ICartService
     public async Task UpdateItemPrescriptionAsync(int cartItemId, string? tempPrescriptionJson)
     {
         var item = await _context.CartItems.FindAsync(cartItemId);
-        if (item == null) throw new InvalidOperationException("Cart item không tồn tại");
+        if (item == null) throw new InvalidOperationException("Cart item does not exist");
         item.TempPrescriptionJson = tempPrescriptionJson;
         _context.CartItems.Update(item);
         await _context.SaveChangesAsync();

@@ -28,7 +28,7 @@ namespace EyewearStore_SWP391.Pages.Customer
             public string TrackingNumber { get; set; } = "";
             public string ShippingAddress { get; set; } = "";
 
-            // Chi tiết sản phẩm
+            // Product details
             public List<ProductItem> Products { get; set; } = new();
         }
 
@@ -48,16 +48,16 @@ namespace EyewearStore_SWP391.Pages.Customer
         {
             try
             {
-                // Phương pháp 1: Lấy email từ User.Identity.Name
+                // Method 1: Get email from User.Identity.Name
                 CurrentUserEmail = User.Identity?.Name ?? "";
 
-                // Phương pháp 2: Thử từ Claims (backup)
+                // Method 2: Try from Claims (backup)
                 if (string.IsNullOrEmpty(CurrentUserEmail))
                 {
                     CurrentUserEmail = User.FindFirst(ClaimTypes.Email)?.Value ?? "";
                 }
 
-                // Phương pháp 3: Thử từ NameIdentifier (backup)
+                // Method 3: Try from NameIdentifier (backup)
                 if (string.IsNullOrEmpty(CurrentUserEmail))
                 {
                     CurrentUserEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
@@ -69,7 +69,7 @@ namespace EyewearStore_SWP391.Pages.Customer
                     return;
                 }
 
-                // Tìm user trong database
+                // Find user in database
                 var user = await _context.Users
                     .AsNoTracking()
                     .FirstOrDefaultAsync(u => u.Email == CurrentUserEmail);
@@ -82,7 +82,7 @@ namespace EyewearStore_SWP391.Pages.Customer
 
                 CurrentUserName = user.FullName ?? user.Email;
 
-                // Lấy tất cả đơn hàng của user này
+                // Get all orders for this user
                 var orders = await _context.Orders
                     .Where(o => o.UserId == user.UserId)
                     .Include(o => o.OrderItems)
@@ -102,10 +102,10 @@ namespace EyewearStore_SWP391.Pages.Customer
                     ItemCount = o.OrderItems.Sum(oi => oi.Quantity),
                     PaymentMethod = o.PaymentMethod ?? "COD",
                     TrackingNumber = o.Shipments.FirstOrDefault()?.TrackingNumber ?? "",
-                    ShippingAddress = o.Address?.AddressLine ?? "Chưa có địa chỉ",
+                    ShippingAddress = o.Address?.AddressLine ?? "No address provided",
                     Products = o.OrderItems.Select(oi => new ProductItem
                     {
-                        Name = oi.Product?.Name ?? "Sản phẩm đã bị xóa",
+                        Name = oi.Product?.Name ?? "Deleted product",
                         Sku = oi.Product?.Sku ?? "N/A",
                         Quantity = oi.Quantity,
                         UnitPrice = oi.UnitPrice
@@ -114,13 +114,13 @@ namespace EyewearStore_SWP391.Pages.Customer
             }
             catch (Exception ex)
             {
-                // Log error (trong production nên dùng ILogger)
+                // Log error (in production use ILogger)
                 Console.WriteLine($"Error loading orders: {ex.Message}");
                 Orders = new List<OrderItem>();
             }
         }
 
-        // Helper method để lấy màu badge theo status
+        // Helper method to get badge class by status
         public static string GetStatusBadgeClass(string status)
         {
             return status switch
@@ -136,7 +136,7 @@ namespace EyewearStore_SWP391.Pages.Customer
             };
         }
 
-        // Helper method để lấy icon theo status
+        // Helper method to get icon by status
         public static string GetStatusIcon(string status)
         {
             return status switch
@@ -152,7 +152,7 @@ namespace EyewearStore_SWP391.Pages.Customer
             };
         }
 
-        // Helper method để hiển thị tiến trình
+        // Helper method to display progress
         public static int GetStatusProgress(string status)
         {
             return status switch
@@ -168,18 +168,18 @@ namespace EyewearStore_SWP391.Pages.Customer
             };
         }
 
-        // Helper method để hiển thị tiếng Việt
+        // Helper method to display status label
         public static string GetStatusVietnamese(string status)
         {
             return status switch
             {
-                "Pending Confirmation" => "Chờ xác nhận",
-                "Confirmed" => "Đã xác nhận",
-                "Processing" => "Đang xử lý",
-                "Shipped" => "Đang giao hàng",
-                "Delivered" => "Đã giao hàng",
-                "Completed" => "Hoàn thành",
-                "Cancelled" => "Đã hủy",
+                "Pending Confirmation" => "Pending Confirmation",
+                "Confirmed" => "Confirmed",
+                "Processing" => "Processing",
+                "Shipped" => "Shipped",
+                "Delivered" => "Delivered",
+                "Completed" => "Completed",
+                "Cancelled" => "Cancelled",
                 _ => status
             };
         }

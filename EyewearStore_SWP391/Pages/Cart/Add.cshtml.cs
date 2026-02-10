@@ -23,7 +23,7 @@ namespace EyewearStore_SWP391.Pages.Cart
             try
             {
                 await _cartService.AddToCartAsync(uid, ProductId, Quantity, ServiceId, TempPrescriptionJson);
-                TempData["SuccessMessage"] = "Đã thêm vào giỏ hàng";
+                TempData["SuccessMessage"] = "Added to cart";
             }
             catch (Exception ex)
             {

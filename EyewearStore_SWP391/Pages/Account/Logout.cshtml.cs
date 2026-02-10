@@ -10,7 +10,7 @@ namespace EyewearStore_SWP391.Pages.Account
     {
         public void OnGet()
         {
-            // Hiển thị trang confirm logout (nếu cần)
+            // Show logout confirmation page (if needed)
         }
 
         public async Task<IActionResult> OnPostAsync()

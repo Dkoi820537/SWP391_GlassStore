@@ -17,6 +17,12 @@ public partial class Order
 
     public string? PaymentMethod { get; set; }
 
+    /// <summary>Stripe Checkout Session ID (cs_test_...)</summary>
+    public string? StripeSessionId { get; set; }
+
+    /// <summary>Stripe Payment Intent ID (pi_...)</summary>
+    public string? StripePaymentIntentId { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     // Navigation properties

@@ -1,0 +1,96 @@
+@page
+@model EyewearStore_SWP391.Pages.Checkout.SuccessModel
+@{
+    ViewData["Title"] = "Order Confirmed";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card" style="border: none; border-radius: 16px; box-shadow: var(--shadow-lg); text-align: center; overflow: hidden;">
+
+                <!-- Success Header -->
+                <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 3rem 2rem;">
+                    <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                        <span style="font-size: 2.5rem;">✓</span>
+                    </div>
+                    <h1 style="color: white; font-family: var(--font-secondary); font-size: 2.25rem; margin-bottom: 0.5rem;">
+                        Payment Successful!
+                    </h1>
+                    <p style="color: rgba(255,255,255,0.85); font-size: 1.1rem; margin: 0;">
+                        Thank you for your order
+                    </p>
+                </div>
+
+                @if (Model.Order != null)
+                {
+                    <div style="padding: 2rem;">
+                        <!-- Order Info -->
+                        <div style="background: var(--light-gray); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                            <div class="row g-3 text-start">
+                                <div class="col-sm-4">
+                                    <div style="font-size: 0.85rem; color: var(--secondary-warm-gray); margin-bottom: 0.25rem;">Order Number</div>
+                                    <div style="font-weight: 700; color: var(--primary-navy); font-size: 1.25rem;">#@Model.Order.OrderId</div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div style="font-size: 0.85rem; color: var(--secondary-warm-gray); margin-bottom: 0.25rem;">Status</div>
+                                    <span class="badge" style="background: #10b981; color: white; padding: 0.4rem 0.8rem; font-size: 0.85rem; border-radius: 6px;">
+                                        @Model.Order.Status
+                                    </span>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div style="font-size: 0.85rem; color: var(--secondary-warm-gray); margin-bottom: 0.25rem;">Total</div>
+                                    <div style="font-weight: 700; color: var(--primary-gold); font-size: 1.25rem;">@Model.Order.TotalAmount.ToString("N0") VND</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Items -->
+                        @if (Model.Order.OrderItems.Any())
+                        {
+                            <h5 style="color: var(--primary-navy); font-weight: 600; text-align: left; margin-bottom: 1rem;">Items Ordered</h5>
+                            @foreach (var oi in Model.Order.OrderItems)
+                            {
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--medium-gray);">
+                                    <div style="text-align: left;">
+                                        <div style="font-weight: 600; color: var(--primary-navy);">@(oi.Product?.Name ?? "Product")</div>
+                                        <small style="color: var(--secondary-warm-gray);">Qty: @oi.Quantity × @oi.UnitPrice.ToString("N0") VND</small>
+                                    </div>
+                                    <div style="font-weight: 700; color: var(--primary-navy);">
+                                        @((oi.UnitPrice * oi.Quantity).ToString("N0")) VND
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                        <!-- Action Buttons -->
+                        <div class="mt-4 d-flex gap-3 justify-content-center flex-wrap">
+                            <a asp-page="/Orders/Index"
+                               class="btn"
+                               style="padding: 0.75rem 2rem;
+                                      background: linear-gradient(135deg, var(--primary-navy), var(--primary-navy-light));
+                                      color: white;
+                                      border: none;
+                                      border-radius: 8px;
+                                      font-weight: 600;
+                                      text-decoration: none;">
+                                📋 View Order History
+                            </a>
+                            <a asp-page="/Index"
+                               class="btn"
+                               style="padding: 0.75rem 2rem;
+                                      background: white;
+                                      color: var(--primary-navy);
+                                      border: 2px solid var(--primary-navy);
+                                      border-radius: 8px;
+                                      font-weight: 600;
+                                      text-decoration: none;">
+                                Continue Shopping
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -441,6 +441,7 @@ public partial class EyewearStoreContext : DbContext
             entity.HasKey(e => e.OrderId);
 
             entity.HasIndex(e => e.UserId).HasDatabaseName("IX_orders_user");
+            entity.HasIndex(e => e.StripeSessionId).HasDatabaseName("IX_orders_stripe_session");
 
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
@@ -456,6 +457,12 @@ public partial class EyewearStoreContext : DbContext
             entity.Property(e => e.PaymentMethod)
                 .HasMaxLength(50)
                 .HasColumnName("payment_method");
+            entity.Property(e => e.StripeSessionId)
+                .HasMaxLength(255)
+                .HasColumnName("stripe_session_id");
+            entity.Property(e => e.StripePaymentIntentId)
+                .HasMaxLength(255)
+                .HasColumnName("stripe_payment_intent_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("SYSDATETIME()")
                 .HasColumnName("created_at");

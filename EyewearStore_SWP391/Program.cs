@@ -44,6 +44,11 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ILensService, LensService>();
 builder.Services.AddScoped<IFrameService, FrameService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IStripeService, StripeService>();
+
+// Configure Stripe
+Stripe.StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 // Authentication (cookie) - secure defaults and RememberMe handling
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -56,7 +61,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         // Cookie settings
         options.Cookie.Name = "LensadeAuth";
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // đổi thành Always khi deploy HTTPS
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // change to Always when deploying with HTTPS
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
         options.SlidingExpiration = true;

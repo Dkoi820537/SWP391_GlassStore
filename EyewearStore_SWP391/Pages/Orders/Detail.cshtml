@@ -1,0 +1,156 @@
+@page
+@model EyewearStore_SWP391.Pages.Orders.DetailModel
+@{
+    ViewData["Title"] = $"Order #{Model.Order?.OrderId}";
+}
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-page="/Orders/Index">My Orders</a></li>
+            <li class="breadcrumb-item active">Order #@Model.Order?.OrderId</li>
+        </ol>
+    </nav>
+
+    @if (Model.Order == null)
+    {
+        <div class="alert alert-danger">Order not found.</div>
+    }
+    else
+    {
+        var statusColor = Model.Order.Status switch
+        {
+            "Paid" => "#10b981",
+            "Pending" => "#f59e0b",
+            "Processing" => "#3b82f6",
+            "Shipped" => "#8b5cf6",
+            "Completed" => "#059669",
+            "Cancelled" => "#ef4444",
+            _ => "#6b7280"
+        };
+
+        <div class="row g-4">
+            <!-- Left: Order Info -->
+            <div class="col-lg-8">
+                <!-- Order Header -->
+                <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, var(--primary-navy), var(--primary-navy-light)); padding: 1.5rem;">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <h2 style="color: white; margin: 0; font-family: var(--font-secondary);">
+                                    Order #@Model.Order.OrderId
+                                </h2>
+                                <small style="color: rgba(255,255,255,0.7);">
+                                    Placed on @Model.Order.CreatedAt.ToString("MMMM dd, yyyy 'at' HH:mm")
+                                </small>
+                            </div>
+                            <span class="badge" style="background: @statusColor; color: white; padding: 0.5rem 1rem; font-size: 1rem; border-radius: 8px;">
+                                @Model.Order.Status
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden;">
+                    <div style="padding: 1.25rem 1.5rem; background: var(--light-gray); border-bottom: 1px solid var(--medium-gray);">
+                        <h5 style="color: var(--primary-navy); margin: 0; font-weight: 600;">
+                            📦 Items (@Model.Order.OrderItems.Count)
+                        </h5>
+                    </div>
+                    @foreach (var oi in Model.Order.OrderItems)
+                    {
+                        <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--medium-gray);">
+                            <div class="row align-items-center g-3">
+                                <div class="col-auto">
+                                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--light-gray), var(--secondary-cream)); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--medium-gray);">
+                                        <span style="font-size: 1.25rem;">
+                                            @(oi.Product?.ProductType switch { "frame" => "👓", "lens" => "🔍", _ => "📦" })
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <h6 style="color: var(--primary-navy); margin-bottom: 0.25rem; font-weight: 600;">
+                                        @(oi.Product?.Name ?? "Product")
+                                    </h6>
+                                    @if (oi.Product != null)
+                                    {
+                                        <span class="badge" style="background: var(--primary-gold); color: white; padding: 0.2rem 0.5rem; font-size: 0.7rem; border-radius: 4px;">
+                                            @oi.Product.ProductType
+                                        </span>
+                                    }
+                                </div>
+                                <div class="col-auto text-end">
+                                    <div style="font-size: 0.85rem; color: var(--secondary-warm-gray);">
+                                        @oi.UnitPrice.ToString("N0") VND × @oi.Quantity
+                                    </div>
+                                    <div style="font-weight: 700; color: var(--primary-navy); font-size: 1.1rem;">
+                                        @((oi.UnitPrice * oi.Quantity).ToString("N0")) VND
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Right: Summary -->
+            <div class="col-lg-4">
+                <!-- Payment Summary -->
+                <div class="card mb-3" style="border: none; border-radius: 12px; box-shadow: var(--shadow-lg);">
+                    <div style="padding: 1.5rem;">
+                        <h5 style="color: var(--primary-navy); font-weight: 600; margin-bottom: 1rem;">Payment Summary</h5>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--medium-gray);">
+                            <span style="color: var(--dark-gray);">Method</span>
+                            <span style="font-weight: 600; color: var(--primary-navy);">@(Model.Order.PaymentMethod ?? "—")</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--medium-gray);">
+                            <span style="color: var(--dark-gray);">Items</span>
+                            <span style="font-weight: 600; color: var(--primary-navy);">@Model.Order.OrderItems.Count</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--medium-gray);">
+                            <span style="color: var(--dark-gray);">Shipping</span>
+                            <span style="font-weight: 600; color: var(--success);">FREE</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 1rem 0;">
+                            <span style="font-weight: 700; color: var(--primary-navy); font-size: 1.15rem;">Total</span>
+                            <span style="font-weight: 700; color: var(--primary-gold); font-size: 1.35rem; font-family: var(--font-secondary);">
+                                @Model.Order.TotalAmount.ToString("N0") VND
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping Address -->
+                @if (Model.Order.Address != null)
+                {
+                    <div class="card mb-3" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
+                        <div style="padding: 1.5rem;">
+                            <h5 style="color: var(--primary-navy); font-weight: 600; margin-bottom: 1rem;">📍 Shipping Address</h5>
+                            <div style="color: var(--dark-gray); line-height: 1.7;">
+                                <strong>@Model.Order.Address.ReceiverName</strong><br />
+                                📞 @Model.Order.Address.Phone<br />
+                                📍 @Model.Order.Address.AddressLine
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Back Link -->
+                <div class="text-center mt-3">
+                    <a asp-page="/Orders/Index" style="color: var(--primary-gold); text-decoration: none; font-weight: 600;">
+                        ← Back to Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .breadcrumb { background: transparent; padding: 0; margin-bottom: 1rem; }
+    .breadcrumb-item + .breadcrumb-item::before { content: "›"; color: var(--secondary-warm-gray); }
+    .breadcrumb-item a { color: var(--primary-gold); text-decoration: none; }
+    .breadcrumb-item.active { color: var(--dark-gray); }
+</style>

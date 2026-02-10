@@ -51,7 +51,7 @@ namespace EyewearStore_SWP391.Pages.Account
             var exists = _context.Users.FirstOrDefault(u => u.Email == Input.Email);
             if (exists != null)
             {
-                ModelState.AddModelError("", "Email đã tồn tại");
+                ModelState.AddModelError("", "Email already exists");
                 return Page();
             }
 
@@ -68,7 +68,7 @@ namespace EyewearStore_SWP391.Pages.Account
             user.PasswordHash = _passwordHasher.HashPassword(user, Input.Password);
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = "Đăng ký thành công. Vui lòng đăng nhập bằng email và mật khẩu vừa tạo.";
+            TempData["SuccessMessage"] = "Registration successful. Please log in with the email and password you just created.";
 
             return RedirectToPage("/Account/Login");
         }

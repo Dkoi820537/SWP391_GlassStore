@@ -27,7 +27,7 @@ namespace EyewearStore_SWP391.Pages.Cart
             try
             {
                 await _cartService.UpdateQuantityAsync(cartItemId, quantity);
-                TempData["SuccessMessage"] = "Cập nhật thành công";
+                TempData["SuccessMessage"] = "Cart updated successfully";
             }
             catch (Exception ex)
             {
@@ -39,7 +39,7 @@ namespace EyewearStore_SWP391.Pages.Cart
         public async Task<IActionResult> OnPostRemoveAsync(int cartItemId)
         {
             await _cartService.RemoveItemAsync(cartItemId);
-            TempData["SuccessMessage"] = "Mục đã được xóa";
+            TempData["SuccessMessage"] = "Item removed from cart";
             return RedirectToPage();
         }
 
@@ -47,7 +47,7 @@ namespace EyewearStore_SWP391.Pages.Cart
         {
             var uid = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             await _cartService.ClearCartAsync(uid);
-            TempData["SuccessMessage"] = "Giỏ hàng đã được xoá toàn bộ";
+            TempData["SuccessMessage"] = "Cart has been cleared";
             return RedirectToPage();
         }
 
@@ -56,7 +56,7 @@ namespace EyewearStore_SWP391.Pages.Cart
             try
             {
                 await _cartService.UpdateItemPrescriptionAsync(cartItemId, tempPrescriptionJson);
-                TempData["SuccessMessage"] = "Cập nhật prescription thành công";
+                TempData["SuccessMessage"] = "Prescription updated successfully";
             }
             catch (Exception ex)
             {

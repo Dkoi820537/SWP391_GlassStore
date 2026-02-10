@@ -1,0 +1,254 @@
+@page
+@model EyewearStore_SWP391.Pages.Checkout.IndexModel
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-page="/Cart/Index">Cart</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+        </ol>
+    </nav>
+
+    <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
+        🛍️ Checkout
+    </h1>
+    <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin-bottom: 2rem;">
+        Review your order and complete payment
+    </p>
+
+    <!-- Alert Messages -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px; border-left: 4px solid var(--error);">
+            <strong>⚠</strong> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <form method="post" asp-page-handler="Checkout">
+        <div class="row g-4">
+            <!-- Left Column: Address & Items -->
+            <div class="col-lg-8">
+
+                <!-- Shipping Address Section -->
+                <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%); padding: 1.25rem 1.5rem;">
+                        <h4 style="color: white; margin: 0; font-size: 1.25rem;">📍 Shipping Address</h4>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        @if (Model.Addresses.Any())
+                        {
+                            <!-- Existing Addresses Dropdown -->
+                            <div class="mb-3">
+                                <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
+                                    Select a saved address
+                                </label>
+                                <select name="SelectedAddressId" class="form-select" id="addressSelect"
+                                        style="border: 2px solid var(--medium-gray); border-radius: 8px; padding: 0.75rem;"
+                                        onchange="toggleNewAddressForm()">
+                                    @foreach (var addr in Model.Addresses)
+                                    {
+                                        <option value="@addr.AddressId"
+                                                selected="@(addr.AddressId == Model.SelectedAddressId)">
+                                            @addr.ReceiverName — @addr.Phone — @addr.AddressLine
+                                            @if (addr.IsDefault) { <text> ⭐ Default</text> }
+                                        </option>
+                                    }
+                                    <option value="0">➕ Add a new address...</option>
+                                </select>
+                            </div>
+
+                            <!-- Inline New Address Form (hidden by default) -->
+                            <div id="newAddressForm" style="display: none;">
+                                <hr style="border-color: var(--medium-gray);" />
+                                <h6 style="color: var(--primary-navy); font-weight: 600; margin-bottom: 1rem;">
+                                    Add New Address
+                                </h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Receiver Name</label>
+                                        <input type="text" name="NewReceiverName" class="form-control"
+                                               placeholder="Full name" style="border-radius: 8px;" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone</label>
+                                        <input type="text" name="NewPhone" class="form-control"
+                                               placeholder="Phone number" style="border-radius: 8px;" />
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Address</label>
+                                        <textarea name="NewAddressLine" class="form-control" rows="2"
+                                                  placeholder="Street, district, city..." style="border-radius: 8px;"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- No saved addresses — show inline form by default -->
+                            <input type="hidden" name="SelectedAddressId" value="0" />
+                            <div class="alert alert-info" style="border-radius: 8px;">
+                                <strong>📝</strong> You don't have any saved addresses. Please add one below.
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label" style="font-weight: 600;">Receiver Name *</label>
+                                    <input type="text" name="NewReceiverName" class="form-control" required
+                                           placeholder="Full name" style="border-radius: 8px;" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" style="font-weight: 600;">Phone *</label>
+                                    <input type="text" name="NewPhone" class="form-control" required
+                                           placeholder="Phone number" style="border-radius: 8px;" />
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" style="font-weight: 600;">Address *</label>
+                                    <textarea name="NewAddressLine" class="form-control" rows="2" required
+                                              placeholder="Street, district, city..." style="border-radius: 8px;"></textarea>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Order Items Section -->
+                <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden;">
+                    <div style="background: var(--light-gray); padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--medium-gray);">
+                        <h4 style="color: var(--primary-navy); margin: 0; font-size: 1.25rem;">
+                            📦 Order Items (@Model.Cart!.CartItems.Count)
+                        </h4>
+                    </div>
+
+                    @foreach (var it in Model.Cart.CartItems)
+                    {
+                        var unit = it.Product != null ? it.Product.Price : it.Service != null ? it.Service.Price : 0m;
+                        if (it.Service != null) unit += it.Service.Price;
+                        var productName = it.Product?.Name ?? it.Service?.Name ?? "Product";
+                        var productType = it.Product?.ProductType ?? "Service";
+
+                        <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--medium-gray);">
+                            <div class="row align-items-center g-3">
+                                <div class="col-auto">
+                                    <div style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--light-gray), var(--secondary-cream)); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--medium-gray);">
+                                        @if (productType == "frame" || productType == "bundle")
+                                        {
+                                            <span style="font-size: 1.5rem;">👓</span>
+                                        }
+                                        else if (productType == "lens")
+                                        {
+                                            <span style="font-size: 1.5rem;">🔍</span>
+                                        }
+                                        else
+                                        {
+                                            <span style="font-size: 1.5rem;">📦</span>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <h6 style="color: var(--primary-navy); margin-bottom: 0.25rem; font-weight: 600;">@productName</h6>
+                                    <span class="badge" style="background: var(--primary-gold); color: white; padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: 4px;">@productType</span>
+                                    @if (it.Service != null)
+                                    {
+                                        <span class="badge" style="background: var(--secondary-teal); color: white; padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: 4px;">+ @it.Service.Name</span>
+                                    }
+                                </div>
+                                <div class="col-auto text-end">
+                                    <div style="font-size: 0.85rem; color: var(--secondary-warm-gray);">@(unit.ToString("N0")) VND × @it.Quantity</div>
+                                    <div style="font-size: 1.15rem; font-weight: 700; color: var(--primary-navy);">@((unit * it.Quantity).ToString("N0")) VND</div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Right Column: Order Summary -->
+            <div class="col-lg-4">
+                <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-lg); position: sticky; top: 100px;">
+                    <div style="background: linear-gradient(135deg, var(--primary-navy), var(--primary-navy-light)); padding: 1.5rem; border-radius: 12px 12px 0 0;">
+                        <h4 style="color: white; margin: 0; font-family: var(--font-secondary); font-size: 1.5rem;">
+                            Order Summary
+                        </h4>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--medium-gray);">
+                            <span style="color: var(--dark-gray);">Items</span>
+                            <span style="color: var(--primary-navy); font-weight: 600;">@Model.Cart.CartItems.Count</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--medium-gray);">
+                            <span style="color: var(--dark-gray);">Subtotal</span>
+                            <span style="color: var(--primary-navy); font-weight: 600;">@Model.Total.ToString("N0") VND</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 2px solid var(--medium-gray);">
+                            <span style="color: var(--dark-gray);">Shipping</span>
+                            <span style="color: var(--success); font-weight: 600;">FREE 🎉</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 1.25rem 0;">
+                            <span style="color: var(--primary-navy); font-weight: 700; font-size: 1.25rem;">Total</span>
+                            <span style="color: var(--primary-gold); font-weight: 700; font-size: 1.5rem; font-family: var(--font-secondary);">
+                                @Model.Total.ToString("N0") VND
+                            </span>
+                        </div>
+
+                        <!-- Pay Button -->
+                        <button type="submit"
+                                class="btn btn-primary w-100"
+                                id="checkoutBtn"
+                                style="padding: 1rem;
+                                       font-size: 1.1rem;
+                                       font-weight: 600;
+                                       border-radius: 8px;
+                                       background: linear-gradient(135deg, #635bff 0%, #7c3aed 100%);
+                                       border: none;
+                                       letter-spacing: 0.5px;
+                                       margin-bottom: 1rem;
+                                       transition: all 0.3s ease;">
+                            💳 Pay with Stripe
+                        </button>
+
+                        <!-- Security Info -->
+                        <div style="text-align: center; padding: 1rem; background: var(--light-gray); border-radius: 8px;">
+                            <div style="margin-bottom: 0.5rem;">🔒</div>
+                            <small style="color: var(--secondary-warm-gray); font-weight: 500;">
+                                Secure payment powered by Stripe
+                            </small><br />
+                            <small style="color: var(--secondary-warm-gray);">
+                                Your payment information is encrypted and secure
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Back to Cart Link -->
+                <div class="mt-3 text-center">
+                    <a asp-page="/Cart/Index" style="color: var(--primary-gold); text-decoration: none; font-weight: 600;">
+                        ← Back to Cart
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+    .breadcrumb { background: transparent; padding: 0; margin-bottom: 1rem; }
+    .breadcrumb-item + .breadcrumb-item::before { content: "›"; color: var(--secondary-warm-gray); }
+    .breadcrumb-item a { color: var(--primary-gold); text-decoration: none; }
+    .breadcrumb-item.active { color: var(--dark-gray); }
+    #checkoutBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 91, 255, 0.35); }
+</style>
+
+<script>
+    function toggleNewAddressForm() {
+        var select = document.getElementById('addressSelect');
+        var form = document.getElementById('newAddressForm');
+        if (select && form) {
+            form.style.display = select.value === '0' ? 'block' : 'none';
+        }
+    }
+</script>

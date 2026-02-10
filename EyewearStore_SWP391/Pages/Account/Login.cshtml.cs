@@ -52,24 +52,24 @@ namespace EyewearStore_SWP391.Pages.Account
             var user = _context.Users.FirstOrDefault(u => u.Email == Input.Email);
             if (user == null)
             {
-                ModelState.AddModelError("", "Email hoặc mật khẩu không đúng");
+                ModelState.AddModelError("", "Invalid email or password");
                 return Page();
             }
 
             if (!user.IsActive)
             {
-                ModelState.AddModelError("", "Tài khoản không được phép đăng nhập");
+                ModelState.AddModelError("", "This account is not allowed to log in");
                 return Page();
             }
 
             var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, Input.Password);
             if (result == PasswordVerificationResult.Failed)
             {
-                ModelState.AddModelError("", "Email hoặc mật khẩu không đúng");
+                ModelState.AddModelError("", "Invalid email or password");
                 return Page();
             }
 
-            // tạo claims (lấy role từ user.Role)
+            // create claims (get role from user.Role)
             var role = (user.Role ?? "customer").Trim();
             var claims = new List<Claim>
             {
@@ -94,7 +94,7 @@ namespace EyewearStore_SWP391.Pages.Account
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
 
-            // redirect theo role (lowercase compare)
+            // redirect by role (lowercase compare)
             var r = role.ToLowerInvariant();
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             {

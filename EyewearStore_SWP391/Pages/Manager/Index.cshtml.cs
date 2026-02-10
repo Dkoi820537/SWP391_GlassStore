@@ -1,32 +1,35 @@
+using EyewearStore_SWP391.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using EyewearStore_SWP391.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
 using System;
-
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 namespace EyewearStore_SWP391.Pages.Manager
 {
-    /// <summary>
-    /// Manager Dashboard - Overview of business operations
-    /// Role: Manager can view analytics, manage policies, staff, and products
-    /// </summary>
     [Authorize(Roles = "manager,admin,Administrator")]
     public class IndexModel : PageModel
     {
         private readonly EyewearStoreContext _context;
-
-        public IndexModel(EyewearStoreContext context)
-        {
-            _context = context;
-        }
+        public IndexModel(EyewearStoreContext context) { _context = context; }
 
         public DashboardStats Stats { get; set; } = new();
         public List<RecentOrderDto> RecentOrders { get; set; } = new();
         public List<TopProductDto> TopProducts { get; set; } = new();
         public ChartDataDto ChartData { get; set; } = new();
+
+        // Recent orders paging
+        [BindProperty(SupportsGet = true)]
+        public int RecentPageNumber { get; set; } = 1;
+        [BindProperty(SupportsGet = true)]
+        public int RecentPageSize { get; set; } = 10;
+
+        public int RecentTotalOrders { get; set; }
+        public int RecentTotalPages { get; set; }
+        public List<int> RecentDisplayPageNumbers { get; set; } = new();
+        private const int RecentPageWindow = 7;
 
         public class DashboardStats
         {
@@ -65,9 +68,9 @@ namespace EyewearStore_SWP391.Pages.Manager
         public async Task OnGetAsync()
         {
             await LoadDashboardStatsAsync();
-            await LoadRecentOrdersAsync();
             await LoadTopProductsAsync();
             await LoadRevenueChartDataAsync();
+            await LoadRecentOrdersAsync(); // paging-aware
         }
 
         private async Task LoadDashboardStatsAsync()
@@ -77,71 +80,32 @@ namespace EyewearStore_SWP391.Pages.Manager
             var firstDayOfLastMonth = firstDayOfMonth.AddMonths(-1);
             var lastDayOfLastMonth = firstDayOfMonth.AddDays(-1);
 
-            // Total Revenue (This Month)
             Stats.TotalRevenue = await _context.Orders
-                .Where(o => o.CreatedAt >= firstDayOfMonth)
-                .Where(o => o.Status != "Cancelled")
+                .Where(o => o.CreatedAt >= firstDayOfMonth && o.Status != "Cancelled")
                 .SumAsync(o => o.TotalAmount);
 
-            // Total Orders (This Month)
             Stats.TotalOrders = await _context.Orders
                 .Where(o => o.CreatedAt >= firstDayOfMonth)
                 .CountAsync();
 
-            // Last Month Orders (for growth calculation)
             var lastMonthOrders = await _context.Orders
                 .Where(o => o.CreatedAt >= firstDayOfLastMonth && o.CreatedAt <= lastDayOfLastMonth)
                 .CountAsync();
 
-            // Calculate growth percentage
             if (lastMonthOrders > 0)
-            {
                 Stats.OrderGrowth = Math.Round(((decimal)(Stats.TotalOrders - lastMonthOrders) / lastMonthOrders) * 100, 1);
-            }
+            else
+                Stats.OrderGrowth = lastMonthOrders == 0 && Stats.TotalOrders > 0 ? 100 : 0;
 
-            // Active Products
-            Stats.ActiveProducts = await _context.Products
-                .CountAsync(p => p.IsActive);
-
-            // Low Stock Count (InventoryQty < 10)
-            Stats.LowStockCount = await _context.Products
-                .Where(p => p.IsActive && p.InventoryQty < 10)
-                .CountAsync();
-
-            // Total Staff
-            Stats.TotalStaff = await _context.Users
-                .Where(u => u.Role != "customer" && u.IsActive)
-                .CountAsync();
-
-            // Active Staff (logged in today - simplified)
-            Stats.ActiveStaff = Stats.TotalStaff; // TODO: Track last login time
-
-            // Pending Returns
-            Stats.PendingReturns = await _context.Returns
-                .Where(r => r.Status == "Pending" || r.Status == "Under Review")
-                .CountAsync();
-        }
-
-        private async Task LoadRecentOrdersAsync()
-        {
-            RecentOrders = await _context.Orders
-                .Include(o => o.User)
-                .OrderByDescending(o => o.CreatedAt)
-                .Take(10)
-                .Select(o => new RecentOrderDto
-                {
-                    OrderId = o.OrderId,
-                    CustomerName = o.User.FullName ?? o.User.Email ?? "Unknown",
-                    CreatedAt = o.CreatedAt,
-                    Status = o.Status,
-                    TotalAmount = o.TotalAmount
-                })
-                .ToListAsync();
+            Stats.ActiveProducts = await _context.Products.CountAsync(p => p.IsActive);
+            Stats.LowStockCount = await _context.Products.Where(p => p.IsActive && p.InventoryQty < 10).CountAsync();
+            Stats.TotalStaff = await _context.Users.Where(u => u.Role != "customer" && u.IsActive).CountAsync();
+            Stats.ActiveStaff = Stats.TotalStaff; // placeholder: adjust later with last-login tracking
+            Stats.PendingReturns = await _context.Returns.Where(r => r.Status == "Pending" || r.Status == "Under Review").CountAsync();
         }
 
         private async Task LoadTopProductsAsync()
         {
-            // Get top 5 products by revenue (from OrderItems)
             TopProducts = await _context.OrderItems
                 .Include(oi => oi.Product)
                 .Include(oi => oi.Order)
@@ -160,30 +124,74 @@ namespace EyewearStore_SWP391.Pages.Manager
 
         private async Task LoadRevenueChartDataAsync()
         {
-            // Last 7 days revenue
             var today = DateTime.UtcNow.Date;
             var sevenDaysAgo = today.AddDays(-6);
-
             var dailyRevenue = await _context.Orders
                 .Where(o => o.CreatedAt >= sevenDaysAgo && o.Status != "Cancelled")
                 .GroupBy(o => o.CreatedAt.Date)
-                .Select(g => new
-                {
-                    Date = g.Key,
-                    Revenue = g.Sum(o => o.TotalAmount)
-                })
+                .Select(g => new { Date = g.Key, Revenue = g.Sum(o => o.TotalAmount) })
                 .OrderBy(x => x.Date)
                 .ToListAsync();
 
-            // Fill in missing dates with 0 revenue
             for (int i = 0; i < 7; i++)
             {
                 var date = sevenDaysAgo.AddDays(i);
                 var dayData = dailyRevenue.FirstOrDefault(d => d.Date == date);
-
                 ChartData.Labels.Add(date.ToString("MMM dd"));
                 ChartData.Values.Add(dayData?.Revenue ?? 0);
             }
+        }
+
+        private async Task LoadRecentOrdersAsync()
+        {
+            // Recent = all orders ordered by CreatedAt desc, paginated.
+            var baseQuery = _context.Orders
+                .Include(o => o.User)
+                .AsNoTracking()
+                .OrderByDescending(o => o.CreatedAt)
+                .AsQueryable();
+
+            RecentTotalOrders = await baseQuery.CountAsync();
+
+            if (RecentPageSize <= 0) RecentPageSize = 10;
+            if (RecentPageSize > 50) RecentPageSize = 50;
+
+            RecentTotalPages = (int)Math.Ceiling(RecentTotalOrders / (double)RecentPageSize);
+            if (RecentTotalPages < 1) RecentTotalPages = 1;
+            if (RecentPageNumber < 1) RecentPageNumber = 1;
+            if (RecentPageNumber > RecentTotalPages) RecentPageNumber = RecentTotalPages;
+
+            var items = await baseQuery
+                .Skip((RecentPageNumber - 1) * RecentPageSize)
+                .Take(RecentPageSize)
+                .Select(o => new RecentOrderDto
+                {
+                    OrderId = o.OrderId,
+                    CustomerName = o.User.FullName ?? o.User.Email ?? "Unknown",
+                    CreatedAt = o.CreatedAt,
+                    Status = o.Status,
+                    TotalAmount = o.TotalAmount
+                })
+                .ToListAsync();
+
+            RecentOrders = items;
+            BuildRecentDisplayPageNumbers();
+        }
+
+        private void BuildRecentDisplayPageNumbers()
+        {
+            RecentDisplayPageNumbers.Clear();
+            if (RecentTotalPages <= RecentPageWindow)
+            {
+                for (int i = 1; i <= RecentTotalPages; i++) RecentDisplayPageNumbers.Add(i);
+                return;
+            }
+
+            int left = Math.Max(1, RecentPageNumber - RecentPageWindow / 2);
+            int right = Math.Min(RecentTotalPages, left + RecentPageWindow - 1);
+            if (right - left + 1 < RecentPageWindow) left = Math.Max(1, right - RecentPageWindow + 1);
+
+            for (int i = left; i <= right; i++) RecentDisplayPageNumbers.Add(i);
         }
     }
 }

@@ -8,7 +8,8 @@ namespace EyewearStore_SWP391.Pages.Lenses;
 
 /// <summary>
 /// Page model for viewing lens product details.
-/// Displays comprehensive information about a single lens.
+/// Displays complete information about a single lens.
+/// Mirrors the Frames/Details architecture.
 /// </summary>
 public class DetailsModel : PageModel
 {
@@ -20,19 +21,14 @@ public class DetailsModel : PageModel
     }
 
     /// <summary>
-    /// The lens view model to display
+    /// The lens view model containing all lens data
     /// </summary>
     public LensViewModel Lens { get; set; } = new();
 
     /// <summary>
-    /// List of product images
+    /// Handles GET request - loads lens details from database
     /// </summary>
-    public List<ProductImage> ProductImages { get; set; } = new();
-
-    /// <summary>
-    /// Handles GET request - loads lens details
-    /// </summary>
-    /// <param name="id">The product ID of the lens to view</param>
+    /// <param name="id">The product ID of the lens to display</param>
     /// <returns>The page or NotFound result</returns>
     public async Task<IActionResult> OnGetAsync(int? id)
     {
@@ -42,8 +38,9 @@ public class DetailsModel : PageModel
             return NotFound();
         }
 
-        // Query lens from database with images
+        // Query lens from database by ProductId, including images
         var lens = await _context.Lenses
+            .Include(l => l.ProductImages)
             .AsNoTracking()
             .FirstOrDefaultAsync(l => l.ProductId == id);
 
@@ -52,17 +49,6 @@ public class DetailsModel : PageModel
         {
             return NotFound();
         }
-
-        // Get product images
-        ProductImages = await _context.ProductImages
-            .Where(pi => pi.ProductId == id && pi.IsActive)
-            .OrderByDescending(pi => pi.IsPrimary)
-            .ThenBy(pi => pi.SortOrder)
-            .ToListAsync();
-
-        // Get primary image URL
-        var primaryImageUrl = ProductImages.FirstOrDefault(pi => pi.IsPrimary)?.ImageUrl
-            ?? ProductImages.FirstOrDefault()?.ImageUrl;
 
         // Map lens entity to LensViewModel
         Lens = new LensViewModel
@@ -83,9 +69,10 @@ public class DetailsModel : PageModel
             LensType = lens.LensType,
             LensIndex = lens.LensIndex,
             IsPrescription = lens.IsPrescription,
-            // Images
-            PrimaryImageUrl = primaryImageUrl,
-            ImageUrls = ProductImages.Select(pi => pi.ImageUrl).ToList()
+            // Image properties (only active images)
+            PrimaryImageUrl = lens.ProductImages?.FirstOrDefault(i => i.IsPrimary && i.IsActive)?.ImageUrl
+                ?? lens.ProductImages?.FirstOrDefault(i => i.IsActive)?.ImageUrl,
+            ImageUrls = lens.ProductImages?.Where(i => i.IsActive).OrderByDescending(i => i.IsPrimary).ThenBy(i => i.SortOrder).Select(i => i.ImageUrl).ToList() ?? new List<string>()
         };
 
         return Page();

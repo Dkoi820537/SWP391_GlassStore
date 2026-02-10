@@ -1,178 +1,31 @@
-@page
+@page "{id:int}"
 @model EyewearStore_SWP391.Pages.Lenses.DetailsModel
 @{
-    ViewData["Title"] = "Lens Details";
+    ViewData["Title"] = $"Lens Details - {Model.Lens.Name}";
     Layout = "_Layout";
 }
 
 <style>
     .details-container {
-        max-width: 900px;
+        max-width: 1200px;
         margin: 0 auto;
         padding: 2rem;
     }
 
     .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
     }
 
     .page-header h1 {
         font-size: 2rem;
         font-weight: 700;
         color: #1a1a2e;
-        margin: 0 0 0.5rem 0;
-    }
-
-    .breadcrumb {
-        display: flex;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-        font-size: 0.9rem;
-    }
-
-    .breadcrumb a {
-        color: #667eea;
-        text-decoration: none;
-    }
-
-    .breadcrumb a:hover {
-        text-decoration: underline;
-    }
-
-    .breadcrumb .separator {
-        color: #adb5bd;
-    }
-
-    .breadcrumb .current {
-        color: #6c757d;
-    }
-
-    .detail-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        overflow: hidden;
-        margin-bottom: 2rem;
-    }
-
-    .detail-section {
-        padding: 2rem;
-        border-bottom: 1px solid #f0f0f5;
-    }
-
-    .detail-section:last-child {
-        border-bottom: none;
-    }
-
-    .section-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #1a1a2e;
-        margin: 0 0 1.5rem 0;
-        padding-bottom: 0.75rem;
-        border-bottom: 2px solid #667eea;
-        display: inline-block;
-    }
-
-    .detail-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-    }
-
-    .detail-item {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .detail-label {
-        font-weight: 600;
-        font-size: 0.875rem;
-        color: #6c757d;
-    }
-
-    .detail-value {
-        font-size: 1rem;
-        color: #1a1a2e;
-    }
-
-    .detail-value.empty {
-        color: #adb5bd;
-        font-style: italic;
-    }
-
-    .sku-badge {
-        font-family: 'Courier New', monospace;
-        background: #e8eaff;
-        color: #667eea;
-        padding: 0.35rem 0.75rem;
-        border-radius: 6px;
-        font-size: 0.95rem;
-        font-weight: 600;
-        display: inline-block;
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 0.35rem 0.85rem;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-
-    .status-active {
-        background: #d4edda;
-        color: #155724;
-    }
-
-    .status-inactive {
-        background: #f8d7da;
-        color: #721c24;
-    }
-
-    .prescription-badge {
-        display: inline-block;
-        padding: 0.35rem 0.85rem;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-
-    .prescription-yes {
-        background: #d1ecf1;
-        color: #0c5460;
-    }
-
-    .prescription-no {
-        background: #f0f0f5;
-        color: #6c757d;
-    }
-
-    .product-image {
-        max-width: 100%;
-        height: auto;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .no-image {
-        background: #f0f0f5;
-        border-radius: 8px;
-        padding: 3rem;
-        text-align: center;
-        color: #adb5bd;
-    }
-
-    .no-image-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 1rem;
-        justify-content: flex-end;
+        margin: 0;
     }
 
     .btn {
@@ -199,24 +52,6 @@
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
 
-    .btn-warning {
-        background: #ffc107;
-        color: #212529;
-    }
-
-    .btn-warning:hover {
-        background: #e0a800;
-    }
-
-    .btn-danger {
-        background: #dc3545;
-        color: white;
-    }
-
-    .btn-danger:hover {
-        background: #c82333;
-    }
-
     .btn-secondary {
         background: #f0f0f5;
         color: #4a4a68;
@@ -226,164 +61,376 @@
         background: #e0e0e8;
     }
 
+    .btn-warning {
+        background: #ffc107;
+        color: #212529;
+    }
+
+    .btn-warning:hover {
+        background: #e0a800;
+    }
+
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 2rem;
+    }
+
+    /* Image Section */
+    .image-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .main-image {
+        width: 100%;
+        aspect-ratio: 1;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #f8f9fc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .main-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .no-image {
+        color: #6c757d;
+        font-size: 4rem;
+    }
+
+    .thumbnail-gallery {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .thumbnail {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: border-color 0.2s;
+    }
+
+    .thumbnail:hover,
+    .thumbnail.active {
+        border-color: #667eea;
+    }
+
+    .thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Details Section */
+    .details-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #f0f0f5;
+    }
+
+    .details-list {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .details-list dl {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 1rem 2rem;
+        margin: 0;
+    }
+
+    .details-list dt {
+        font-weight: 600;
+        color: #4a4a68;
+        font-size: 0.9rem;
+    }
+
+    .details-list dd {
+        margin: 0;
+        color: #1a1a2e;
+        font-size: 0.95rem;
+    }
+
+    .sku-badge {
+        font-family: 'Courier New', monospace;
+        background: #e8eaff;
+        color: #667eea;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .price-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #28a745;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.35rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-inactive {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .lens-type-badge {
+        display: inline-block;
+        padding: 0.3rem 0.8rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .prescription-badge {
+        display: inline-block;
+        padding: 0.3rem 0.8rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .prescription-yes {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .prescription-no {
+        background: #f0f0f5;
+        color: #6c757d;
+    }
+
+    .index-value {
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .na-text {
+        color: #6c757d;
+        font-style: italic;
+    }
+
+    .timestamp {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .description-text {
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+
+    .stock-value {
+        font-weight: 600;
+    }
+
+    .stock-in {
+        color: #28a745;
+    }
+
+    .stock-low {
+        color: #ffc107;
+    }
+
+    .stock-out {
+        color: #dc3545;
+    }
+
+    /* Actions */
+    .actions-section {
+        margin-top: 2rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    /* Responsive */
+    @@media (max-width: 992px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
     @@media (max-width: 768px) {
         .details-container {
             padding: 1rem;
         }
 
-        .detail-grid {
+        .details-list dl {
             grid-template-columns: 1fr;
+            gap: 0.5rem;
         }
 
-        .action-buttons {
-            flex-direction: column;
+        .details-list dt {
+            margin-top: 1rem;
         }
 
-        .btn {
-            width: 100%;
-            justify-content: center;
+        .details-list dt:first-child {
+            margin-top: 0;
         }
     }
 </style>
 
 <div class="details-container">
-    <!-- Breadcrumb -->
-    <nav class="breadcrumb" aria-label="breadcrumb">
-        <a href="/">Home</a>
-        <span class="separator">›</span>
-        <a asp-page="/Lenses/Index">Lenses</a>
-        <span class="separator">›</span>
-        <span class="current">Details</span>
-    </nav>
-
     <!-- Page Header -->
     <div class="page-header">
-        <h1>👓 Lens Details</h1>
+        <h1>👓 @Model.Lens.Name</h1>
+        <div style="display: flex; gap: 0.5rem;">
+            <a asp-page="/Lenses/Edit" asp-route-id="@Model.Lens.ProductId" class="btn btn-warning">
+                ✏️ Edit
+            </a>
+            <a asp-page="/Lenses/Index" class="btn btn-secondary">
+                ← Back to List
+            </a>
+        </div>
     </div>
 
-    <!-- Lens Details Card -->
-    <div class="detail-card">
-        <!-- Product Image Section -->
-        @if (!string.IsNullOrEmpty(Model.Lens.PrimaryImageUrl))
-        {
-            <div class="detail-section">
-                <img src="@Model.Lens.PrimaryImageUrl" 
-                     alt="@Model.Lens.Name" 
-                     class="product-image" />
-            </div>
-        }
-        else if (Model.ProductImages.Any())
-        {
-            <div class="detail-section">
-                <img src="@Model.ProductImages.First().ImageUrl" 
-                     alt="@Model.Lens.Name" 
-                     class="product-image" />
-            </div>
-        }
-        else
-        {
-            <div class="detail-section">
-                <div class="no-image">
-                    <div class="no-image-icon">📷</div>
-                    <p>No product image available</p>
-                </div>
-            </div>
-        }
-
-        <!-- Basic Information -->
-        <div class="detail-section">
-            <h2 class="section-title">Product Information</h2>
-            
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <span class="detail-label">SKU</span>
-                    <span class="detail-value">
-                        <span class="sku-badge">@Model.Lens.Sku</span>
-                    </span>
-                </div>
-
-                <div class="detail-item">
-                    <span class="detail-label">Status</span>
-                    <span class="detail-value">
-                        @if (Model.Lens.IsActive)
-                        {
-                            <span class="status-badge status-active">Active</span>
-                        }
-                        else
-                        {
-                            <span class="status-badge status-inactive">Inactive</span>
-                        }
-                    </span>
-                </div>
-
-                <div class="detail-item">
-                    <span class="detail-label">Product Name</span>
-                    <span class="detail-value">@Model.Lens.Name</span>
-                </div>
-
-                <div class="detail-item">
-                    <span class="detail-label">Product Type</span>
-                    <span class="detail-value">@Model.Lens.ProductType</span>
-                </div>
-
-                <div class="detail-item">
-                    <span class="detail-label">Price</span>
-                    <span class="detail-value">@Model.Lens.Price.ToString("N0") @Model.Lens.Currency</span>
-                </div>
-
-                <div class="detail-item">
-                    <span class="detail-label">Inventory Quantity</span>
-                    <span class="detail-value">
-                        @{
-                            var stock = Model.Lens.InventoryQty ?? 0;
-                            var stockClass = stock > 10 ? "text-success" : stock > 0 ? "text-warning" : "text-danger";
-                        }
-                        <span class="@stockClass">@stock units</span>
-                    </span>
-                </div>
+    <!-- Content Grid -->
+    <div class="content-grid">
+        <!-- Image Section -->
+        <div class="image-section">
+            <div class="main-image" id="mainImage">
+                @if (!string.IsNullOrEmpty(Model.Lens.PrimaryImageUrl))
+                {
+                    <img src="@Model.Lens.PrimaryImageUrl" alt="@Model.Lens.Name" id="mainImageElement" />
+                }
+                else
+                {
+                    <span class="no-image">👓</span>
+                }
             </div>
 
-            @if (!string.IsNullOrEmpty(Model.Lens.Description))
+            @if (Model.Lens.ImageUrls.Any())
             {
-                <div class="detail-item" style="margin-top: 1.5rem;">
-                    <span class="detail-label">Description</span>
-                    <span class="detail-value">@Model.Lens.Description</span>
+                <div class="thumbnail-gallery">
+                    @foreach (var imageUrl in Model.Lens.ImageUrls)
+                    {
+                        <div class="thumbnail @(imageUrl == Model.Lens.PrimaryImageUrl ? "active" : "")" 
+                             onclick="changeMainImage(this, '@imageUrl')">
+                            <img src="@imageUrl" alt="Lens thumbnail" />
+                        </div>
+                    }
                 </div>
             }
         </div>
 
-        <!-- Lens Details -->
-        <div class="detail-section">
-            <h2 class="section-title">Lens Details</h2>
-            
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <span class="detail-label">Lens Type</span>
-                    @if (!string.IsNullOrEmpty(Model.Lens.LensType))
-                    {
-                        <span class="detail-value">@Model.Lens.LensType</span>
-                    }
-                    else
-                    {
-                        <span class="detail-value empty">Not specified</span>
-                    }
-                </div>
+        <!-- Details Section -->
+        <div class="details-section">
+            <!-- Product Information -->
+            <h3 class="section-title">📦 Product Information</h3>
+            <div class="details-list">
+                <dl>
+                    <dt>SKU</dt>
+                    <dd><span class="sku-badge">@Model.Lens.Sku</span></dd>
 
-                <div class="detail-item">
-                    <span class="detail-label">Lens Index</span>
-                    @if (Model.Lens.LensIndex.HasValue)
-                    {
-                        <span class="detail-value">@Model.Lens.LensIndex.Value.ToString("F2")</span>
-                    }
-                    else
-                    {
-                        <span class="detail-value empty">Not specified</span>
-                    }
-                </div>
+                    <dt>Name</dt>
+                    <dd><strong>@Model.Lens.Name</strong></dd>
 
-                <div class="detail-item">
-                    <span class="detail-label">Prescription Required</span>
-                    <span class="detail-value">
+                    <dt>Description</dt>
+                    <dd>
+                        @if (!string.IsNullOrEmpty(Model.Lens.Description))
+                        {
+                            <span class="description-text">@Model.Lens.Description</span>
+                        }
+                        else
+                        {
+                            <span class="na-text">N/A</span>
+                        }
+                    </dd>
+
+                    <dt>Price</dt>
+                    <dd>
+                        <span class="price-value">@Model.Lens.Price.ToString("N0")</span>
+                        <span>@Model.Lens.Currency</span>
+                    </dd>
+
+                    <dt>Inventory</dt>
+                    <dd>
+                        @{
+                            var stockValue = Model.Lens.InventoryQty ?? 0;
+                            var stockClass = "stock-in";
+                            if (stockValue == 0)
+                            {
+                                stockClass = "stock-out";
+                            }
+                            else if (stockValue < 10)
+                            {
+                                stockClass = "stock-low";
+                            }
+                        }
+                        <span class="stock-value @stockClass">@stockValue units</span>
+                    </dd>
+                </dl>
+            </div>
+
+            <!-- Lens-Specific Properties -->
+            <h3 class="section-title" style="margin-top: 2rem;">🔬 Lens Specifications</h3>
+            <div class="details-list">
+                <dl>
+                    <dt>Lens Type</dt>
+                    <dd>
+                        @if (!string.IsNullOrEmpty(Model.Lens.LensType))
+                        {
+                            <span class="lens-type-badge">@Model.Lens.LensType</span>
+                        }
+                        else
+                        {
+                            <span class="na-text">N/A</span>
+                        }
+                    </dd>
+
+                    <dt>Lens Index</dt>
+                    <dd>
+                        @if (Model.Lens.LensIndex.HasValue)
+                        {
+                            <span class="index-value">@Model.Lens.LensIndex.Value.ToString("F2")</span>
+                        }
+                        else
+                        {
+                            <span class="na-text">N/A</span>
+                        }
+                    </dd>
+
+                    <dt>Prescription Required</dt>
+                    <dd>
                         @if (Model.Lens.IsPrescription)
                         {
                             <span class="prescription-badge prescription-yes">Required</span>
@@ -392,33 +439,70 @@
                         {
                             <span class="prescription-badge prescription-no">Not Required</span>
                         }
-                    </span>
-                </div>
+                    </dd>
+                </dl>
+            </div>
+
+            <!-- Status and Metadata -->
+            <h3 class="section-title" style="margin-top: 2rem;">📋 Status & Metadata</h3>
+            <div class="details-list">
+                <dl>
+                    <dt>Status</dt>
+                    <dd>
+                        @if (Model.Lens.IsActive)
+                        {
+                            <span class="status-badge status-active">Active</span>
+                        }
+                        else
+                        {
+                            <span class="status-badge status-inactive">Inactive</span>
+                        }
+                    </dd>
+
+                    <dt>Created</dt>
+                    <dd>
+                        <span class="timestamp">@Model.Lens.CreatedAt.ToString("MMMM dd, yyyy 'at' hh:mm tt")</span>
+                    </dd>
+
+                    <dt>Last Updated</dt>
+                    <dd>
+                        <span class="timestamp">@Model.Lens.UpdatedAt.ToString("MMMM dd, yyyy 'at' hh:mm tt")</span>
+                    </dd>
+                </dl>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="actions-section">
+                <a asp-page="/Lenses/Edit" asp-route-id="@Model.Lens.ProductId" class="btn btn-warning">
+                    ✏️ Edit Lens
+                </a>
+                <a asp-page="/Lenses/Index" class="btn btn-secondary">
+                    ← Back to List
+                </a>
             </div>
         </div>
-
-        <!-- Timestamps -->
-        <div class="detail-section">
-            <h2 class="section-title">Record Information</h2>
-            
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <span class="detail-label">Created At</span>
-                    <span class="detail-value">@Model.Lens.CreatedAt.ToString("MMM dd, yyyy hh:mm tt")</span>
-                </div>
-
-                <div class="detail-item">
-                    <span class="detail-label">Last Updated</span>
-                    <span class="detail-value">@Model.Lens.UpdatedAt.ToString("MMM dd, yyyy hh:mm tt")</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-        <a asp-page="/Lenses/Index" class="btn btn-secondary">Back to List</a>
-        <a asp-page="/Lenses/Edit" asp-route-id="@Model.Lens.ProductId" class="btn btn-warning">Edit</a>
-        <a asp-page="/Lenses/Delete" asp-route-id="@Model.Lens.ProductId" class="btn btn-danger">Delete</a>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function changeMainImage(thumbnail, imageUrl) {
+            // Update main image
+            var mainImageContainer = document.getElementById('mainImage');
+            var existingImg = document.getElementById('mainImageElement');
+            
+            if (existingImg) {
+                existingImg.src = imageUrl;
+            } else {
+                mainImageContainer.innerHTML = '<img src="' + imageUrl + '" alt="Lens image" id="mainImageElement" />';
+            }
+
+            // Update active thumbnail
+            var thumbnails = document.querySelectorAll('.thumbnail');
+            thumbnails.forEach(function(t) {
+                t.classList.remove('active');
+            });
+            thumbnail.classList.add('active');
+        }
+    </script>
+}

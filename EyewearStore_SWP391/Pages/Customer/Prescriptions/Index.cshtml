@@ -1,4 +1,5 @@
-﻿@page
+﻿
+@page
 @model EyewearStore_SWP391.Pages.Customer.Prescriptions.IndexModel
 @{
     ViewData["Title"] = "My Prescriptions";
@@ -14,18 +15,41 @@
     </nav>
 
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
+            <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.1rem; margin-bottom: 0.25rem;">
                 👓 My Prescription Profiles
             </h1>
-            <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin: 0;">
+            <p class="text-muted mb-0" style="font-size: 0.95rem;">
                 Manage your eyeglass prescription information
             </p>
         </div>
-        <a asp-page="./Create" class="btn btn-primary btn-lg">
-            <i class="bi bi-plus-circle me-2"></i>Add New Prescription
-        </a>
+
+        <div class="d-flex gap-2 align-items-center">
+            <form method="get" class="d-flex align-items-center" style="gap:0.5rem;">
+                <label class="small text-muted mb-0">Show</label>
+                <select name="pageSize" class="form-select form-select-sm" onchange="this.form.submit()" style="width:90px;">
+                    @* Avoid C# inside option attributes — use if/else to output selected option *@
+                    @foreach (var opt in Model.PageSizeOptions)
+                    {
+                        if (Model.PageSize == opt)
+                        {
+                            <option value="@opt" selected="selected">@opt</option>
+                        }
+                        else
+                        {
+                            <option value="@opt">@opt</option>
+                        }
+                    }
+                </select>
+
+                <input type="hidden" name="pageNumber" value="1" />
+            </form>
+
+            <a asp-page="./Create" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-circle me-2"></i>Add New Prescription
+            </a>
+        </div>
     </div>
 
     <!-- Alerts -->
@@ -36,8 +60,15 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
-    <!-- Prescription Cards -->
+    <!-- If no prescriptions -->
     @if (!Model.Prescriptions.Any())
     {
         <div class="card shadow-sm">
@@ -55,11 +86,12 @@
     }
     else
     {
+        <!-- Grid of prescriptions -->
         <div class="row g-4">
             @foreach (var prescription in Model.Prescriptions)
             {
-                <div class="col-md-6 col-lg-4">
-                    <div class="card shadow-sm" style="border: none; border-radius: 12px; @(prescription.IsActive ? "border-left: 4px solid #4caf50;" : "opacity: 0.7;")">
+                <div class="col-sm-12 col-md-6 col-lg-4">
+                    <div class="card shadow-sm" style="border: none; border-radius: 12px; @(prescription.IsActive ? "border-left: 4px solid #4caf50;" : "opacity: 0.85;")">
                         <div class="card-header" style="background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%); color: white; border-radius: 12px 12px 0 0;">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">
@@ -83,17 +115,17 @@
                                 <h6 style="color: var(--primary-navy); margin-bottom: 0.75rem;">
                                     <i class="bi bi-eye me-1"></i>Right Eye (OD)
                                 </h6>
-                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; padding: 0.75rem; background: var(--light-gray); border-radius: 8px;">
-                                    <div>
-                                        <small class="text-muted">SPH</small>
+                                <div class="d-grid gap-2" style="grid-template-columns: repeat(3, 1fr); display: grid;">
+                                    <div class="p-2" style="background: var(--light-gray); border-radius:6px; text-align:center;">
+                                        <small class="text-muted d-block">SPH</small>
                                         <div style="font-weight: 600;">@(prescription.RightSph?.ToString("0.00") ?? "—")</div>
                                     </div>
-                                    <div>
-                                        <small class="text-muted">CYL</small>
+                                    <div class="p-2" style="background: var(--light-gray); border-radius:6px; text-align:center;">
+                                        <small class="text-muted d-block">CYL</small>
                                         <div style="font-weight: 600;">@(prescription.RightCyl?.ToString("0.00") ?? "—")</div>
                                     </div>
-                                    <div>
-                                        <small class="text-muted">AXIS</small>
+                                    <div class="p-2" style="background: var(--light-gray); border-radius:6px; text-align:center;">
+                                        <small class="text-muted d-block">AXIS</small>
                                         <div style="font-weight: 600;">@(prescription.RightAxis?.ToString() ?? "—")</div>
                                     </div>
                                 </div>
@@ -104,17 +136,17 @@
                                 <h6 style="color: var(--primary-navy); margin-bottom: 0.75rem;">
                                     <i class="bi bi-eye me-1"></i>Left Eye (OS)
                                 </h6>
-                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; padding: 0.75rem; background: var(--light-gray); border-radius: 8px;">
-                                    <div>
-                                        <small class="text-muted">SPH</small>
+                                <div class="d-grid gap-2" style="grid-template-columns: repeat(3, 1fr); display: grid;">
+                                    <div class="p-2" style="background: var(--light-gray); border-radius:6px; text-align:center;">
+                                        <small class="text-muted d-block">SPH</small>
                                         <div style="font-weight: 600;">@(prescription.LeftSph?.ToString("0.00") ?? "—")</div>
                                     </div>
-                                    <div>
-                                        <small class="text-muted">CYL</small>
+                                    <div class="p-2" style="background: var(--light-gray); border-radius:6px; text-align:center;">
+                                        <small class="text-muted d-block">CYL</small>
                                         <div style="font-weight: 600;">@(prescription.LeftCyl?.ToString("0.00") ?? "—")</div>
                                     </div>
-                                    <div>
-                                        <small class="text-muted">AXIS</small>
+                                    <div class="p-2" style="background: var(--light-gray); border-radius:6px; text-align:center;">
+                                        <small class="text-muted d-block">AXIS</small>
                                         <div style="font-weight: 600;">@(prescription.LeftAxis?.ToString() ?? "—")</div>
                                     </div>
                                 </div>
@@ -141,6 +173,69 @@
                 </div>
             }
         </div>
+
+        <!-- Pagination / Footer -->
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <div class="text-muted small">
+                Showing
+                <strong>@(((Model.PageNumber - 1) * Model.PageSize) + 1)</strong>
+                -
+                <strong>@(Math.Min(Model.PageNumber * Model.PageSize, Model.TotalItems))</strong>
+                of <strong>@Model.TotalItems</strong> prescriptions
+            </div>
+
+            <nav aria-label="Page navigation">
+                <ul class="pagination mb-0">
+                    <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                        <a class="page-link" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize">Previous</a>
+                    </li>
+
+                    @{
+                        // show a compact window of pages (max 7 buttons)
+                        var maxButtons = 7;
+                        var start = Math.Max(1, Model.PageNumber - 3);
+                        var end = Math.Min(Model.TotalPages, start + maxButtons - 1);
+                        if (end - start + 1 < maxButtons)
+                        {
+                            start = Math.Max(1, end - maxButtons + 1);
+                        }
+                    }
+
+                    @if (start > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-route-pageNumber="1" asp-route-pageSize="@Model.PageSize">1</a>
+                        </li>
+                        @if (start > 2)
+                        {
+                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                        }
+                    }
+
+                    @for (int i = start; i <= end; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <a class="page-link" asp-route-pageNumber="@i" asp-route-pageSize="@Model.PageSize">@i</a>
+                        </li>
+                    }
+
+                    @if (end < Model.TotalPages)
+                    {
+                        if (end < Model.TotalPages - 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                        }
+                        <li class="page-item">
+                            <a class="page-link" asp-route-pageNumber="@Model.TotalPages" asp-route-pageSize="@Model.PageSize">@Model.TotalPages</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     }
 </div>
 
@@ -148,6 +243,8 @@
 <form id="deleteForm" method="post" asp-page-handler="Delete" style="display:none;">
     @Html.AntiForgeryToken()
     <input type="hidden" name="prescriptionId" id="deletePrescriptionId" />
+    <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
+    <input type="hidden" name="pageSize" value="@Model.PageSize" />
 </form>
 
 @section Scripts {

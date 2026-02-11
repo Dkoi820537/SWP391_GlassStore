@@ -1,0 +1,185 @@
+﻿@page
+@model EyewearStore_SWP391.Pages.Customer.Prescriptions.CreateModel
+@{
+    ViewData["Title"] = "Add Prescription";
+}
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-page="./Index">My Prescriptions</a></li>
+            <li class="breadcrumb-item active">Add New</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
+                <i class="bi bi-plus-circle me-2"></i>Add New Prescription
+            </h1>
+            <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin: 0;">
+                Enter your eyeglass prescription details
+            </p>
+        </div>
+        <a asp-page="./Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+    </div>
+
+    <!-- Validation Summary -->
+    @if (!ModelState.IsValid)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <h5><i class="bi bi-exclamation-triangle me-2"></i>Please fix the following errors:</h5>
+            <ul class="mb-0">
+                @foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <form method="post">
+        <div class="row g-4">
+            <!-- Form -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-header" style="background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%); color: white;">
+                        <h5 class="mb-0"><i class="bi bi-eyeglasses me-2"></i>Prescription Details</h5>
+                    </div>
+                    <div class="card-body" style="padding: 2rem;">
+                        <!-- Profile Name -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">
+                                Profile Name <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Input.ProfileName" class="form-control" placeholder="e.g., Reading Glasses, Distance Vision" required />
+                            <span asp-validation-for="Input.ProfileName" class="text-danger small"></span>
+                            <small class="text-muted">Give this prescription a memorable name</small>
+                        </div>
+
+                        <!-- Right Eye (OD) -->
+                        <div class="mb-4">
+                            <h5 style="color: var(--primary-navy); margin-bottom: 1rem;">
+                                <i class="bi bi-eye me-2"></i>Right Eye (OD)
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">SPH (Sphere)</label>
+                                    <input asp-for="Input.RightSph" type="number" step="0.25" class="form-control" placeholder="-20.00 to +20.00" />
+                                    <span asp-validation-for="Input.RightSph" class="text-danger small"></span>
+                                    <small class="text-muted">Range: -20.00 to +20.00</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">CYL (Cylinder)</label>
+                                    <input asp-for="Input.RightCyl" type="number" step="0.25" class="form-control" placeholder="-6.00 to +6.00" />
+                                    <span asp-validation-for="Input.RightCyl" class="text-danger small"></span>
+                                    <small class="text-muted">Range: -6.00 to +6.00</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">AXIS</label>
+                                    <input asp-for="Input.RightAxis" type="number" class="form-control" placeholder="0 to 180" />
+                                    <span asp-validation-for="Input.RightAxis" class="text-danger small"></span>
+                                    <small class="text-muted">Range: 0 to 180</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Left Eye (OS) -->
+                        <div class="mb-4">
+                            <h5 style="color: var(--primary-navy); margin-bottom: 1rem;">
+                                <i class="bi bi-eye me-2"></i>Left Eye (OS)
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">SPH (Sphere)</label>
+                                    <input asp-for="Input.LeftSph" type="number" step="0.25" class="form-control" placeholder="-20.00 to +20.00" />
+                                    <span asp-validation-for="Input.LeftSph" class="text-danger small"></span>
+                                    <small class="text-muted">Range: -20.00 to +20.00</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">CYL (Cylinder)</label>
+                                    <input asp-for="Input.LeftCyl" type="number" step="0.25" class="form-control" placeholder="-6.00 to +6.00" />
+                                    <span asp-validation-for="Input.LeftCyl" class="text-danger small"></span>
+                                    <small class="text-muted">Range: -6.00 to +6.00</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">AXIS</label>
+                                    <input asp-for="Input.LeftAxis" type="number" class="form-control" placeholder="0 to 180" />
+                                    <span asp-validation-for="Input.LeftAxis" class="text-danger small"></span>
+                                    <small class="text-muted">Range: 0 to 180</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active Status -->
+                        <div class="mb-0">
+                            <div class="form-check form-switch">
+                                <input asp-for="Input.IsActive" class="form-check-input" type="checkbox" id="activeSwitch" checked />
+                                <label class="form-check-label fw-semibold" for="activeSwitch">
+                                    <i class="bi bi-check-circle text-success me-1"></i>Active Prescription
+                                </label>
+                            </div>
+                            <small class="text-muted">Active prescriptions can be used when ordering eyewear</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body">
+                        <h6 style="color: var(--primary-navy); margin-bottom: 1rem;">
+                            <i class="bi bi-info-circle me-2"></i>Prescription Guide
+                        </h6>
+                        <div style="font-size: 0.9rem; color: var(--secondary-warm-gray);">
+                            <p><strong>SPH (Sphere):</strong> Measures nearsightedness (-) or farsightedness (+)</p>
+                            <p><strong>CYL (Cylinder):</strong> Measures astigmatism</p>
+                            <p><strong>AXIS:</strong> Direction of astigmatism correction</p>
+                            <hr />
+                            <p class="mb-0"><small class="text-muted">💡 You can find these values on your prescription from your eye doctor</small></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h6 style="color: var(--primary-navy); margin-bottom: 1rem;">
+                            <i class="bi bi-shield-check me-2"></i>Validation Rules (BR-S003)
+                        </h6>
+                        <ul style="font-size: 0.85rem; color: var(--secondary-warm-gray); margin: 0; padding-left: 1.2rem;">
+                            <li>SPH: -20.00 to +20.00</li>
+                            <li>CYL: -6.00 to +6.00</li>
+                            <li>AXIS: 0 to 180 degrees</li>
+                            <li>All values optional</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card shadow-sm mt-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-page="./Index" class="btn btn-secondary px-4">
+                        <i class="bi bi-x-circle me-1"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-check-circle me-1"></i>Save Prescription
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -374,29 +374,26 @@
             <!-- Users Card (Coming Soon) -->
             <div class="admin-card users">
                 <div class="admin-card-icon">
-                    <span class="card-badge">Coming Soon</span>
-                    <svg viewBox="0 0 24 24">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    <span class="card-badge">Users</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
                     </svg>
                 </div>
                 <div class="admin-card-body">
                     <h3 class="admin-card-title">User Management</h3>
                     <p class="admin-card-description">
-                        Manage customer accounts, admin users, and roles. View customer details 
+                        Manage customer accounts, admin users, and roles. View customer details
                         and handle account-related requests.
                     </p>
-                    <span class="admin-card-btn" style="opacity: 0.5; pointer-events: none;">
-                        Coming Soon
-                        <svg viewBox="0 0 24 24">
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                            <polyline points="12 5 19 12 12 19"/>
-                        </svg>
-                    </span>
+
+                    <a asp-page="/Admin/Users/Index" class="admin-card-btn">
+                        Manage Users
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+                    </a>
                 </div>
             </div>
+
         </div>
     </div>
 </div>

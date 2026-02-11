@@ -1,4 +1,177 @@
-﻿@page
+﻿@page "{id:int}"
 @model EyewearStore_SWP391.Pages.Admin.Users.EditModel
 @{
+    ViewData["Title"] = "Edit User";
+}
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-page="/Admin/Index">Admin</a></li>
+            <li class="breadcrumb-item"><a asp-page="./Index">Users</a></li>
+            <li class="breadcrumb-item active">Edit User</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
+                <i class="bi bi-pencil-square me-2"></i>Edit User
+            </h1>
+            <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin: 0;">
+                Update user information and permissions
+            </p>
+        </div>
+        <a asp-page="./Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back to Users
+        </a>
+    </div>
+
+    <!-- Alerts -->
+    @if (!ModelState.IsValid)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <h5><i class="bi bi-exclamation-triangle me-2"></i>Validation Errors:</h5>
+            <ul class="mb-0">
+                @foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <form method="post">
+        <div class="row g-4">
+            <!-- User Information -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>User Information</h5>
+                    </div>
+                    <div class="card-body" style="padding: 2rem;">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    Email <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                    <input asp-for="Input.Email" class="form-control" required />
+                                </div>
+                                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    Full Name <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                    <input asp-for="Input.FullName" class="form-control" required />
+                                </div>
+                                <span asp-validation-for="Input.FullName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Phone Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                    <input asp-for="Input.Phone" class="form-control" />
+                                </div>
+                                <span asp-validation-for="Input.Phone" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">New Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                    <input asp-for="Input.NewPassword" type="password" class="form-control" placeholder="Leave blank to keep current" />
+                                </div>
+                                <small class="text-muted">Leave blank to keep current password</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role & Status -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>Role & Status</h5>
+                    </div>
+                    <div class="card-body" style="padding: 1.5rem;">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                User Role <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="Input.Role" class="form-select" required>
+                                <option value="">-- Select Role --</option>
+                                <option value="customer">Customer</option>
+                                <option value="sale">Sale Staff</option>
+                                <option value="support">Support Staff</option>
+                                <option value="staff">Operations Staff</option>
+                                <option value="manager">Manager</option>
+                                <option value="admin">Administrator</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold">Account Status</label>
+                            <div class="form-check form-switch">
+                                <input asp-for="Input.IsActive" class="form-check-input" type="checkbox" id="activeSwitch" />
+                                <label class="form-check-label" for="activeSwitch">
+                                    <i class="bi bi-check-circle text-success me-1"></i>Active
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Info -->
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h6 style="color: var(--primary-navy); margin-bottom: 1rem;">
+                            <i class="bi bi-info-circle me-1"></i>User Details
+                        </h6>
+                        <div style="font-size: 0.9rem;">
+                            <p style="margin-bottom: 0.5rem;">
+                                <strong>User ID:</strong> #@Model.UserId
+                            </p>
+                            <p style="margin-bottom: 0.5rem;">
+                                <strong>Created:</strong> @Model.CreatedAt.ToString("MMM dd, yyyy")
+                            </p>
+                            <p style="margin-bottom: 0;">
+                                <strong>Current Role:</strong>
+                                <span class="badge bg-secondary">@Model.CurrentRole</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card shadow-sm mt-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-page="./Index" class="btn btn-secondary px-4">
+                        <i class="bi bi-x-circle me-1"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-check-circle me-1"></i>Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

@@ -1,4 +1,162 @@
 ﻿@page
 @model EyewearStore_SWP391.Pages.Customer.Prescriptions.IndexModel
 @{
+    ViewData["Title"] = "My Prescriptions";
+}
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
+            <li class="breadcrumb-item active">My Prescriptions</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
+                👓 My Prescription Profiles
+            </h1>
+            <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin: 0;">
+                Manage your eyeglass prescription information
+            </p>
+        </div>
+        <a asp-page="./Create" class="btn btn-primary btn-lg">
+            <i class="bi bi-plus-circle me-2"></i>Add New Prescription
+        </a>
+    </div>
+
+    <!-- Alerts -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Prescription Cards -->
+    @if (!Model.Prescriptions.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <div style="font-size: 4rem; opacity: 0.2; margin-bottom: 1rem;">👓</div>
+                <h4 style="color: var(--primary-navy);">No Prescription Profiles Yet</h4>
+                <p style="color: var(--secondary-warm-gray);">
+                    Add your first prescription to get started with personalized eyewear.
+                </p>
+                <a asp-page="./Create" class="btn btn-primary mt-3">
+                    <i class="bi bi-plus-circle me-2"></i>Add Your First Prescription
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var prescription in Model.Prescriptions)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm" style="border: none; border-radius: 12px; @(prescription.IsActive ? "border-left: 4px solid #4caf50;" : "opacity: 0.7;")">
+                        <div class="card-header" style="background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%); color: white; border-radius: 12px 12px 0 0;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-eyeglasses me-2"></i>@(prescription.ProfileName ?? "Prescription")
+                                </h5>
+                                @if (prescription.IsActive)
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="card-body" style="padding: 1.5rem;">
+                            <!-- Right Eye -->
+                            <div class="mb-3">
+                                <h6 style="color: var(--primary-navy); margin-bottom: 0.75rem;">
+                                    <i class="bi bi-eye me-1"></i>Right Eye (OD)
+                                </h6>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; padding: 0.75rem; background: var(--light-gray); border-radius: 8px;">
+                                    <div>
+                                        <small class="text-muted">SPH</small>
+                                        <div style="font-weight: 600;">@(prescription.RightSph?.ToString("0.00") ?? "—")</div>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">CYL</small>
+                                        <div style="font-weight: 600;">@(prescription.RightCyl?.ToString("0.00") ?? "—")</div>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">AXIS</small>
+                                        <div style="font-weight: 600;">@(prescription.RightAxis?.ToString() ?? "—")</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Left Eye -->
+                            <div class="mb-3">
+                                <h6 style="color: var(--primary-navy); margin-bottom: 0.75rem;">
+                                    <i class="bi bi-eye me-1"></i>Left Eye (OS)
+                                </h6>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; padding: 0.75rem; background: var(--light-gray); border-radius: 8px;">
+                                    <div>
+                                        <small class="text-muted">SPH</small>
+                                        <div style="font-weight: 600;">@(prescription.LeftSph?.ToString("0.00") ?? "—")</div>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">CYL</small>
+                                        <div style="font-weight: 600;">@(prescription.LeftCyl?.ToString("0.00") ?? "—")</div>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">AXIS</small>
+                                        <div style="font-weight: 600;">@(prescription.LeftAxis?.ToString() ?? "—")</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Created Date -->
+                            <div class="text-muted small">
+                                <i class="bi bi-calendar me-1"></i>Created: @prescription.CreatedAt.ToString("MMM dd, yyyy")
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="card-footer bg-transparent" style="border: none; padding: 1rem;">
+                            <div class="d-flex gap-2">
+                                <a asp-page="./Edit" asp-route-id="@prescription.PrescriptionId" class="btn btn-sm btn-outline-primary flex-fill">
+                                    <i class="bi bi-pencil me-1"></i>Edit
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDelete(@prescription.PrescriptionId)">
+                                    <i class="bi bi-trash me-1"></i>Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Delete Form -->
+<form id="deleteForm" method="post" asp-page-handler="Delete" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="prescriptionId" id="deletePrescriptionId" />
+</form>
+
+@section Scripts {
+    <script>
+        function confirmDelete(id) {
+            if (confirm('Are you sure you want to delete this prescription profile?\n\nThis action cannot be undone!')) {
+                document.getElementById('deletePrescriptionId').value = id;
+                document.getElementById('deleteForm').submit();
+            }
+        }
+    </script>
 }

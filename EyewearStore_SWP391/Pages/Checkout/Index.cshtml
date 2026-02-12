@@ -5,25 +5,6 @@
 }
 
 <div class="container py-5">
-    <!-- Toast Container -->
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1050">
-        <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body" id="toastMessage">
-                    ✓ Address Saved!
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
-        <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body" id="errorToastMessage">
-                    ⚠ Error saving address
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
-    </div>
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
@@ -51,7 +32,7 @@
 
     <form method="post" asp-page-handler="Checkout">
         <div class="row g-4">
-            <!-- Left Column: Address & Items -->
+            <!-- Left Column: Address, Prescription & Items -->
             <div class="col-lg-8">
 
                 <!-- Shipping Address Section -->
@@ -72,11 +53,18 @@
                                         onchange="toggleNewAddressForm()">
                                     @foreach (var addr in Model.Addresses)
                                     {
-                                        <option value="@addr.AddressId"
-                                                selected="@(addr.AddressId == Model.SelectedAddressId)">
-                                            @addr.ReceiverName — @addr.Phone — @addr.AddressLine
-                                            @if (addr.IsDefault) { <text> ⭐ Default</text> }
-                                        </option>
+                                        if (addr.AddressId == Model.SelectedAddressId)
+                                        {
+                                            <option value="@addr.AddressId" selected>
+                                                @addr.ReceiverName — @addr.Phone — @addr.AddressLine@(addr.IsDefault ? " ⭐ Default" : "")
+                                            </option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@addr.AddressId">
+                                                @addr.ReceiverName — @addr.Phone — @addr.AddressLine@(addr.IsDefault ? " ⭐ Default" : "")
+                                            </option>
+                                        }
                                     }
                                     <option value="0">➕ Add a new address...</option>
                                 </select>
@@ -105,12 +93,6 @@
                                                   placeholder="Street, district, city..." style="border-radius: 8px;"></textarea>
                                     </div>
                                 </div>
-                                <div class="col-12 text-end mt-3">
-                                    <button type="button" onclick="saveAddress()" class="btn btn-primary" id="saveAddressBtn" 
-                                            style="background-color: #0066CC; border-radius: 8px; padding: 0.5rem 1.5rem;">
-                                        Save Address
-                                    </button>
-                                </div>
                             </div>
                         }
                         else
@@ -137,11 +119,78 @@
                                               placeholder="Street, district, city..." style="border-radius: 8px;"></textarea>
                                 </div>
                             </div>
-                            <div class="col-12 text-end mt-3">
-                                <button type="button" onclick="saveAddress()" class="btn btn-primary" id="saveAddressBtnInitial" 
-                                        style="background-color: #0066CC; border-radius: 8px; padding: 0.5rem 1.5rem;">
-                                    Save Address
-                                </button>
+                        }
+                    </div>
+                </div>
+
+                <!-- ✅ PRESCRIPTION SECTION (NEW!) -->
+                <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%); padding: 1.25rem 1.5rem;">
+                        <h4 style="color: white; margin: 0; font-size: 1.25rem;">
+                            👓 Prescription (Optional)
+                        </h4>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        @if (Model.Prescriptions.Any())
+                        {
+                            <div class="mb-3">
+                                <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
+                                    Select a prescription profile
+                                </label>
+                                <select name="SelectedPrescriptionId" class="form-select" id="prescriptionSelect"
+                                        style="border: 2px solid #9c27b0; border-radius: 8px; padding: 0.75rem;">
+                                    <option value="">🚫 No prescription needed</option>
+
+                                    @foreach (var presc in Model.Prescriptions)
+                                    {
+                                        if (presc.PrescriptionId == Model.SelectedPrescriptionId)
+                                        {
+                                            <option value="@presc.PrescriptionId" selected>
+                                                @presc.ProfileName@(presc.IsActive ? " ✅ Active" : "") — OD: SPH @(presc.RightSph?.ToString("0.00") ?? "—"), CYL @(presc.RightCyl?.ToString("0.00") ?? "—")
+                                            </option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@presc.PrescriptionId">
+                                                @presc.ProfileName@(presc.IsActive ? " ✅ Active" : "") — OD: SPH @(presc.RightSph?.ToString("0.00") ?? "—"), CYL @(presc.RightCyl?.ToString("0.00") ?? "—")
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                                <small class="text-muted d-block mt-2">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Select if you need prescription lenses. Leave empty for non-prescription glasses.
+                                </small>
+                            </div>
+
+                            <!-- Prescription Details Preview -->
+                            <div id="prescriptionDetails" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(156, 39, 176, 0.05); border-radius: 8px; border-left: 4px solid #9c27b0;">
+                                <h6 style="color: #9c27b0; margin-bottom: 0.75rem;">
+                                    <i class="bi bi-eyeglasses me-1"></i>Selected Prescription Details
+                                </h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <strong class="d-block" style="color: var(--primary-navy);">Right Eye (OD)</strong>
+                                        <small class="text-muted d-block">SPH: <span id="rightSph">—</span></small>
+                                        <small class="text-muted d-block">CYL: <span id="rightCyl">—</span></small>
+                                        <small class="text-muted d-block">AXIS: <span id="rightAxis">—</span></small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong class="d-block" style="color: var(--primary-navy);">Left Eye (OS)</strong>
+                                        <small class="text-muted d-block">SPH: <span id="leftSph">—</span></small>
+                                        <small class="text-muted d-block">CYL: <span id="leftCyl">—</span></small>
+                                        <small class="text-muted d-block">AXIS: <span id="leftAxis">—</span></small>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <input type="hidden" name="SelectedPrescriptionId" value="" />
+                            <div class="alert alert-warning" style="border-radius: 8px; border-left: 4px solid #9c27b0;">
+                                <strong>👓</strong> You don't have any saved prescriptions.
+                                <a asp-page="/Customer/Prescriptions/Create" class="alert-link">Create one now</a>
+                                or continue without prescription.
                             </div>
                         }
                     </div>
@@ -283,105 +332,52 @@
         }
     }
 
-    async function saveAddress() {
-        // Find active inputs (handles both 'Addresses Exist' and 'No Addresses' scenarios)
-        // Since only one set is rendered or we rely on the visible one?
-        // Actually, Razor renders based on Model.Addresses.Any().
-        // If Any() true: we have #newAddressForm (hidden/shown). 
-        // If Any() false: we have the alert-info and visible inputs.
-        // Both use same 'name' attributes. querySelector picks the first match.
-        // Since only one block exists in DOM at a time (server-side if/else), simple querySelector works.
+    // ✅ NEW: Prescription data for preview
+    // NOTE: Use PascalCase property names since System.Text.Json by default preserves C# names
+    const prescriptions = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Prescriptions.Select(p => new {
+        p.PrescriptionId,
+        p.ProfileName,
+        RightSph = p.RightSph?.ToString("0.00") ?? "—",
+        RightCyl = p.RightCyl?.ToString("0.00") ?? "—",
+        RightAxis = p.RightAxis?.ToString() ?? "—",
+        LeftSph = p.LeftSph?.ToString("0.00") ?? "—",
+        LeftCyl = p.LeftCyl?.ToString("0.00") ?? "—",
+        LeftAxis = p.LeftAxis?.ToString() ?? "—"
+    })));
 
-        const receiverName = document.querySelector('input[name="NewReceiverName"]').value;
-        const phone = document.querySelector('input[name="NewPhone"]').value;
-        const addressLine = document.querySelector('textarea[name="NewAddressLine"]').value;
-        
-        // Try to find the button that was clicked or just find any save button
-        const btn = document.getElementById('saveAddressBtn') || document.getElementById('saveAddressBtnInitial');
+    document.getElementById('prescriptionSelect')?.addEventListener('change', function() {
+        const val = this.value;
+        const detailsDiv = document.getElementById('prescriptionDetails');
 
-        if (!receiverName || !phone || !addressLine) {
-            showToast('error', 'Please fill in all required fields.');
+        // empty string means no prescription
+        if (!val) {
+            detailsDiv.style.display = 'none';
             return;
         }
 
-        if(btn) {
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+        const selectedId = parseInt(val, 10);
+        const selected = prescriptions.find(p => p.PrescriptionId === selectedId);
+        if (selected) {
+            document.getElementById('rightSph').textContent = selected.RightSph;
+            document.getElementById('rightCyl').textContent = selected.RightCyl;
+            document.getElementById('rightAxis').textContent = selected.RightAxis;
+            document.getElementById('leftSph').textContent = selected.LeftSph;
+            document.getElementById('leftCyl').textContent = selected.LeftCyl;
+            document.getElementById('leftAxis').textContent = selected.LeftAxis;
+            detailsDiv.style.display = 'block';
+        } else {
+            detailsDiv.style.display = 'none';
+        }
+    });
+
+    // Trigger on page load if prescription is pre-selected
+    window.addEventListener('DOMContentLoaded', function() {
+        const prescSelect = document.getElementById('prescriptionSelect');
+        if (prescSelect && prescSelect.value) {
+            prescSelect.dispatchEvent(new Event('change'));
         }
 
-        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-
-        try {
-            const response = await fetch('?handler=SaveAddress', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': token
-                },
-                body: JSON.stringify({
-                    receiverName: receiverName,
-                    phone: phone,
-                    addressLine: addressLine
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                showToast('success', 'Address saved successfully!');
-                
-                // If we are in the "dropdown" mode
-                const select = document.getElementById('addressSelect');
-                if (select) {
-                    const option = document.createElement('option');
-                    option.value = data.address.addressId;
-                    option.text = `${data.address.receiverName} — ${data.address.phone} — ${data.address.addressLine}`;
-                    if (data.address.isDefault) option.text += ' ⭐ Default';
-                    
-                    // Add before "Add new..."
-                    // "Add new..." is always the last option? 
-                    // Let's check logic: <option value="0">➕ Add a new address...</option> is last.
-                    select.add(option, select.options[select.options.length - 1]);
-                    
-                    select.value = data.address.addressId;
-                    toggleNewAddressForm();
-                } else {
-                    // We are in "No addresses yet" mode
-                    // Reloading page is simplest to switch to "dropdown" mode
-                    // OR we could just update the UI to look like it was saved.
-                    // But reloading ensures the page state (Model.Addresses) is consistent for the next render
-                    // and switches the view from "No addresses" alert to "Dropdown" view.
-                    // For a seamless experience, we reload.
-                     location.reload(); 
-                }
-
-                // Clear inputs
-                document.querySelector('input[name="NewReceiverName"]').value = '';
-                document.querySelector('input[name="NewPhone"]').value = '';
-                document.querySelector('textarea[name="NewAddressLine"]').value = '';
-
-            } else {
-                 showToast('error', data.message || 'Failed to save address.');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            showToast('error', 'An unexpected error occurred.');
-        } finally {
-            if(btn) {
-                btn.disabled = false;
-                btn.innerHTML = 'Save Address';
-            }
-        }
-    }
-
-    function showToast(type, message) {
-        const toastEl = type === 'success' ? document.getElementById('liveToast') : document.getElementById('errorToast');
-        const msgEl = type === 'success' ? document.getElementById('toastMessage') : document.getElementById('errorToastMessage');
-        
-        if (msgEl) msgEl.textContent = message;
-        
-        // Bootstrap 5 Toast
-        const toast = new bootstrap.Toast(toastEl);
-        toast.show();
-    }
+        // Also toggle address form based on current selection (useful when page loads with SelectedAddressId=0)
+        toggleNewAddressForm();
+    });
 </script>

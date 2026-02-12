@@ -48,31 +48,18 @@ namespace EyewearStore_SWP391.Pages.Customer
         {
             try
             {
-                // Method 1: Get email from User.Identity.Name
-                CurrentUserEmail = User.Identity?.Name ?? "";
-
-                // Method 2: Try from Claims (backup)
-                if (string.IsNullOrEmpty(CurrentUserEmail))
-                {
-                    CurrentUserEmail = User.FindFirst(ClaimTypes.Email)?.Value ?? "";
-                }
-
-                // Method 3: Try from NameIdentifier (backup)
-                if (string.IsNullOrEmpty(CurrentUserEmail))
-                {
-                    CurrentUserEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
-                }
-
-                if (string.IsNullOrEmpty(CurrentUserEmail))
+                // Retrieve UserId from claims (reliable source)
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                 {
                     Orders = new List<OrderItem>();
                     return;
                 }
 
-                // Find user in database
+                // Find user in database by ID
                 var user = await _context.Users
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(u => u.Email == CurrentUserEmail);
+                    .FirstOrDefaultAsync(u => u.UserId == userId);
 
                 if (user == null)
                 {
@@ -80,11 +67,13 @@ namespace EyewearStore_SWP391.Pages.Customer
                     return;
                 }
 
-                CurrentUserName = user.FullName ?? user.Email;
+                // Populate display properties
+                CurrentUserEmail = user.Email ?? "";
+                CurrentUserName = user.FullName ?? user.Email ?? "";
 
                 // Get all orders for this user
                 var orders = await _context.Orders
-                    .Where(o => o.UserId == user.UserId)
+                    .Where(o => o.UserId == userId)
                     .Include(o => o.OrderItems)
                         .ThenInclude(oi => oi.Product)
                     .Include(o => o.Address)

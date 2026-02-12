@@ -5,6 +5,25 @@
 }
 
 <div class="container py-5">
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1050">
+        <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="toastMessage">
+                    ✓ Address Saved!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="errorToastMessage">
+                    ⚠ Error saving address
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
@@ -86,6 +105,12 @@
                                                   placeholder="Street, district, city..." style="border-radius: 8px;"></textarea>
                                     </div>
                                 </div>
+                                <div class="col-12 text-end mt-3">
+                                    <button type="button" onclick="saveAddress()" class="btn btn-primary" id="saveAddressBtn" 
+                                            style="background-color: #0066CC; border-radius: 8px; padding: 0.5rem 1.5rem;">
+                                        Save Address
+                                    </button>
+                                </div>
                             </div>
                         }
                         else
@@ -111,6 +136,12 @@
                                     <textarea name="NewAddressLine" class="form-control" rows="2" required
                                               placeholder="Street, district, city..." style="border-radius: 8px;"></textarea>
                                 </div>
+                            </div>
+                            <div class="col-12 text-end mt-3">
+                                <button type="button" onclick="saveAddress()" class="btn btn-primary" id="saveAddressBtnInitial" 
+                                        style="background-color: #0066CC; border-radius: 8px; padding: 0.5rem 1.5rem;">
+                                    Save Address
+                                </button>
                             </div>
                         }
                     </div>
@@ -250,5 +281,107 @@
         if (select && form) {
             form.style.display = select.value === '0' ? 'block' : 'none';
         }
+    }
+
+    async function saveAddress() {
+        // Find active inputs (handles both 'Addresses Exist' and 'No Addresses' scenarios)
+        // Since only one set is rendered or we rely on the visible one?
+        // Actually, Razor renders based on Model.Addresses.Any().
+        // If Any() true: we have #newAddressForm (hidden/shown). 
+        // If Any() false: we have the alert-info and visible inputs.
+        // Both use same 'name' attributes. querySelector picks the first match.
+        // Since only one block exists in DOM at a time (server-side if/else), simple querySelector works.
+
+        const receiverName = document.querySelector('input[name="NewReceiverName"]').value;
+        const phone = document.querySelector('input[name="NewPhone"]').value;
+        const addressLine = document.querySelector('textarea[name="NewAddressLine"]').value;
+        
+        // Try to find the button that was clicked or just find any save button
+        const btn = document.getElementById('saveAddressBtn') || document.getElementById('saveAddressBtnInitial');
+
+        if (!receiverName || !phone || !addressLine) {
+            showToast('error', 'Please fill in all required fields.');
+            return;
+        }
+
+        if(btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+        }
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+        try {
+            const response = await fetch('?handler=SaveAddress', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify({
+                    receiverName: receiverName,
+                    phone: phone,
+                    addressLine: addressLine
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showToast('success', 'Address saved successfully!');
+                
+                // If we are in the "dropdown" mode
+                const select = document.getElementById('addressSelect');
+                if (select) {
+                    const option = document.createElement('option');
+                    option.value = data.address.addressId;
+                    option.text = `${data.address.receiverName} — ${data.address.phone} — ${data.address.addressLine}`;
+                    if (data.address.isDefault) option.text += ' ⭐ Default';
+                    
+                    // Add before "Add new..."
+                    // "Add new..." is always the last option? 
+                    // Let's check logic: <option value="0">➕ Add a new address...</option> is last.
+                    select.add(option, select.options[select.options.length - 1]);
+                    
+                    select.value = data.address.addressId;
+                    toggleNewAddressForm();
+                } else {
+                    // We are in "No addresses yet" mode
+                    // Reloading page is simplest to switch to "dropdown" mode
+                    // OR we could just update the UI to look like it was saved.
+                    // But reloading ensures the page state (Model.Addresses) is consistent for the next render
+                    // and switches the view from "No addresses" alert to "Dropdown" view.
+                    // For a seamless experience, we reload.
+                     location.reload(); 
+                }
+
+                // Clear inputs
+                document.querySelector('input[name="NewReceiverName"]').value = '';
+                document.querySelector('input[name="NewPhone"]').value = '';
+                document.querySelector('textarea[name="NewAddressLine"]').value = '';
+
+            } else {
+                 showToast('error', data.message || 'Failed to save address.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('error', 'An unexpected error occurred.');
+        } finally {
+            if(btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Save Address';
+            }
+        }
+    }
+
+    function showToast(type, message) {
+        const toastEl = type === 'success' ? document.getElementById('liveToast') : document.getElementById('errorToast');
+        const msgEl = type === 'success' ? document.getElementById('toastMessage') : document.getElementById('errorToastMessage');
+        
+        if (msgEl) msgEl.textContent = message;
+        
+        // Bootstrap 5 Toast
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
     }
 </script>

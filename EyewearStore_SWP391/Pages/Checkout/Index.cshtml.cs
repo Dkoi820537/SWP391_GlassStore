@@ -184,6 +184,64 @@ public class IndexModel : PageModel
         }
     }
 
+    public async Task<IActionResult> OnPostSaveAddressAsync([FromBody] SaveAddressRequest request)
+    {
+        if (request == null)
+            return new JsonResult(new { success = false, message = "Invalid request data." });
+
+        if (string.IsNullOrWhiteSpace(request.ReceiverName) ||
+            string.IsNullOrWhiteSpace(request.Phone) ||
+            string.IsNullOrWhiteSpace(request.AddressLine))
+        {
+            return new JsonResult(new { success = false, message = "Please fill in all required fields." });
+        }
+
+        if (!User.Identity?.IsAuthenticated ?? true)
+            return new JsonResult(new { success = false, message = "User not authenticated." });
+
+        try 
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var newAddr = new Address
+            {
+                UserId = userId,
+                ReceiverName = request.ReceiverName,
+                Phone = request.Phone,
+                AddressLine = request.AddressLine,
+                IsDefault = false, // Default is usually explicitly set, or handled by logic below
+                CreatedAt = DateTime.UtcNow
+            };
+
+            // Check if this is the first address
+            var hasAddresses = await _context.Addresses.AnyAsync(a => a.UserId == userId);
+            if (!hasAddresses)
+                newAddr.IsDefault = true;
+
+            _context.Addresses.Add(newAddr);
+            await _context.SaveChangesAsync();
+
+            return new JsonResult(new 
+            { 
+                success = true, 
+                message = "Address saved successfully!",
+                address = new 
+                {
+                    addressId = newAddr.AddressId,
+                    receiverName = newAddr.ReceiverName,
+                    phone = newAddr.Phone,
+                    addressLine = newAddr.AddressLine,
+                    isDefault = newAddr.IsDefault
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            // Log error if logger was available
+            return new JsonResult(new { success = false, message = "Error saving address: " + ex.Message });
+        }
+    }
+
     private async Task LoadAddressesAsync(int userId)
     {
         Addresses = await _context.Addresses
@@ -197,5 +255,12 @@ public class IndexModel : PageModel
 
         if (DefaultAddress != null && SelectedAddressId == 0)
             SelectedAddressId = DefaultAddress.AddressId;
+    }
+
+    public class SaveAddressRequest
+    {
+        public string ReceiverName { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string AddressLine { get; set; } = string.Empty;
     }
 }

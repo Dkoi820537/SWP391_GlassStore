@@ -1070,3 +1070,195 @@
         border: 1px solid var(--shop-border-gray);
     }
 }
+/* ==========================================
+   PRODUCT ACTIONS (New)
+   ========================================== */
+.product-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 12px;
+}
+
+.btn-add-cart {
+    flex: 3; /* 60% approx */
+    background: var(--shop-cta-blue);
+    color: var(--shop-white);
+    border: none;
+    padding: 10px 12px;
+    border-radius: var(--shop-radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--shop-transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+}
+
+.btn-add-cart:hover {
+    background: var(--shop-cta-blue-hover);
+    color: var(--shop-white);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
+}
+
+.btn-add-cart:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-view-details-outline {
+    flex: 2; /* 40% approx */
+    background: transparent;
+    color: var(--shop-cta-blue);
+    border: 1px solid var(--shop-cta-blue);
+    padding: 10px 12px;
+    border-radius: var(--shop-radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--shop-transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.btn-view-details-outline:hover {
+    background: rgba(0, 102, 204, 0.05);
+    color: var(--shop-cta-blue-hover);
+    border-color: var(--shop-cta-blue-hover);
+}
+
+.btn-buy-now {
+    width: 100%;
+    text-align: center;
+    color: var(--shop-primary-teal);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    transition: color var(--shop-transition);
+    margin-top: 4px;
+}
+
+.btn-buy-now:hover {
+    color: var(--shop-primary-teal-dark);
+}
+
+/* Toast Notifications */
+.toast-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--shop-white);
+    border-radius: var(--shop-radius-md);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transform: translateX(120%);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 10000;
+    min-width: 300px;
+    max-width: 400px;
+    border-left: 4px solid var(--shop-cta-blue);
+}
+
+.toast-notification.show {
+    transform: translateX(0);
+}
+
+.toast-notification.success { border-left-color: #10B981; }
+.toast-notification.error { border-left-color: #EF4444; }
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-grow: 1;
+}
+
+.toast-icon {
+    font-size: 20px;
+}
+
+.toast-notification.success .toast-icon { color: #10B981; }
+.toast-notification.error .toast-icon { color: #EF4444; }
+
+.toast-message {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--shop-text-primary);
+}
+
+.toast-actions {
+    margin-left: auto;
+}
+
+.btn-toast-action {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--shop-cta-blue);
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(0, 102, 204, 0.1);
+    transition: all 0.2s;
+}
+
+.btn-toast-action:hover {
+    background: var(--shop-cta-blue);
+    color: white;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: var(--shop-text-muted);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+}
+
+.toast-close:hover {
+    color: var(--shop-text-primary);
+}
+
+.pulse-animation {
+    animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+/* Mobile Responsive for Buttons */
+@media (max-width: 576px) {
+    .product-actions {
+        flex-direction: column;
+    }
+    
+    .btn-add-cart, 
+    .btn-view-details-outline {
+        width: 100%;
+        flex: auto;
+    }
+    
+    /* Order: Add to Cart on top */
+    .btn-add-cart { order: 1; }
+    .btn-view-details-outline { order: 2; }
+    .btn-buy-now { order: 3; }
+}

@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using EyewearStore_SWP391.Models;
 using EyewearStore_SWP391.Models.ViewModels.Shop;
 
+using System.Security.Claims;
+
 namespace EyewearStore_SWP391.Pages.Products;
 
 /// <summary>
@@ -13,11 +15,13 @@ namespace EyewearStore_SWP391.Pages.Products;
 public class IndexModel : PageModel
 {
     private readonly EyewearStoreContext _context;
+    private readonly Services.ICartService _cartService;
     private const int DefaultPageSize = 12;
 
-    public IndexModel(EyewearStoreContext context)
+    public IndexModel(EyewearStoreContext context, Services.ICartService cartService)
     {
         _context = context;
+        _cartService = cartService;
     }
 
     /// <summary>
@@ -281,5 +285,84 @@ public class IndexModel : PageModel
         };
 
         return Page();
+    }
+
+    /// <summary>
+    /// Handles AJAX Add to Cart request
+    /// </summary>
+    public async Task<IActionResult> OnPostAddToCartAsync([FromBody] AddToCartRequest request)
+    {
+        if (request == null || request.ProductId <= 0 || request.Quantity <= 0)
+        {
+            return new JsonResult(new { success = false, message = "Invalid request data." });
+        }
+
+        // Check authentication
+        if (!User.Identity?.IsAuthenticated ?? true)
+        {
+            return new JsonResult(new { success = false, message = "Please login to add items to cart." }) { StatusCode = 401 };
+        }
+
+        var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdStr, out var userId))
+        {
+            return new JsonResult(new { success = false, message = "User identity not found." }) { StatusCode = 401 };
+        }
+
+        try
+        {
+            // Verify product (check both Frames and Lenses)
+            // Note: In a real scenario, we might want a unified Product table,
+            // but here we check both. We assume ProductId is unique across both tables or logic handles it.
+            // Based on models, they are separate tables but might share ID space if inherited, 
+            // but looking at Context they seems separate.
+            // Let's check Frame first, then Lens.
+            
+            int? inventoryQty = 0;
+            bool isStockManaged = false;
+
+            var frame = await _context.Frames.FindAsync(request.ProductId);
+            if (frame != null)
+            {
+                inventoryQty = frame.InventoryQty;
+                isStockManaged = true;
+            }
+            else
+            {
+                var lens = await _context.Lenses.FindAsync(request.ProductId);
+                if (lens != null)
+                {
+                   inventoryQty = lens.InventoryQty;
+                   isStockManaged = true;
+                }
+                else
+                {
+                    return new JsonResult(new { success = false, message = "Product not found." });
+                }
+            }
+
+            if (isStockManaged && inventoryQty.HasValue && inventoryQty.Value < request.Quantity)
+            {
+                 return new JsonResult(new { success = false, message = $"Only {inventoryQty} items left in stock." });
+            }
+
+            await _cartService.AddToCartAsync(userId, request.ProductId, request.Quantity);
+
+            // Get updated cart count
+            var cart = await _cartService.GetCartByUserIdAsync(userId);
+            var newCount = cart?.CartItems.Sum(i => i.Quantity) ?? 0;
+
+            return new JsonResult(new { success = true, message = "Added to cart successfully!", cartCount = newCount });
+        }
+        catch (Exception ex)
+        {
+            return new JsonResult(new { success = false, message = "Error adding to cart: " + ex.Message });
+        }
+    }
+
+    public class AddToCartRequest
+    {
+        public int ProductId { get; set; }
+        public int Quantity { get; set; }
     }
 }

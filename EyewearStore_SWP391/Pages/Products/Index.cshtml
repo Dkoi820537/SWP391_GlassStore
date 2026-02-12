@@ -295,23 +295,41 @@
                                     }
                                 </div>
 
-                                <!-- View Details Button -->
-                                @if (product.ProductType == "Frame")
-                                {
-                                    <a asp-page="/Products/FrameDetails" 
-                                       asp-route-id="@product.ProductId"
-                                       class="btn-view-details">
-                                        View Details
-                                    </a>
-                                }
-                                else
-                                {
-                                    <a asp-page="/Products/LensDetails" 
-                                       asp-route-id="@product.ProductId"
-                                       class="btn-view-details">
-                                        View Details
-                                    </a>
-                                }
+                                <!-- Action Buttons -->
+                                <div class="product-actions">
+                                    @if (product.ProductType == "Frame")
+                                    {
+                                        <button onclick="addToCart(this, @product.ProductId)" 
+                                                class="btn-add-cart" 
+                                                title="Add to Cart">
+                                            <i class="bi bi-cart-plus"></i> Add
+                                        </button>
+                                        <a asp-page="/Products/FrameDetails" 
+                                           asp-route-id="@product.ProductId"
+                                           class="btn-view-details-outline"
+                                           title="View Details">
+                                            Details
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button onclick="addToCart(this, @product.ProductId)" 
+                                                class="btn-add-cart" 
+                                                title="Add to Cart">
+                                            <i class="bi bi-cart-plus"></i> Add
+                                        </button>
+                                        <a asp-page="/Products/LensDetails" 
+                                           asp-route-id="@product.ProductId"
+                                           class="btn-view-details-outline"
+                                           title="View Details">
+                                            Details
+                                        </a>
+                                    }
+                                    
+                                    <button onclick="addToCart(this, @product.ProductId, true)" class="btn-buy-now">
+                                        Buy Now
+                                    </button>
+                                </div>
                             </div>
                         </article>
                     }
@@ -514,4 +532,8 @@
             });
         });
     </script>
+    <script src="~/js/shop-cart.js"></script>
 }
+
+<!-- Anti-forgery token for AJAX -->
+@Html.AntiForgeryToken()

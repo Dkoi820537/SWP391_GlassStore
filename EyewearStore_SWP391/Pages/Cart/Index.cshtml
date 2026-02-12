@@ -299,161 +299,161 @@
 
             <!-- Order Summary Column -->
             <div class="col-lg-4">
-                <div class="card"
-                     style="border: none;
-                                border-radius: 12px;
-                                box-shadow: var(--shadow-lg);
-                                position: sticky;
-                                top: 100px;">
+                <div style="position: sticky; top: 100px;">
+                    <div class="card"
+                         style="border: none;
+                                    border-radius: 12px;
+                                    box-shadow: var(--shadow-lg);">
 
-                    <!-- Summary Header -->
-                    <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
-                                    padding: 1.5rem;
-                                    border-radius: 12px 12px 0 0;">
-                        <h4 style="color: white;
+                        <!-- Summary Header -->
+                        <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+                                        padding: 1.5rem;
+                                        border-radius: 12px 12px 0 0;">
+                            <h4 style="color: white;
+                                           margin: 0;
+                                           font-family: var(--font-secondary);
+                                           font-size: 1.5rem;">
+                                Order Summary
+                            </h4>
+                        </div>
+
+                        <!-- Summary Body -->
+                        <div style="padding: 1.5rem;">
+                            <!-- Items Count -->
+                            <div style="display: flex;
+                                            justify-content: space-between;
+                                            padding: 1rem 0;
+                                            border-bottom: 1px solid var(--medium-gray);">
+                                <span style="color: var(--dark-gray); font-weight: 500;">
+                                    Items in Cart
+                                </span>
+                                <span style="color: var(--primary-navy); font-weight: 600;">
+                                    @Model.Cart.CartItems.Count
+                                </span>
+                            </div>
+
+                            <!-- Subtotal -->
+                            <div style="display: flex;
+                                            justify-content: space-between;
+                                            padding: 1rem 0;
+                                            border-bottom: 1px solid var(--medium-gray);">
+                                <span style="color: var(--dark-gray); font-weight: 500;">
+                                    Subtotal
+                                </span>
+                                <span style="color: var(--primary-navy); font-weight: 600;">
+                                    @Model.Total.ToString("N0") VND
+                                </span>
+                            </div>
+
+                            <!-- Shipping -->
+                            <div style="display: flex;
+                                            justify-content: space-between;
+                                            padding: 1rem 0;
+                                            border-bottom: 2px solid var(--medium-gray);">
+                                <span style="color: var(--dark-gray); font-weight: 500;">
+                                    Shipping
+                                </span>
+                                <span style="color: var(--success); font-weight: 600;">
+                                    FREE 🎉
+                                </span>
+                            </div>
+
+                            <!-- Total -->
+                            <div style="display: flex;
+                                            justify-content: space-between;
+                                            padding: 1.5rem 0;">
+                                <span style="color: var(--primary-navy);
+                                                 font-weight: 700;
+                                                 font-size: 1.25rem;
+                                                 font-family: var(--font-secondary);">
+                                    Total
+                                </span>
+                                <span style="color: var(--primary-gold);
+                                                 font-weight: 700;
+                                                 font-size: 1.5rem;
+                                                 font-family: var(--font-secondary);">
+                                    @Model.Total.ToString("N0") VND
+                                </span>
+                            </div>
+
+                            <!-- Checkout Button -->
+                            <a asp-page="/Checkout/Index"
+                               class="btn btn-primary w-100"
+                               style="padding: 1rem;
+                                          font-size: 1.1rem;
+                                          font-weight: 600;
+                                          border-radius: 8px;
+                                          background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-light) 100%);
+                                          border: none;
+                                          text-transform: uppercase;
+                                          letter-spacing: 0.5px;
+                                          margin-bottom: 1rem;">
+                                Proceed to Checkout 🛍️
+                            </a>
+
+                            <!-- Security Badge -->
+                            <div style="text-align: center;
+                                            padding: 1rem;
+                                            background: var(--light-gray);
+                                            border-radius: 8px;">
+                                <div style="margin-bottom: 0.5rem;">🔒</div>
+                                <small style="color: var(--secondary-warm-gray);
+                                                 font-weight: 500;
+                                                 display: block;">
+                                    Secure Checkout
+                                </small>
+                                <small style="color: var(--secondary-warm-gray);">
+                                    Your payment info is safe with us
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Info Card -->
+                    <div class="card mt-3"
+                         style="border: none;
+                                    border-radius: 12px;
+                                    background: linear-gradient(135deg, var(--secondary-cream) 0%, var(--light-gray) 100%);
+                                    padding: 1.5rem;">
+                        <h6 style="color: var(--primary-navy);
+                                       font-weight: 600;
+                                       margin-bottom: 1rem;">
+                            💡 Shopping Benefits
+                        </h6>
+                        <ul style="list-style: none;
+                                       padding: 0;
                                        margin: 0;
-                                       font-family: var(--font-secondary);
-                                       font-size: 1.5rem;">
-                            Order Summary
-                        </h4>
+                                       color: var(--dark-gray);">
+                            <li style="padding: 0.5rem 0;
+                                           display: flex;
+                                           align-items: start;
+                                           gap: 0.5rem;">
+                                <span>✓</span>
+                                <span>Free shipping on all orders</span>
+                            </li>
+                            <li style="padding: 0.5rem 0;
+                                           display: flex;
+                                           align-items: start;
+                                           gap: 0.5rem;">
+                                <span>✓</span>
+                                <span>30-day hassle-free returns</span>
+                            </li>
+                            <li style="padding: 0.5rem 0;
+                                           display: flex;
+                                           align-items: start;
+                                           gap: 0.5rem;">
+                                <span>✓</span>
+                                <span>1-year warranty included</span>
+                            </li>
+                            <li style="padding: 0.5rem 0;
+                                           display: flex;
+                                           align-items: start;
+                                           gap: 0.5rem;">
+                                <span>✓</span>
+                                <span>Expert customer support</span>
+                            </li>
+                        </ul>
                     </div>
-
-                    <!-- Summary Body -->
-                    <div style="padding: 1.5rem;">
-                        <!-- Items Count -->
-                        <div style="display: flex;
-                                        justify-content: space-between;
-                                        padding: 1rem 0;
-                                        border-bottom: 1px solid var(--medium-gray);">
-                            <span style="color: var(--dark-gray); font-weight: 500;">
-                                Items in Cart
-                            </span>
-                            <span style="color: var(--primary-navy); font-weight: 600;">
-                                @Model.Cart.CartItems.Count
-                            </span>
-                        </div>
-
-                        <!-- Subtotal -->
-                        <div style="display: flex;
-                                        justify-content: space-between;
-                                        padding: 1rem 0;
-                                        border-bottom: 1px solid var(--medium-gray);">
-                            <span style="color: var(--dark-gray); font-weight: 500;">
-                                Subtotal
-                            </span>
-                            <span style="color: var(--primary-navy); font-weight: 600;">
-                                @Model.Total.ToString("N0") VND
-                            </span>
-                        </div>
-
-                        <!-- Shipping -->
-                        <div style="display: flex;
-                                        justify-content: space-between;
-                                        padding: 1rem 0;
-                                        border-bottom: 2px solid var(--medium-gray);">
-                            <span style="color: var(--dark-gray); font-weight: 500;">
-                                Shipping
-                            </span>
-                            <span style="color: var(--success); font-weight: 600;">
-                                FREE 🎉
-                            </span>
-                        </div>
-
-                        <!-- Total -->
-                        <div style="display: flex;
-                                        justify-content: space-between;
-                                        padding: 1.5rem 0;">
-                            <span style="color: var(--primary-navy);
-                                             font-weight: 700;
-                                             font-size: 1.25rem;
-                                             font-family: var(--font-secondary);">
-                                Total
-                            </span>
-                            <span style="color: var(--primary-gold);
-                                             font-weight: 700;
-                                             font-size: 1.5rem;
-                                             font-family: var(--font-secondary);">
-                                @Model.Total.ToString("N0") VND
-                            </span>
-                        </div>
-
-                        <!-- Checkout Button -->
-                        <a asp-page="/Checkout/Index"
-                           class="btn btn-primary w-100"
-                           style="padding: 1rem;
-                                      font-size: 1.1rem;
-                                      font-weight: 600;
-                                      border-radius: 8px;
-                                      background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-light) 100%);
-                                      border: none;
-                                      text-transform: uppercase;
-                                      letter-spacing: 0.5px;
-                                      margin-bottom: 1rem;">
-                            Proceed to Checkout 🛍️
-                        </a>
-
-                        <!-- Security Badge -->
-                        <div style="text-align: center;
-                                        padding: 1rem;
-                                        background: var(--light-gray);
-                                        border-radius: 8px;">
-                            <div style="margin-bottom: 0.5rem;">🔒</div>
-                            <small style="color: var(--secondary-warm-gray);
-                                             font-weight: 500;
-                                             display: block;">
-                                Secure Checkout
-                            </small>
-                            <small style="color: var(--secondary-warm-gray);">
-                                Your payment info is safe with us
-                            </small>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Additional Info Card -->
-                <div class="card mt-3"
-                     style="border: none;
-                                border-radius: 12px;
-                                background: linear-gradient(135deg, var(--secondary-cream) 0%, var(--light-gray) 100%);
-                                padding: 1.5rem;">
-                    <h6 style="color: var(--primary-navy);
-                                   font-weight: 600;
-                                   margin-bottom: 1rem;">
-                        💡 Shopping Benefits
-                    </h6>
-                    <ul style="list-style: none;
-                                   padding: 0;
-                                   margin: 0;
-                                   color: var(--dark-gray);">
-                        <li style="padding: 0.5rem 0;
-                                       display: flex;
-                                       align-items: start;
-                                       gap: 0.5rem;">
-                            <span>✓</span>
-                            <span>Free shipping on all orders</span>
-                        </li>
-                        <li style="padding: 0.5rem 0;
-                                       display: flex;
-                                       align-items: start;
-                                       gap: 0.5rem;">
-                            <span>✓</span>
-                            <span>30-day hassle-free returns</span>
-                        </li>
-                        <li style="padding: 0.5rem 0;
-                                       display: flex;
-                                       align-items: start;
-                                       gap: 0.5rem;">
-                            <span>✓</span>
-                            <span>1-year warranty included</span>
-                        </li>
-                        <li style="padding: 0.5rem 0;
-                                       display: flex;
-                                       align-items: start;
-                                       gap: 0.5rem;">
-                            <span>✓</span>
-                            <span>Expert customer support</span>
-                        </li>
-                    </ul>
                 </div>
             </div>
         </div>

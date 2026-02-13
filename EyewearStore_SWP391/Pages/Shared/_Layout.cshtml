@@ -59,13 +59,7 @@
 
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Customer/MyOrders">
-                                    <i class="bi bi-box-seam me-1"></i>My Orders
-                                </a>
-                            </li>
-
-                            <!-- ✅ MỚI: MY PRESCRIPTIONS LINK -->
+                            <!-- ✅ MY PRESCRIPTIONS LINK -->
                             <li class="nav-item">
                                 <a class="nav-link text-primary fw-semibold" asp-page="/Customer/Prescriptions/Index" style="background: linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, rgba(186, 104, 200, 0.1) 100%); border-radius: 6px; padding: 0.5rem 1rem;">
                                     <i class="bi bi-eyeglasses me-1"></i>My Prescriptions

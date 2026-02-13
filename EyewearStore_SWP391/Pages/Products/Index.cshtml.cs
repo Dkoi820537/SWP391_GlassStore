@@ -348,16 +348,38 @@ public class IndexModel : PageModel
 
             await _cartService.AddToCartAsync(userId, request.ProductId, request.Quantity);
 
-            // Get updated cart count
+            // Get updated cart with items for dropdown refresh
             var cart = await _cartService.GetCartByUserIdAsync(userId);
             var newCount = cart?.CartItems.Sum(i => i.Quantity) ?? 0;
+            decimal subtotal = 0m;
+            var cartItemsList = new List<object>();
 
-            return new JsonResult(new { success = true, message = "Added to cart successfully!", cartCount = newCount });
+            if (cart?.CartItems != null)
+            {
+                foreach (var ci in cart.CartItems)
+                {
+                    decimal unitPrice = ci.Product != null ? ci.Product.Price : ci.Service != null ? ci.Service.Price : 0m;
+                    string name = ci.Product != null ? ci.Product.Name : ci.Service != null ? ci.Service.Name : "Product";
+                    decimal lineTotal = unitPrice * ci.Quantity;
+                    subtotal += lineTotal;
+                    cartItemsList.Add(new { name, unitPrice, quantity = ci.Quantity, lineTotal });
+                }
+            }
+
+            return new JsonResult(new { success = true, message = "Added to cart successfully!", cartCount = newCount, cartItems = cartItemsList, subtotal });
         }
         catch (Exception ex)
         {
             return new JsonResult(new { success = false, message = "Error adding to cart: " + ex.Message });
         }
+    }
+
+    /// <summary>
+    /// Returns the _CartSummary partial view HTML for AJAX cart dropdown refresh
+    /// </summary>
+    public IActionResult OnGetCartSummaryPartial()
+    {
+        return Partial("_CartSummary");
     }
 
     public class AddToCartRequest

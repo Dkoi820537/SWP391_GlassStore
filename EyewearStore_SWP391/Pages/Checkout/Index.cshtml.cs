@@ -184,7 +184,7 @@ namespace EyewearStore_SWP391.Pages.Checkout
                     {
                         OrderId = order.OrderId,
                         ProductId = cartItem.ProductId,
-                        ServiceId = cartItem.ServiceId,
+                        //ServiceId = cartItem.ServiceId,
                         PrescriptionId = SelectedPrescriptionId,  // ← Prescription support
                         Quantity = cartItem.Quantity,
                         UnitPrice = unitPrice

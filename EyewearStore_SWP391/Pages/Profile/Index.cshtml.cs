@@ -1,4 +1,3 @@
-
 using EyewearStore_SWP391.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -184,23 +183,41 @@ namespace EyewearStore_SWP391.Pages.Profile
             addr.Phone = AddressInput.Phone.Trim();
             addr.AddressLine = AddressInput.AddressLine.Trim();
             addr.IsDefault = AddressInput.IsDefault;
-     
 
             await _context.SaveChangesAsync();
             TempData["SuccessMessage"] = "Address updated successfully.";
             return RedirectToPage();
         }
 
+        // ✅✅✅ FIXED METHOD - CHỖ QUAN TRỌNG NHẤT! ✅✅✅
         public async Task<IActionResult> OnPostDeleteAddressAsync(int addressId)
         {
             var uid = CurrentUserId();
-            var addr = await _context.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId && a.UserId == uid);
-            if (addr == null) return NotFound();
+            var addr = await _context.Addresses
+                .FirstOrDefaultAsync(a => a.AddressId == addressId && a.UserId == uid);
 
+            if (addr == null)
+            {
+                TempData["ErrorMessage"] = "Address not found!";
+                return RedirectToPage();
+            }
+
+            // ✅ KEY FIX: Set AddressId = null for all orders using this address
+            // Orders will keep ReceiverName, Phone, AddressLine (snapshot)
+            var ordersWithThisAddress = await _context.Orders
+                .Where(o => o.AddressId == addressId)
+                .ToListAsync();
+
+            foreach (var order in ordersWithThisAddress)
+            {
+                order.AddressId = null;  // ← DÒNG QUAN TRỌNG!
+            }
+
+            // Now safe to delete address
             _context.Addresses.Remove(addr);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Address deleted successfully.";
+            TempData["SuccessMessage"] = "Address deleted successfully!";
             return RedirectToPage();
         }
 

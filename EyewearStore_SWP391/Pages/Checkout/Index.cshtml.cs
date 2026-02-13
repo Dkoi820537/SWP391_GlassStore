@@ -66,6 +66,7 @@ namespace EyewearStore_SWP391.Pages.Checkout
             return Page();
         }
 
+        // ✅✅✅ FIXED METHOD - TẠO ORDER VỚI ADDRESS SNAPSHOT ✅✅✅
         public async Task<IActionResult> OnPostCheckoutAsync()
         {
             if (!User.Identity?.IsAuthenticated ?? true)
@@ -73,31 +74,41 @@ namespace EyewearStore_SWP391.Pages.Checkout
 
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            // Inline add address
+            // ✅ STEP 1: Get or create address
+            Address? selectedAddress = null;
+
             if (SelectedAddressId == 0 &&
                 !string.IsNullOrWhiteSpace(NewReceiverName) &&
                 !string.IsNullOrWhiteSpace(NewPhone) &&
                 !string.IsNullOrWhiteSpace(NewAddressLine))
             {
-                var newAddr = new Address
+                // User is adding new address inline
+                selectedAddress = new Address
                 {
                     UserId = userId,
-                    ReceiverName = NewReceiverName,
-                    Phone = NewPhone,
-                    AddressLine = NewAddressLine,
+                    ReceiverName = NewReceiverName.Trim(),
+                    Phone = NewPhone.Trim(),
+                    AddressLine = NewAddressLine.Trim(),
                     IsDefault = false,
                     CreatedAt = DateTime.UtcNow
                 };
 
                 var hasAddresses = await _context.Addresses.AnyAsync(a => a.UserId == userId);
-                if (!hasAddresses) newAddr.IsDefault = true;
+                if (!hasAddresses)
+                    selectedAddress.IsDefault = true;
 
-                _context.Addresses.Add(newAddr);
+                _context.Addresses.Add(selectedAddress);
                 await _context.SaveChangesAsync();
-                SelectedAddressId = newAddr.AddressId;
+            }
+            else if (SelectedAddressId > 0)
+            {
+                // User selected existing address
+                selectedAddress = await _context.Addresses
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(a => a.AddressId == SelectedAddressId && a.UserId == userId);
             }
 
-            if (SelectedAddressId <= 0)
+            if (selectedAddress == null)
             {
                 TempData["ErrorMessage"] = "Please select or add a shipping address.";
                 Cart = await _cartService.GetCartByUserIdAsync(userId);
@@ -107,12 +118,15 @@ namespace EyewearStore_SWP391.Pages.Checkout
                 return Page();
             }
 
-            // Validate prescription selection if provided
+            // ✅ STEP 2: Validate prescription if selected
             if (SelectedPrescriptionId.HasValue && SelectedPrescriptionId.Value > 0)
             {
                 var presc = await _context.PrescriptionProfiles
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(p => p.PrescriptionId == SelectedPrescriptionId.Value && p.UserId == userId && p.IsActive);
+                    .FirstOrDefaultAsync(p =>
+                        p.PrescriptionId == SelectedPrescriptionId.Value &&
+                        p.UserId == userId &&
+                        p.IsActive);
 
                 if (presc == null)
                 {
@@ -127,61 +141,124 @@ namespace EyewearStore_SWP391.Pages.Checkout
 
             try
             {
-                // Create pending order and pass prescription id (optional)
-                var order = await _orderService.CreatePendingOrderAsync(userId, SelectedAddressId, SelectedPrescriptionId);
-
-                // Build Stripe line items (from cart) and include prescription info in product name if chosen
+                // ✅ STEP 3: Get cart and calculate total
                 var cart = await _cartService.GetCartByUserIdAsync(userId);
-                var lineItems = new List<StripeLineItemDto>();
+                var total = await _cartService.CalculateCartTotalAsync(userId);
 
-                if (cart != null)
+                if (cart == null || !cart.CartItems.Any())
                 {
-                    foreach (var ci in cart.CartItems)
-                    {
-                        decimal unitPrice = ci.Product?.Price ?? 0m;
-                        if (ci.Service != null) unitPrice += ci.Service.Price;
-
-                        var itemName = ci.Product?.Name ?? ci.Service?.Name ?? "Product";
-                        if (ci.Service != null) itemName += $" + {ci.Service.Name}";
-
-                        if (SelectedPrescriptionId.HasValue && SelectedPrescriptionId.Value > 0)
-                        {
-                            var presc = await _context.PrescriptionProfiles
-                                .AsNoTracking()
-                                .FirstOrDefaultAsync(p => p.PrescriptionId == SelectedPrescriptionId.Value);
-                            if (presc != null) itemName += $" (Rx: {presc.ProfileName})";
-                        }
-
-                        string? imageUrl = null;
-                        if (ci.Product?.ProductImages != null)
-                        {
-                            var primaryImg = ci.Product.ProductImages.FirstOrDefault(img => img.IsPrimary && img.IsActive);
-                            if (primaryImg != null && !string.IsNullOrEmpty(primaryImg.ImageUrl))
-                                imageUrl = primaryImg.ImageUrl.StartsWith("http") ? primaryImg.ImageUrl : $"{Request.Scheme}://{Request.Host}{primaryImg.ImageUrl}";
-                        }
-
-                        lineItems.Add(new StripeLineItemDto
-                        {
-                            ProductName = itemName,
-                            UnitAmountInSmallestUnit = (long)unitPrice,
-                            Quantity = ci.Quantity,
-                            ImageUrl = imageUrl
-                        });
-                    }
+                    TempData["ErrorMessage"] = "Your cart is empty.";
+                    return RedirectToPage("/Cart/Index");
                 }
 
+                // ✅ STEP 4: CREATE ORDER WITH ADDRESS SNAPSHOT
+                var order = new Order
+                {
+                    UserId = userId,
+
+                    // ✅ COPY address data (snapshot) - QUAN TRỌNG!
+                    ReceiverName = selectedAddress.ReceiverName,
+                    Phone = selectedAddress.Phone,
+                    AddressLine = selectedAddress.AddressLine,
+
+                    // Keep reference (optional, for analytics)
+                    AddressId = selectedAddress.AddressId,
+
+                    TotalAmount = total,
+                    Status = "Pending",
+                    PaymentMethod = "Stripe",
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Orders.Add(order);
+                await _context.SaveChangesAsync();
+
+                // ✅ STEP 5: Create order items
+                foreach (var cartItem in cart.CartItems)
+                {
+                    decimal unitPrice = cartItem.Product?.Price ?? 0m;
+                    if (cartItem.Service != null)
+                        unitPrice += cartItem.Service.Price;
+
+                    var orderItem = new OrderItem
+                    {
+                        OrderId = order.OrderId,
+                        ProductId = cartItem.ProductId,
+                        ServiceId = cartItem.ServiceId,
+                        PrescriptionId = SelectedPrescriptionId,  // ← Prescription support
+                        Quantity = cartItem.Quantity,
+                        UnitPrice = unitPrice
+                    };
+
+                    _context.OrderItems.Add(orderItem);
+                }
+
+                await _context.SaveChangesAsync();
+
+                // ✅ STEP 6: Build Stripe line items
+                var lineItems = new List<StripeLineItemDto>();
+
+                foreach (var ci in cart.CartItems)
+                {
+                    decimal unitPrice = ci.Product?.Price ?? 0m;
+                    if (ci.Service != null)
+                        unitPrice += ci.Service.Price;
+
+                    var itemName = ci.Product?.Name ?? ci.Service?.Name ?? "Product";
+                    if (ci.Service != null)
+                        itemName += $" + {ci.Service.Name}";
+
+                    // Add prescription info to item name
+                    if (SelectedPrescriptionId.HasValue && SelectedPrescriptionId.Value > 0)
+                    {
+                        var presc = await _context.PrescriptionProfiles
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(p => p.PrescriptionId == SelectedPrescriptionId.Value);
+                        if (presc != null)
+                            itemName += $" (Rx: {presc.ProfileName})";
+                    }
+
+                    string? imageUrl = null;
+                    if (ci.Product?.ProductImages != null)
+                    {
+                        var primaryImg = ci.Product.ProductImages
+                            .FirstOrDefault(img => img.IsPrimary && img.IsActive);
+                        if (primaryImg != null && !string.IsNullOrEmpty(primaryImg.ImageUrl))
+                        {
+                            imageUrl = primaryImg.ImageUrl.StartsWith("http")
+                                ? primaryImg.ImageUrl
+                                : $"{Request.Scheme}://{Request.Host}{primaryImg.ImageUrl}";
+                        }
+                    }
+
+                    lineItems.Add(new StripeLineItemDto
+                    {
+                        ProductName = itemName,
+                        UnitAmountInSmallestUnit = (long)unitPrice,
+                        Quantity = ci.Quantity,
+                        ImageUrl = imageUrl
+                    });
+                }
+
+                // ✅ STEP 7: Create Stripe session
                 var baseUrl = $"{Request.Scheme}://{Request.Host}";
                 var successUrl = $"{baseUrl}/Checkout/Success";
                 var cancelUrl = $"{baseUrl}/Checkout/Cancel";
 
                 var userEmail = User.FindFirst(ClaimTypes.Email)?.Value
-                             ?? User.FindFirst(ClaimTypes.Name)?.Value ?? "";
+                             ?? User.FindFirst(ClaimTypes.Name)?.Value
+                             ?? "";
 
-                var stripeUrl = await _stripeService.CreateCheckoutSessionAsync(order.OrderId, lineItems, successUrl, cancelUrl, userEmail);
+                var stripeUrl = await _stripeService.CreateCheckoutSessionAsync(
+                    order.OrderId,
+                    lineItems,
+                    successUrl,
+                    cancelUrl,
+                    userEmail);
 
                 return Redirect(stripeUrl);
             }
-            catch (InvalidOperationException ex)
+            catch (Exception ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
                 Cart = await _cartService.GetCartByUserIdAsync(userId);
@@ -200,9 +277,11 @@ namespace EyewearStore_SWP391.Pages.Checkout
                 .ThenByDescending(a => a.CreatedAt)
                 .ToListAsync();
 
-            DefaultAddress = Addresses.FirstOrDefault(a => a.IsDefault) ?? Addresses.FirstOrDefault();
+            DefaultAddress = Addresses.FirstOrDefault(a => a.IsDefault)
+                          ?? Addresses.FirstOrDefault();
 
-            if (DefaultAddress != null && SelectedAddressId == 0) SelectedAddressId = DefaultAddress.AddressId;
+            if (DefaultAddress != null && SelectedAddressId == 0)
+                SelectedAddressId = DefaultAddress.AddressId;
         }
 
         private async Task LoadPrescriptionsAsync(int userId)

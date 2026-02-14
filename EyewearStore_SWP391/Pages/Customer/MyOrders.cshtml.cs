@@ -27,12 +27,12 @@ namespace EyewearStore_SWP391.Pages.Customer
             public string PaymentMethod { get; set; } = "";
             public string? TrackingNumber { get; set; }
 
-            // ✅ Address snapshot
+            // Address snapshot
             public string ReceiverName { get; set; } = "";
             public string Phone { get; set; } = "";
             public string AddressLine { get; set; } = "";
 
-            // ✅ Prescription indicator
+            // Prescription indicator
             public bool HasPrescription { get; set; }
 
             public List<OrderProductViewModel> Products { get; set; } = new();
@@ -45,7 +45,7 @@ namespace EyewearStore_SWP391.Pages.Customer
             public int Quantity { get; set; }
             public decimal UnitPrice { get; set; }
 
-            // ✅ Prescription details
+            // Prescription details
             public int? PrescriptionId { get; set; }
             public PrescriptionViewModel? Prescription { get; set; }
         }
@@ -89,13 +89,13 @@ namespace EyewearStore_SWP391.Pages.Customer
                 CurrentUserEmail = user.Email ?? "";
                 CurrentUserName = user.FullName ?? user.Email ?? "";
 
-                // ✅ Load orders with prescription details
+                // Load orders with prescription details
                 var orders = await _context.Orders
                     .Where(o => o.UserId == userId)
                     .Include(o => o.OrderItems)
                         .ThenInclude(oi => oi.Product)
                     .Include(o => o.OrderItems)
-                        .ThenInclude(oi => oi.Prescription)  // ← KEY: Load prescription!
+                        .ThenInclude(oi => oi.Prescription)
                     .Include(o => o.Shipments)
                     .OrderByDescending(o => o.CreatedAt)
                     .AsNoTracking()
@@ -111,12 +111,12 @@ namespace EyewearStore_SWP391.Pages.Customer
                     PaymentMethod = o.PaymentMethod ?? "Stripe",
                     TrackingNumber = o.Shipments.FirstOrDefault()?.TrackingNumber,
 
-                    // ✅ Use address snapshot
-                    ReceiverName = o.ReceiverName,
-                    Phone = o.Phone,
-                    AddressLine = o.AddressLine,
+                    // address snapshot fields (must exist on Order as you made earlier)
+                    ReceiverName = o.ReceiverName ?? "",
+                    Phone = o.Phone ?? "",
+                    AddressLine = o.AddressLine ?? "",
 
-                    // ✅ Check if order has prescription
+                    // prescription indicator
                     HasPrescription = o.OrderItems.Any(oi => oi.PrescriptionId.HasValue),
 
                     Products = o.OrderItems.Select(oi => new OrderProductViewModel
@@ -126,7 +126,6 @@ namespace EyewearStore_SWP391.Pages.Customer
                         Quantity = oi.Quantity,
                         UnitPrice = oi.UnitPrice,
 
-                        // ✅ Include prescription details
                         PrescriptionId = oi.PrescriptionId,
                         Prescription = oi.Prescription != null ? new PrescriptionViewModel
                         {
@@ -143,12 +142,14 @@ namespace EyewearStore_SWP391.Pages.Customer
             }
             catch (Exception ex)
             {
+                // log if you have a logger; for now print
                 Console.WriteLine($"Error loading orders: {ex.Message}");
                 Orders = new List<OrderViewModel>();
             }
         }
 
-        public static string GetStatusBadgeClass(string status)
+        // ---- CHANGED: these are instance methods now (not static) ----
+        public string GetStatusBadgeClass(string status)
         {
             return status switch
             {
@@ -163,7 +164,7 @@ namespace EyewearStore_SWP391.Pages.Customer
             };
         }
 
-        public static string GetStatusIcon(string status)
+        public string GetStatusIcon(string status)
         {
             return status switch
             {
@@ -178,7 +179,7 @@ namespace EyewearStore_SWP391.Pages.Customer
             };
         }
 
-        public static int GetStatusProgress(string status)
+        public int GetStatusProgress(string status)
         {
             return status switch
             {

@@ -608,23 +608,71 @@ public partial class EyewearStoreContext : DbContext
             entity.ToTable("returns");
             entity.HasKey(e => e.ReturnId);
 
+            entity.HasIndex(e => e.OrderItemId).HasDatabaseName("IX_returns_order_item");
+            entity.HasIndex(e => e.UserId).HasDatabaseName("IX_returns_user");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_returns_status");
+
             entity.Property(e => e.ReturnId).HasColumnName("return_id");
             entity.Property(e => e.OrderItemId).HasColumnName("order_item_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.Quantity)
+                .HasDefaultValue(1)
+                .HasColumnName("quantity");
+            entity.Property(e => e.ReturnType)
+                .HasMaxLength(50)
+                .HasColumnName("return_type");
+            entity.Property(e => e.ReasonCategory)
+                .HasMaxLength(50)
+                .HasColumnName("reason_category");
             entity.Property(e => e.Reason)
                 .HasMaxLength(500)
                 .HasColumnName("reason");
+            entity.Property(e => e.Description)
+                .HasMaxLength(1000)
+                .HasColumnName("description");
+            entity.Property(e => e.ImageUrls)
+                .HasColumnName("image_urls");
             entity.Property(e => e.Status)
-                .HasMaxLength(20)
+                .HasMaxLength(50)
+                .HasDefaultValue("Pending")
                 .HasColumnName("status");
+            entity.Property(e => e.RefundAmount)
+                .HasColumnType("decimal(18,2)")
+                .HasColumnName("refund_amount");
+            entity.Property(e => e.ReviewedBy)
+                .HasColumnName("reviewed_by");
+            entity.Property(e => e.ReviewedAt)
+                .HasColumnName("reviewed_at");
+            entity.Property(e => e.StaffNotes)
+                .HasMaxLength(1000)
+                .HasColumnName("staff_notes");
+            entity.Property(e => e.RejectionReason)
+                .HasMaxLength(500)
+                .HasColumnName("rejection_reason");
+            entity.Property(e => e.ReturnTrackingNumber)
+                .HasMaxLength(100)
+                .HasColumnName("return_tracking_number");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("SYSDATETIME()")
                 .HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnName("updated_at");
+            entity.Property(e => e.CompletedAt)
+                .HasColumnName("completed_at");
 
+            // Relationship: Return -> OrderItem
             entity.HasOne(d => d.OrderItem)
                 .WithMany(p => p.Returns)
                 .HasForeignKey(d => d.OrderItemId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_returns_order_items");
+
+            // Relationship: Return -> User (customer who created return)
+            entity.HasOne(d => d.User)
+                .WithMany()
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_returns_users");
         });
 
         // =========================

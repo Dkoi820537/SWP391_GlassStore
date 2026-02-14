@@ -17,7 +17,7 @@ namespace EyewearStore_SWP391.Pages.Customer
 
         public MyOrdersModel(EyewearStoreContext context) => _context = context;
 
-        public class OrderItem
+        public class OrderViewModel
         {
             public int OrderId { get; set; }
             public DateTime CreatedAt { get; set; }
@@ -25,30 +25,32 @@ namespace EyewearStore_SWP391.Pages.Customer
             public decimal TotalAmount { get; set; }
             public int ItemCount { get; set; }
             public string PaymentMethod { get; set; } = "";
-            public string TrackingNumber { get; set; } = "";
-            public string ShippingAddress { get; set; } = "";
+            public string? TrackingNumber { get; set; }
 
-            // ✅ NEW: Prescription indicator
+            // ✅ Address snapshot
+            public string ReceiverName { get; set; } = "";
+            public string Phone { get; set; } = "";
+            public string AddressLine { get; set; } = "";
+
+            // ✅ Prescription indicator
             public bool HasPrescription { get; set; }
 
-            // Product details
-            public List<ProductItem> Products { get; set; } = new();
+            public List<OrderProductViewModel> Products { get; set; } = new();
         }
 
-        public class ProductItem
+        public class OrderProductViewModel
         {
             public string Name { get; set; } = "";
             public string Sku { get; set; } = "";
             public int Quantity { get; set; }
             public decimal UnitPrice { get; set; }
 
-            // ✅ NEW: Prescription details
+            // ✅ Prescription details
             public int? PrescriptionId { get; set; }
-            public PrescriptionInfo? Prescription { get; set; }
+            public PrescriptionViewModel? Prescription { get; set; }
         }
 
-        // ✅ NEW: Prescription info class
-        public class PrescriptionInfo
+        public class PrescriptionViewModel
         {
             public string ProfileName { get; set; } = "";
             public decimal? RightSph { get; set; }
@@ -59,7 +61,7 @@ namespace EyewearStore_SWP391.Pages.Customer
             public int? LeftAxis { get; set; }
         }
 
-        public List<OrderItem> Orders { get; set; } = new();
+        public List<OrderViewModel> Orders { get; set; } = new();
         public string CurrentUserEmail { get; set; } = "";
         public string CurrentUserName { get; set; } = "";
 
@@ -70,7 +72,7 @@ namespace EyewearStore_SWP391.Pages.Customer
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                 {
-                    Orders = new List<OrderItem>();
+                    Orders = new List<OrderViewModel>();
                     return;
                 }
 
@@ -80,27 +82,26 @@ namespace EyewearStore_SWP391.Pages.Customer
 
                 if (user == null)
                 {
-                    Orders = new List<OrderItem>();
+                    Orders = new List<OrderViewModel>();
                     return;
                 }
 
                 CurrentUserEmail = user.Email ?? "";
                 CurrentUserName = user.FullName ?? user.Email ?? "";
 
-                // ✅ FIXED: Include Prescription in OrderItems!
+                // ✅ Load orders with prescription details
                 var orders = await _context.Orders
                     .Where(o => o.UserId == userId)
                     .Include(o => o.OrderItems)
                         .ThenInclude(oi => oi.Product)
                     .Include(o => o.OrderItems)
-                        .ThenInclude(oi => oi.Prescription)  // ← KEY FIX!
-                    .Include(o => o.Address)
+                        .ThenInclude(oi => oi.Prescription)  // ← KEY: Load prescription!
                     .Include(o => o.Shipments)
                     .OrderByDescending(o => o.CreatedAt)
                     .AsNoTracking()
                     .ToListAsync();
 
-                Orders = orders.Select(o => new OrderItem
+                Orders = orders.Select(o => new OrderViewModel
                 {
                     OrderId = o.OrderId,
                     CreatedAt = o.CreatedAt,
@@ -108,22 +109,26 @@ namespace EyewearStore_SWP391.Pages.Customer
                     TotalAmount = o.TotalAmount,
                     ItemCount = o.OrderItems.Sum(oi => oi.Quantity),
                     PaymentMethod = o.PaymentMethod ?? "Stripe",
-                    TrackingNumber = o.Shipments.FirstOrDefault()?.TrackingNumber ?? "",
-                    ShippingAddress = o.ReceiverName + " — " + o.Phone + " — " + o.AddressLine,  // ✅ Use snapshot
+                    TrackingNumber = o.Shipments.FirstOrDefault()?.TrackingNumber,
 
-                    // ✅ NEW: Check if order has prescription
+                    // ✅ Use address snapshot
+                    ReceiverName = o.ReceiverName,
+                    Phone = o.Phone,
+                    AddressLine = o.AddressLine,
+
+                    // ✅ Check if order has prescription
                     HasPrescription = o.OrderItems.Any(oi => oi.PrescriptionId.HasValue),
 
-                    Products = o.OrderItems.Select(oi => new ProductItem
+                    Products = o.OrderItems.Select(oi => new OrderProductViewModel
                     {
-                        Name = oi.Product?.Name ?? "Deleted product",
+                        Name = oi.Product?.Name ?? "Product",
                         Sku = oi.Product?.Sku ?? "N/A",
                         Quantity = oi.Quantity,
                         UnitPrice = oi.UnitPrice,
 
-                        // ✅ NEW: Include prescription details
+                        // ✅ Include prescription details
                         PrescriptionId = oi.PrescriptionId,
-                        Prescription = oi.Prescription != null ? new PrescriptionInfo
+                        Prescription = oi.Prescription != null ? new PrescriptionViewModel
                         {
                             ProfileName = oi.Prescription.ProfileName ?? "Prescription",
                             RightSph = oi.Prescription.RightSph,
@@ -139,16 +144,14 @@ namespace EyewearStore_SWP391.Pages.Customer
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading orders: {ex.Message}");
-                Orders = new List<OrderItem>();
+                Orders = new List<OrderViewModel>();
             }
         }
 
-        // Helper methods (keep existing ones)
         public static string GetStatusBadgeClass(string status)
         {
             return status switch
             {
-                "Pending Confirmation" => "bg-warning text-dark",
                 "Pending" => "bg-warning text-dark",
                 "Confirmed" => "bg-info",
                 "Processing" => "bg-primary",
@@ -164,7 +167,6 @@ namespace EyewearStore_SWP391.Pages.Customer
         {
             return status switch
             {
-                "Pending Confirmation" => "bi-hourglass-split",
                 "Pending" => "bi-hourglass-split",
                 "Confirmed" => "bi-check-circle",
                 "Processing" => "bi-gear",
@@ -180,7 +182,6 @@ namespace EyewearStore_SWP391.Pages.Customer
         {
             return status switch
             {
-                "Pending Confirmation" => 14,
                 "Pending" => 14,
                 "Confirmed" => 28,
                 "Processing" => 42,

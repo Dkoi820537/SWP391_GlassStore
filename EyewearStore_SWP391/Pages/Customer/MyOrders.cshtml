@@ -2,74 +2,111 @@
 @model EyewearStore_SWP391.Pages.Customer.MyOrdersModel
 @{
     ViewData["Title"] = "My Orders";
-    Layout = "_Layout";
 }
 
-<div class="container py-4">
-    <!-- Page Header -->
-    <div class="mb-4">
-        <div class="d-flex justify-content-between align-items-center">
+<div class="container py-5">
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="mb-5">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
+                <li class="breadcrumb-item active">My Orders</li>
+            </ol>
+        </nav>
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div>
-                <h2 class="mb-2">
-                    <i class="bi bi-bag-check me-2 text-primary"></i>
-                    My Orders
+                <h1 style="font-family: var(--font-secondary);
+                           color: var(--primary-navy);
+                           font-size: 2.5rem;
+                           margin-bottom: 0.5rem;">
+                    🛍️ My Orders
                     @if (Model.Orders.Any())
                     {
-                        <span class="badge bg-primary ms-2">@Model.Orders.Count</span>
+                        <span class="badge" style="background: var(--primary-gold);
+                                                        font-size: 1.2rem;
+                                                        vertical-align: middle;">
+                            @Model.Orders.Count
+                        </span>
                     }
-                </h2>
-                <p class="text-muted mb-0">
-                    <i class="bi bi-info-circle me-1"></i>
-                    Track the status and history of your orders
+                </h1>
+                <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin: 0;">
+                    Track your orders and view prescription details
                 </p>
             </div>
+
             @if (Model.Orders.Any())
             {
-                <div>
-                    <a href="/Products" class="btn btn-outline-primary">
-                        <i class="bi bi-shop me-1"></i>Continue Shopping
-                    </a>
-                </div>
+                <a asp-page="/Index"
+                   class="btn btn-primary"
+                   style="padding: 0.875rem 2rem;
+                              background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+                              border: none;
+                              border-radius: 8px;
+                              font-weight: 600;">
+                    <i class="bi bi-shop me-2"></i>Continue Shopping
+                </a>
             }
         </div>
     </div>
 
     @if (!Model.Orders.Any())
     {
-        <!-- Empty State -->
-        <div class="card shadow-sm">
-            <div class="card-body text-center py-5">
-                <i class="bi bi-cart-x display-1 text-muted mb-3"></i>
-                <h4 class="text-muted">No orders yet</h4>
-                <p class="text-muted mb-4">You haven't placed any orders yet. Start shopping now!</p>
-                <a href="/Products" class="btn btn-primary btn-lg">
-                    <i class="bi bi-shop me-2"></i>Shop Now
-                </a>
-            </div>
+        <!-- ===== EMPTY STATE ===== -->
+        <div class="card" style="border: none;
+                                      border-radius: 16px;
+                                      box-shadow: var(--shadow-lg);
+                                      text-align: center;
+                                      padding: 5rem 3rem;
+                                      background: linear-gradient(135deg, var(--white) 0%, var(--secondary-cream) 100%);">
+            <div style="font-size: 6rem; opacity: 0.2; margin-bottom: 2rem;">🛒</div>
+            <h2 style="color: var(--primary-navy); margin-bottom: 1rem; font-family: var(--font-secondary);">
+                No Orders Yet
+            </h2>
+            <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin-bottom: 2.5rem;">
+                You haven't placed any orders yet. Start shopping for premium eyewear!
+            </p>
+            <a asp-page="/Index"
+               class="btn btn-primary btn-lg"
+               style="padding: 1.25rem 3rem;
+                          background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+                          border: none;
+                          border-radius: 10px;">
+                <i class="bi bi-shop me-2"></i>Shop Now
+            </a>
         </div>
     }
     else
     {
-        <!-- Orders List -->
+        <!-- ===== ORDERS LIST ===== -->
         <div class="row g-4">
             @foreach (var order in Model.Orders)
             {
                 <div class="col-12">
-                    <div class="card shadow-sm order-card">
-                        <div class="card-header bg-white border-bottom">
+                    <div class="card order-card"
+                         style="border: none;
+                                        border-radius: 16px;
+                                        box-shadow: var(--shadow-md);
+                                        overflow: hidden;
+                                        transition: all 0.3s ease;">
+
+                        <!-- Card Header -->
+                        <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+                                            padding: 1.5rem 2rem;">
                             <div class="row align-items-center">
-                                <div class="col-md-6">
-                                    <h5 class="mb-1">
-                                        <i class="bi bi-receipt text-primary me-2"></i>
+                                <div class="col-md-8">
+                                    <h4 style="color: white; margin: 0 0 0.5rem 0; font-weight: 600;">
+                                        <i class="bi bi-receipt-cutoff me-2"></i>
                                         Order #@order.OrderId
-                                    </h5>
-                                    <small class="text-muted">
-                                        <i class="bi bi-calendar-event me-1"></i>
-                                        @order.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy 'at' HH:mm")
-                                    </small>
+                                    </h4>
+                                    <div style="color: rgba(255,255,255,0.9); font-size: 0.95rem;">
+                                        <i class="bi bi-calendar3 me-1"></i>
+                                        @order.CreatedAt.ToString("MMMM dd, yyyy 'at' HH:mm")
+                                    </div>
                                 </div>
-                                <div class="col-md-6 text-md-end mt-2 mt-md-0">
-                                    <span class="badge @MyOrdersModel.GetStatusBadgeClass(order.Status) fs-6 px-3 py-2">
+                                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                    <span class="badge @MyOrdersModel.GetStatusBadgeClass(order.Status)"
+                                          style="font-size: 1rem; padding: 0.5rem 1.25rem; border-radius: 20px;">
                                         <i class="@MyOrdersModel.GetStatusIcon(order.Status) me-1"></i>
                                         @order.Status
                                     </span>
@@ -77,137 +114,295 @@
                             </div>
                         </div>
 
-                        <div class="card-body">
-                            <!-- Status Progress Bar -->
+                        <!-- Card Body -->
+                        <div class="card-body" style="padding: 2rem;">
+
+                            <!-- Progress Bar -->
                             @if (order.Status != "Cancelled")
                             {
                                 <div class="mb-4">
                                     <div class="d-flex justify-content-between mb-2">
-                                        <small class="text-muted">Order Progress</small>
-                                        <small class="fw-semibold">@MyOrdersModel.GetStatusProgress(order.Status)%</small>
+                                        <small style="font-weight: 600; color: var(--primary-navy);">Order Progress</small>
+                                        <small style="font-weight: 600; color: var(--primary-gold);">
+                                            @MyOrdersModel.GetStatusProgress(order.Status)%
+                                        </small>
                                     </div>
-                                    <div class="progress" style="height: 8px;">
-                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success"
-                                             role="progressbar"
-                                             style="width: @MyOrdersModel.GetStatusProgress(order.Status)%"
-                                             aria-valuenow="@MyOrdersModel.GetStatusProgress(order.Status)"
-                                             aria-valuemin="0"
-                                             aria-valuemax="100">
+                                    <div class="progress" style="height: 10px; border-radius: 10px; background: var(--light-gray);">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                             style="width: @MyOrdersModel.GetStatusProgress(order.Status)%;
+                                                                background: linear-gradient(90deg, var(--primary-gold) 0%, var(--primary-gold-light) 100%);
+                                                                border-radius: 10px;">
                                         </div>
                                     </div>
                                 </div>
                             }
 
-                            <!-- Order Info Grid -->
-                            <div class="row mb-3">
-                                <div class="col-md-6 mb-3">
-                                    <div class="d-flex align-items-start">
-                                        <i class="bi bi-geo-alt-fill text-primary me-2 mt-1"></i>
-                                        <div>
-                                            <small class="text-muted d-block">Shipping Address</small>
-                                            <span class="fw-semibold">@order.ShippingAddress</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <div class="d-flex align-items-start">
-                                        <i class="bi bi-credit-card text-success me-2 mt-1"></i>
-                                        <div>
-                                            <small class="text-muted d-block">Payment</small>
-                                            <span class="fw-semibold">
-                                                @(order.PaymentMethod == "COD" ? "COD (Cash)" : "Stripe")
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <div class="d-flex align-items-start">
-                                        <i class="bi bi-box-seam text-info me-2 mt-1"></i>
-                                        <div>
-                                            <small class="text-muted d-block">Total Items</small>
-                                            <span class="fw-semibold">@order.ItemCount item(s)</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- ✅ PRESCRIPTION INFO (NEW!) -->
+                            <!-- ✅ PRESCRIPTION INDICATOR -->
                             @if (order.HasPrescription)
                             {
-                                <div class="alert" style="background: rgba(156, 39, 176, 0.1); border-left: 4px solid #9c27b0; margin-bottom: 1rem;">
-                                    <div class="d-flex align-items-start">
-                                        <i class="bi bi-eyeglasses text-purple me-2" style="font-size: 1.5rem; color: #9c27b0;"></i>
-                                        <div class="flex-grow-1">
-                                            <strong style="color: #9c27b0;">Prescription Order</strong>
-                                            <p class="mb-0 small text-muted">
-                                                This order includes prescription lenses. Details available in order items below.
+                                <div class="alert"
+                                     style="background: linear-gradient(135deg, rgba(156, 39, 176, 0.08) 0%, rgba(186, 104, 200, 0.05) 100%);
+                                                        border: none;
+                                                        border-left: 4px solid #9c27b0;
+                                                        border-radius: 10px;
+                                                        padding: 1rem 1.25rem;
+                                                        margin-bottom: 1.5rem;">
+                                    <div class="d-flex align-items-center">
+                                        <div style="font-size: 2rem; margin-right: 1rem; color: #9c27b0;">👓</div>
+                                        <div>
+                                            <strong style="color: #9c27b0; font-size: 1.05rem;">Prescription Order</strong>
+                                            <p class="mb-0" style="color: #7b1fa2; font-size: 0.9rem; margin-top: 0.25rem;">
+                                                This order includes custom prescription lenses. Details shown below.
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                             }
 
-                            <!-- Tracking Number -->
-                            @if (!string.IsNullOrWhiteSpace(order.TrackingNumber))
-                            {
-                                <div class="alert alert-info mb-3" role="alert">
-                                    <i class="bi bi-truck me-2"></i>
-                                    <strong>Tracking Number:</strong>
-                                    <span class="font-monospace fw-bold ms-2">@order.TrackingNumber</span>
-                                    <button class="btn btn-sm btn-outline-info ms-3" onclick="copyTracking('@order.TrackingNumber')">
-                                        <i class="bi bi-clipboard"></i> Copy
-                                    </button>
+                            <!-- Order Info Grid -->
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-4">
+                                    <div class="info-box" style="background: var(--light-gray);
+                                                                          padding: 1.25rem;
+                                                                          border-radius: 12px;
+                                                                          height: 100%;">
+                                        <div class="d-flex align-items-start">
+                                            <i class="bi bi-geo-alt-fill"
+                                               style="color: var(--primary-gold);
+                                                              font-size: 1.5rem;
+                                                              margin-right: 0.75rem;"></i>
+                                            <div>
+                                                <small style="color: var(--secondary-warm-gray);
+                                                                      font-size: 0.85rem;
+                                                                      text-transform: uppercase;
+                                                                      letter-spacing: 0.5px;">
+                                                    Shipping To
+                                                </small>
+                                                <div style="color: var(--primary-navy); font-weight: 600; margin-top: 0.25rem;">
+                                                    @order.ReceiverName
+                                                </div>
+                                                <div style="color: var(--dark-gray); font-size: 0.9rem;">
+                                                    @order.Phone
+                                                </div>
+                                                <div style="color: var(--dark-gray); font-size: 0.9rem;">
+                                                    @order.AddressLine
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            }
 
-                            <!-- Product List -->
-                            <div class="order-products mb-3">
-                                <h6 class="border-bottom pb-2 mb-3">
-                                    <i class="bi bi-bag me-2"></i>Products in Order
+                                <div class="col-md-4">
+                                    <div class="info-box" style="background: var(--light-gray);
+                                                                          padding: 1.25rem;
+                                                                          border-radius: 12px;
+                                                                          height: 100%;">
+                                        <div class="d-flex align-items-start">
+                                            <i class="bi bi-credit-card-fill"
+                                               style="color: var(--success);
+                                                              font-size: 1.5rem;
+                                                              margin-right: 0.75rem;"></i>
+                                            <div>
+                                                <small style="color: var(--secondary-warm-gray);
+                                                                      font-size: 0.85rem;
+                                                                      text-transform: uppercase;
+                                                                      letter-spacing: 0.5px;">
+                                                    Payment
+                                                </small>
+                                                <div style="color: var(--primary-navy); font-weight: 600; margin-top: 0.25rem;">
+                                                    @order.PaymentMethod
+                                                </div>
+                                                @if (!string.IsNullOrEmpty(order.TrackingNumber))
+                                                {
+                                                    <div style="margin-top: 0.5rem;">
+                                                        <small style="color: var(--secondary-warm-gray);">Tracking:</small>
+                                                        <code style="background: white;
+                                                                                 padding: 0.25rem 0.5rem;
+                                                                                 border-radius: 4px;
+                                                                                 font-size: 0.85rem;">
+                                                            @order.TrackingNumber
+                                                        </code>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="info-box" style="background: var(--light-gray);
+                                                                          padding: 1.25rem;
+                                                                          border-radius: 12px;
+                                                                          height: 100%;">
+                                        <div class="d-flex align-items-start">
+                                            <i class="bi bi-box-seam-fill"
+                                               style="color: var(--secondary-teal);
+                                                              font-size: 1.5rem;
+                                                              margin-right: 0.75rem;"></i>
+                                            <div>
+                                                <small style="color: var(--secondary-warm-gray);
+                                                                      font-size: 0.85rem;
+                                                                      text-transform: uppercase;
+                                                                      letter-spacing: 0.5px;">
+                                                    Order Total
+                                                </small>
+                                                <div style="color: var(--primary-gold);
+                                                                   font-weight: 700;
+                                                                   font-size: 1.5rem;
+                                                                   font-family: var(--font-secondary);
+                                                                   margin-top: 0.25rem;">
+                                                    @order.TotalAmount.ToString("N0") VND
+                                                </div>
+                                                <div style="color: var(--dark-gray); font-size: 0.9rem;">
+                                                    @order.ItemCount item(s)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Products List -->
+                            <div class="products-section">
+                                <h6 style="color: var(--primary-navy);
+                                                  font-weight: 600;
+                                                  border-bottom: 2px solid var(--medium-gray);
+                                                  padding-bottom: 0.75rem;
+                                                  margin-bottom: 1.25rem;">
+                                    <i class="bi bi-bag-check me-2"></i>Products in Order
                                 </h6>
+
                                 @foreach (var product in order.Products)
                                 {
-                                    <div class="mb-3 p-3 bg-light rounded">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div class="flex-grow-1">
-                                                <div class="fw-semibold">@product.Name</div>
-                                                <small class="text-muted">
-                                                    SKU: @product.Sku | Qty: <strong>×@product.Quantity</strong>
-                                                </small>
-                                            </div>
-                                            <div class="text-end">
-                                                <div class="fw-semibold text-primary">
-                                                    @String.Format("{0:N0} ₫", product.UnitPrice)
+                                    <div class="product-item"
+                                         style="background: white;
+                                                            border: 2px solid var(--medium-gray);
+                                                            border-radius: 12px;
+                                                            padding: 1.25rem;
+                                                            margin-bottom: 1rem;
+                                                            transition: all 0.3s ease;">
+
+                                        <div class="row align-items-center">
+                                            <div class="col-md-7">
+                                                <h6 style="color: var(--primary-navy);
+                                                                      font-weight: 600;
+                                                                      margin-bottom: 0.5rem;">
+                                                    @product.Name
+                                                </h6>
+                                                <div style="color: var(--secondary-warm-gray);
+                                                                       font-size: 0.9rem;
+                                                                       margin-bottom: 0.5rem;">
+                                                    <span class="badge" style="background: var(--light-gray);
+                                                                                           color: var(--dark-gray);
+                                                                                           font-weight: 500;">
+                                                        SKU: @product.Sku
+                                                    </span>
+                                                    <span class="ms-2">Qty: <strong>×@product.Quantity</strong></span>
                                                 </div>
-                                                <small class="text-muted">
-                                                    = @String.Format("{0:N0} ₫", product.UnitPrice * product.Quantity)
-                                                </small>
+                                            </div>
+                                            <div class="col-md-5 text-md-end">
+                                                <div style="font-size: 0.9rem; color: var(--secondary-warm-gray);">
+                                                    Unit Price
+                                                </div>
+                                                <div style="color: var(--primary-navy);
+                                                                       font-weight: 700;
+                                                                       font-size: 1.25rem;">
+                                                    @product.UnitPrice.ToString("N0") VND
+                                                </div>
+                                                <div style="color: var(--dark-gray); font-size: 0.9rem;">
+                                                    Subtotal: @((product.UnitPrice * product.Quantity).ToString("N0")) VND
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <!-- ✅ PRESCRIPTION DETAILS FOR THIS ITEM (NEW!) -->
+                                        <!-- ✅ PRESCRIPTION DETAILS -->
                                         @if (product.PrescriptionId.HasValue && product.Prescription != null)
                                         {
-                                            <div class="mt-2 p-2" style="background: white; border-radius: 6px; border: 2px solid #9c27b0;">
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <i class="bi bi-eyeglasses me-2" style="color: #9c27b0;"></i>
-                                                    <strong style="color: #9c27b0;">Prescription: @product.Prescription.ProfileName</strong>
-                                                </div>
-                                                <div class="row g-2 small">
-                                                    <div class="col-md-6">
-                                                        <strong class="d-block text-muted">Right Eye (OD)</strong>
-                                                        <div class="d-flex gap-3">
-                                                            <span>SPH: <strong>@(product.Prescription.RightSph?.ToString("0.00") ?? "—")</strong></span>
-                                                            <span>CYL: <strong>@(product.Prescription.RightCyl?.ToString("0.00") ?? "—")</strong></span>
-                                                            <span>AXIS: <strong>@(product.Prescription.RightAxis?.ToString() ?? "—")°</strong></span>
+                                            <div class="prescription-details"
+                                                 style="margin-top: 1rem;
+                                                                        padding: 1.25rem;
+                                                                        background: linear-gradient(135deg, #f3e5f5 0%, #fce4ec 100%);
+                                                                        border-radius: 10px;
+                                                                        border: 2px solid #9c27b0;">
+
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <i class="bi bi-eyeglasses" style="font-size: 1.5rem; color: #9c27b0; margin-right: 0.75rem;"></i>
+                                                    <div>
+                                                        <strong style="color: #9c27b0; font-size: 1.1rem;">
+                                                            @product.Prescription.ProfileName
+                                                        </strong>
+                                                        <div style="color: #7b1fa2; font-size: 0.85rem;">
+                                                            Prescription Details
                                                         </div>
                                                     </div>
+                                                </div>
+
+                                                <div class="row g-3">
                                                     <div class="col-md-6">
-                                                        <strong class="d-block text-muted">Left Eye (OS)</strong>
-                                                        <div class="d-flex gap-3">
-                                                            <span>SPH: <strong>@(product.Prescription.LeftSph?.ToString("0.00") ?? "—")</strong></span>
-                                                            <span>CYL: <strong>@(product.Prescription.LeftCyl?.ToString("0.00") ?? "—")</strong></span>
-                                                            <span>AXIS: <strong>@(product.Prescription.LeftAxis?.ToString() ?? "—")°</strong></span>
+                                                        <div style="background: white;
+                                                                                   padding: 1rem;
+                                                                                   border-radius: 8px;
+                                                                                   border-left: 4px solid #9c27b0;">
+                                                            <strong style="color: #9c27b0;
+                                                                                         display: block;
+                                                                                         margin-bottom: 0.5rem;
+                                                                                         font-size: 0.95rem;">
+                                                                👁️ Right Eye (OD)
+                                                            </strong>
+                                                            <div class="d-flex gap-3" style="font-size: 0.9rem;">
+                                                                <div>
+                                                                    <small style="color: var(--secondary-warm-gray); display: block;">SPH</small>
+                                                                    <strong style="color: var(--primary-navy);">
+                                                                        @(product.Prescription.RightSph?.ToString("0.00") ?? "—")
+                                                                    </strong>
+                                                                </div>
+                                                                <div>
+                                                                    <small style="color: var(--secondary-warm-gray); display: block;">CYL</small>
+                                                                    <strong style="color: var(--primary-navy);">
+                                                                        @(product.Prescription.RightCyl?.ToString("0.00") ?? "—")
+                                                                    </strong>
+                                                                </div>
+                                                                <div>
+                                                                    <small style="color: var(--secondary-warm-gray); display: block;">AXIS</small>
+                                                                    <strong style="color: var(--primary-navy);">
+                                                                        @(product.Prescription.RightAxis?.ToString() ?? "—")°
+                                                                    </strong>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div style="background: white;
+                                                                                   padding: 1rem;
+                                                                                   border-radius: 8px;
+                                                                                   border-left: 4px solid #ba68c8;">
+                                                            <strong style="color: #ba68c8;
+                                                                                         display: block;
+                                                                                         margin-bottom: 0.5rem;
+                                                                                         font-size: 0.95rem;">
+                                                                👁️ Left Eye (OS)
+                                                            </strong>
+                                                            <div class="d-flex gap-3" style="font-size: 0.9rem;">
+                                                                <div>
+                                                                    <small style="color: var(--secondary-warm-gray); display: block;">SPH</small>
+                                                                    <strong style="color: var(--primary-navy);">
+                                                                        @(product.Prescription.LeftSph?.ToString("0.00") ?? "—")
+                                                                    </strong>
+                                                                </div>
+                                                                <div>
+                                                                    <small style="color: var(--secondary-warm-gray); display: block;">CYL</small>
+                                                                    <strong style="color: var(--primary-navy);">
+                                                                        @(product.Prescription.LeftCyl?.ToString("0.00") ?? "—")
+                                                                    </strong>
+                                                                </div>
+                                                                <div>
+                                                                    <small style="color: var(--secondary-warm-gray); display: block;">AXIS</small>
+                                                                    <strong style="color: var(--primary-navy);">
+                                                                        @(product.Prescription.LeftAxis?.ToString() ?? "—")°
+                                                                    </strong>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -217,78 +412,86 @@
                                 }
                             </div>
 
-                            <!-- Order Total -->
-                            <div class="d-flex justify-content-between align-items-center border-top pt-3">
-                                <h5 class="mb-0">Total:</h5>
-                                <h4 class="mb-0 text-success fw-bold">
-                                    @String.Format("{0:N0} ₫", order.TotalAmount)
-                                </h4>
-                            </div>
-
                             <!-- Action Buttons -->
-                            <div class="mt-3 d-flex gap-2 justify-content-end">
-                                @if (order.Status == "Pending Confirmation")
+                            <div class="d-flex gap-2 justify-content-end mt-4">
+                                @if (order.Status == "Pending")
                                 {
-                                    <button class="btn btn-outline-danger" onclick="cancelOrder(@order.OrderId)">
+                                    <button class="btn btn-outline-danger"
+                                            style="padding: 0.75rem 1.5rem;
+                                                               border-radius: 8px;
+                                                               font-weight: 600;">
                                         <i class="bi bi-x-circle me-1"></i>Cancel Order
                                     </button>
                                 }
-                                @if (order.Status == "Delivered" || order.Status == "Completed")
-                                {
-                                    <button class="btn btn-outline-primary">
-                                        <i class="bi bi-arrow-repeat me-1"></i>Reorder
-                                    </button>
-                                }
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailModal@(order.OrderId)">
-                                    <i class="bi bi-eye me-1"></i>Details
+                                <button class="btn btn-primary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modal@(order.OrderId)"
+                                        style="padding: 0.75rem 2rem;
+                                                       background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-light) 100%);
+                                                       border: none;
+                                                       border-radius: 8px;
+                                                       font-weight: 600;">
+                                    <i class="bi bi-eye me-1"></i>View Details
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Detail Modal (with prescription info) -->
-                <div class="modal fade" id="detailModal@(order.OrderId)" tabindex="-1">
-                    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">
-                                    <i class="bi bi-receipt me-2"></i>Order Details #@order.OrderId
+                <!-- ===== DETAIL MODAL ===== -->
+                <div class="modal fade" id="modal@(order.OrderId)" tabindex="-1">
+                    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content" style="border: none; border-radius: 16px; overflow: hidden;">
+                            <div class="modal-header"
+                                 style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+                                                border: none;
+                                                padding: 1.5rem 2rem;">
+                                <h5 class="modal-title" style="color: white; font-weight: 600;">
+                                    <i class="bi bi-receipt-cutoff me-2"></i>Order Details #@order.OrderId
                                 </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body" style="padding: 2rem;">
                                 <div class="row mb-3">
                                     <div class="col-6">
-                                        <strong>Order Date:</strong><br />
-                                        @order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                        <strong style="color: var(--primary-navy);">Order Date:</strong><br />
+                                        @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")
                                     </div>
                                     <div class="col-6">
-                                        <strong>Status:</strong><br />
+                                        <strong style="color: var(--primary-navy);">Status:</strong><br />
                                         <span class="badge @MyOrdersModel.GetStatusBadgeClass(order.Status)">
                                             @order.Status
                                         </span>
                                     </div>
                                 </div>
+
                                 <div class="mb-3">
-                                    <strong>Shipping Address:</strong><br />
-                                    @order.ShippingAddress
+                                    <strong style="color: var(--primary-navy);">Shipping Address:</strong><br />
+                                    @order.ReceiverName — @order.Phone<br />
+                                    @order.AddressLine
                                 </div>
-                                @if (!string.IsNullOrWhiteSpace(order.TrackingNumber))
+
+                                @if (!string.IsNullOrEmpty(order.TrackingNumber))
                                 {
                                     <div class="mb-3">
-                                        <strong>Tracking Number:</strong><br />
-                                        <code>@order.TrackingNumber</code>
+                                        <strong style="color: var(--primary-navy);">Tracking Number:</strong><br />
+                                        <code style="background: var(--light-gray); padding: 0.5rem; border-radius: 4px;">
+                                            @order.TrackingNumber
+                                        </code>
                                     </div>
                                 }
+
                                 <hr />
-                                <h6>Products:</h6>
-                                <table class="table table-sm">
-                                    <thead>
+
+                                <h6 style="color: var(--primary-navy); font-weight: 600; margin-bottom: 1rem;">
+                                    Products:
+                                </h6>
+                                <table class="table table-hover">
+                                    <thead style="background: var(--light-gray);">
                                         <tr>
-                                            <th>Product Name</th>
+                                            <th>Product</th>
                                             <th class="text-center">Qty</th>
-                                            <th class="text-end">Unit Price</th>
+                                            <th class="text-end">Price</th>
                                             <th class="text-end">Subtotal</th>
                                         </tr>
                                     </thead>
@@ -297,57 +500,53 @@
                                         {
                                             <tr>
                                                 <td>
-                                                    @p.Name
+                                                    <strong>@p.Name</strong>
                                                     @if (p.PrescriptionId.HasValue)
                                                     {
                                                         <br />
-                                                        <span class="badge bg-purple small">
+                                                        <span class="badge" style="background: #9c27b0; color: white;">
                                                             <i class="bi bi-eyeglasses me-1"></i>
                                                             @(p.Prescription?.ProfileName ?? "Prescription")
                                                         </span>
                                                     }
                                                     <br />
-                                                    <small class="text-muted">@p.Sku</small>
+                                                    <small class="text-muted">SKU: @p.Sku</small>
                                                 </td>
                                                 <td class="text-center">@p.Quantity</td>
-                                                <td class="text-end">@String.Format("{0:N0} ₫", p.UnitPrice)</td>
-                                                <td class="text-end">@String.Format("{0:N0} ₫", p.UnitPrice * p.Quantity)</td>
+                                                <td class="text-end">@p.UnitPrice.ToString("N0") VND</td>
+                                                <td class="text-end fw-bold">@((p.UnitPrice * p.Quantity).ToString("N0")) VND</td>
                                             </tr>
                                             @if (p.PrescriptionId.HasValue && p.Prescription != null)
                                             {
                                                 <tr style="background: rgba(156, 39, 176, 0.05);">
                                                     <td colspan="4" class="small">
                                                         <strong style="color: #9c27b0;">
-                                                            <i class="bi bi-eyeglasses me-1"></i>Prescription Details:
+                                                            <i class="bi bi-eyeglasses me-1"></i>Prescription:
                                                         </strong>
-                                                        <div class="row mt-1">
-                                                            <div class="col-6">
-                                                                <strong>Right Eye (OD):</strong>
-                                                                SPH @(p.Prescription.RightSph?.ToString("0.00") ?? "—"),
-                                                                CYL @(p.Prescription.RightCyl?.ToString("0.00") ?? "—"),
-                                                                AXIS @(p.Prescription.RightAxis?.ToString() ?? "—")°
-                                                            </div>
-                                                            <div class="col-6">
-                                                                <strong>Left Eye (OS):</strong>
-                                                                SPH @(p.Prescription.LeftSph?.ToString("0.00") ?? "—"),
-                                                                CYL @(p.Prescription.LeftCyl?.ToString("0.00") ?? "—"),
-                                                                AXIS @(p.Prescription.LeftAxis?.ToString() ?? "—")°
-                                                            </div>
-                                                        </div>
+                                                        <strong>Right Eye:</strong> SPH @(p.Prescription.RightSph?.ToString("0.00") ?? "—"),
+                                                        CYL @(p.Prescription.RightCyl?.ToString("0.00") ?? "—"),
+                                                        AXIS @(p.Prescription.RightAxis?.ToString() ?? "—")° |
+                                                        <strong>Left Eye:</strong> SPH @(p.Prescription.LeftSph?.ToString("0.00") ?? "—"),
+                                                        CYL @(p.Prescription.LeftCyl?.ToString("0.00") ?? "—"),
+                                                        AXIS @(p.Prescription.LeftAxis?.ToString() ?? "—")°
                                                     </td>
                                                 </tr>
                                             }
                                         }
                                     </tbody>
-                                    <tfoot>
-                                        <tr class="fw-bold">
-                                            <td colspan="3" class="text-end">Total:</td>
-                                            <td class="text-end text-success">@String.Format("{0:N0} ₫", order.TotalAmount)</td>
+                                    <tfoot style="border-top: 2px solid var(--primary-navy);">
+                                        <tr>
+                                            <td colspan="3" class="text-end fw-bold" style="color: var(--primary-navy);">
+                                                Total:
+                                            </td>
+                                            <td class="text-end fw-bold" style="color: var(--primary-gold); font-size: 1.25rem;">
+                                                @order.TotalAmount.ToString("N0") VND
+                                            </td>
                                         </tr>
                                     </tfoot>
                                 </table>
                             </div>
-                            <div class="modal-footer">
+                            <div class="modal-footer" style="border: none; padding: 1.5rem 2rem;">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
@@ -358,57 +557,58 @@
     }
 </div>
 
-@section Scripts {
-    <script>
-        function copyTracking(trackingNumber) {
-            navigator.clipboard.writeText(trackingNumber).then(function() {
-                alert('Tracking number copied: ' + trackingNumber);
-            }, function() {
-                alert('Unable to copy tracking number');
-            });
+<style>
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--secondary-warm-gray);
+    }
+
+    .breadcrumb-item a {
+        color: var(--primary-gold);
+        text-decoration: none;
+    }
+
+    .breadcrumb-item.active {
+        color: var(--dark-gray);
+    }
+
+    .order-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.15) !important;
+    }
+
+    .product-item:hover {
+        border-color: var(--primary-gold) !important;
+        box-shadow: 0 4px 12px rgba(212, 165, 116, 0.2);
+    }
+
+    .info-box {
+        transition: all 0.3s ease;
+    }
+
+        .info-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
-        function cancelOrder(orderId) {
-            if (confirm('Are you sure you want to cancel order #' + orderId + '?')) {
-                alert('Order cancellation feature will be implemented soon');
-            }
-        }
-    </script>
-}
+    .prescription-details {
+        animation: fadeIn 0.3s ease;
+    }
 
-@section Styles {
-    <style>
-        .order-card {
-            transition: all 0.3s ease;
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
         }
 
-            .order-card:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 8px 16px rgba(0,0,0,0.15) !important;
-            }
-
-        .order-products {
-            max-height: none;
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
-
-        .badge {
-            font-weight: 500;
-        }
-
-        .progress {
-            border-radius: 10px;
-        }
-
-        .progress-bar {
-            border-radius: 10px;
-        }
-
-        .bg-purple {
-            background-color: #9c27b0 !important;
-        }
-
-        .text-purple {
-            color: #9c27b0 !important;
-        }
-    </style>
-}
+    }
+</style>

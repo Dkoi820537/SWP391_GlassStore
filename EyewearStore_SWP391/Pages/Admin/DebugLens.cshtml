@@ -1,0 +1,62 @@
+@page
+@model EyewearStore_SWP391.Pages.Admin.DebugLensModel
+@{
+    ViewData["Title"] = "Debug Lenses";
+    Layout = "_Layout";
+}
+
+<div class="container py-5">
+    <h1>Debug Lens Data</h1>
+    <p>This page lists all products of type 'lens' and their properties from the Lenses table.</p>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>SKU</th>
+                    <th>Price</th>
+                    <th>Can be prescription lens</th>
+                    <th>Prescription Fee</th>
+                    <th>Lens Type</th>
+                    <th>Lens Index</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Lenses)
+                {
+                    <tr>
+                        <td>@item.ProductId</td>
+                        <td>@item.Name</td>
+                        <td>@item.Sku</td>
+                        <td>@item.Price.ToString("N0")</td>
+                        <td>
+                            <form method="post" asp-page-handler="TogglePrescription" class="d-flex align-items-center gap-2">
+                                <input type="hidden" name="productId" value="@item.ProductId" />
+                                <span class="@(item.IsPrescription ? "text-success fw-bold" : "text-danger fw-bold")">
+                                    @item.IsPrescription
+                                </span>
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                    Toggle
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            @if (item.PrescriptionFee.HasValue)
+                            {
+                                @item.PrescriptionFee.Value.ToString("N0")
+                            }
+                            else
+                            {
+                                <span class="text-muted">NULL (Default: 500,000)</span>
+                            }
+                        </td>
+                        <td>@item.LensType</td>
+                        <td>@item.LensIndex</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
@@ -372,6 +372,8 @@ public partial class EyewearStoreContext : DbContext
                 .HasColumnName("quantity");
             entity.Property(e => e.TempPrescriptionJson)
                 .HasColumnName("temp_prescription_json");
+            entity.Property(e => e.PrescriptionId)
+                .HasColumnName("prescription_id");
             entity.Property(e => e.PrescriptionFee)
                 .HasColumnType("decimal(18,2)")
                 .HasDefaultValue(0m)
@@ -394,6 +396,12 @@ public partial class EyewearStoreContext : DbContext
                 .HasForeignKey(d => d.ServiceId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_cart_items_service");
+
+            entity.HasOne(d => d.Prescription)
+                .WithMany()
+                .HasForeignKey(d => d.PrescriptionId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK_cart_items_prescription");
         });
 
         // =========================

@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model EyewearStore_SWP391.Pages.Cart.IndexModel
 @{
     ViewData["Title"] = "Shopping Cart";
@@ -129,8 +129,11 @@
                 <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden;">
                     @foreach (var it in Model.Cart.CartItems)
                     {
-                        var unit = it.Product != null ? it.Product.Price :
-                        it.Service != null ? it.Service.Price : 0m;
+                        var baseUnit = it.Product != null ? it.Product.Price : 0m;
+                        if (it.Service != null) { baseUnit += it.Service.Price; }
+                        var lineBase = baseUnit * it.Quantity;
+                        var linePrescription = it.PrescriptionFee * it.Quantity;
+                        var lineTotal = lineBase + linePrescription;
 
                         var productName = it.Product != null ? it.Product.Name :
                         it.Service != null ? it.Service.Name : "Product";
@@ -138,10 +141,14 @@
                         var productType = it.Product != null ? it.Product.ProductType :
                         it.Service != null ? "Service" : "";
 
+                        var prescriptionLabel = it.PrescriptionId.HasValue && it.Prescription != null
+                            ? (it.Prescription.ProfileName ?? "Prescription")
+                            : "No prescription";
+
                         <div style="padding: 1.5rem; border-bottom: 1px solid var(--medium-gray);">
-                            <div class="row g-3 align-items-center">
+                            <div style="display: grid; grid-template-columns: auto 1fr auto; align-items: start; gap: 1.5rem;">
                                 <!-- Product Image -->
-                                <div class="col-auto">
+                                <div>
                                     <div style="width: 100px;
                                                         height: 100px;
                                                         background: linear-gradient(135deg, var(--light-gray) 0%, var(--secondary-cream) 100%);
@@ -172,7 +179,7 @@
                                 </div>
 
                                 <!-- Product Details -->
-                                <div class="col">
+                                <div>
                                     <h5 style="color: var(--primary-navy);
                                                        margin-bottom: 0.5rem;
                                                        font-weight: 600;
@@ -188,28 +195,60 @@
                                                              border-radius: 6px;">
                                             @productType
                                         </span>
-                                        @if (!string.IsNullOrEmpty(it.TempPrescriptionJson))
+                                        @if (productType?.ToLowerInvariant() == "lens")
                                         {
-                                            <span class="badge"
-                                                  style="background: var(--secondary-teal);
-                                                                     color: white;
-                                                                     padding: 0.35rem 0.75rem;
-                                                                     font-weight: 500;
-                                                                     border-radius: 6px;">
-                                                📋 Prescription Saved
+                                            <span class="badge @(it.PrescriptionId.HasValue ? "bg-secondary" : "bg-light text-dark")"
+                                                  style="padding: 0.35rem 0.75rem; font-weight: 500; border-radius: 6px;">
+                                                👓 @prescriptionLabel
                                             </span>
                                         }
                                     </div>
-                                    <p style="color: var(--secondary-warm-gray);
-                                                      margin: 0;
-                                                      font-size: 1rem;
-                                                      font-weight: 600;">
-                                        @unit.ToString("N0") VND
-                                    </p>
+                                    <!-- Itemized pricing -->
+                                    <div style="font-size: 0.9rem; color: var(--secondary-warm-gray);">
+                                        <div>@baseUnit.ToString("N0") VND <span class="text-muted">× @it.Quantity</span></div>
+                                        @if (it.PrescriptionFee > 0)
+                                        {
+                                            <div>+ @it.PrescriptionFee.ToString("N0") VND <span class="text-muted">(prescription)</span></div>
+                                        }
+                                    </div>
+                                    @if (productType?.ToLowerInvariant() == "lens")
+                                    {
+                                        <form method="post" asp-page-handler="UpdatePrescriptionById" style="margin-top: 0.5rem; display: inline-flex; gap: 0.75rem; align-items: center; background: var(--light-gray); padding: 0.5rem; border-radius: 8px;">
+                                            <input type="hidden" name="cartItemId" value="@it.CartItemId" />
+                                            <select name="prescriptionId" class="form-select form-select-sm" style="width: auto; max-width: 200px;">
+                                                <option value="">No prescription</option>
+                                                @foreach (var p in Model.Prescriptions)
+                                                {
+                                                    <option value="@p.PrescriptionId" selected="@(it.PrescriptionId == p.PrescriptionId)">@(p.ProfileName ?? "Prescription")</option>
+                                                }
+                                            </select>
+                                            <button type="submit" 
+                                                    class="btn btn-sm btn-primary" 
+                                                    style="padding: 0.35rem 1rem; 
+                                                           background: var(--primary-navy); 
+                                                           border: none; 
+                                                           border-radius: 6px; 
+                                                           font-size: 0.875rem;">
+                                                Update Rx
+                                            </button>
+                                        </form>
+                                    }
                                 </div>
 
-                                <!-- Quantity Controls -->
-                                <div class="col-auto">
+                                <!-- Right Column: Total, Qty, Remove -->
+                                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px;">
+                                    
+                                    <!-- Item Total -->
+                                    <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                                        <div style="font-size: 0.875rem; color: var(--secondary-warm-gray); margin-bottom: 0.25rem;">
+                                            Item total
+                                        </div>
+                                        <div style="font-size: 1.25rem; font-weight: 700; color: var(--primary-navy);">
+                                            @lineTotal.ToString("N0") VND
+                                        </div>
+                                    </div>
+
+                                    <!-- Quantity Controls -->
                                     <form method="post" asp-page-handler="UpdateQuantity" style="margin: 0;">
                                         <input type="hidden" name="cartItemId" value="@it.CartItemId" />
                                         <div style="display: flex;
@@ -245,22 +284,8 @@
                                             </button>
                                         </div>
                                     </form>
-                                </div>
 
-                                <!-- Subtotal & Remove -->
-                                <div class="col-auto text-end">
-                                    <div style="margin-bottom: 0.75rem;">
-                                        <div style="font-size: 0.875rem;
-                                                            color: var(--secondary-warm-gray);
-                                                            margin-bottom: 0.25rem;">
-                                            Subtotal
-                                        </div>
-                                        <div style="font-size: 1.25rem;
-                                                            font-weight: 700;
-                                                            color: var(--primary-navy);">
-                                            @((unit * it.Quantity).ToString("N0")) VND
-                                        </div>
-                                    </div>
+                                    <!-- Remove Button -->
                                     <form method="post"
                                           asp-page-handler="Remove"
                                           onsubmit="return confirm('Remove this item from cart?');"
@@ -332,7 +357,7 @@
                                 </span>
                             </div>
 
-                            <!-- Subtotal -->
+                            <!-- Subtotal (base prices) -->
                             <div style="display: flex;
                                             justify-content: space-between;
                                             padding: 1rem 0;
@@ -341,9 +366,24 @@
                                     Subtotal
                                 </span>
                                 <span style="color: var(--primary-navy); font-weight: 600;">
-                                    @Model.Total.ToString("N0") VND
+                                    @Model.SubtotalBase.ToString("N0") VND
                                 </span>
                             </div>
+
+                            @if (Model.PrescriptionFeesTotal > 0)
+                            {
+                                <div style="display: flex;
+                                                justify-content: space-between;
+                                                padding: 1rem 0;
+                                                border-bottom: 1px solid var(--medium-gray);">
+                                    <span style="color: var(--dark-gray); font-weight: 500;">
+                                        Prescription fees
+                                    </span>
+                                    <span style="color: var(--primary-navy); font-weight: 600;">
+                                        @Model.PrescriptionFeesTotal.ToString("N0") VND
+                                    </span>
+                                </div>
+                            }
 
                             <!-- Shipping -->
                             <div style="display: flex;

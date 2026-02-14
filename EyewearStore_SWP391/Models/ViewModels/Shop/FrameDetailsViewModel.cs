@@ -179,4 +179,9 @@ public class AddToCartInputModel
     /// Quantity to add (default: 1)
     /// </summary>
     public int Quantity { get; set; } = 1;
+
+    /// <summary>
+    /// Optional saved prescription profile ID (for lenses). Null = no prescription.
+    /// </summary>
+    public int? PrescriptionId { get; set; }
 }

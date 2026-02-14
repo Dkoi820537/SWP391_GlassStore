@@ -52,9 +52,14 @@ public class LensDetailsViewModel
     public decimal? LensIndex { get; set; }
 
     /// <summary>
-    /// Whether this lens requires a prescription
+    /// Whether this lens supports/requires a prescription
     /// </summary>
     public bool IsPrescription { get; set; }
+
+    /// <summary>
+    /// Fee in VND when adding a prescription (Phase 1: fixed 500,000)
+    /// </summary>
+    public decimal PrescriptionFee { get; set; }
 
     // Inventory and stock properties
 

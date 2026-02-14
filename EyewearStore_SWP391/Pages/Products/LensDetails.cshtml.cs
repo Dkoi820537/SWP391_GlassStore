@@ -72,6 +72,7 @@ public class LensDetailsModel : PageModel
             LensType = lens.LensType,
             LensIndex = lens.LensIndex,
             IsPrescription = lens.IsPrescription,
+            PrescriptionFee = lens.IsPrescription ? (lens.PrescriptionFee ?? 500_000m) : 0m,
             InventoryQty = lens.InventoryQty,
             CreatedAt = lens.CreatedAt,
             CareInstructions = GetCareInstructions(lens.LensType),
@@ -96,7 +97,25 @@ public class LensDetailsModel : PageModel
         // Load related lenses (same type or prescription, limit 4)
         Lens.RelatedProducts = await LoadRelatedLensesAsync(lens);
 
+        await LoadPrescriptionsIfAuthenticatedAsync();
         return Page();
+    }
+
+    /// <summary>
+    /// User's saved prescriptions for the add-to-cart modal (when authenticated).
+    /// </summary>
+    public List<PrescriptionProfile> Prescriptions { get; set; } = new();
+
+    private async Task LoadPrescriptionsIfAuthenticatedAsync()
+    {
+        if (User?.Identity?.IsAuthenticated != true) return;
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null) return;
+        var userId = int.Parse(userIdClaim.Value);
+        Prescriptions = await _context.PrescriptionProfiles
+            .Where(p => p.UserId == userId && p.IsActive)
+            .OrderByDescending(p => p.CreatedAt)
+            .ToListAsync();
     }
 
     /// <summary>
@@ -152,8 +171,8 @@ public class LensDetailsModel : PageModel
 
             var userId = int.Parse(userIdClaim.Value);
 
-            // Add to cart using the cart service
-            await _cartService.AddToCartAsync(userId, AddToCartInput.ProductId, AddToCartInput.Quantity);
+            // Add to cart with optional prescription
+            await _cartService.AddToCartAsync(userId, AddToCartInput.ProductId, AddToCartInput.Quantity, prescriptionId: AddToCartInput.PrescriptionId);
 
             TempData["SuccessMessage"] = "Lens added to cart!";
             return RedirectToPage("/Products/LensDetails", new { id = AddToCartInput.ProductId });
@@ -258,6 +277,7 @@ public class LensDetailsModel : PageModel
                 LensType = lens.LensType,
                 LensIndex = lens.LensIndex,
                 IsPrescription = lens.IsPrescription,
+                PrescriptionFee = lens.IsPrescription ? (lens.PrescriptionFee ?? 500_000m) : 0m,
                 InventoryQty = lens.InventoryQty,
                 CreatedAt = lens.CreatedAt,
                 CareInstructions = GetCareInstructions(lens.LensType),
@@ -276,6 +296,7 @@ public class LensDetailsModel : PageModel
             };
 
             Lens.RelatedProducts = await LoadRelatedLensesAsync(lens);
+            await LoadPrescriptionsIfAuthenticatedAsync();
         }
     }
 

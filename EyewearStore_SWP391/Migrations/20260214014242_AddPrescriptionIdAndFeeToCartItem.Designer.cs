@@ -4,6 +4,7 @@ using EyewearStore_SWP391.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EyewearStore_SWP391.Migrations
 {
     [DbContext(typeof(EyewearStoreContext))]
-    partial class EyewearStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20260214014242_AddPrescriptionIdAndFeeToCartItem")]
+    partial class AddPrescriptionIdAndFeeToCartItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

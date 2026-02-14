@@ -14,6 +14,7 @@ namespace EyewearStore_SWP391.Pages.Cart
         [BindProperty] public int Quantity { get; set; } = 1;
         [BindProperty] public int? ServiceId { get; set; }
         [BindProperty] public string? TempPrescriptionJson { get; set; }
+        [BindProperty] public int? PrescriptionId { get; set; }
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -22,7 +23,7 @@ namespace EyewearStore_SWP391.Pages.Cart
 
             try
             {
-                await _cartService.AddToCartAsync(uid, ProductId, Quantity, ServiceId, TempPrescriptionJson);
+                await _cartService.AddToCartAsync(uid, ProductId, Quantity, ServiceId, TempPrescriptionJson, PrescriptionId);
                 TempData["SuccessMessage"] = "Added to cart";
             }
             catch (Exception ex)

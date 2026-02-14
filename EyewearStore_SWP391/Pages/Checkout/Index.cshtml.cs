@@ -31,13 +31,12 @@ namespace EyewearStore_SWP391.Pages.Checkout
         public decimal Total { get; set; }
         public List<Address> Addresses { get; set; } = new();
         public Address? DefaultAddress { get; set; }
-        public List<PrescriptionProfile> Prescriptions { get; set; } = new();
+
 
         [BindProperty]
         public int SelectedAddressId { get; set; }
 
-        [BindProperty]
-        public int? SelectedPrescriptionId { get; set; }
+
 
         [BindProperty]
         public string? NewReceiverName { get; set; }
@@ -62,7 +61,7 @@ namespace EyewearStore_SWP391.Pages.Checkout
             }
 
             await LoadAddressesAsync(userId);
-            await LoadPrescriptionsAsync(userId);
+
             return Page();
         }
 
@@ -114,36 +113,15 @@ namespace EyewearStore_SWP391.Pages.Checkout
                 Cart = await _cartService.GetCartByUserIdAsync(userId);
                 Total = await _cartService.CalculateCartTotalAsync(userId);
                 await LoadAddressesAsync(userId);
-                await LoadPrescriptionsAsync(userId);
+
                 return Page();
-            }
-
-            // ✅ STEP 2: Validate prescription if selected
-            if (SelectedPrescriptionId.HasValue && SelectedPrescriptionId.Value > 0)
-            {
-                var presc = await _context.PrescriptionProfiles
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(p =>
-                        p.PrescriptionId == SelectedPrescriptionId.Value &&
-                        p.UserId == userId &&
-                        p.IsActive);
-
-                if (presc == null)
-                {
-                    TempData["ErrorMessage"] = "Selected prescription is invalid or inactive.";
-                    Cart = await _cartService.GetCartByUserIdAsync(userId);
-                    Total = await _cartService.CalculateCartTotalAsync(userId);
-                    await LoadAddressesAsync(userId);
-                    await LoadPrescriptionsAsync(userId);
-                    return Page();
-                }
             }
 
             try
             {
-                // ✅ STEP 3: Get cart and calculate total
+                // Get cart with per-item prescription data and totals breakdown
                 var cart = await _cartService.GetCartByUserIdAsync(userId);
-                var total = await _cartService.CalculateCartTotalAsync(userId);
+                var (subtotalBase, prescriptionFeesTotal, total) = await _cartService.GetCartTotalsBreakdownAsync(userId);
 
                 if (cart == null || !cart.CartItems.Any())
                 {
@@ -151,19 +129,14 @@ namespace EyewearStore_SWP391.Pages.Checkout
                     return RedirectToPage("/Cart/Index");
                 }
 
-                // ✅ STEP 4: CREATE ORDER WITH ADDRESS SNAPSHOT
+                // CREATE ORDER WITH ADDRESS SNAPSHOT
                 var order = new Order
                 {
                     UserId = userId,
-
-                    // ✅ COPY address data (snapshot) - QUAN TRỌNG!
                     ReceiverName = selectedAddress.ReceiverName,
                     Phone = selectedAddress.Phone,
                     AddressLine = selectedAddress.AddressLine,
-
-                    // Keep reference (optional, for analytics)
                     AddressId = selectedAddress.AddressId,
-
                     TotalAmount = total,
                     Status = "Pending",
                     PaymentMethod = "Stripe",
@@ -173,7 +146,7 @@ namespace EyewearStore_SWP391.Pages.Checkout
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
 
-                // ✅ STEP 5: Create order items
+                // Create order items: preserve per-item PrescriptionId and PrescriptionFee from cart
                 foreach (var cartItem in cart.CartItems)
                 {
                     decimal unitPrice = cartItem.Product?.Price ?? 0m;
@@ -184,10 +157,12 @@ namespace EyewearStore_SWP391.Pages.Checkout
                     {
                         OrderId = order.OrderId,
                         ProductId = cartItem.ProductId,
-                        //ServiceId = cartItem.ServiceId,
-                        PrescriptionId = SelectedPrescriptionId,  // ← Prescription support
+                        PrescriptionId = cartItem.PrescriptionId,
+                        PrescriptionFee = cartItem.PrescriptionFee,
                         Quantity = cartItem.Quantity,
-                        UnitPrice = unitPrice
+                        UnitPrice = unitPrice,
+                        IsBundle = false,
+                        SnapshotJson = null
                     };
 
                     _context.OrderItems.Add(orderItem);
@@ -195,7 +170,7 @@ namespace EyewearStore_SWP391.Pages.Checkout
 
                 await _context.SaveChangesAsync();
 
-                // ✅ STEP 6: Build Stripe line items
+                // Build Stripe line items: unit amount = base + prescription fee so total matches
                 var lineItems = new List<StripeLineItemDto>();
 
                 foreach (var ci in cart.CartItems)
@@ -203,20 +178,13 @@ namespace EyewearStore_SWP391.Pages.Checkout
                     decimal unitPrice = ci.Product?.Price ?? 0m;
                     if (ci.Service != null)
                         unitPrice += ci.Service.Price;
+                    decimal unitTotal = unitPrice + ci.PrescriptionFee;
 
                     var itemName = ci.Product?.Name ?? ci.Service?.Name ?? "Product";
                     if (ci.Service != null)
                         itemName += $" + {ci.Service.Name}";
-
-                    // Add prescription info to item name
-                    if (SelectedPrescriptionId.HasValue && SelectedPrescriptionId.Value > 0)
-                    {
-                        var presc = await _context.PrescriptionProfiles
-                            .AsNoTracking()
-                            .FirstOrDefaultAsync(p => p.PrescriptionId == SelectedPrescriptionId.Value);
-                        if (presc != null)
-                            itemName += $" (Rx: {presc.ProfileName})";
-                    }
+                    if (ci.PrescriptionId.HasValue && ci.Prescription != null)
+                        itemName += $" (Rx: {ci.Prescription.ProfileName ?? "Prescription"})";
 
                     string? imageUrl = null;
                     if (ci.Product?.ProductImages != null)
@@ -234,7 +202,7 @@ namespace EyewearStore_SWP391.Pages.Checkout
                     lineItems.Add(new StripeLineItemDto
                     {
                         ProductName = itemName,
-                        UnitAmountInSmallestUnit = (long)unitPrice,
+                        UnitAmountInSmallestUnit = (long)unitTotal,
                         Quantity = ci.Quantity,
                         ImageUrl = imageUrl
                     });
@@ -264,7 +232,7 @@ namespace EyewearStore_SWP391.Pages.Checkout
                 Cart = await _cartService.GetCartByUserIdAsync(userId);
                 Total = await _cartService.CalculateCartTotalAsync(userId);
                 await LoadAddressesAsync(userId);
-                await LoadPrescriptionsAsync(userId);
+
                 return Page();
             }
         }
@@ -284,12 +252,6 @@ namespace EyewearStore_SWP391.Pages.Checkout
                 SelectedAddressId = DefaultAddress.AddressId;
         }
 
-        private async Task LoadPrescriptionsAsync(int userId)
-        {
-            Prescriptions = await _context.PrescriptionProfiles
-                .Where(p => p.UserId == userId && p.IsActive)
-                .OrderByDescending(p => p.CreatedAt)
-                .ToListAsync();
-        }
+
     }
 }

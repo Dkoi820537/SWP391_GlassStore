@@ -779,6 +779,12 @@
                     <span class="currency">@Model.Lens.Currency</span>
                     <span>@Model.Lens.Price.ToString("N0")</span>
                 </div>
+                @if (Model.Lens.IsPrescription && Model.Lens.PrescriptionFee > 0)
+                {
+                    <p class="lens-price-with-rx" style="font-size: 16px; color: #666; margin: -8px 0 24px 0;">
+                        From @Model.Lens.Price.ToString("N0") VND · <strong>+ @Model.Lens.PrescriptionFee.ToString("N0") VND</strong> with prescription
+                    </p>
+                }
 
                 <!-- Stock Status Badge -->
                 <div class="stock-badge @Model.Lens.StockStatus.ToLower().Replace("stock", "-stock")">
@@ -845,6 +851,7 @@
                 <!-- Add to Cart Form -->
                 <form method="post" asp-page-handler="AddToCart" id="addToCartForm">
                     <input type="hidden" asp-for="AddToCartInput.ProductId" />
+                    <input type="hidden" asp-for="AddToCartInput.PrescriptionId" id="selectedPrescriptionId" />
 
                     <!-- Quantity Selector -->
                     <div class="quantity-section">
@@ -863,8 +870,8 @@
                         </div>
                     </div>
 
-                    <!-- Add to Cart Button -->
-                    <button type="submit" class="btn-add-to-cart" @(Model.Lens.IsInStock ? "" : "disabled")>
+                    <!-- Add to Cart Button: opens prescription modal for prescription lenses, else submit -->
+                    <button type="button" class="btn-add-to-cart" id="btnAddToCart" @(Model.Lens.IsInStock ? "" : "disabled")>
                         @if (Model.Lens.IsInStock)
                         {
                             <i class="bi bi-cart-plus"></i>
@@ -877,6 +884,38 @@
                         }
                     </button>
                 </form>
+
+                @if (Model.Lens.IsPrescription)
+                {
+                    <!-- Prescription selection modal -->
+                    <div class="modal fade" id="addToCartPrescriptionModal" tabindex="-1" aria-labelledby="prescriptionModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="prescriptionModalLabel">Add prescription to this lens?</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="text-muted small">Select a saved prescription or skip. +@Model.Lens.PrescriptionFee.ToString("N0") VND will be added for prescription.</p>
+                                    <label class="form-label">Prescription</label>
+                                    <select class="form-select" id="modalPrescriptionSelect">
+                                        <option value="">No prescription</option>
+                                        @foreach (var p in Model.Prescriptions)
+                                        {
+                                            <option value="@p.PrescriptionId">@(p.ProfileName ?? "Prescription")</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-primary" id="modalAddToCartConfirm">
+                                        <i class="bi bi-cart-plus"></i> Add to Cart
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
 
                 <!-- Add to Wishlist Button (placeholder for future) -->
                 <button type="button" class="btn-add-wishlist" id="wishlistBtn">
@@ -1133,9 +1172,40 @@ else
             lastScrollTop = scrollTop;
         });
 
-        // Submit Add to Cart from mobile sticky bar
+        // Add to Cart: open prescription modal or submit form
+        const prescriptionModal = document.getElementById('addToCartPrescriptionModal');
+        const addToCartForm = document.getElementById('addToCartForm');
+        const btnAddToCart = document.getElementById('btnAddToCart');
+
+        if (btnAddToCart) {
+            btnAddToCart.addEventListener('click', function () {
+                if (prescriptionModal) {
+                    const modal = new bootstrap.Modal(prescriptionModal);
+                    modal.show();
+                } else {
+                    addToCartForm.submit();
+                }
+            });
+        }
+
+        const modalConfirm = document.getElementById('modalAddToCartConfirm');
+        if (modalConfirm && prescriptionModal) {
+            modalConfirm.addEventListener('click', function () {
+                const sel = document.getElementById('modalPrescriptionSelect');
+                const hidden = document.getElementById('selectedPrescriptionId');
+                if (hidden) hidden.value = sel ? (sel.value || '') : '';
+                addToCartForm.submit();
+            });
+        }
+
+        // Submit Add to Cart from mobile sticky bar (same logic: modal or submit)
         function submitAddToCart() {
-            document.getElementById('addToCartForm').submit();
+            if (prescriptionModal) {
+                const modal = new bootstrap.Modal(prescriptionModal);
+                modal.show();
+            } else {
+                addToCartForm.submit();
+            }
         }
 
         // Initialize on page load

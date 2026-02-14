@@ -91,3 +91,13 @@
 {"hypothesisId":"A,D","location":"CartService.cs:GetCartByUserIdAsync","message":"Entry","data":{"userId":2},"timestamp":1771036468769}
 {"hypothesisId":"A,D","location":"CartService.cs:GetCartByUserIdAsync","message":"Entry","data":{"userId":2},"timestamp":1771036470240}
 {"hypothesisId":"A,D","location":"CartService.cs:GetCartByUserIdAsync","message":"Entry","data":{"userId":2},"timestamp":1771036470338}
+{"hypothesisId":"A,D","location":"CartService.cs:GetCartByUserIdAsync","message":"Entry","data":{"userId":2},"timestamp":1771037318229}
+{"hypothesisId":"A,D","location":"CartService.cs:GetCartByUserIdAsync","message":"Entry","data":{"userId":2},"timestamp":1771037319436}
+{"hypothesisId":"A,D","location":"CartService.cs:GetCartByUserIdAsync","message":"Entry","data":{"userId":2},"timestamp":1771037319555}
+{"hypothesisId":"A,D","location":"CartService.cs:GetCartByUserIdAsync","message":"Entry","data":{"userId":2},"timestamp":1771037778275}
+{"hypothesisId":"A,D","location":"CartService.cs:GetCartByUserIdAsync","message":"Entry","data":{"userId":2},"timestamp":1771037779561}
+{"hypothesisId":"A,D","location":"CartService.cs:GetCartByUserIdAsync","message":"Entry","data":{"userId":2},"timestamp":1771037779654}
+{"hypothesisId":"A,D","location":"CartService.cs:GetCartByUserIdAsync","message":"Entry","data":{"userId":2},"timestamp":1771037781767}
+{"hypothesisId":"A,D","location":"CartService.cs:GetCartByUserIdAsync","message":"Entry","data":{"userId":2},"timestamp":1771037781784}
+{"hypothesisId":"A,D","location":"CartService.cs:GetCartByUserIdAsync","message":"Entry","data":{"userId":2},"timestamp":1771037781812}
+{"hypothesisId":"A,D","location":"CartService.cs:GetCartByUserIdAsync","message":"Entry","data":{"userId":2},"timestamp":1771037787865}

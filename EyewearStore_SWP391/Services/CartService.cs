@@ -33,6 +33,7 @@ public class CartService : ICartService
             return await _context.Carts
                 .Include(c => c.CartItems)
                     .ThenInclude(ci => ci.Product)
+                        .ThenInclude(p => p.ProductImages)
                 .Include(c => c.CartItems)
                     .ThenInclude(ci => ci.Service)
                 .Include(c => c.CartItems)
@@ -143,6 +144,7 @@ public class CartService : ICartService
     {
         var item = await _context.CartItems
             .Include(ci => ci.Product)
+                .ThenInclude(p => p.ProductImages)
             .FirstOrDefaultAsync(ci => ci.CartItemId == cartItemId);
             
         if (item == null) throw new InvalidOperationException("Cart item does not exist");

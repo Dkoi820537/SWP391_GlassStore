@@ -143,18 +143,28 @@
                         <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--medium-gray);">
                             <div class="row align-items-center g-3">
                                 <div class="col-auto">
-                                    <div style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--light-gray), var(--secondary-cream)); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--medium-gray);">
-                                        @if (productType == "frame" || productType == "bundle")
-                                        {
-                                            <span style="font-size: 1.5rem;">👓</span>
+                                    <div style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--light-gray), var(--secondary-cream)); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--medium-gray); overflow: hidden;">
+                                        @{
+                                            var imgUrl = it.Product?.ProductImages?.OrderByDescending(x => x.IsPrimary).FirstOrDefault()?.ImageUrl;
                                         }
-                                        else if (productType == "lens")
+                                        @if (!string.IsNullOrEmpty(imgUrl))
                                         {
-                                            <span style="font-size: 1.5rem;">🔍</span>
+                                            <img src="@imgUrl" alt="@productName" style="width: 100%; height: 100%; object-fit: cover;" />
                                         }
-                                        else
+                                        else 
                                         {
-                                            <span style="font-size: 1.5rem;">📦</span>
+                                            @if (productType == "frame" || productType == "bundle")
+                                            {
+                                                <span style="font-size: 1.5rem;">👓</span>
+                                            }
+                                            else if (productType == "lens")
+                                            {
+                                                <span style="font-size: 1.5rem;">🔍</span>
+                                            }
+                                            else
+                                            {
+                                                <span style="font-size: 1.5rem;">📦</span>
+                                            }
                                         }
                                     </div>
                                 </div>

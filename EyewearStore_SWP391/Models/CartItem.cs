@@ -17,6 +17,8 @@ public partial class CartItem
 
     public string? TempPrescriptionJson { get; set; }
 
+    public decimal PrescriptionFee { get; set; }
+
     // Navigation properties
     public virtual Cart Cart { get; set; } = null!;
 

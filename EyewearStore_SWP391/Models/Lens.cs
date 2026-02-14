@@ -14,4 +14,6 @@ public class Lens : Product
     public decimal? LensIndex { get; set; }
 
     public bool IsPrescription { get; set; }
+
+    public decimal? PrescriptionFee { get; set; }
 }

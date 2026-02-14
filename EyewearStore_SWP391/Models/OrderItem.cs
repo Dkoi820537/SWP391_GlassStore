@@ -31,6 +31,9 @@ public partial class OrderItem
     [Column("snapshot_json")]
     public string? SnapshotJson { get; set; }
 
+    [Column("prescription_fee")]
+    public decimal PrescriptionFee { get; set; }
+
     // Navigation properties
     public virtual Order Order { get; set; } = null!;
     public virtual Product Product { get; set; } = null!;

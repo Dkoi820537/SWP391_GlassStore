@@ -220,6 +220,9 @@ public partial class EyewearStoreContext : DbContext
             entity.Property(e => e.IsPrescription)
                 .IsRequired()
                 .HasColumnName("is_prescription");
+            entity.Property(e => e.PrescriptionFee)
+                .HasColumnType("decimal(18,2)")
+                .HasColumnName("prescription_fee");
         });
 
         // =========================
@@ -369,6 +372,10 @@ public partial class EyewearStoreContext : DbContext
                 .HasColumnName("quantity");
             entity.Property(e => e.TempPrescriptionJson)
                 .HasColumnName("temp_prescription_json");
+            entity.Property(e => e.PrescriptionFee)
+                .HasColumnType("decimal(18,2)")
+                .HasDefaultValue(0m)
+                .HasColumnName("prescription_fee");
 
             entity.HasOne(d => d.Cart)
                 .WithMany(p => p.CartItems)
@@ -506,6 +513,10 @@ public partial class EyewearStoreContext : DbContext
                 .HasColumnName("is_bundle");
             entity.Property(e => e.SnapshotJson)
                 .HasColumnName("snapshot_json");
+            entity.Property(e => e.PrescriptionFee)
+                .HasColumnType("decimal(18,2)")
+                .HasDefaultValue(0m)
+                .HasColumnName("prescription_fee");
 
             entity.HasOne(d => d.Order)
                 .WithMany(p => p.OrderItems)

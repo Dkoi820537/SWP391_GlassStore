@@ -22,17 +22,6 @@
                     <i class="bi bi-info-circle me-1"></i>
                     Track the status and history of your orders
                 </p>
-                @if (!string.IsNullOrEmpty(Model.CurrentUserEmail))
-                {
-                    <p class="text-muted small mb-0 mt-1">
-                        <i class="bi bi-person me-1"></i>
-                        Account: <strong>@Model.CurrentUserEmail</strong>
-                        @if (!string.IsNullOrEmpty(Model.CurrentUserName))
-                        {
-                            <span> (@Model.CurrentUserName)</span>
-                        }
-                    </p>
-                }
             </div>
             @if (Model.Orders.Any())
             {
@@ -52,16 +41,7 @@
             <div class="card-body text-center py-5">
                 <i class="bi bi-cart-x display-1 text-muted mb-3"></i>
                 <h4 class="text-muted">No orders yet</h4>
-                <p class="text-muted mb-4">
-                    @if (!string.IsNullOrEmpty(Model.CurrentUserEmail))
-                    {
-                        <span>You haven't placed any orders yet. Start shopping now!</span>
-                    }
-                    else
-                    {
-                        <span>Unable to load order information. Please try logging in again.</span>
-                    }
-                </p>
+                <p class="text-muted mb-4">You haven't placed any orders yet. Start shopping now!</p>
                 <a href="/Products" class="btn btn-primary btn-lg">
                     <i class="bi bi-shop me-2"></i>Shop Now
                 </a>
@@ -135,7 +115,7 @@
                                         <div>
                                             <small class="text-muted d-block">Payment</small>
                                             <span class="fw-semibold">
-                                                @(order.PaymentMethod == "COD" ? "COD (Cash)" : "Bank Transfer")
+                                                @(order.PaymentMethod == "COD" ? "COD (Cash)" : "Stripe")
                                             </span>
                                         </div>
                                     </div>
@@ -150,6 +130,22 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- ✅ PRESCRIPTION INFO (NEW!) -->
+                            @if (order.HasPrescription)
+                            {
+                                <div class="alert" style="background: rgba(156, 39, 176, 0.1); border-left: 4px solid #9c27b0; margin-bottom: 1rem;">
+                                    <div class="d-flex align-items-start">
+                                        <i class="bi bi-eyeglasses text-purple me-2" style="font-size: 1.5rem; color: #9c27b0;"></i>
+                                        <div class="flex-grow-1">
+                                            <strong style="color: #9c27b0;">Prescription Order</strong>
+                                            <p class="mb-0 small text-muted">
+                                                This order includes prescription lenses. Details available in order items below.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
 
                             <!-- Tracking Number -->
                             @if (!string.IsNullOrWhiteSpace(order.TrackingNumber))
@@ -171,21 +167,52 @@
                                 </h6>
                                 @foreach (var product in order.Products)
                                 {
-                                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
-                                        <div class="flex-grow-1">
-                                            <div class="fw-semibold">@product.Name</div>
-                                            <small class="text-muted">
-                                                SKU: @product.Sku | Qty: <strong>×@product.Quantity</strong>
-                                            </small>
-                                        </div>
-                                        <div class="text-end">
-                                            <div class="fw-semibold text-primary">
-                                                @String.Format("{0:N0} ₫", product.UnitPrice)
+                                    <div class="mb-3 p-3 bg-light rounded">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div class="flex-grow-1">
+                                                <div class="fw-semibold">@product.Name</div>
+                                                <small class="text-muted">
+                                                    SKU: @product.Sku | Qty: <strong>×@product.Quantity</strong>
+                                                </small>
                                             </div>
-                                            <small class="text-muted">
-                                                = @String.Format("{0:N0} ₫", product.UnitPrice * product.Quantity)
-                                            </small>
+                                            <div class="text-end">
+                                                <div class="fw-semibold text-primary">
+                                                    @String.Format("{0:N0} ₫", product.UnitPrice)
+                                                </div>
+                                                <small class="text-muted">
+                                                    = @String.Format("{0:N0} ₫", product.UnitPrice * product.Quantity)
+                                                </small>
+                                            </div>
                                         </div>
+
+                                        <!-- ✅ PRESCRIPTION DETAILS FOR THIS ITEM (NEW!) -->
+                                        @if (product.PrescriptionId.HasValue && product.Prescription != null)
+                                        {
+                                            <div class="mt-2 p-2" style="background: white; border-radius: 6px; border: 2px solid #9c27b0;">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <i class="bi bi-eyeglasses me-2" style="color: #9c27b0;"></i>
+                                                    <strong style="color: #9c27b0;">Prescription: @product.Prescription.ProfileName</strong>
+                                                </div>
+                                                <div class="row g-2 small">
+                                                    <div class="col-md-6">
+                                                        <strong class="d-block text-muted">Right Eye (OD)</strong>
+                                                        <div class="d-flex gap-3">
+                                                            <span>SPH: <strong>@(product.Prescription.RightSph?.ToString("0.00") ?? "—")</strong></span>
+                                                            <span>CYL: <strong>@(product.Prescription.RightCyl?.ToString("0.00") ?? "—")</strong></span>
+                                                            <span>AXIS: <strong>@(product.Prescription.RightAxis?.ToString() ?? "—")°</strong></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <strong class="d-block text-muted">Left Eye (OS)</strong>
+                                                        <div class="d-flex gap-3">
+                                                            <span>SPH: <strong>@(product.Prescription.LeftSph?.ToString("0.00") ?? "—")</strong></span>
+                                                            <span>CYL: <strong>@(product.Prescription.LeftCyl?.ToString("0.00") ?? "—")</strong></span>
+                                                            <span>AXIS: <strong>@(product.Prescription.LeftAxis?.ToString() ?? "—")°</strong></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
                                     </div>
                                 }
                             </div>
@@ -220,9 +247,9 @@
                     </div>
                 </div>
 
-                <!-- Detail Modal -->
+                <!-- Detail Modal (with prescription info) -->
                 <div class="modal fade" id="detailModal@(order.OrderId)" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
+                    <div class="modal-dialog modal-lg modal-dialog-scrollable">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title">
@@ -270,13 +297,46 @@
                                         {
                                             <tr>
                                                 <td>
-                                                    @p.Name<br />
+                                                    @p.Name
+                                                    @if (p.PrescriptionId.HasValue)
+                                                    {
+                                                        <br />
+                                                        <span class="badge bg-purple small">
+                                                            <i class="bi bi-eyeglasses me-1"></i>
+                                                            @(p.Prescription?.ProfileName ?? "Prescription")
+                                                        </span>
+                                                    }
+                                                    <br />
                                                     <small class="text-muted">@p.Sku</small>
                                                 </td>
                                                 <td class="text-center">@p.Quantity</td>
                                                 <td class="text-end">@String.Format("{0:N0} ₫", p.UnitPrice)</td>
                                                 <td class="text-end">@String.Format("{0:N0} ₫", p.UnitPrice * p.Quantity)</td>
                                             </tr>
+                                            @if (p.PrescriptionId.HasValue && p.Prescription != null)
+                                            {
+                                                <tr style="background: rgba(156, 39, 176, 0.05);">
+                                                    <td colspan="4" class="small">
+                                                        <strong style="color: #9c27b0;">
+                                                            <i class="bi bi-eyeglasses me-1"></i>Prescription Details:
+                                                        </strong>
+                                                        <div class="row mt-1">
+                                                            <div class="col-6">
+                                                                <strong>Right Eye (OD):</strong>
+                                                                SPH @(p.Prescription.RightSph?.ToString("0.00") ?? "—"),
+                                                                CYL @(p.Prescription.RightCyl?.ToString("0.00") ?? "—"),
+                                                                AXIS @(p.Prescription.RightAxis?.ToString() ?? "—")°
+                                                            </div>
+                                                            <div class="col-6">
+                                                                <strong>Left Eye (OS):</strong>
+                                                                SPH @(p.Prescription.LeftSph?.ToString("0.00") ?? "—"),
+                                                                CYL @(p.Prescription.LeftCyl?.ToString("0.00") ?? "—"),
+                                                                AXIS @(p.Prescription.LeftAxis?.ToString() ?? "—")°
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
                                         }
                                     </tbody>
                                     <tfoot>
@@ -310,7 +370,6 @@
 
         function cancelOrder(orderId) {
             if (confirm('Are you sure you want to cancel order #' + orderId + '?')) {
-                // TODO: Implement cancel order API call
                 alert('Order cancellation feature will be implemented soon');
             }
         }
@@ -329,8 +388,7 @@
             }
 
         .order-products {
-            max-height: 300px;
-            overflow-y: auto;
+            max-height: none;
         }
 
         .badge {
@@ -343,6 +401,14 @@
 
         .progress-bar {
             border-radius: 10px;
+        }
+
+        .bg-purple {
+            background-color: #9c27b0 !important;
+        }
+
+        .text-purple {
+            color: #9c27b0 !important;
         }
     </style>
 }

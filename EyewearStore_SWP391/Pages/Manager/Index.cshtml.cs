@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 namespace EyewearStore_SWP391.Pages.Manager
 {
     [Authorize(Roles = "manager,admin,Administrator")]
@@ -39,7 +40,7 @@ namespace EyewearStore_SWP391.Pages.Manager
             public int LowStockCount { get; set; }
             public int TotalStaff { get; set; }
             public int ActiveStaff { get; set; }
-            public int PendingReturns { get; set; }
+            public int PendingReturns { get; set; } // ✅ ADDED
             public decimal OrderGrowth { get; set; }
         }
 
@@ -70,7 +71,7 @@ namespace EyewearStore_SWP391.Pages.Manager
             await LoadDashboardStatsAsync();
             await LoadTopProductsAsync();
             await LoadRevenueChartDataAsync();
-            await LoadRecentOrdersAsync(); // paging-aware
+            await LoadRecentOrdersAsync();
         }
 
         private async Task LoadDashboardStatsAsync()
@@ -100,8 +101,12 @@ namespace EyewearStore_SWP391.Pages.Manager
             Stats.ActiveProducts = await _context.Products.CountAsync(p => p.IsActive);
             Stats.LowStockCount = await _context.Products.Where(p => p.IsActive && p.InventoryQty < 10).CountAsync();
             Stats.TotalStaff = await _context.Users.Where(u => u.Role != "customer" && u.IsActive).CountAsync();
-            Stats.ActiveStaff = Stats.TotalStaff; // placeholder: adjust later with last-login tracking
-            Stats.PendingReturns = await _context.Returns.Where(r => r.Status == "Pending" || r.Status == "Under Review").CountAsync();
+            Stats.ActiveStaff = Stats.TotalStaff;
+
+            // ✅ ADDED: Get pending returns count
+            Stats.PendingReturns = await _context.Returns
+                .Where(r => r.Status == "Pending")
+                .CountAsync();
         }
 
         private async Task LoadTopProductsAsync()
@@ -144,7 +149,6 @@ namespace EyewearStore_SWP391.Pages.Manager
 
         private async Task LoadRecentOrdersAsync()
         {
-            // Recent = all orders ordered by CreatedAt desc, paginated.
             var baseQuery = _context.Orders
                 .Include(o => o.User)
                 .AsNoTracking()

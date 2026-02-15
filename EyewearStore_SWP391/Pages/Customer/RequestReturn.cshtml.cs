@@ -27,21 +27,6 @@ namespace EyewearStore_SWP391.Pages.Customer
 
         public Order? Order { get; set; }
 
-        // View model per order item for UI
-        public class ReturnableItemVm
-        {
-            public int OrderItemId { get; set; }
-            public string ProductName { get; set; } = "";
-            public string Sku { get; set; } = "";
-            public int Quantity { get; set; }
-            public decimal UnitPrice { get; set; }
-            public bool IsReturnable { get; set; } = true;
-            public string? ExistingReturnStatus { get; set; } = null;
-        }
-
-        // Items to render in UI
-        public List<ReturnableItemVm> DisplayItems { get; set; } = new();
-
         [BindProperty]
         public List<int> SelectedOrderItemIds { get; set; } = new();
 
@@ -63,7 +48,6 @@ namespace EyewearStore_SWP391.Pages.Customer
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                 return RedirectToPage("/Account/Login");
 
-            // load order + items + products + returns
             Order = await _context.Orders
                 .Include(o => o.OrderItems!)
                     .ThenInclude(oi => oi.Product)
@@ -77,34 +61,16 @@ namespace EyewearStore_SWP391.Pages.Customer
                 return RedirectToPage("/Customer/MyOrders");
             }
 
-            // Check return window
+            // Check 30-day return window
             if ((DateTime.UtcNow - Order.CreatedAt).TotalDays > 30)
             {
                 TempData["ErrorMessage"] = "This order is past the 30-day return window.";
                 return RedirectToPage("/Customer/MyOrders");
             }
 
-            // Build DisplayItems: keep everything but mark non-returnable items
-            DisplayItems = Order.OrderItems
-                .Select(oi =>
-                {
-                    // find any active return (status not Rejected and not Cancelled)
-                    var active = oi.Returns
-                        .FirstOrDefault(r => !string.Equals(r.Status, "Rejected", StringComparison.OrdinalIgnoreCase)
-                                          && !string.Equals(r.Status, "Cancelled", StringComparison.OrdinalIgnoreCase));
-
-                    return new ReturnableItemVm
-                    {
-                        OrderItemId = oi.OrderItemId,
-                        ProductName = oi.Product?.Name ?? "(Product removed)",
-                        Sku = oi.Product?.Sku ?? "",
-                        Quantity = oi.Quantity,
-                        UnitPrice = oi.UnitPrice,
-                        IsReturnable = active == null,
-                        ExistingReturnStatus = active?.Status
-                    };
-                })
-                .ToList();
+            // ✅ FIX: KHÔNG FILTER - Hiển thị tất cả items
+            // Validation sẽ làm ở OnPost thay vì OnGet
+            // Để user thấy form ngay cả khi có return rồi
 
             return Page();
         }
@@ -115,19 +81,20 @@ namespace EyewearStore_SWP391.Pages.Customer
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                 return RedirectToPage("/Account/Login");
 
-            // server-side validation: at least one selected
+            // Validation
             if (SelectedOrderItemIds == null || !SelectedOrderItemIds.Any())
             {
                 TempData["ErrorMessage"] = "Please select at least one item to return.";
                 return await OnGetAsync(orderId);
             }
+
             if (string.IsNullOrWhiteSpace(ReasonCategory))
             {
                 TempData["ErrorMessage"] = "Please select a reason for return.";
                 return await OnGetAsync(orderId);
             }
 
-            // Load order + items + returns to validate selection
+            // Load order
             var order = await _context.Orders
                 .Include(o => o.OrderItems!)
                     .ThenInclude(oi => oi.Returns)
@@ -139,79 +106,101 @@ namespace EyewearStore_SWP391.Pages.Customer
                 return RedirectToPage("/Customer/MyOrders");
             }
 
-            // Re-validate selections (skip any item that already has active return)
-            var validatedSelected = new List<int>();
-            foreach (var id in SelectedOrderItemIds.Distinct())
+            // ✅ VALIDATION: Chỉ check items được chọn, không filter toàn bộ
+            var validatedItemIds = new List<int>();
+
+            foreach (var itemId in SelectedOrderItemIds.Distinct())
             {
-                var oi = order.OrderItems.FirstOrDefault(x => x.OrderItemId == id);
-                if (oi == null) continue;
+                var orderItem = order.OrderItems.FirstOrDefault(oi => oi.OrderItemId == itemId);
+                if (orderItem == null) continue;
 
-                var hasActiveReturn = oi.Returns.Any(r => !string.Equals(r.Status, "Rejected", StringComparison.OrdinalIgnoreCase)
-                                                        && !string.Equals(r.Status, "Cancelled", StringComparison.OrdinalIgnoreCase));
-                if (!hasActiveReturn)
-                    validatedSelected.Add(id);
-            }
+                // Chỉ skip item nếu có return PENDING hoặc APPROVED
+                // Cho phép return lại nếu trước đó bị REJECTED
+                var hasPendingReturn = orderItem.Returns
+                    .Any(r => r.Status == "Pending" || r.Status == "Approved");
 
-            if (!validatedSelected.Any())
-            {
-                TempData["ErrorMessage"] = "Selected items cannot be returned (maybe a return was already created).";
-                return await OnGetAsync(orderId);
-            }
-
-            // handle images upload
-            List<string> imageUrls = new();
-            if (Images != null && Images.Any())
-            {
-                var uploadsFolder = Path.Combine(_environment.WebRootPath ?? ".", "uploads", "returns");
-                Directory.CreateDirectory(uploadsFolder);
-
-                foreach (var image in Images.Take(5))
+                if (!hasPendingReturn)
                 {
-                    if (image.Length > 0 && image.Length <= 5 * 1024 * 1024)
-                    {
-                        var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(image.FileName)}";
-                        var filePath = Path.Combine(uploadsFolder, fileName);
-                        using var stream = new FileStream(filePath, FileMode.Create);
-                        await image.CopyToAsync(stream);
-                        imageUrls.Add($"/uploads/returns/{fileName}");
-                    }
+                    validatedItemIds.Add(itemId);
                 }
             }
 
-            // create Return records
-            var now = DateTime.UtcNow;
-            foreach (var orderItemId in validatedSelected)
+            if (!validatedItemIds.Any())
             {
-                var oi = order.OrderItems.FirstOrDefault(x => x.OrderItemId == orderItemId);
-                if (oi == null) continue;
-
-                // read return quantity from posted form
-                var quantityKey = $"ReturnQuantities_{orderItemId}";
-                var quantityStr = Request.Form[quantityKey].FirstOrDefault();
-                int returnQuantity = int.TryParse(quantityStr, out var q) ? Math.Min(q, oi.Quantity) : oi.Quantity;
-
-                var returnRequest = new Return
-                {
-                    OrderItemId = orderItemId,
-                    UserId = userId,
-                    Quantity = returnQuantity,
-                    ReturnType = ReturnType,
-                    ReasonCategory = ReasonCategory,
-                    Reason = ReasonCategory,
-                    Description = Description,
-                    ImageUrls = imageUrls.Any() ? System.Text.Json.JsonSerializer.Serialize(imageUrls) : null,
-                    Status = "Pending",
-                    RefundAmount = oi.UnitPrice * returnQuantity,
-                    CreatedAt = now
-                };
-
-                _context.Returns.Add(returnRequest);
+                TempData["ErrorMessage"] = "Selected items already have pending return requests.";
+                return await OnGetAsync(orderId);
             }
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                // Handle image uploads
+                List<string> imageUrls = new();
+                if (Images != null && Images.Any())
+                {
+                    var uploadsFolder = Path.Combine(_environment.WebRootPath ?? ".", "uploads", "returns");
+                    Directory.CreateDirectory(uploadsFolder);
 
-            TempData["SuccessMessage"] = "Return request submitted successfully! We'll review it within 24-48 hours.";
-            return RedirectToPage("/Customer/MyOrders");
+                    foreach (var image in Images.Take(5))
+                    {
+                        if (image.Length > 0 && image.Length <= 5 * 1024 * 1024)
+                        {
+                            var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(image.FileName)}";
+                            var filePath = Path.Combine(uploadsFolder, fileName);
+
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await image.CopyToAsync(stream);
+                            }
+
+                            imageUrls.Add($"/uploads/returns/{fileName}");
+                        }
+                    }
+                }
+
+                // Create return requests
+                var now = DateTime.UtcNow;
+
+                foreach (var itemId in validatedItemIds)
+                {
+                    var orderItem = order.OrderItems.First(oi => oi.OrderItemId == itemId);
+
+                    // Get return quantity
+                    var quantityKey = $"ReturnQuantities_{itemId}";
+                    var quantityStr = Request.Form[quantityKey].FirstOrDefault();
+                    int returnQuantity = int.TryParse(quantityStr, out var qty)
+                        ? Math.Min(qty, orderItem.Quantity)
+                        : orderItem.Quantity;
+
+                    var returnRequest = new Return
+                    {
+                        OrderItemId = itemId,
+                        UserId = userId,
+                        Quantity = returnQuantity,
+                        ReturnType = ReturnType,
+                        ReasonCategory = ReasonCategory,
+                        Reason = ReasonCategory,
+                        Description = Description,
+                        ImageUrls = imageUrls.Any()
+                            ? System.Text.Json.JsonSerializer.Serialize(imageUrls)
+                            : null,
+                        Status = "Pending",
+                        RefundAmount = orderItem.UnitPrice * returnQuantity,
+                        CreatedAt = now
+                    };
+
+                    _context.Returns.Add(returnRequest);
+                }
+
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Return request submitted successfully! We'll review it within 24-48 hours.";
+                return RedirectToPage("/Customer/MyOrders");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error: {ex.Message}";
+                return await OnGetAsync(orderId);
+            }
         }
     }
 }

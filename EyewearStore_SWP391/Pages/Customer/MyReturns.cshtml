@@ -1,0 +1,156 @@
+﻿@page
+@model EyewearStore_SWP391.Pages.Customer.MyReturnsModel
+@{
+    ViewData["Title"] = "My Returns";
+}
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-page="/Customer/MyOrders">My Orders</a></li>
+            <li class="breadcrumb-item active">My Returns</li>
+        </ol>
+    </nav>
+
+    <div class="mb-5">
+        <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
+            🔄 My Returns
+            @if (Model.Returns.Any())
+            {
+                <span class="badge" style="background: var(--primary-gold); font-size: 1.2rem; vertical-align: middle;">
+                    @Model.Returns.Count
+                </span>
+            }
+        </h1>
+        <p style="color: var(--secondary-warm-gray); font-size: 1.1rem;">
+            Track your return requests and refund status
+        </p>
+    </div>
+
+    @if (!Model.Returns.Any())
+    {
+        <div class="card" style="border: none; border-radius: 16px; box-shadow: var(--shadow-lg); text-align: center; padding: 5rem 3rem;">
+            <div style="font-size: 6rem; opacity: 0.2; margin-bottom: 2rem;">📦</div>
+            <h2 style="color: var(--primary-navy); margin-bottom: 1rem;">No Returns Yet</h2>
+            <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin-bottom: 2.5rem;">
+                You haven't requested any returns yet.
+            </p>
+            <a asp-page="/Customer/MyOrders" class="btn btn-primary btn-lg">
+                <i class="bi bi-arrow-left me-2"></i>Back to Orders
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var ret in Model.Returns)
+            {
+                <div class="col-12">
+                    <div class="card" style="border: none; border-radius: 16px; box-shadow: var(--shadow-md); overflow: hidden;">
+                        <div style="background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%); padding: 1.5rem 2rem;">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h5 style="color: white; margin: 0 0 0.5rem 0;">
+                                        <i class="bi bi-arrow-repeat me-2"></i>Return #@ret.ReturnId
+                                    </h5>
+                                    <small style="color: rgba(255,255,255,0.9);">
+                                        Order #@ret.OrderId · @ret.CreatedAt.ToString("MMM dd, yyyy")
+                                    </small>
+                                </div>
+                                <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                                    <span class="badge @MyReturnsModel.GetStatusBadgeClass(ret.Status)" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                                        <i class="@MyReturnsModel.GetStatusIcon(ret.Status) me-1"></i>@ret.Status
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body" style="padding: 2rem;">
+                            <div class="row g-4">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <h6 style="color: var(--primary-navy); font-weight: 600;">@ret.ProductName</h6>
+                                        <small class="text-muted">SKU: @ret.Sku</small>
+                                    </div>
+
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Return Type</small>
+                                            <strong>@ret.ReturnType</strong>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Quantity</small>
+                                            <strong>@ret.Quantity</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <small class="text-muted d-block">Reason</small>
+                                        <strong>@ret.ReasonCategory</strong>
+                                        @if (!string.IsNullOrEmpty(ret.Description))
+                                        {
+                                            <p class="mt-1 mb-0" style="color: var(--dark-gray); font-size: 0.9rem;">@ret.Description</p>
+                                        }
+                                    </div>
+
+                                    @if (ret.Status == "Rejected" && !string.IsNullOrEmpty(ret.RejectionReason))
+                                    {
+                                        <div class="alert alert-danger">
+                                            <strong>Rejection Reason:</strong> @ret.RejectionReason
+                                        </div>
+                                    }
+
+                                    @if (ret.ImageUrls.Any())
+                                    {
+                                        <div class="mt-3">
+                                            <small class="text-muted d-block mb-2">Evidence Photos</small>
+                                            <div class="d-flex gap-2 flex-wrap">
+                                                @foreach (var img in ret.ImageUrls.Take(3))
+                                                {
+                                                    <img src="@img" alt="Evidence" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid var(--medium-gray);">
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div style="background: var(--light-gray); padding: 1.5rem; border-radius: 12px;">
+                                        <small class="text-muted d-block mb-2">Refund Amount</small>
+                                        <h3 style="color: var(--primary-gold); margin: 0; font-family: var(--font-secondary);">
+                                            @ret.RefundAmount.ToString("N0") VND
+                                        </h3>
+
+                                        @if (ret.ReviewedAt.HasValue)
+                                        {
+                                            <hr />
+                                            <small class="text-muted d-block">Reviewed On</small>
+                                            <strong style="font-size: 0.9rem;">@ret.ReviewedAt.Value.ToString("MMM dd, yyyy")</strong>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+    }
+
+    .breadcrumb-item a {
+        color: var(--primary-gold);
+        text-decoration: none;
+    }
+</style>

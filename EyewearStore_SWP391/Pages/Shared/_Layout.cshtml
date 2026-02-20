@@ -20,6 +20,77 @@
 
     <!-- Page-specific Styles Section -->
     @await RenderSectionAsync("Styles", required: false)
+
+    <style>
+        /* ── Wishlist nav icon (header) ── */
+        .nav-wishlist-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            color: inherit;
+            text-decoration: none;
+            transition: background .2s, color .2s, transform .2s;
+        }
+
+            .nav-wishlist-btn:hover {
+                background: rgba(201,169,110,0.12);
+                color: #c9a96e;
+                transform: scale(1.08);
+            }
+
+            .nav-wishlist-btn i {
+                font-size: 18px;
+            }
+
+            .nav-wishlist-btn .wl-count {
+                position: absolute;
+                top: 2px;
+                right: 2px;
+                min-width: 16px;
+                height: 16px;
+                background: #c9a96e;
+                color: #fff;
+                font-size: 10px;
+                font-weight: 700;
+                border-radius: 100px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0 3px;
+                line-height: 1;
+                display: none; /* ẩn mặc định, JS sẽ show khi có items */
+            }
+
+        /* ── My Wishlist dropdown item ── */
+        .dropdown-item-wishlist {
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, rgba(201,169,110,0.06) 0%, rgba(232,208,176,0.06) 100%);
+        }
+
+            .dropdown-item-wishlist:hover {
+                background: linear-gradient(135deg, rgba(201,169,110,0.15) 0%, rgba(232,208,176,0.15) 100%);
+            }
+
+            .dropdown-item-wishlist .wl-label {
+                font-weight: 600;
+                color: #9a7840;
+            }
+
+            .dropdown-item-wishlist .wl-badge {
+                font-size: 10px;
+                padding: 2px 7px;
+                border-radius: 100px;
+                background: linear-gradient(135deg, #c9a96e 0%, #e8d5b0 100%);
+                color: #fff;
+                font-weight: 700;
+                margin-left: auto;
+                display: none; /* JS sẽ show */
+            }
+    </style>
 </head>
 <body>
     <header>
@@ -67,8 +138,7 @@
                             </a>
                         </li>
 
-
-                        @* ADMIN DROPDOWN — ONLY VISIBLE FOR ADMIN *@
+                        @* ADMIN DROPDOWN *@
                         @if (User.IsInRole("admin"))
                         {
                             <li class="nav-item dropdown">
@@ -83,7 +153,6 @@
                                         </a>
                                     </li>
                                     <li><hr class="dropdown-divider" /></li>
-
                                     <li class="dropdown-header text-muted small">Products</li>
                                     <li>
                                         <a class="dropdown-item" asp-page="/Lenses/Index">
@@ -95,17 +164,13 @@
                                             <i class="bi bi-eyeglasses me-2"></i>Frame Management
                                         </a>
                                     </li>
-
                                     <li><hr class="dropdown-divider" /></li>
-
                                     <li>
                                         <a class="dropdown-item" asp-page="/Sale/Orders/Index">
                                             <i class="bi bi-cart-check me-2"></i>Order Management
                                         </a>
                                     </li>
-
                                     <li><hr class="dropdown-divider" /></li>
-
                                     <li>
                                         <a class="dropdown-item" asp-page="/Support/Orders/Index">
                                             <i class="bi bi-people me-2"></i>Sale Staff
@@ -121,15 +186,12 @@
                                             <i class="bi bi-person-badge me-2"></i>Managers
                                         </a>
                                     </li>
-
                                     <li><hr class="dropdown-divider" /></li>
-
                                     <li>
                                         <a class="dropdown-item" asp-page="/Admin/Users/Index">
                                             <i class="bi bi-people me-2"></i>User Management
                                         </a>
                                     </li>
-
                                     <li>
                                         <a class="dropdown-item" asp-page="/Admin/AdminRole">
                                             <i class="bi bi-key me-2"></i>Admin Roles
@@ -141,6 +203,18 @@
                     </ul>
 
                     <ul class="navbar-nav align-items-center">
+
+                        @* ── WISHLIST ICON (chỉ hiện khi đã login) ── *@
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item me-1">
+                                <a class="nav-wishlist-btn nav-link" asp-page="/Customer/Wishlist" title="My Wishlist">
+                                    <i class="bi bi-heart"></i>
+                                    <span class="wl-count" id="navWlCount"></span>
+                                </a>
+                            </li>
+                        }
+
                         @await Html.PartialAsync("_CartSummary")
 
                         @if (User.Identity.IsAuthenticated)
@@ -161,7 +235,6 @@
                                                  style="width: 50px; height: 50px;">
                                                 <i class="bi bi-person-circle fs-3"></i>
                                             </div>
-
                                             <div class="user-meta">
                                                 <div class="fw-bold user-fullname">@User.Identity.Name</div>
                                                 <div class="text-muted small">
@@ -187,9 +260,19 @@
                                         </a>
                                     </li>
 
-                                    <!-- ✅ MỚI: MY PRESCRIPTIONS TRONG DROPDOWN -->
+                                    @* ── MY WISHLIST ── *@
                                     <li>
-                                        <a class="dropdown-item d-flex align-items-center" asp-page="/Customer/Prescriptions/Index" style="padding: 0.75rem 1rem; background: linear-gradient(135deg, rgba(156, 39, 176, 0.05) 0%, rgba(186, 104, 200, 0.05) 100%);">
+                                        <a class="dropdown-item d-flex align-items-center dropdown-item-wishlist"
+                                           asp-page="/Customer/Wishlist">
+                                            <i class="bi bi-heart-fill me-2" style="color: #c9a96e;"></i>
+                                            <span class="wl-label">My Wishlist</span>
+                                            <span class="wl-badge" id="dropdownWlCount"></span>
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" asp-page="/Customer/Prescriptions/Index"
+                                           style="padding: 0.75rem 1rem; background: linear-gradient(135deg, rgba(156, 39, 176, 0.05) 0%, rgba(186, 104, 200, 0.05) 100%);">
                                             <i class="bi bi-eyeglasses me-2" style="color: #9c27b0;"></i>
                                             <span style="font-weight: 600; color: #9c27b0;">My Prescriptions</span>
                                             <span class="badge bg-purple ms-auto" style="background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);">New</span>
@@ -236,33 +319,24 @@
     </main>
 
     <!-- Footer -->
-    <!-- Footer -->
     <footer class="footer-optiplus" id="footer">
         <div class="footer-container">
             <div class="footer-content">
                 <div class="footer-brand">
                     <h3>OptiPlus</h3>
                     <p>
-                        Your trusted destination for premium eyewear. 
+                        Your trusted destination for premium eyewear.
                         We combine style, quality, and affordability to help you see the world better.
                     </p>
                     <div class="social-icons">
                         <a href="#" class="social-icon" aria-label="Facebook">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
-                            </svg>
+                            <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg>
                         </a>
                         <a href="#" class="social-icon" aria-label="Instagram">
-                            <svg viewBox="0 0 24 24">
-                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
-                            </svg>
+                            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></svg>
                         </a>
                         <a href="#" class="social-icon" aria-label="Twitter">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
-                            </svg>
+                            <svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" /></svg>
                         </a>
                     </div>
                 </div>
@@ -309,6 +383,41 @@
     <!-- Page-specific Scripts Section -->
     @await RenderSectionAsync("Scripts", required: false)
 
+    @* ── Wishlist count badge (load 1 lần cho toàn bộ site) ── *@
+    @if (User.Identity.IsAuthenticated)
+    {
+        <script>
+            (async () => {
+                try {
+                    const res = await fetch('/api/wishlist/my');
+                    if (!res.ok) return;
+                    const items = await res.json();
+                    const count = items.length;
+                    if (count === 0) return;
+
+                    // Icon badge trên navbar
+                    const navBadge = document.getElementById('navWlCount');
+                    if (navBadge) {
+                        navBadge.textContent = count > 99 ? '99+' : count;
+                        navBadge.style.display = 'flex';
+                    }
+
+                    // Badge trong dropdown
+                    const dropBadge = document.getElementById('dropdownWlCount');
+                    if (dropBadge) {
+                        dropBadge.textContent = count > 99 ? '99+' : count;
+                        dropBadge.style.display = 'inline-flex';
+                    }
+
+                    // Icon đổi sang heart-fill khi có items
+                    const heartIcon = document.querySelector('.nav-wishlist-btn i');
+                    if (heartIcon) heartIcon.className = 'bi bi-heart-fill';
+
+                } catch {}
+            })();
+        </script>
+    }
+
     <!-- Global Toast Notification for TempData -->
     @if (TempData["Success"] != null || TempData["Error"] != null)
     {
@@ -316,17 +425,11 @@
             document.addEventListener('DOMContentLoaded', function() {
                 @if (TempData["Success"] != null)
                 {
-                        <text>
-                        // Show success toast/alert
-                        console.log('Success: @TempData["Success"]');
-                        </text>
+                        <text>console.log('Success: @TempData["Success"]');</text>
                 }
                 @if (TempData["Error"] != null)
                 {
-                        <text>
-                        // Show error toast/alert
-                        console.log('Error: @TempData["Error"]');
-                        </text>
+                        <text>console.log('Error: @TempData["Error"]');</text>
                 }
             });
         </script>

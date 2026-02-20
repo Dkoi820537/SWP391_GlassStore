@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using EyewearStore_SWP391.Models;
 using EyewearStore_SWP391.Models.ViewModels.Shop;
-
 using System.Security.Claims;
 
 namespace EyewearStore_SWP391.Pages.Products;
@@ -29,65 +28,33 @@ public class IndexModel : PageModel
     /// </summary>
     public ProductCatalogViewModel Catalog { get; set; } = new();
 
-    // Filter properties with SupportsGet = true for query string binding
-
-    /// <summary>
-    /// Product type filter: "All", "Frame", or "Lens"
-    /// </summary>
     [BindProperty(SupportsGet = true)]
     public string ProductTypeFilter { get; set; } = "All";
 
-    /// <summary>
-    /// Search term to filter by name, description, or SKU
-    /// </summary>
     [BindProperty(SupportsGet = true)]
     public string? SearchTerm { get; set; }
 
-    /// <summary>
-    /// Minimum price filter
-    /// </summary>
     [BindProperty(SupportsGet = true)]
     public decimal? MinPrice { get; set; }
 
-    /// <summary>
-    /// Maximum price filter
-    /// </summary>
     [BindProperty(SupportsGet = true)]
     public decimal? MaxPrice { get; set; }
 
-    /// <summary>
-    /// Frame material filter
-    /// </summary>
     [BindProperty(SupportsGet = true)]
     public string? FrameMaterialFilter { get; set; }
 
-    /// <summary>
-    /// Frame type filter
-    /// </summary>
     [BindProperty(SupportsGet = true)]
     public string? FrameTypeFilter { get; set; }
 
-    /// <summary>
-    /// Lens type filter
-    /// </summary>
     [BindProperty(SupportsGet = true)]
     public string? LensTypeFilter { get; set; }
 
-    /// <summary>
-    /// Sort option: "name", "price-low", "price-high", "newest"
-    /// </summary>
     [BindProperty(SupportsGet = true)]
     public string SortBy { get; set; } = "name";
 
-    /// <summary>
-    /// Current page number (1-indexed)
-    /// </summary>
     [BindProperty(SupportsGet = true)]
     public int CurrentPage { get; set; } = 1;
 
-    /// <summary>
-    /// Number of items per page
-    /// </summary>
     [BindProperty(SupportsGet = true)]
     public int PageSize { get; set; } = DefaultPageSize;
 
@@ -96,26 +63,22 @@ public class IndexModel : PageModel
     /// </summary>
     public async Task<IActionResult> OnGetAsync()
     {
-        // Ensure page values are valid
         if (CurrentPage < 1) CurrentPage = 1;
         if (PageSize < 1 || PageSize > 48) PageSize = DefaultPageSize;
 
-        // Build combined query for both Frames and Lenses
         var productList = new List<ProductCatalogItemViewModel>();
 
-        // Determine which product types to query based on filter
         bool includeFrames = ProductTypeFilter == "All" || ProductTypeFilter == "Frame";
         bool includeLenses = ProductTypeFilter == "All" || ProductTypeFilter == "Lens";
 
-        // Query Frames if applicable
+        // ── Query Frames ─────────────────────────────────────────────────────
         if (includeFrames)
         {
             var framesQuery = _context.Frames
                 .Include(f => f.ProductImages)
                 .AsNoTracking()
-                .Where(f => f.IsActive); // Only show active products
+                .Where(f => f.IsActive);
 
-            // Apply search filter
             if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
                 var searchLower = SearchTerm.ToLower();
@@ -125,25 +88,13 @@ public class IndexModel : PageModel
                     (f.Description != null && f.Description.ToLower().Contains(searchLower)));
             }
 
-            // Apply price range filters
-            if (MinPrice.HasValue)
-            {
-                framesQuery = framesQuery.Where(f => f.Price >= MinPrice.Value);
-            }
-            if (MaxPrice.HasValue)
-            {
-                framesQuery = framesQuery.Where(f => f.Price <= MaxPrice.Value);
-            }
+            if (MinPrice.HasValue) framesQuery = framesQuery.Where(f => f.Price >= MinPrice.Value);
+            if (MaxPrice.HasValue) framesQuery = framesQuery.Where(f => f.Price <= MaxPrice.Value);
 
-            // Apply frame-specific filters
             if (!string.IsNullOrWhiteSpace(FrameMaterialFilter))
-            {
                 framesQuery = framesQuery.Where(f => f.FrameMaterial == FrameMaterialFilter);
-            }
             if (!string.IsNullOrWhiteSpace(FrameTypeFilter))
-            {
                 framesQuery = framesQuery.Where(f => f.FrameType == FrameTypeFilter);
-            }
 
             var frames = await framesQuery.ToListAsync();
             productList.AddRange(frames.Select(f => new ProductCatalogItemViewModel
@@ -155,23 +106,23 @@ public class IndexModel : PageModel
                 Description = f.Description,
                 Price = f.Price,
                 Currency = f.Currency,
+                InventoryQty = f.InventoryQty,   // ← THÊM
                 PrimaryImageUrl = f.ProductImages?.FirstOrDefault(i => i.IsPrimary && i.IsActive)?.ImageUrl
-                    ?? f.ProductImages?.FirstOrDefault(i => i.IsActive)?.ImageUrl,
+                                  ?? f.ProductImages?.FirstOrDefault(i => i.IsActive)?.ImageUrl,
                 FrameMaterial = f.FrameMaterial,
                 FrameType = f.FrameType,
                 CreatedAt = f.CreatedAt
             }));
         }
 
-        // Query Lenses if applicable
+        // ── Query Lenses ─────────────────────────────────────────────────────
         if (includeLenses)
         {
             var lensesQuery = _context.Lenses
                 .Include(l => l.ProductImages)
                 .AsNoTracking()
-                .Where(l => l.IsActive); // Only show active products
+                .Where(l => l.IsActive);
 
-            // Apply search filter
             if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
                 var searchLower = SearchTerm.ToLower();
@@ -181,21 +132,11 @@ public class IndexModel : PageModel
                     (l.Description != null && l.Description.ToLower().Contains(searchLower)));
             }
 
-            // Apply price range filters
-            if (MinPrice.HasValue)
-            {
-                lensesQuery = lensesQuery.Where(l => l.Price >= MinPrice.Value);
-            }
-            if (MaxPrice.HasValue)
-            {
-                lensesQuery = lensesQuery.Where(l => l.Price <= MaxPrice.Value);
-            }
+            if (MinPrice.HasValue) lensesQuery = lensesQuery.Where(l => l.Price >= MinPrice.Value);
+            if (MaxPrice.HasValue) lensesQuery = lensesQuery.Where(l => l.Price <= MaxPrice.Value);
 
-            // Apply lens-specific filters
             if (!string.IsNullOrWhiteSpace(LensTypeFilter))
-            {
                 lensesQuery = lensesQuery.Where(l => l.LensType == LensTypeFilter);
-            }
 
             var lenses = await lensesQuery.ToListAsync();
             productList.AddRange(lenses.Select(l => new ProductCatalogItemViewModel
@@ -207,8 +148,9 @@ public class IndexModel : PageModel
                 Description = l.Description,
                 Price = l.Price,
                 Currency = l.Currency,
+                InventoryQty = l.InventoryQty,   // ← THÊM
                 PrimaryImageUrl = l.ProductImages?.FirstOrDefault(i => i.IsPrimary && i.IsActive)?.ImageUrl
-                    ?? l.ProductImages?.FirstOrDefault(i => i.IsActive)?.ImageUrl,
+                                  ?? l.ProductImages?.FirstOrDefault(i => i.IsActive)?.ImageUrl,
                 LensType = l.LensType,
                 LensIndex = l.LensIndex,
                 IsPrescription = l.IsPrescription,
@@ -216,54 +158,41 @@ public class IndexModel : PageModel
             }));
         }
 
-        // Apply sorting
+        // ── Sort ─────────────────────────────────────────────────────────────
         productList = SortBy switch
         {
             "price-low" => productList.OrderBy(p => p.Price).ToList(),
             "price-high" => productList.OrderByDescending(p => p.Price).ToList(),
             "newest" => productList.OrderByDescending(p => p.CreatedAt).ToList(),
-            _ => productList.OrderBy(p => p.Name).ToList() // default: name
+            _ => productList.OrderBy(p => p.Name).ToList()
         };
 
-        // Calculate total count for pagination
+        // ── Pagination ───────────────────────────────────────────────────────
         var totalCount = productList.Count;
         var totalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
+        if (CurrentPage > totalPages && totalPages > 0) CurrentPage = totalPages;
 
-        // Ensure current page doesn't exceed total pages
-        if (CurrentPage > totalPages && totalPages > 0)
-        {
-            CurrentPage = totalPages;
-        }
-
-        // Apply pagination
         var pagedProducts = productList
             .Skip((CurrentPage - 1) * PageSize)
             .Take(PageSize)
             .ToList();
 
-        // Get available filter options
+        // ── Filter options ───────────────────────────────────────────────────
         var availableFrameMaterials = await _context.Frames
             .Where(f => f.IsActive && f.FrameMaterial != null)
             .Select(f => f.FrameMaterial!)
-            .Distinct()
-            .OrderBy(m => m)
-            .ToListAsync();
+            .Distinct().OrderBy(m => m).ToListAsync();
 
         var availableFrameTypes = await _context.Frames
             .Where(f => f.IsActive && f.FrameType != null)
             .Select(f => f.FrameType!)
-            .Distinct()
-            .OrderBy(t => t)
-            .ToListAsync();
+            .Distinct().OrderBy(t => t).ToListAsync();
 
         var availableLensTypes = await _context.Lenses
             .Where(l => l.IsActive && l.LensType != null)
             .Select(l => l.LensType!)
-            .Distinct()
-            .OrderBy(t => t)
-            .ToListAsync();
+            .Distinct().OrderBy(t => t).ToListAsync();
 
-        // Populate the view model
         Catalog = new ProductCatalogViewModel
         {
             Products = pagedProducts,
@@ -293,31 +222,17 @@ public class IndexModel : PageModel
     public async Task<IActionResult> OnPostAddToCartAsync([FromBody] AddToCartRequest request)
     {
         if (request == null || request.ProductId <= 0 || request.Quantity <= 0)
-        {
             return new JsonResult(new { success = false, message = "Invalid request data." });
-        }
 
-        // Check authentication
         if (!User.Identity?.IsAuthenticated ?? true)
-        {
             return new JsonResult(new { success = false, message = "Please login to add items to cart." }) { StatusCode = 401 };
-        }
 
-        var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (!int.TryParse(userIdStr, out var userId))
-        {
             return new JsonResult(new { success = false, message = "User identity not found." }) { StatusCode = 401 };
-        }
 
         try
         {
-            // Verify product (check both Frames and Lenses)
-            // Note: In a real scenario, we might want a unified Product table,
-            // but here we check both. We assume ProductId is unique across both tables or logic handles it.
-            // Based on models, they are separate tables but might share ID space if inherited, 
-            // but looking at Context they seems separate.
-            // Let's check Frame first, then Lens.
-            
             int? inventoryQty = 0;
             bool isStockManaged = false;
 
@@ -332,8 +247,8 @@ public class IndexModel : PageModel
                 var lens = await _context.Lenses.FindAsync(request.ProductId);
                 if (lens != null)
                 {
-                   inventoryQty = lens.InventoryQty;
-                   isStockManaged = true;
+                    inventoryQty = lens.InventoryQty;
+                    isStockManaged = true;
                 }
                 else
                 {
@@ -342,13 +257,10 @@ public class IndexModel : PageModel
             }
 
             if (isStockManaged && inventoryQty.HasValue && inventoryQty.Value < request.Quantity)
-            {
-                 return new JsonResult(new { success = false, message = $"Only {inventoryQty} items left in stock." });
-            }
+                return new JsonResult(new { success = false, message = $"Only {inventoryQty} items left in stock." });
 
             await _cartService.AddToCartAsync(userId, request.ProductId, request.Quantity);
 
-            // Get updated cart with items for dropdown refresh
             var cart = await _cartService.GetCartByUserIdAsync(userId);
             var newCount = cart?.CartItems.Sum(i => i.Quantity) ?? 0;
             decimal subtotal = 0m;
@@ -358,15 +270,24 @@ public class IndexModel : PageModel
             {
                 foreach (var ci in cart.CartItems)
                 {
-                    decimal unitPrice = ci.Product != null ? ci.Product.Price : ci.Service != null ? ci.Service.Price : 0m;
-                    string name = ci.Product != null ? ci.Product.Name : ci.Service != null ? ci.Service.Name : "Product";
+                    decimal unitPrice = ci.Product != null ? ci.Product.Price :
+                                        ci.Service != null ? ci.Service.Price : 0m;
+                    string name = ci.Product != null ? ci.Product.Name :
+                                        ci.Service != null ? ci.Service.Name : "Product";
                     decimal lineTotal = unitPrice * ci.Quantity;
                     subtotal += lineTotal;
                     cartItemsList.Add(new { name, unitPrice, quantity = ci.Quantity, lineTotal });
                 }
             }
 
-            return new JsonResult(new { success = true, message = "Added to cart successfully!", cartCount = newCount, cartItems = cartItemsList, subtotal });
+            return new JsonResult(new
+            {
+                success = true,
+                message = "Added to cart successfully!",
+                cartCount = newCount,
+                cartItems = cartItemsList,
+                subtotal
+            });
         }
         catch (Exception ex)
         {

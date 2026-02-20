@@ -8,6 +8,95 @@
 @section Styles {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <style>
+        /* ── Wishlist Heart Button ── */
+        .product-image {
+            position: relative;
+        }
+
+        .btn-wishlist {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 15px;
+            color: #aaa;
+            backdrop-filter: blur(6px);
+            transition: color .2s, background .2s, transform .25s, border-color .2s;
+            z-index: 5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+        }
+
+            .btn-wishlist:hover {
+                color: #e05a6a;
+                background: #fff;
+                border-color: #f5c0c7;
+                transform: scale(1.12);
+            }
+
+            .btn-wishlist.active,
+            .btn-wishlist[data-in-wishlist="true"] {
+                color: #c9a96e;
+                background: #fffbf5;
+                border-color: #e8d5b0;
+            }
+
+            .btn-wishlist.pop {
+                animation: heart-pop .28s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+        @@keyframes heart-pop {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.4);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* ── Wishlist Toast ── */
+        #wl-toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #0f0f0f;
+            color: #fff;
+            border-radius: 12px;
+            padding: 12px 22px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+            z-index: 9999;
+            white-space: nowrap;
+            transition: transform .35s cubic-bezier(0.34,1.56,0.64,1);
+            pointer-events: none;
+        }
+
+            #wl-toast.show {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            #wl-toast .wl-icon {
+                font-size: 16px;
+            }
+    </style>
 }
 
 <div class="shop-container">
@@ -42,26 +131,25 @@
                 <div class="filter-section">
                     <h4>Product Type</h4>
                     <div class="product-type-pills">
-                        <button type="submit" 
-                                name="ProductTypeFilter" 
-                                value="All" 
+                        <button type="submit"
+                                name="ProductTypeFilter"
+                                value="All"
                                 class="type-pill @(Model.ProductTypeFilter == "All" ? "active" : "")">
                             All
                         </button>
-                        <button type="submit" 
-                                name="ProductTypeFilter" 
-                                value="Frame" 
+                        <button type="submit"
+                                name="ProductTypeFilter"
+                                value="Frame"
                                 class="type-pill @(Model.ProductTypeFilter == "Frame" ? "active" : "")">
                             <i class="bi bi-eyeglasses"></i> Frames
                         </button>
-                        <button type="submit" 
-                                name="ProductTypeFilter" 
-                                value="Lens" 
+                        <button type="submit"
+                                name="ProductTypeFilter"
+                                value="Lens"
                                 class="type-pill @(Model.ProductTypeFilter == "Lens" ? "active" : "")">
                             <i class="bi bi-circle"></i> Lenses
                         </button>
                     </div>
-                    <!-- Hidden inputs to preserve other filter values -->
                     <input type="hidden" name="SearchTerm" value="@Model.SearchTerm" />
                     <input type="hidden" name="MinPrice" value="@Model.MinPrice" />
                     <input type="hidden" name="MaxPrice" value="@Model.MaxPrice" />
@@ -73,16 +161,14 @@
             </form>
 
             <form method="get" asp-page="/Products/Index" id="searchFilterForm">
-                <!-- Hidden input for product type -->
                 <input type="hidden" name="ProductTypeFilter" value="@Model.ProductTypeFilter" />
-                
-                <!-- Search Box -->
+
                 <div class="filter-section">
                     <h4>Search</h4>
                     <div class="search-input-wrapper">
                         <i class="bi bi-search search-icon"></i>
-                        <input type="text" 
-                               name="SearchTerm" 
+                        <input type="text"
+                               name="SearchTerm"
                                value="@Model.SearchTerm"
                                placeholder="Search products..."
                                class="search-input"
@@ -90,42 +176,27 @@
                     </div>
                 </div>
 
-                <!-- Price Range -->
                 <div class="filter-section">
                     <h4>Price Range</h4>
                     <div class="price-range-inputs">
                         <div class="price-input-group">
                             <label for="minPrice">Min</label>
-                            <input type="number" 
-                                   name="MinPrice" 
-                                   value="@Model.MinPrice"
-                                   placeholder="0"
-                                   min="0"
-                                   step="0.01"
-                                   class="price-input"
-                                   id="minPrice" />
+                            <input type="number" name="MinPrice" value="@Model.MinPrice"
+                                   placeholder="0" min="0" step="0.01" class="price-input" id="minPrice" />
                         </div>
                         <span class="price-separator">—</span>
                         <div class="price-input-group">
                             <label for="maxPrice">Max</label>
-                            <input type="number" 
-                                   name="MaxPrice" 
-                                   value="@Model.MaxPrice"
-                                   placeholder="Any"
-                                   min="0"
-                                   step="0.01"
-                                   class="price-input"
-                                   id="maxPrice" />
+                            <input type="number" name="MaxPrice" value="@Model.MaxPrice"
+                                   placeholder="Any" min="0" step="0.01" class="price-input" id="maxPrice" />
                         </div>
                     </div>
                 </div>
 
-                <!-- Frame-specific Filters (show when All or Frame selected) -->
                 @if (Model.ProductTypeFilter == "All" || Model.ProductTypeFilter == "Frame")
                 {
                     <div class="filter-section frame-filters">
                         <h4><i class="bi bi-eyeglasses"></i> Frame Options</h4>
-                        
                         @if (Model.Catalog.AvailableFrameMaterials.Any())
                         {
                             <div class="select-wrapper">
@@ -140,7 +211,6 @@
                                 <i class="bi bi-chevron-down select-arrow"></i>
                             </div>
                         }
-
                         @if (Model.Catalog.AvailableFrameTypes.Any())
                         {
                             <div class="select-wrapper">
@@ -158,12 +228,10 @@
                     </div>
                 }
 
-                <!-- Lens-specific Filters (show when All or Lens selected) -->
                 @if (Model.ProductTypeFilter == "All" || Model.ProductTypeFilter == "Lens")
                 {
                     <div class="filter-section lens-filters">
                         <h4><i class="bi bi-circle"></i> Lens Options</h4>
-                        
                         @if (Model.Catalog.AvailableLensTypes.Any())
                         {
                             <div class="select-wrapper">
@@ -181,10 +249,8 @@
                     </div>
                 }
 
-                <!-- Hidden field for sort -->
                 <input type="hidden" name="SortBy" value="@Model.SortBy" />
 
-                <!-- Apply Filters Button -->
                 <div class="filter-actions">
                     <button type="submit" class="btn-apply-filters">
                         <i class="bi bi-check-lg"></i> Apply Filters
@@ -195,7 +261,6 @@
 
         <!-- Products Section -->
         <section class="products-section">
-            <!-- Results Header -->
             <div class="results-header">
                 <div class="results-count">
                     @if (Model.Catalog.TotalItems > 0)
@@ -207,8 +272,6 @@
                         <span>No products found</span>
                     }
                 </div>
-                
-                <!-- Sort Dropdown -->
                 <div class="sort-wrapper">
                     <label for="sortSelect">Sort by:</label>
                     <div class="select-wrapper compact">
@@ -223,12 +286,10 @@
                 </div>
             </div>
 
-            <!-- Mobile Filter Toggle -->
             <button class="mobile-filter-toggle" id="mobileFilterToggle">
                 <i class="bi bi-funnel"></i> Filters
             </button>
 
-            <!-- Product Grid -->
             @if (Model.Catalog.Products.Any())
             {
                 <div class="product-grid">
@@ -239,9 +300,7 @@
                             <div class="product-image">
                                 @if (!string.IsNullOrEmpty(product.PrimaryImageUrl))
                                 {
-                                    <img src="@product.PrimaryImageUrl" 
-                                         alt="@product.Name" 
-                                         loading="lazy" />
+                                    <img src="@product.PrimaryImageUrl" alt="@product.Name" loading="lazy" />
                                 }
                                 else
                                 {
@@ -249,16 +308,30 @@
                                         <i class="bi bi-eyeglasses"></i>
                                     </div>
                                 }
+
                                 <!-- Product Type Badge -->
                                 <span class="product-badge @product.ProductType.ToLower()">
                                     @product.ProductType
                                 </span>
+
+                                @* ── Wishlist Button: CHỈ hiện khi hết hàng (InventoryQty == 0) ── *@
+                                @if (product.InventoryQty <= 0)
+                                {
+                                    <button class="btn-wishlist"
+                                            data-product-id="@product.ProductId"
+                                            data-in-wishlist="false"
+                                            data-out-of-stock="true"
+                                            onclick="toggleWishlist(this)"
+                                            title="Save to Wishlist — notify me when back in stock">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                }
                             </div>
 
                             <!-- Product Info -->
                             <div class="product-info">
                                 <h3 class="product-name">@product.Name</h3>
-                                
+
                                 <p class="product-price">
                                     <span class="currency">@product.Currency</span>
                                     <span class="amount">@product.Price.ToString("N0")</span>
@@ -269,7 +342,6 @@
                                     <p class="product-description">@product.Description</p>
                                 }
 
-                                <!-- Product Attributes -->
                                 <div class="product-attributes">
                                     @if (product.ProductType == "Frame")
                                     {
@@ -297,38 +369,58 @@
 
                                 <!-- Action Buttons -->
                                 <div class="product-actions">
-                                    @if (product.ProductType == "Frame")
+                                    @if (product.InventoryQty <= 0)
                                     {
-                                        <button onclick="addToCart(this, @product.ProductId)" 
-                                                class="btn-add-cart" 
-                                                title="Add to Cart">
-                                            <i class="bi bi-cart-plus"></i> Add
-                                        </button>
-                                        <a asp-page="/Products/FrameDetails" 
-                                           asp-route-id="@product.ProductId"
-                                           class="btn-view-details-outline"
-                                           title="View Details">
-                                            Details
-                                        </a>
+                                        @* Hết hàng: chỉ hiện nút Details, không có Add to Cart *@
+                                        <span class="badge bg-secondary me-2" style="font-size:11px; padding: 6px 10px; align-self:center;">
+                                            <i class="bi bi-x-circle me-1"></i>Out of Stock
+                                        </span>
+                                        @if (product.ProductType == "Frame")
+                                        {
+                                            <a asp-page="/Products/FrameDetails"
+                                               asp-route-id="@product.ProductId"
+                                               class="btn-view-details-outline" title="View Details">
+                                                Details
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-page="/Products/LensDetails"
+                                               asp-route-id="@product.ProductId"
+                                               class="btn-view-details-outline" title="View Details">
+                                                Details
+                                            </a>
+                                        }
                                     }
                                     else
                                     {
-                                        <button onclick="addToCart(this, @product.ProductId)" 
-                                                class="btn-add-cart" 
-                                                title="Add to Cart">
-                                            <i class="bi bi-cart-plus"></i> Add
+                                        @* Còn hàng: hiện Add to Cart + Details + Buy Now như bình thường *@
+                                        @if (product.ProductType == "Frame")
+                                        {
+                                            <button onclick="addToCart(this, @product.ProductId)" class="btn-add-cart" title="Add to Cart">
+                                                <i class="bi bi-cart-plus"></i> Add
+                                            </button>
+                                            <a asp-page="/Products/FrameDetails"
+                                               asp-route-id="@product.ProductId"
+                                               class="btn-view-details-outline" title="View Details">
+                                                Details
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <button onclick="addToCart(this, @product.ProductId)" class="btn-add-cart" title="Add to Cart">
+                                                <i class="bi bi-cart-plus"></i> Add
+                                            </button>
+                                            <a asp-page="/Products/LensDetails"
+                                               asp-route-id="@product.ProductId"
+                                               class="btn-view-details-outline" title="View Details">
+                                                Details
+                                            </a>
+                                        }
+                                        <button onclick="addToCart(this, @product.ProductId, true)" class="btn-buy-now">
+                                            Buy Now
                                         </button>
-                                        <a asp-page="/Products/LensDetails" 
-                                           asp-route-id="@product.ProductId"
-                                           class="btn-view-details-outline"
-                                           title="View Details">
-                                            Details
-                                        </a>
                                     }
-                                    
-                                    <button onclick="addToCart(this, @product.ProductId, true)" class="btn-buy-now">
-                                        Buy Now
-                                    </button>
                                 </div>
                             </div>
                         </article>
@@ -340,11 +432,10 @@
                 {
                     <nav class="pagination-nav" aria-label="Product pagination">
                         <ul class="pagination">
-                            <!-- Previous Button -->
                             <li class="page-item @(!Model.Catalog.HasPreviousPage ? "disabled" : "")">
                                 @if (Model.Catalog.HasPreviousPage)
                                 {
-                                    <a class="page-link prev" 
+                                    <a class="page-link prev"
                                        asp-page="/Products/Index"
                                        asp-route-ProductTypeFilter="@Model.ProductTypeFilter"
                                        asp-route-SearchTerm="@Model.SearchTerm"
@@ -365,30 +456,20 @@
                                 }
                             </li>
 
-                            <!-- Page Numbers -->
                             @{
                                 int startPage = Math.Max(1, Model.CurrentPage - 2);
                                 int endPage = Math.Min(Model.Catalog.TotalPages, Model.CurrentPage + 2);
-                                
-                                // Ensure we show at least 5 pages when possible
                                 if (endPage - startPage < 4)
                                 {
-                                    if (startPage == 1)
-                                    {
-                                        endPage = Math.Min(5, Model.Catalog.TotalPages);
-                                    }
-                                    else if (endPage == Model.Catalog.TotalPages)
-                                    {
-                                        startPage = Math.Max(1, Model.Catalog.TotalPages - 4);
-                                    }
+                                    if (startPage == 1) endPage = Math.Min(5, Model.Catalog.TotalPages);
+                                    else if (endPage == Model.Catalog.TotalPages) startPage = Math.Max(1, Model.Catalog.TotalPages - 4);
                                 }
                             }
 
                             @if (startPage > 1)
                             {
                                 <li class="page-item">
-                                    <a class="page-link" 
-                                       asp-page="/Products/Index"
+                                    <a class="page-link" asp-page="/Products/Index"
                                        asp-route-ProductTypeFilter="@Model.ProductTypeFilter"
                                        asp-route-SearchTerm="@Model.SearchTerm"
                                        asp-route-MinPrice="@Model.MinPrice"
@@ -414,8 +495,7 @@
                                     }
                                     else
                                     {
-                                        <a class="page-link" 
-                                           asp-page="/Products/Index"
+                                        <a class="page-link" asp-page="/Products/Index"
                                            asp-route-ProductTypeFilter="@Model.ProductTypeFilter"
                                            asp-route-SearchTerm="@Model.SearchTerm"
                                            asp-route-MinPrice="@Model.MinPrice"
@@ -436,8 +516,7 @@
                                     <li class="page-item ellipsis"><span class="page-link">...</span></li>
                                 }
                                 <li class="page-item">
-                                    <a class="page-link" 
-                                       asp-page="/Products/Index"
+                                    <a class="page-link" asp-page="/Products/Index"
                                        asp-route-ProductTypeFilter="@Model.ProductTypeFilter"
                                        asp-route-SearchTerm="@Model.SearchTerm"
                                        asp-route-MinPrice="@Model.MinPrice"
@@ -450,11 +529,10 @@
                                 </li>
                             }
 
-                            <!-- Next Button -->
                             <li class="page-item @(!Model.Catalog.HasNextPage ? "disabled" : "")">
                                 @if (Model.Catalog.HasNextPage)
                                 {
-                                    <a class="page-link next" 
+                                    <a class="page-link next"
                                        asp-page="/Products/Index"
                                        asp-route-ProductTypeFilter="@Model.ProductTypeFilter"
                                        asp-route-SearchTerm="@Model.SearchTerm"
@@ -480,11 +558,8 @@
             }
             else
             {
-                <!-- Empty State -->
                 <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="bi bi-eyeglasses"></i>
-                    </div>
+                    <div class="empty-state-icon"><i class="bi bi-eyeglasses"></i></div>
                     <h2>No Products Found</h2>
                     <p>We couldn't find any products matching your criteria.</p>
                     <p class="empty-state-hint">Try adjusting your filters or search terms.</p>
@@ -499,32 +574,26 @@
 
 @section Scripts {
     <script>
-        // Update sort and submit form
         function updateSort(value) {
             const url = new URL(window.location.href);
             url.searchParams.set('SortBy', value);
-            url.searchParams.set('CurrentPage', '1'); // Reset to first page on sort change
+            url.searchParams.set('CurrentPage', '1');
             window.location.href = url.toString();
         }
 
-        // Mobile filter toggle
         document.addEventListener('DOMContentLoaded', function() {
             const mobileToggle = document.getElementById('mobileFilterToggle');
             const filterSidebar = document.getElementById('filterSidebar');
-            
             if (mobileToggle && filterSidebar) {
                 mobileToggle.addEventListener('click', function() {
                     filterSidebar.classList.toggle('show');
                     mobileToggle.classList.toggle('active');
                 });
             }
-
-            // Close sidebar when clicking outside on mobile
             document.addEventListener('click', function(e) {
-                if (window.innerWidth < 992 && 
-                    filterSidebar && 
-                    filterSidebar.classList.contains('show') &&
-                    !filterSidebar.contains(e.target) && 
+                if (window.innerWidth < 992 &&
+                    filterSidebar?.classList.contains('show') &&
+                    !filterSidebar.contains(e.target) &&
                     !mobileToggle.contains(e.target)) {
                     filterSidebar.classList.remove('show');
                     mobileToggle.classList.remove('active');
@@ -533,6 +602,98 @@
         });
     </script>
     <script src="~/js/shop-cart.js" asp-append-version="true"></script>
+
+    @* ── Wishlist Script ── *@
+    <script>
+        // Toast helper
+        let _wlToast = null;
+        function showWlToast(msg, icon = '♡') {
+            if (!_wlToast) {
+                _wlToast = document.createElement('div');
+                _wlToast.id = 'wl-toast';
+                document.body.appendChild(_wlToast);
+            }
+            _wlToast.innerHTML = `<span class="wl-icon">${icon}</span>${msg}`;
+            _wlToast.classList.add('show');
+            clearTimeout(_wlToast._t);
+            _wlToast._t = setTimeout(() => _wlToast.classList.remove('show'), 2800);
+        }
+
+        async function toggleWishlist(btn) {
+            @if (!User.Identity.IsAuthenticated)
+            {
+                    <text>
+                    showWlToast('Please login to save items', '🔒');
+                    setTimeout(() => window.location.href = '/Account/Login', 1200);
+                    return;
+                    </text>
+            }
+
+            const productId    = parseInt(btn.dataset.productId);
+            const isInWishlist = btn.dataset.inWishlist === 'true';
+            btn.disabled = true;
+
+            try {
+                if (isInWishlist) {
+                    const res = await fetch('/api/wishlist/remove', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ productId })
+                    });
+                    if (res.ok) {
+                        btn.dataset.inWishlist = 'false';
+                        btn.querySelector('i').className = 'bi bi-heart';
+                        btn.classList.remove('active');
+                        showWlToast('Removed from wishlist', '🤍');
+                    }
+                } else {
+                    const res  = await fetch('/api/wishlist/add', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ productId })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        btn.dataset.inWishlist = 'true';
+                        btn.querySelector('i').className = 'bi bi-heart-fill';
+                        btn.classList.add('active');
+                        // Pop animation
+                        btn.classList.add('pop');
+                        btn.addEventListener('animationend', () => btn.classList.remove('pop'), { once: true });
+                        showWlToast("Saved! We'll notify you when it's back ❤️", '♡');
+                    } else {
+                        showWlToast(data.message || 'Something went wrong', '⚠️');
+                    }
+                }
+            } catch {
+                showWlToast('Network error. Try again.', '⚠️');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // Highlight already-wishlisted items on load
+        document.addEventListener('DOMContentLoaded', async () => {
+            @if (User.Identity.IsAuthenticated)
+            {
+                    <text>
+                    try {
+                        const res = await fetch('/api/wishlist/my');
+                        if (!res.ok) return;
+                        const items = await res.json();
+                        const ids = new Set(items.map(i => i.productId));
+                        document.querySelectorAll('.btn-wishlist').forEach(btn => {
+                            if (ids.has(parseInt(btn.dataset.productId))) {
+                                btn.dataset.inWishlist = 'true';
+                                btn.querySelector('i').className = 'bi bi-heart-fill';
+                                btn.classList.add('active');
+                            }
+                        });
+                    } catch {}
+                    </text>
+            }
+        });
+    </script>
 }
 
 <!-- Anti-forgery token for AJAX -->

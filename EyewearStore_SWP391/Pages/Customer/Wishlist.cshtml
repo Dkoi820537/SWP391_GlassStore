@@ -1,0 +1,843 @@
+﻿@page
+@model EyewearStore_SWP391.Pages.Customer.WishlistModel
+@{
+    ViewData["Title"] = "My Wishlist";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0f0f0f;
+            --parchment: #faf8f5;
+            --cream: #f5f0e8;
+            --gold: #c9a96e;
+            --gold-light: #e8d5b0;
+            --gold-dark: #a07840;
+            --dust: #e8e0d0;
+            --muted: #7a7060;
+            --danger: #c0392b;
+        }
+
+        body {
+            background: var(--parchment);
+        }
+
+        /* ─── Hero ─── */
+        .wishlist-hero {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1610 50%, #2a2015 100%);
+            padding: 64px 0 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .wishlist-hero::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(ellipse 80% 60% at 60% 50%, rgba(201,169,110,0.12) 0%, transparent 70%);
+            }
+
+            .wishlist-hero::after {
+                content: '♡';
+                position: absolute;
+                right: 8%;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 180px;
+                line-height: 1;
+                color: rgba(201,169,110,0.06);
+                font-family: 'Playfair Display', serif;
+                pointer-events: none;
+            }
+
+            .wishlist-hero .container {
+                position: relative;
+                z-index: 1;
+            }
+
+        .hero-eyebrow {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            color: #fff;
+            margin: 0 0 12px;
+            line-height: 1.1;
+        }
+
+            .hero-title span {
+                color: var(--gold);
+                font-style: italic;
+            }
+
+        .hero-subtitle {
+            font-family: 'DM Sans', sans-serif;
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+            font-weight: 300;
+        }
+
+        .hero-count-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(201,169,110,0.15);
+            border: 1px solid rgba(201,169,110,0.3);
+            border-radius: 100px;
+            padding: 6px 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: var(--gold);
+            margin-top: 16px;
+        }
+
+        /* ─── Layout ─── */
+        .wishlist-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        /* ─── Empty ─── */
+        .wishlist-empty {
+            text-align: center;
+            padding: 80px 24px;
+            background: white;
+            border-radius: 20px;
+            border: 1px solid var(--dust);
+        }
+
+        .empty-icon {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 24px;
+            background: var(--cream);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+        .empty-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 8px;
+        }
+
+        .empty-desc {
+            font-family: 'DM Sans', sans-serif;
+            color: var(--muted);
+            font-size: 14px;
+            max-width: 360px;
+            margin: 0 auto 28px;
+            line-height: 1.6;
+        }
+
+        .btn-shop-now {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--ink);
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+            .btn-shop-now:hover {
+                background: var(--gold);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        /* ─── Info banner ─── */
+        .restock-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: linear-gradient(135deg, #fffbf5, #fff8ed);
+            border: 1px solid var(--gold-light);
+            border-left: 4px solid var(--gold);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 32px;
+        }
+
+            .restock-info .icon {
+                font-size: 20px;
+                flex-shrink: 0;
+                margin-top: 1px;
+            }
+
+            .restock-info p {
+                font-family: 'DM Sans', sans-serif;
+                font-size: 13px;
+                color: #6b5a3e;
+                margin: 0;
+                line-height: 1.6;
+            }
+
+                .restock-info p strong {
+                    color: var(--gold-dark);
+                }
+
+        /* ─── Grid ─── */
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        /* ─── Card ─── */
+        .wishlist-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--dust);
+            overflow: hidden;
+            position: relative;
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+
+            .wishlist-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            }
+
+        .card-remove-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 10;
+            width: 34px;
+            height: 34px;
+            background: rgba(255,255,255,0.95);
+            border: 1px solid var(--dust);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            color: #999;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+        }
+
+            .card-remove-btn:hover {
+                background: #fff0ee;
+                border-color: #f5c6c0;
+                color: var(--danger);
+                transform: scale(1.1);
+            }
+
+        .card-image {
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            background: var(--cream);
+            position: relative;
+        }
+
+            .card-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.5s ease;
+            }
+
+        .wishlist-card:hover .card-image img {
+            transform: scale(1.05);
+        }
+
+        .card-image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: var(--dust);
+        }
+
+        .type-chip {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 100px;
+            background: rgba(15,15,15,0.85);
+            color: var(--gold-light);
+            backdrop-filter: blur(4px);
+        }
+
+        .stock-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 100px;
+        }
+
+            .stock-badge.out {
+                background: #fef0ee;
+                color: #c0392b;
+            }
+
+            .stock-badge.in {
+                background: #edf9f0;
+                color: #1e8449;
+            }
+
+            .stock-badge .dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: currentColor;
+                animation: pulse-dot 1.5s infinite;
+            }
+
+        @@keyframes pulse-dot {
+            0%, 100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        .card-body {
+            padding: 18px 20px 20px;
+        }
+
+        .card-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--ink);
+            margin: 0 0 4px;
+            line-height: 1.3;
+        }
+
+        .card-sku {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            color: #bbb;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .card-price {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+            .card-price .currency {
+                font-size: 14px;
+                color: var(--muted);
+                font-weight: 400;
+                margin-right: 2px;
+            }
+
+        .card-date {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            color: #bbb;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-details {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px;
+            border: 1.5px solid var(--dust);
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--ink);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+            .btn-details:hover {
+                border-color: var(--ink);
+                color: var(--ink);
+                background: var(--cream);
+            }
+
+        .btn-notify-active {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px;
+            background: linear-gradient(135deg, #f0f7ff, #e8f0fe);
+            border: 1.5px solid #c5d9f7;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c6cb0;
+            cursor: default;
+        }
+
+        .btn-add-cart-active {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px;
+            background: var(--ink);
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .btn-add-cart-active:hover {
+                background: var(--gold);
+            }
+
+        /* ─── Pagination ─── */
+        .wl-pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            margin-top: 48px;
+        }
+
+        .wl-page-btn {
+            min-width: 38px;
+            height: 38px;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1.5px solid var(--dust);
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--ink);
+            text-decoration: none;
+            background: white;
+            transition: all 0.2s;
+        }
+
+            .wl-page-btn:hover {
+                border-color: var(--gold);
+                color: var(--gold);
+            }
+
+            .wl-page-btn.active {
+                background: var(--ink);
+                color: white;
+                border-color: var(--ink);
+                font-weight: 700;
+            }
+
+            .wl-page-btn.disabled {
+                opacity: 0.35;
+                pointer-events: none;
+            }
+
+        .wl-page-ellipsis {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: var(--muted);
+            padding: 0 4px;
+        }
+
+        /* ─── Toast ─── */
+        .toast-confirm {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--ink);
+            color: white;
+            border-radius: 14px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            z-index: 1000;
+            white-space: nowrap;
+        }
+
+            .toast-confirm.show {
+                transform: translateX(-50%) translateY(0);
+            }
+
+        .toast-undo {
+            background: var(--gold);
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: background 0.2s;
+        }
+
+            .toast-undo:hover {
+                background: var(--gold-dark);
+            }
+
+        @@media (max-width: 640px) {
+            .wishlist-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .wishlist-hero {
+                padding: 40px 0 32px;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+}
+
+<!-- Hero -->
+<div class="wishlist-hero">
+    <div class="container">
+        <div class="hero-eyebrow">Your Collection</div>
+        <h1 class="hero-title">My <span>Wishlist</span></h1>
+        <p class="hero-subtitle">Items saved while out of stock — we'll alert you the moment they return.</p>
+        <div class="hero-count-badge">
+            <i class="bi bi-heart-fill"></i>
+            <span id="wishlist-count">
+                @Model.TotalItems item@(Model.TotalItems != 1 ? "s" : "") saved
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="wishlist-wrapper">
+
+    @if (!Model.Items.Any() && Model.CurrentPage == 1)
+    {
+        <div class="wishlist-empty">
+            <div class="empty-icon">🕶️</div>
+            <div class="empty-title">Your wishlist is empty</div>
+            <p class="empty-desc">When a product you love is out of stock, save it here. We'll email you the moment it's back.</p>
+            <a href="/Products" class="btn-shop-now"><i class="bi bi-bag"></i> Browse Collection</a>
+        </div>
+    }
+    else
+    {
+        <!-- Info banner -->
+        <div class="restock-info">
+            <span class="icon">🔔</span>
+            <p>
+                <strong>Automatic restock alerts are enabled.</strong>
+                You'll receive an email notification at <strong>@User.Identity!.Name</strong>
+                as soon as any of these items becomes available again.
+            </p>
+        </div>
+
+        <div class="wishlist-grid" id="wishlist-grid">
+            @foreach (var item in Model.Items)
+            {
+                @* Xác định details URL đúng dựa vào ProductType *@
+                var detailsUrl = item.ProductType == "Frame"
+                ? $"/Products/FrameDetails/{item.ProductId}"
+                : $"/Products/LensDetails/{item.ProductId}";
+
+                <div class="wishlist-card" id="card-@item.ProductId" data-product-id="@item.ProductId">
+                    <!-- Remove -->
+                    <button class="card-remove-btn" onclick="removeItem(@item.ProductId)" title="Remove from wishlist">
+                        <i class="bi bi-x"></i>
+                    </button>
+
+                    <!-- Image -->
+                    <div class="card-image">
+                        @if (!string.IsNullOrEmpty(item.PrimaryImageUrl))
+                        {
+                            <img src="@item.PrimaryImageUrl" alt="@item.ProductName" loading="lazy" />
+                        }
+                        else
+                        {
+                            <div class="card-image-placeholder">🕶️</div>
+                        }
+                        <span class="type-chip">@item.ProductType</span>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="card-body">
+                        <div style="margin-bottom:10px;">
+                            @if (item.IsInStock)
+                            {
+                                <span class="stock-badge in"><span class="dot"></span> Back in Stock!</span>
+                            }
+                            else
+                            {
+                                <span class="stock-badge out"><span class="dot"></span> Out of Stock</span>
+                            }
+                        </div>
+
+                        <div class="card-name">@item.ProductName</div>
+                        <div class="card-sku">SKU: @item.Sku</div>
+
+                        <div class="card-meta">
+                            <div class="card-price">
+                                <span class="currency">₫</span>@item.Price.ToString("N0")
+                            </div>
+                            <div class="card-date">Added @item.AddedAt.ToString("MMM dd, yyyy")</div>
+                        </div>
+
+                        <div class="card-actions">
+                            @if (item.IsInStock)
+                            {
+                                <button class="btn-add-cart-active" onclick="addToCartFromWishlist(@item.ProductId)">
+                                    <i class="bi bi-cart-plus"></i> Add to Cart
+                                </button>
+                            }
+                            else
+                            {
+                                <div class="btn-notify-active" title="You'll be notified by email when this item is back">
+                                    <i class="bi bi-bell-fill"></i> Notified
+                                </div>
+                            }
+                            <a href="@detailsUrl" class="btn-details">
+                                <i class="bi bi-eye"></i> Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @* ── Pagination ── *@
+        @if (Model.TotalPages > 1)
+        {
+            <nav class="wl-pagination" aria-label="Wishlist pagination">
+
+                @* Prev *@
+                @if (Model.HasPreviousPage)
+                {
+                    <a class="wl-page-btn"
+                       asp-page="/Customer/Wishlist"
+                       asp-route-CurrentPage="@(Model.CurrentPage - 1)">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                }
+                else
+                {
+                    <span class="wl-page-btn disabled"><i class="bi bi-chevron-left"></i></span>
+                }
+
+                @* Page numbers *@
+                @{
+                    int start = Math.Max(1, Model.CurrentPage - 2);
+                    int end = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+                    if (end - start < 4)
+                    {
+                        if (start == 1) end = Math.Min(5, Model.TotalPages);
+                        else if (end == Model.TotalPages) start = Math.Max(1, Model.TotalPages - 4);
+                    }
+                }
+
+                @if (start > 1)
+                {
+                    <a class="wl-page-btn" asp-page="/Customer/Wishlist" asp-route-CurrentPage="1">1</a>
+                    @if (start > 2)
+                    {
+                        <span class="wl-page-ellipsis">…</span>
+                    }
+                }
+
+                @for (int i = start; i <= end; i++)
+                {
+                    @if (i == Model.CurrentPage)
+                    {
+                        <span class="wl-page-btn active">@i</span>
+                    }
+                    else
+                    {
+                        <a class="wl-page-btn" asp-page="/Customer/Wishlist" asp-route-CurrentPage="@i">@i</a>
+                    }
+                }
+
+                @if (end < Model.TotalPages)
+                {
+                    @if (end < Model.TotalPages - 1)
+                    {
+                        <span class="wl-page-ellipsis">…</span>
+                    }
+                    <a class="wl-page-btn" asp-page="/Customer/Wishlist" asp-route-CurrentPage="@Model.TotalPages">@Model.TotalPages</a>
+                }
+
+                @* Next *@
+                @if (Model.HasNextPage)
+                {
+                    <a class="wl-page-btn"
+                       asp-page="/Customer/Wishlist"
+                       asp-route-CurrentPage="@(Model.CurrentPage + 1)">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                }
+                else
+                {
+                    <span class="wl-page-btn disabled"><i class="bi bi-chevron-right"></i></span>
+                }
+
+            </nav>
+        }
+    }
+</div>
+
+<!-- Toast -->
+<div class="toast-confirm" id="removeToast">
+    <span id="toastMsg">Item removed from wishlist</span>
+    <button class="toast-undo" id="toastUndoBtn">Undo</button>
+</div>
+
+@section Scripts {
+    <script>
+        let removeTimeout = null;
+        let lastRemovedId = null;
+
+        async function removeItem(productId) {
+            const card = document.getElementById('card-' + productId);
+            card.style.transition = 'opacity 0.3s, transform 0.3s';
+            card.style.opacity = '0.4';
+            card.style.transform = 'scale(0.97)';
+            lastRemovedId = productId;
+            showToast('Removed from wishlist');
+
+            removeTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch('/api/wishlist/remove', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ productId })
+                    });
+                    if (res.ok) {
+                        card.remove();
+                        updateCount();
+                    } else {
+                        card.style.opacity = '1';
+                        card.style.transform = '';
+                    }
+                } catch {
+                    card.style.opacity = '1';
+                    card.style.transform = '';
+                }
+            }, 3000);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('removeToast');
+            document.getElementById('toastMsg').textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        document.getElementById('toastUndoBtn').addEventListener('click', () => {
+            if (removeTimeout) { clearTimeout(removeTimeout); removeTimeout = null; }
+            const card = document.getElementById('card-' + lastRemovedId);
+            if (card) { card.style.opacity = '1'; card.style.transform = ''; }
+            document.getElementById('removeToast').classList.remove('show');
+        });
+
+        function updateCount() {
+            const cards = document.querySelectorAll('.wishlist-card').length;
+            const el = document.getElementById('wishlist-count');
+            if (el) el.textContent = cards + ' item' + (cards !== 1 ? 's' : '') + ' saved';
+            if (cards === 0) {
+                document.getElementById('wishlist-grid')?.parentElement
+                    ?.insertAdjacentHTML('afterbegin', `
+                    <div class="wishlist-empty" style="margin-top:0">
+                        <div class="empty-icon">🕶️</div>
+                        <div class="empty-title">Your wishlist is empty</div>
+                        <p class="empty-desc">Browse the shop and save out-of-stock items to your wishlist.</p>
+                        <a href="/Products" class="btn-shop-now"><i class="bi bi-bag"></i> Browse Collection</a>
+                    </div>`);
+                document.getElementById('wishlist-grid')?.remove();
+                document.querySelector('.restock-info')?.remove();
+                document.querySelector('.wl-pagination')?.remove();
+            }
+        }
+
+        async function addToCartFromWishlist(productId) {
+            try {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                const res = await fetch('/Products?handler=AddToCart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token ?? ''
+                    },
+                    body: JSON.stringify({ productId, quantity: 1 })
+                });
+                const data = await res.json();
+                showToast(data.success ? '✓ Added to cart!' : (data.message || 'Error'));
+            } catch {
+                showToast('Error adding to cart');
+            }
+        }
+    </script>
+    @Html.AntiForgeryToken()
+}

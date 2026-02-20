@@ -1,6 +1,8 @@
 using EyewearStore_SWP391.DTOs.Frame;
 using EyewearStore_SWP391.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using EyewearStore_SWP391.Models;
 
 namespace EyewearStore_SWP391.Controllers;
 
@@ -13,24 +15,25 @@ namespace EyewearStore_SWP391.Controllers;
 public class FramesController : ControllerBase
 {
     private readonly IFrameService _frameService;
+    private readonly IWishlistService _wishlistService;
+    private readonly EyewearStoreContext _context;
+    private readonly IConfiguration _configuration;
 
-    /// <summary>
-    /// Initializes a new instance of the FramesController
-    /// </summary>
-    /// <param name="frameService">The frame service</param>
-    public FramesController(IFrameService frameService)
+    public FramesController(
+        IFrameService frameService,
+        IWishlistService wishlistService,
+        EyewearStoreContext context,
+        IConfiguration configuration)
     {
         _frameService = frameService;
+        _wishlistService = wishlistService;
+        _context = context;
+        _configuration = configuration;
     }
 
     /// <summary>
     /// Creates a new frame product
     /// </summary>
-    /// <param name="createDto">The frame data to create</param>
-    /// <returns>The created frame product</returns>
-    /// <response code="201">Returns the newly created frame</response>
-    /// <response code="400">If the frame data is invalid</response>
-    /// <response code="500">If there was an internal server error</response>
     [HttpPost]
     [ProducesResponseType(typeof(FrameResponseDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -40,14 +43,10 @@ public class FramesController : ControllerBase
         try
         {
             if (createDto == null)
-            {
                 return BadRequest("Frame data is required");
-            }
 
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
             var responseDto = await _frameService.CreateFrameAsync(createDto);
 
@@ -66,19 +65,6 @@ public class FramesController : ControllerBase
     /// <summary>
     /// Gets all frames with optional filtering, searching, sorting, and pagination
     /// </summary>
-    /// <param name="search">Search term for name, description, frame type, or material</param>
-    /// <param name="frameType">Filter by frame type</param>
-    /// <param name="frameMaterial">Filter by frame material</param>
-    /// <param name="priceMin">Minimum price filter</param>
-    /// <param name="priceMax">Maximum price filter</param>
-    /// <param name="isActive">Filter by active status</param>
-    /// <param name="sortBy">Sort field (price, name, frameType, frameMaterial, createdAt)</param>
-    /// <param name="sortOrder">Sort order (asc, desc)</param>
-    /// <param name="pageNumber">Page number (default: 1)</param>
-    /// <param name="pageSize">Page size (default: 10, max: 100)</param>
-    /// <returns>A paginated list of frames</returns>
-    /// <response code="200">Returns the list of frames</response>
-    /// <response code="500">If there was an internal server error</response>
     [HttpGet]
     [ProducesResponseType(typeof(FrameListResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -110,13 +96,8 @@ public class FramesController : ControllerBase
     }
 
     /// <summary>
-    /// Gets a single frame by ID (ProductId)
+    /// Gets a single frame by ID
     /// </summary>
-    /// <param name="id">The product ID</param>
-    /// <returns>The frame product</returns>
-    /// <response code="200">Returns the frame</response>
-    /// <response code="404">If the frame is not found</response>
-    /// <response code="500">If there was an internal server error</response>
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(FrameResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -128,9 +109,7 @@ public class FramesController : ControllerBase
             var responseDto = await _frameService.GetFrameByIdAsync(id);
 
             if (responseDto == null)
-            {
                 return NotFound($"Frame with ID {id} not found");
-            }
 
             return Ok(responseDto);
         }
@@ -142,15 +121,10 @@ public class FramesController : ControllerBase
     }
 
     /// <summary>
-    /// Updates an existing frame product
+    /// Updates an existing frame product.
+    /// ✅ If InventoryQty changes from 0 → positive, automatically sends
+    /// restock email notifications to all users who wishlisted this frame.
     /// </summary>
-    /// <param name="id">The product ID to update</param>
-    /// <param name="updateDto">The updated frame data</param>
-    /// <returns>The updated frame product</returns>
-    /// <response code="200">Returns the updated frame</response>
-    /// <response code="400">If the frame data is invalid</response>
-    /// <response code="404">If the frame is not found</response>
-    /// <response code="500">If there was an internal server error</response>
     [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(FrameResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -161,20 +135,44 @@ public class FramesController : ControllerBase
         try
         {
             if (updateDto == null)
-            {
                 return BadRequest("Frame data is required");
-            }
 
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
+            // ── Snapshot inventory BEFORE update ──────────────────────────────
+            var currentFrame = await _context.Products
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.ProductId == id);
+
+            var wasOutOfStock = currentFrame != null && currentFrame.InventoryQty <= 0;
+
+            // ── Perform the actual update ──────────────────────────────────────
             var responseDto = await _frameService.UpdateFrameAsync(id, updateDto);
 
             if (responseDto == null)
-            {
                 return NotFound($"Frame with ID {id} not found");
+
+            // ── Check if restocked → trigger email notifications ───────────────
+            var isNowInStock = responseDto.InventoryQty > 0;
+
+            if (wasOutOfStock && isNowInStock)
+            {
+                var baseUrl = _configuration["BaseUrl"] ?? "https://localhost:7001";
+                var productUrl = $"{baseUrl}/Products/Details/{id}";
+
+                // Fire-and-forget — don't block the HTTP response for email sending
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _wishlistService.NotifyRestockAsync(id, productUrl);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[Restock Email Error] FrameId={id}: {ex.Message}");
+                    }
+                });
             }
 
             return Ok(responseDto);
@@ -189,15 +187,6 @@ public class FramesController : ControllerBase
     /// <summary>
     /// Soft deletes a frame by setting IsActive to false
     /// </summary>
-    /// <param name="id">The product ID to delete</param>
-    /// <returns>No content on success</returns>
-    /// <response code="204">The frame was successfully soft deleted</response>
-    /// <response code="404">If the frame is not found</response>
-    /// <response code="500">If there was an internal server error</response>
-    /// <remarks>
-    /// Soft delete is implemented by setting IsActive to false.
-    /// The product will no longer appear in active product listings.
-    /// </remarks>
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -209,9 +198,7 @@ public class FramesController : ControllerBase
             var deleted = await _frameService.DeleteFrameAsync(id);
 
             if (!deleted)
-            {
                 return NotFound($"Frame with ID {id} not found");
-            }
 
             return NoContent();
         }

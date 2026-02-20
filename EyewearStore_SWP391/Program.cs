@@ -46,7 +46,8 @@ builder.Services.AddScoped<ILensService, LensService>();
 builder.Services.AddScoped<IFrameService, FrameService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IStripeService, StripeService>();
-
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IWishlistService, WishlistService>();
 // Configure Stripe
 Stripe.StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 

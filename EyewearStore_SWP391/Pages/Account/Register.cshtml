@@ -2,92 +2,772 @@
 @model EyewearStore_SWP391.Pages.Account.RegisterModel
 @{
     ViewData["Title"] = "Register";
+    // Restore step from TempData if coming back after postback
+    var step = Model.Step;
+    if (step == "form" && TempData["Reg_Step"] as string == "otp") step = "otp";
+    var resendMsg = TempData["ResendMsg"] as string;
+    var email = TempData.Peek("Reg_Email") as string ?? Model.Input.Email;
 }
 
-<div class="row justify-content-center" style="min-height: 70vh; align-items: center; padding: 2rem 0;">
-    <div class="col-md-8 col-lg-7">
-        <div class="card" style="border-radius:20px; overflow:hidden; box-shadow:0 8px 32px rgba(74,124,126,0.15); border:none;">
-            <div style="background: linear-gradient(135deg, var(--color-teal) 0%, var(--color-teal-light) 100%); padding:3rem 2rem; text-align:center; position:relative;">
-                <div style="position:absolute; top:-40px; right:-40px; width:150px; height:150px; background:rgba(245,230,211,0.15); border-radius:50%;"></div>
-                <div style="position:relative; z-index:1;">
-                    <div style="font-size:3.5rem; margin-bottom:1rem;">✨</div>
-                    <h3 style="color:white; margin-bottom:0.75rem; font-family:'Playfair Display', serif; font-weight:600; font-size:2rem;">Join OptiPlus</h3>
-                    <p style="color:rgba(255,255,255,0.9); margin:0; font-size:1rem;">Create your account and discover perfect eyewear</p>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0f0f0f;
+            --gold: #c9a96e;
+            --gold-light: #e8d5b0;
+            --gold-dark: #a07840;
+            --cream: #faf8f5;
+            --teal: #4a7c7e;
+        }
+
+        body {
+            background: var(--cream);
+        }
+
+        .reg-outer {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem 1rem;
+        }
+
+        .reg-card {
+            width: 100%;
+            max-width: 520px;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 16px 60px rgba(0,0,0,0.10);
+        }
+
+        /* ── Header ── */
+        .reg-header {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1610 60%, #2a2015 100%);
+            padding: 3rem 2rem 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .reg-header::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(ellipse 70% 50% at 70% 50%, rgba(201,169,110,0.14) 0%, transparent 70%);
+            }
+
+        .reg-header-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .reg-logo {
+            font-size: 2.8rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .reg-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: white;
+            margin: 0 0 0.4rem;
+        }
+
+        .reg-subtitle {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.875rem;
+            font-family: 'DM Sans', sans-serif;
+            margin: 0;
+        }
+
+        /* ── Progress steps ── */
+        .reg-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-top: 1.75rem;
+        }
+
+        .reg-step {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .step-dot {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            border: 2px solid rgba(201,169,110,0.3);
+            color: rgba(255,255,255,0.3);
+            transition: all 0.3s;
+        }
+
+            .step-dot.done {
+                background: var(--gold);
+                border-color: var(--gold);
+                color: white;
+            }
+
+            .step-dot.active {
+                border-color: var(--gold);
+                color: var(--gold);
+            }
+
+        .step-label {
+            color: rgba(255,255,255,0.4);
+        }
+
+            .step-label.active {
+                color: var(--gold);
+            }
+
+        .step-line {
+            width: 48px;
+            height: 2px;
+            background: rgba(201,169,110,0.2);
+            margin: 0 6px;
+        }
+
+            .step-line.done {
+                background: var(--gold);
+            }
+
+        /* ── Body ── */
+        .reg-body {
+            padding: 2.25rem 2rem 2.5rem;
+        }
+
+        /* ── Form fields ── */
+        .field-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .field-label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+            .field-label .fi {
+                font-size: 14px;
+            }
+
+        .field-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1.5px solid #e8e0d0;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            color: var(--ink);
+            background: #faf8f5;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+            .field-input:focus {
+                border-color: var(--gold);
+                box-shadow: 0 0 0 3px rgba(201,169,110,0.12);
+                background: white;
+            }
+
+        .field-hint {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            color: #bbb;
+            margin-top: 5px;
+        }
+
+        .field-error {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            color: #c0392b;
+            margin-top: 5px;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* ── Submit btn ── */
+        .btn-register {
+            width: 100%;
+            padding: 1rem;
+            background: var(--ink);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.25s;
+            margin-top: 0.5rem;
+        }
+
+            .btn-register:hover {
+                background: var(--gold);
+                transform: translateY(-1px);
+                box-shadow: 0 6px 20px rgba(201,169,110,0.3);
+            }
+
+        /* ── Divider ── */
+        .reg-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 1.5rem 0;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            color: #ccc;
+        }
+
+            .reg-divider::before, .reg-divider::after {
+                content: '';
+                flex: 1;
+                height: 1px;
+                background: #eee;
+            }
+
+        /* ── Login link ── */
+        .reg-login-link {
+            text-align: center;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: #999;
+        }
+
+            .reg-login-link a {
+                color: var(--teal);
+                font-weight: 700;
+                text-decoration: none;
+            }
+
+                .reg-login-link a:hover {
+                    color: var(--gold);
+                }
+
+        /* ── Error summary ── */
+        .error-box {
+            background: #fef0ee;
+            border-left: 3px solid #e05a6a;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: #c0392b;
+        }
+
+        /* ══════════════════════════════════
+                   OTP STEP
+                ══════════════════════════════════ */
+        .otp-info {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .otp-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .otp-heading {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+        }
+
+        .otp-desc {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: #888;
+            line-height: 1.6;
+        }
+
+        .otp-email-highlight {
+            font-weight: 700;
+            color: var(--gold-dark);
+            background: #fffbf5;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* ── OTP input boxes ── */
+        .otp-inputs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 1.75rem 0 0.5rem;
+        }
+
+        .otp-digit {
+            width: 52px;
+            height: 60px;
+            border: 2px solid #e8e0d0;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            color: var(--ink);
+            background: #faf8f5;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+        }
+
+            .otp-digit:focus {
+                border-color: var(--gold);
+                box-shadow: 0 0 0 3px rgba(201,169,110,0.15);
+                background: white;
+                transform: scale(1.05);
+            }
+
+            .otp-digit.filled {
+                border-color: var(--gold);
+                background: #fffbf5;
+            }
+
+            .otp-digit.error {
+                border-color: #e05a6a;
+                background: #fff5f5;
+                animation: shake .3s;
+            }
+
+        @@keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        /* hidden real input for form submission */
+        #OtpCode {
+            display: none;
+        }
+
+        /* ── Timer ── */
+        .otp-timer {
+            text-align: center;
+            margin: 1rem 0;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .timer-value {
+            font-weight: 700;
+            color: var(--gold-dark);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-expired {
+            color: #c0392b;
+        }
+
+        /* ── Resend ── */
+        .otp-resend {
+            text-align: center;
+            margin-bottom: 1.25rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .btn-resend {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--teal);
+            font-weight: 700;
+            font-size: 13px;
+            font-family: 'DM Sans', sans-serif;
+            padding: 0;
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+
+            .btn-resend:hover {
+                color: var(--gold);
+            }
+
+            .btn-resend:disabled {
+                color: #ccc;
+                cursor: not-allowed;
+                text-decoration: none;
+            }
+
+        .resend-success {
+            display: inline-block;
+            background: #edf9f0;
+            color: #1e8449;
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        /* ── Verify btn ── */
+        .btn-verify {
+            width: 100%;
+            padding: 1rem;
+            background: var(--ink);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+            .btn-verify:hover {
+                background: var(--gold);
+                transform: translateY(-1px);
+                box-shadow: 0 6px 20px rgba(201,169,110,0.3);
+            }
+
+            .btn-verify:disabled {
+                background: #ccc;
+                transform: none;
+                box-shadow: none;
+                cursor: not-allowed;
+            }
+
+        .btn-back {
+            width: 100%;
+            padding: 0.75rem;
+            background: none;
+            color: #999;
+            border: 1.5px solid #e8e0d0;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+            .btn-back:hover {
+                border-color: var(--gold);
+                color: var(--gold);
+            }
+
+        @@media (max-width: 480px) {
+            .row-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .reg-body {
+                padding: 1.75rem 1.25rem 2rem;
+            }
+
+            .otp-digit {
+                width: 44px;
+                height: 52px;
+                font-size: 20px;
+            }
+        }
+    </style>
+}
+
+<div class="reg-outer">
+    <div class="reg-card">
+
+        <!-- Header -->
+        <div class="reg-header">
+            <div class="reg-header-inner">
+                <div class="reg-logo">👓</div>
+                <h1 class="reg-title">Join OptiPlus</h1>
+                <p class="reg-subtitle">Create your account and discover perfect eyewear</p>
+
+                <!-- Progress -->
+                <div class="reg-steps">
+                    <div class="reg-step">
+                        <div class="step-dot @(step == "otp" ? "done" : "active")">
+                            @if (step == "otp")
+                            {
+                                <text>✓</text>
+                            }
+                            else
+                            {
+
+                                <text>1</text>
+                            }
+                        </div>
+                        <span class="step-label @(step == "form" ? "active" : "")">Details</span>
+                    </div>
+                    <div class="step-line @(step == "otp" ? "done" : "")"></div>
+                    <div class="reg-step">
+                        <div class="step-dot @(step == "otp" ? "active" : "")">2</div>
+                        <span class="step-label @(step == "otp" ? "active" : "")">Verify</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="reg-step">
+                        <div class="step-dot">3</div>
+                        <span class="step-label">Done</span>
+                    </div>
                 </div>
-            </div>
-
-            <div class="card-body" style="padding:2.5rem 2rem; background:white;">
-                <form method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" style="padding:1rem; background:#f8d7da; border-radius:8px;"></div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <label class="form-label" style="font-weight:600; color:var(--color-teal); display:flex; gap:0.5rem; align-items:center;">
-                                <span style="font-size:1.1rem;">📧</span> Email Address
-                            </label>
-                            <input asp-for="Input.Email" class="form-control" placeholder="you@example.com" style="padding:1rem 1.25rem; border-radius:10px; border:2px solid #e0e0e0;" />
-                            <span asp-validation-for="Input.Email" class="text-danger" style="font-size:0.875rem;"></span>
-                            <small class="text-muted" style="font-size:0.8rem; display:block; margin-top:0.35rem; color:#999;">We'll use this for your login</small>
-                        </div>
-
-                        <div class="col-md-6 mb-4">
-                            <label class="form-label" style="font-weight:600; color:var(--color-teal); display:flex; gap:0.5rem; align-items:center;">
-                                <span style="font-size:1.1rem;">👤</span> Full Name
-                            </label>
-                            <input asp-for="Input.FullName" class="form-control" placeholder="Enter your full name" style="padding:1rem 1.25rem; border-radius:10px; border:2px solid #e0e0e0;" />
-                            <span asp-validation-for="Input.FullName" class="text-danger" style="font-size:0.875rem;"></span>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <label class="form-label" style="font-weight:600; color:var(--color-teal); display:flex; gap:0.5rem; align-items:center;">
-                                <span style="font-size:1.1rem;">🔐</span> Password
-                            </label>
-                            <input asp-for="Input.Password" type="password" class="form-control" placeholder="Minimum 6 characters" style="padding:1rem 1.25rem; border-radius:10px; border:2px solid #e0e0e0;" />
-                            <span asp-validation-for="Input.Password" class="text-danger" style="font-size:0.875rem;"></span>
-                            <small class="text-muted" style="font-size:0.8rem; display:block; margin-top:0.35rem; color:#999;">Must be at least 6 characters</small>
-                        </div>
-
-                        <div class="col-md-6 mb-4">
-                            <label class="form-label" style="font-weight:600; color:var(--color-teal); display:flex; gap:0.5rem; align-items:center;">
-                                <span style="font-size:1.1rem;">📱</span> Phone Number <span style="font-size:0.75rem; color:#999; margin-left:0.25rem;">(Optional)</span>
-                            </label>
-                            <input asp-for="Input.Phone" class="form-control" placeholder="+84 123 456 789" style="padding:1rem 1.25rem; border-radius:10px; border:2px solid #e0e0e0;" />
-                            <span asp-validation-for="Input.Phone" class="text-danger" style="font-size:0.875rem;"></span>
-                        </div>
-                    </div>
-
-                    <div class="mb-4" style="padding:1.25rem; background:linear-gradient(135deg, var(--color-peach) 0%, var(--color-peach-light) 100%); border-radius:10px; border:1px solid #e0e0e0;">
-                        <p style="font-size:0.875rem; color:#4A4A4A; margin:0; line-height:1.6;">
-                            By creating an account, you agree to our
-                            <a asp-page="/Privacy" style="color:var(--color-teal); text-decoration:none; font-weight:600;">Privacy Policy</a>
-                            and
-                            <a href="#" style="color:var(--color-teal); text-decoration:none; font-weight:600;">Terms of Service</a>
-                        </p>
-                    </div>
-
-                    <div class="d-grid gap-2 mb-4">
-                        <button type="submit" class="btn btn-primary" style="padding:1.125rem 2rem; font-size:1.05rem; font-weight:600; border-radius:10px; background:linear-gradient(135deg, var(--color-blue-cta) 0%, var(--color-blue-cta-hover) 100%); border:none; text-transform:uppercase; letter-spacing:1px; transition:all .2s;">Create Account</button>
-                    </div>
-
-                    <div style="text-align:center; margin:2rem 0; position:relative;">
-                        <span style="background:white; padding:0 1rem; color:#999; font-size:0.9rem; position:relative; z-index:1; font-weight:500;">or</span>
-                        <div style="position:absolute; top:50%; left:0; right:0; height:1px; background:#e0e0e0; z-index:0;"></div>
-                    </div>
-
-                    <div style="text-align:center; padding:1.5rem; background:linear-gradient(135deg, var(--color-peach) 0%, var(--color-peach-light) 100%); border-radius:10px; border:1px solid #e0e0e0;">
-                        <span style="color:#4A4A4A; margin-right:0.5rem; font-size:0.95rem;">Already have an account?</span>
-                        <a asp-page="/Account/Login" class="text-decoration-none fw-semibold" style="color:var(--color-teal); font-weight:700; font-size:0.95rem;">Sign in instead →</a>
-                    </div>
-                </form>
             </div>
         </div>
 
-        <!-- Benefits Section left as-is (if you have it), omitted here for brevity -->
+        <!-- Body -->
+        <div class="reg-body">
+
+            @* ══════════════════════════════════
+               STEP 1 — REGISTRATION FORM
+            ══════════════════════════════════ *@
+            @if (step == "form")
+            {
+                <form method="post" asp-page-handler="SendOtp" id="regForm">
+                    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+                    {
+                        <div class="error-box">
+                            @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <div>⚠ @e.ErrorMessage</div>
+                            }
+                        </div>
+                    }
+
+                    <div class="row-2">
+                        <div class="field-group">
+                            <label class="field-label"><span class="fi">📧</span> Email</label>
+                            <input asp-for="Input.Email" class="field-input" placeholder="you@example.com" autocomplete="email" />
+                            <span asp-validation-for="Input.Email" class="field-error"></span>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label"><span class="fi">👤</span> Full Name</label>
+                            <input asp-for="Input.FullName" class="field-input" placeholder="Your full name" />
+                            <span asp-validation-for="Input.FullName" class="field-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="row-2">
+                        <div class="field-group">
+                            <label class="field-label"><span class="fi">🔐</span> Password</label>
+                            <input asp-for="Input.Password" type="password" class="field-input" placeholder="Min. 6 characters" autocomplete="new-password" />
+                            <span asp-validation-for="Input.Password" class="field-error"></span>
+                            <div class="field-hint">At least 6 characters</div>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label"><span class="fi">📱</span> Phone <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#bbb;">(optional)</span></label>
+                            <input asp-for="Input.Phone" class="field-input" placeholder="+84 123 456 789" />
+                            <span asp-validation-for="Input.Phone" class="field-error"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-register" id="btnSendOtp">
+                        <span id="btnText">Send Verification Code →</span>
+                    </button>
+
+                    <div class="reg-divider">or</div>
+                    <div class="reg-login-link">
+                        Already have an account? <a asp-page="/Account/Login">Sign in →</a>
+                    </div>
+                </form>
+            }
+
+            @* ══════════════════════════════════
+               STEP 2 — OTP VERIFICATION
+            ══════════════════════════════════ *@
+            else
+            {
+                <div class="otp-info">
+                    <div class="otp-icon">📨</div>
+                    <div class="otp-heading">Check your email</div>
+                    <p class="otp-desc">
+                        We sent a 6-digit code to<br>
+                        <span class="otp-email-highlight">@email</span>
+                    </p>
+                </div>
+
+                @if (!string.IsNullOrEmpty(resendMsg))
+                {
+                    <div style="text-align:center;">
+                        <span class="resend-success">✓ @resendMsg</span>
+                    </div>
+                }
+
+                @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("OtpCode"))
+                {
+                    <div class="error-box" id="otpError">
+                        ⚠ @ViewData.ModelState["OtpCode"]!.Errors.First().ErrorMessage
+                    </div>
+                }
+
+                <!-- OTP visual boxes -->
+                <div class="otp-inputs" id="otpInputs">
+                    @for (int i = 0; i < 6; i++)
+                    {
+                        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"
+                               class="otp-digit" data-idx="@i" autocomplete="one-time-code" />
+                    }
+                </div>
+
+                <!-- Timer -->
+                <div class="otp-timer">
+                    Code expires in <span class="timer-value" id="timerDisplay">10:00</span>
+                </div>
+
+                <!-- Resend -->
+                <div class="otp-resend">
+                    Didn't get it?
+                    <form method="post" asp-page-handler="ResendOtp" style="display:inline;">
+                        <button type="submit" class="btn-resend" id="btnResend">Resend code</button>
+                    </form>
+                </div>
+
+                <!-- Verify form (hidden OtpCode filled by JS) -->
+                <form method="post" asp-page-handler="VerifyOtp" id="verifyForm">
+                    <input type="hidden" asp-for="OtpCode" id="OtpCode" />
+                    <button type="submit" class="btn-verify" id="btnVerify" disabled>
+                        Verify &amp; Create Account
+                    </button>
+                </form>
+
+                <a asp-page="/Account/Register" class="btn-back">← Back to registration</a>
+            }
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        // ── STEP 1: Loading state on submit ──────────────────────────────────────────
+        const regForm = document.getElementById('regForm');
+        if (regForm) {
+            regForm.addEventListener('submit', () => {
+                const btn  = document.getElementById('btnSendOtp');
+                const text = document.getElementById('btnText');
+                btn.disabled = true;
+                text.textContent = 'Sending code…';
+            });
+        }
+
+        // ── STEP 2: OTP digit boxes logic ────────────────────────────────────────────
+        const digits   = document.querySelectorAll('.otp-digit');
+        const hidden   = document.getElementById('OtpCode');
+        const btnVerify = document.getElementById('btnVerify');
+
+        if (digits.length) {
+            // Auto-focus first box
+            digits[0].focus();
+
+            digits.forEach((box, idx) => {
+                box.addEventListener('input', (e) => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    e.target.value = val;
+                    if (val) {
+                        box.classList.add('filled');
+                        if (idx < 5) digits[idx + 1].focus();
+                    } else {
+                        box.classList.remove('filled');
+                    }
+                    syncHidden();
+                });
+
+                box.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !box.value && idx > 0) {
+                        digits[idx - 1].focus();
+                        digits[idx - 1].value = '';
+                        digits[idx - 1].classList.remove('filled');
+                        syncHidden();
+                    }
+                });
+
+                // Handle paste on any box
+                box.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const paste = (e.clipboardData || window.clipboardData)
+                        .getData('text').replace(/\D/g, '').slice(0, 6);
+                    paste.split('').forEach((ch, i) => {
+                        if (digits[i]) {
+                            digits[i].value = ch;
+                            digits[i].classList.add('filled');
+                        }
+                    });
+                    syncHidden();
+                    digits[Math.min(paste.length, 5)].focus();
+                });
+            });
+
+            function syncHidden() {
+                const code = Array.from(digits).map(d => d.value).join('');
+                if (hidden) hidden.value = code;
+                if (btnVerify) btnVerify.disabled = code.length !== 6;
+            }
+
+            // Mark error state on digits if error present
+            if (document.getElementById('otpError')) {
+                digits.forEach(d => d.classList.add('error'));
+            }
+        }
+
+        // ── Countdown timer ───────────────────────────────────────────────────────────
+        const timerEl = document.getElementById('timerDisplay');
+        if (timerEl) {
+            let seconds = 600; // 10 min
+            const tick = setInterval(() => {
+                seconds--;
+                if (seconds <= 0) {
+                    clearInterval(tick);
+                    timerEl.textContent = 'Expired';
+                    timerEl.classList.add('timer-expired');
+                    if (btnVerify) { btnVerify.disabled = true; }
+                    return;
+                }
+                const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                const s = (seconds % 60).toString().padStart(2, '0');
+                timerEl.textContent = `${m}:${s}`;
+                // Turn red in last 60 sec
+                if (seconds <= 60) timerEl.classList.add('timer-expired');
+            }, 1000);
+        }
+    </script>
 }

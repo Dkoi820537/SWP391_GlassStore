@@ -130,7 +130,14 @@
                                 Payment Method
                             </label>
                             <div style="font-size: 1.1rem; color: var(--dark-gray);">
-                                💳 @Model.Order?.PaymentMethod
+                                @if (Model.Order?.PaymentMethod == "COD")
+                                {
+                                    <span>💵 Cash on Delivery</span>
+                                }
+                                else
+                                {
+                                    <span>💳 @Model.Order?.PaymentMethod</span>
+                                }
                             </div>
                         </div>
                         <div class="col-12">

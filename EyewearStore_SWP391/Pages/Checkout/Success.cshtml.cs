@@ -7,9 +7,8 @@ using EyewearStore_SWP391.Services;
 namespace EyewearStore_SWP391.Pages.Checkout;
 
 /// <summary>
-/// Success page shown after a successful Stripe Checkout.
-/// Receives session_id from Stripe redirect URL, looks up the order, and displays confirmation.
-/// Also clears the user's cart so they see an empty cart immediately after checkout.
+/// Success page shown after a successful checkout.
+/// Handles both Stripe (session_id) and COD (order_id) flows.
 /// </summary>
 public class SuccessModel : PageModel
 {
@@ -28,30 +27,59 @@ public class SuccessModel : PageModel
     }
 
     public Order? Order { get; set; }
+    public bool IsCodOrder { get; set; }
 
-    public async Task<IActionResult> OnGetAsync(string? session_id)
+    public async Task<IActionResult> OnGetAsync(string? session_id, int? order_id)
     {
         if (!User.Identity?.IsAuthenticated ?? true)
             return RedirectToPage("/Account/Login");
 
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+        // ── COD path: look up by order_id ──
+        if (order_id.HasValue && order_id.Value > 0)
+        {
+            Order = await _orderService.GetOrderByIdAsync(order_id.Value);
+
+            if (Order == null || Order.UserId != userId)
+            {
+                TempData["ErrorMessage"] = "Order not found.";
+                return RedirectToPage("/Cart/Index");
+            }
+
+            IsCodOrder = true;
+
+            // Cart should already be cleared in the checkout handler,
+            // but clear again idempotently just in case.
+            try
+            {
+                await _cartService.ClearCartAsync(userId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to clear cart for user {UserId} on COD success page", userId);
+            }
+
+            return Page();
+        }
+
+        // ── Stripe path: look up by session_id (existing flow) ──
         if (string.IsNullOrEmpty(session_id))
         {
             TempData["ErrorMessage"] = "Invalid session.";
             return RedirectToPage("/Cart/Index");
         }
 
-        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
         Order = await _orderService.GetOrderByStripeSessionIdAsync(session_id);
 
-        // Security: only show if the order belongs to this user
         if (Order == null || Order.UserId != userId)
         {
             TempData["ErrorMessage"] = "Order not found.";
             return RedirectToPage("/Cart/Index");
         }
 
-        // Clear the cart immediately so the user sees it empty.
-        // This is safe even if the webhook already cleared it (ClearCartAsync is idempotent).
+        IsCodOrder = false;
+
         try
         {
             await _cartService.ClearCartAsync(userId);
@@ -61,7 +89,6 @@ public class SuccessModel : PageModel
         }
         catch (Exception ex)
         {
-            // Don't block the success page if cart clearing fails
             _logger.LogWarning(ex,
                 "Failed to clear cart for user {UserId} on success page", userId);
         }
@@ -69,4 +96,3 @@ public class SuccessModel : PageModel
         return Page();
     }
 }
-

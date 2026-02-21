@@ -198,13 +198,13 @@ namespace EyewearStore_SWP391.Services
                     return;
                 }
 
-                if (order.Status == "Paid")
+                if (order.Status == "Pending Confirmation")
                 {
-                    _logger.LogInformation("Order {OrderId} already Paid", orderId);
+                    _logger.LogInformation("Order {OrderId} already Pending Confirmation", orderId);
                     return;
                 }
 
-                order.Status = "Paid";
+                order.Status = "Pending Confirmation";
                 order.StripePaymentIntentId = paymentIntentId;
 
                 // Reduce inventory
@@ -232,7 +232,7 @@ namespace EyewearStore_SWP391.Services
 
                 await tx.CommitAsync();
 
-                _logger.LogInformation("Order {OrderId} marked Paid, inventory reduced, cart cleared for user {UserId}",
+                _logger.LogInformation("Order {OrderId} marked Pending Confirmation, inventory reduced, cart cleared for user {UserId}",
                     orderId, order.UserId);
             }
             catch

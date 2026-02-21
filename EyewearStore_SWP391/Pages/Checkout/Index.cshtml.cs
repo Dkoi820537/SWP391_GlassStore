@@ -36,7 +36,8 @@ namespace EyewearStore_SWP391.Pages.Checkout
         [BindProperty]
         public int SelectedAddressId { get; set; }
 
-
+        [BindProperty]
+        public string PaymentMethod { get; set; } = "Stripe";
 
         [BindProperty]
         public string? NewReceiverName { get; set; }
@@ -138,8 +139,8 @@ namespace EyewearStore_SWP391.Pages.Checkout
                     AddressLine = selectedAddress.AddressLine,
                     AddressId = selectedAddress.AddressId,
                     TotalAmount = total,
-                    Status = "Pending",
-                    PaymentMethod = "Stripe",
+                    Status = PaymentMethod == "COD" ? "Pending Confirmation" : "Pending",
+                    PaymentMethod = PaymentMethod == "COD" ? "COD" : "Stripe",
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -170,7 +171,28 @@ namespace EyewearStore_SWP391.Pages.Checkout
 
                 await _context.SaveChangesAsync();
 
-                // Build Stripe line items: unit amount = base + prescription fee so total matches
+                // ── COD PATH: skip Stripe, reduce inventory, clear cart, redirect ──
+                if (PaymentMethod == "COD")
+                {
+                    // Reduce inventory
+                    foreach (var oi in order.OrderItems)
+                    {
+                        var product = await _context.Products.FindAsync(oi.ProductId);
+                        if (product != null && product.InventoryQty.HasValue)
+                        {
+                            product.InventoryQty -= oi.Quantity;
+                            if (product.InventoryQty < 0) product.InventoryQty = 0;
+                        }
+                    }
+                    await _context.SaveChangesAsync();
+
+                    // Clear cart
+                    await _cartService.ClearCartAsync(userId);
+
+                    return RedirectToPage("/Checkout/Success", new { order_id = order.OrderId });
+                }
+
+                // ── STRIPE PATH (existing flow) ──
                 var lineItems = new List<StripeLineItemDto>();
 
                 foreach (var ci in cart.CartItems)

@@ -115,6 +115,12 @@
                                         </svg>
                                     </button>
                                 </div>
+                                @* Prescription profile name (lenses only) *@
+                                @if (it.Product?.ProductType == "Lens")
+                                {
+                                    var rxName = it.Prescription?.ProfileName ?? "No prescription";
+                                    <div class="text-muted text-truncate" style="font-size:12px; color:#6B7280;" title="@rxName">@rxName</div>
+                                }
                                 @* Row 2: Unit price *@
                                 <div class="small text-muted" style="font-size:11px;">@unit.ToString("N0") VND each</div>
                                 @* Row 3: Quantity controls *@

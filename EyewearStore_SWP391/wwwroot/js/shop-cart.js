@@ -345,6 +345,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 ${trashIcon}
                             </button>
                         </div>
+                        ${item.productType === 'Lens'
+                        ? `<div class="text-muted text-truncate" style="font-size:12px; color:#6B7280;" title="${item.prescriptionName || 'No prescription'}">${item.prescriptionName || 'No prescription'}</div>`
+                        : ''}
                         <div class="small text-muted" style="font-size:11px;">${formatPrice(item.unitPrice)} VND each</div>
                         <div style="display:flex; align-items:center; margin-top:2px;">
                             <div class="cart-qty-group" style="display:inline-flex; border:1px solid #D1D5DB; border-radius:6px; overflow:hidden; height:26px;">

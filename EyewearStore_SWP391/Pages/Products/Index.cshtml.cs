@@ -277,7 +277,9 @@ public class IndexModel : PageModel
                     decimal lineTotal = unitPrice * ci.Quantity;
                     subtotal += lineTotal;
                     string? imageUrl = ci.Product?.ProductImages?.OrderByDescending(x => x.IsPrimary).FirstOrDefault()?.ImageUrl;
-                    cartItemsList.Add(new { cartItemId = ci.CartItemId, name, unitPrice, quantity = ci.Quantity, lineTotal, imageUrl });
+                    string? prescriptionName = ci.Prescription?.ProfileName;
+                    string productType = ci.Product?.ProductType ?? "Frame";
+                    cartItemsList.Add(new { cartItemId = ci.CartItemId, name, unitPrice, quantity = ci.Quantity, lineTotal, imageUrl, prescriptionName, productType });
                 }
             }
 
@@ -338,7 +340,9 @@ public class IndexModel : PageModel
                     decimal lineTotal = unitPrice * ci.Quantity;
                     subtotal += lineTotal;
                     string? imageUrl = ci.Product?.ProductImages?.OrderByDescending(x => x.IsPrimary).FirstOrDefault()?.ImageUrl;
-                    cartItemsList.Add(new { cartItemId = ci.CartItemId, name, unitPrice, quantity = ci.Quantity, lineTotal, imageUrl });
+                    string? prescriptionName = ci.Prescription?.ProfileName;
+                    string productType = ci.Product?.ProductType ?? "Frame";
+                    cartItemsList.Add(new { cartItemId = ci.CartItemId, name, unitPrice, quantity = ci.Quantity, lineTotal, imageUrl, prescriptionName, productType });
                 }
             }
 
@@ -430,7 +434,9 @@ public class IndexModel : PageModel
                     decimal lineTotal = unitPrice * ci.Quantity;
                     subtotal += lineTotal;
                     string? imageUrl = ci.Product?.ProductImages?.OrderByDescending(x => x.IsPrimary).FirstOrDefault()?.ImageUrl;
-                    cartItemsList.Add(new { cartItemId = ci.CartItemId, name, unitPrice, quantity = ci.Quantity, lineTotal, imageUrl });
+                    string? prescriptionName = ci.Prescription?.ProfileName;
+                    string productType = ci.Product?.ProductType ?? "Frame";
+                    cartItemsList.Add(new { cartItemId = ci.CartItemId, name, unitPrice, quantity = ci.Quantity, lineTotal, imageUrl, prescriptionName, productType });
                 }
             }
 

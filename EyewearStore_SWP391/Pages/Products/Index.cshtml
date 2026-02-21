@@ -408,7 +408,7 @@
                                         }
                                         else
                                         {
-                                            <button onclick="addToCart(this, @product.ProductId)" class="btn-add-cart" title="Add to Cart">
+                                            <button onclick="handleAddToCart(this, @product.ProductId, 'Lens', '@Html.Raw(product.Name.Replace("'", "\\'"))', '@product.Price.ToString("N0")', '@product.PrimaryImageUrl')" class="btn-add-cart" title="Add to Cart">
                                                 <i class="bi bi-cart-plus"></i> Add
                                             </button>
                                             <a asp-page="/Products/LensDetails"
@@ -417,7 +417,7 @@
                                                 Details
                                             </a>
                                         }
-                                        <button onclick="addToCart(this, @product.ProductId, true)" class="btn-buy-now">
+                                        <button onclick="handleAddToCart(this, @product.ProductId, '@product.ProductType', '@Html.Raw(product.Name.Replace("'", "\\'"))', '@product.Price.ToString("N0")', '@product.PrimaryImageUrl', true)" class="btn-buy-now">
                                             Buy Now
                                         </button>
                                     }

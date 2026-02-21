@@ -259,7 +259,7 @@ public class IndexModel : PageModel
             if (isStockManaged && inventoryQty.HasValue && inventoryQty.Value < request.Quantity)
                 return new JsonResult(new { success = false, message = $"Only {inventoryQty} items left in stock." });
 
-            await _cartService.AddToCartAsync(userId, request.ProductId, request.Quantity);
+            await _cartService.AddToCartAsync(userId, request.ProductId, request.Quantity, prescriptionId: request.PrescriptionId);
 
             var cart = await _cartService.GetCartByUserIdAsync(userId);
             var newCount = cart?.CartItems.Sum(i => i.Quantity) ?? 0;
@@ -378,6 +378,7 @@ public class IndexModel : PageModel
     {
         public int ProductId { get; set; }
         public int Quantity { get; set; }
+        public int? PrescriptionId { get; set; }
     }
 
     public class RemoveCartItemRequest
@@ -439,5 +440,35 @@ public class IndexModel : PageModel
         {
             return new JsonResult(new { success = false, message = "Error: " + ex.Message });
         }
+    }
+
+    /// <summary>
+    /// AJAX GET: Returns the authenticated user's active prescription profiles as JSON.
+    /// Used by the prescription selection popup.
+    /// </summary>
+    public async Task<IActionResult> OnGetPrescriptionsAsync()
+    {
+        if (!User.Identity?.IsAuthenticated ?? true)
+            return new JsonResult(new { prescriptions = Array.Empty<object>() }) { StatusCode = 401 };
+
+        var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdStr, out var userId))
+            return new JsonResult(new { prescriptions = Array.Empty<object>() }) { StatusCode = 401 };
+
+        var prescriptions = await _context.PrescriptionProfiles
+            .Where(p => p.UserId == userId && p.IsActive)
+            .OrderByDescending(p => p.CreatedAt)
+            .Select(p => new
+            {
+                p.PrescriptionId,
+                name = p.ProfileName ?? "Prescription",
+                leftSph = p.LeftSph,
+                leftCyl = p.LeftCyl,
+                rightSph = p.RightSph,
+                rightCyl = p.RightCyl
+            })
+            .ToListAsync();
+
+        return new JsonResult(new { prescriptions });
     }
 }

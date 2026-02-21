@@ -135,8 +135,13 @@
 
                     @foreach (var it in Model.Cart.CartItems)
                     {
-                        var unit = it.Product != null ? it.Product.Price : it.Service != null ? it.Service.Price : 0m;
-                        if (it.Service != null) unit += it.Service.Price;
+                        var baseUnit = it.Product != null ? it.Product.Price : 0m;
+                        if (it.Service != null) baseUnit += it.Service.Price;
+                        
+                        var lineBase = baseUnit * it.Quantity;
+                        var linePrescription = it.PrescriptionFee * it.Quantity;
+                        var lineTotal = lineBase + linePrescription;
+
                         var productName = it.Product?.Name ?? it.Service?.Name ?? "Product";
                         var productType = it.Product?.ProductType ?? "Service";
 
@@ -177,8 +182,14 @@
                                     }
                                 </div>
                                 <div class="col-auto text-end">
-                                    <div style="font-size: 0.85rem; color: var(--secondary-warm-gray);">@(unit.ToString("N0")) VND × @it.Quantity</div>
-                                    <div style="font-size: 1.15rem; font-weight: 700; color: var(--primary-navy);">@((unit * it.Quantity).ToString("N0")) VND</div>
+                                    <div style="font-size: 0.85rem; color: var(--secondary-warm-gray);">
+                                        <div>@(baseUnit.ToString("N0")) VND <span class="text-muted">× @it.Quantity</span></div>
+                                        @if (it.PrescriptionFee > 0)
+                                        {
+                                            <div>+ @it.PrescriptionFee.ToString("N0") VND <span class="text-muted">(prescription)</span></div>
+                                        }
+                                    </div>
+                                    <div style="font-size: 1.15rem; font-weight: 700; color: var(--primary-navy);">@lineTotal.ToString("N0") VND</div>
                                 </div>
                             </div>
                         </div>
@@ -201,8 +212,15 @@
                         </div>
                         <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--medium-gray);">
                             <span style="color: var(--dark-gray);">Subtotal</span>
-                            <span style="color: var(--primary-navy); font-weight: 600;">@Model.Total.ToString("N0") VND</span>
+                            <span style="color: var(--primary-navy); font-weight: 600;">@Model.SubtotalBase.ToString("N0") VND</span>
                         </div>
+                        @if (Model.PrescriptionFeesTotal > 0)
+                        {
+                            <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--medium-gray);">
+                                <span style="color: var(--dark-gray);">Prescription fees</span>
+                                <span style="color: var(--primary-navy); font-weight: 600;">@Model.PrescriptionFeesTotal.ToString("N0") VND</span>
+                            </div>
+                        }
                         <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 2px solid var(--medium-gray);">
                             <span style="color: var(--dark-gray);">Shipping</span>
                             <span style="color: var(--success); font-weight: 600;">FREE 🎉</span>

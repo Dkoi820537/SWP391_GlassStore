@@ -29,6 +29,8 @@ namespace EyewearStore_SWP391.Pages.Checkout
 
         public Models.Cart? Cart { get; set; }
         public decimal Total { get; set; }
+        public decimal SubtotalBase { get; set; }
+        public decimal PrescriptionFeesTotal { get; set; }
         public List<Address> Addresses { get; set; } = new();
         public Address? DefaultAddress { get; set; }
 
@@ -53,7 +55,10 @@ namespace EyewearStore_SWP391.Pages.Checkout
 
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             Cart = await _cartService.GetCartByUserIdAsync(userId);
-            Total = await _cartService.CalculateCartTotalAsync(userId);
+            var (subtotalBase, prescriptionFees, grandTotal) = await _cartService.GetCartTotalsBreakdownAsync(userId);
+            SubtotalBase = subtotalBase;
+            PrescriptionFeesTotal = prescriptionFees;
+            Total = grandTotal;
 
             if (Cart == null || !Cart.CartItems.Any())
             {
@@ -112,7 +117,10 @@ namespace EyewearStore_SWP391.Pages.Checkout
             {
                 TempData["ErrorMessage"] = "Please select or add a shipping address.";
                 Cart = await _cartService.GetCartByUserIdAsync(userId);
-                Total = await _cartService.CalculateCartTotalAsync(userId);
+                var (subtotalBase, prescriptionFees, grandTotal) = await _cartService.GetCartTotalsBreakdownAsync(userId);
+                SubtotalBase = subtotalBase;
+                PrescriptionFeesTotal = prescriptionFees;
+                Total = grandTotal;
                 await LoadAddressesAsync(userId);
 
                 return Page();
@@ -252,7 +260,10 @@ namespace EyewearStore_SWP391.Pages.Checkout
             {
                 TempData["ErrorMessage"] = ex.Message;
                 Cart = await _cartService.GetCartByUserIdAsync(userId);
-                Total = await _cartService.CalculateCartTotalAsync(userId);
+                var (subtotalBase, prescriptionFees, grandTotal) = await _cartService.GetCartTotalsBreakdownAsync(userId);
+                SubtotalBase = subtotalBase;
+                PrescriptionFeesTotal = prescriptionFees;
+                Total = grandTotal;
                 await LoadAddressesAsync(userId);
 
                 return Page();

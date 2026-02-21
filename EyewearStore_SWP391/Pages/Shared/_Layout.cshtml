@@ -380,6 +380,12 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
+    @* Global antiforgery token for AJAX requests (cart remove/clear, etc.) *@
+    @Html.AntiForgeryToken()
+
+    @* Cart dropdown actions - must be global since the dropdown is in the layout *@
+    <script src="~/js/shop-cart.js" asp-append-version="true"></script>
+
     <!-- Page-specific Scripts Section -->
     @await RenderSectionAsync("Scripts", required: false)
 

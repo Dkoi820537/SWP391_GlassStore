@@ -30,7 +30,7 @@
 }
 
 <li class="nav-item dropdown ms-3">
-    <a class="nav-link d-flex align-items-center position-relative" href="#" id="cartDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Cart">
+    <a class="nav-link d-flex align-items-center position-relative" href="#" id="cartDropdown" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label="Cart">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.25" class="me-1">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12l-1 12H7L6 7z" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 7V6a3 3 0 116 0v1" />
@@ -43,7 +43,18 @@
         <li>
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <strong>Cart</strong>
-                <small class="text-muted">@itemCount item(s)</small>
+                <div class="d-flex align-items-center gap-2">
+                    @if (itemCount > 0)
+                    {
+                        <button type="button"
+                                class="btn-cart-clear btn btn-sm btn-outline-danger py-0 px-2"
+                                style="font-size:11px; border-radius:4px;"
+                                aria-label="Clear all items from cart">
+                            Clear All
+                        </button>
+                    }
+                    <small class="text-muted">@itemCount item(s)</small>
+                </div>
             </div>
         </li>
 
@@ -57,14 +68,21 @@
         else
         {
             <li>
-                <div style="max-height:240px; overflow:auto;">
+                <div style="max-height:300px; overflow-y:auto; overflow-x:visible; padding-right:4px;">
                     @foreach (var it in items)
                     {
                         decimal unit = it.Product != null ? it.Product.Price :
                         it.Service != null ? it.Service.Price : 0m;
 
-                        <div class="d-flex align-items-center mb-2">
-                            <div style="width:56px; height:56px; background:#f5f5f5; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; color:#777; margin-right:10px; overflow:hidden;">
+                        string itemName = it.Product != null ? it.Product.Name :
+                                          it.Service != null ? it.Service.Name : "Product";
+
+                        <div class="cart-item-row mb-2"
+                             data-cart-item-id="@it.CartItemId"
+                             data-unit-price="@unit"
+                             style="transition: opacity 0.25s ease, max-height 0.3s ease; display:flex; gap:10px; align-items:flex-start; padding:6px 0; border-bottom:1px solid #f0f0f0;">
+                            @* ── Image ── *@
+                            <div style="width:50px; height:50px; background:#f5f5f5; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#999; overflow:hidden; flex-shrink:0;">
                                 @{
                                     var img = it.Product?.ProductImages?.OrderByDescending(x => x.IsPrimary).FirstOrDefault()?.ImageUrl;
                                 }
@@ -77,18 +95,54 @@
                                     <span>IMG</span>
                                 }
                             </div>
-                            <div class="flex-grow-1">
-                                <div class="fw-semibold">
-                                    @(it.Product != null ? it.Product.Name :
-                                                it.Service != null ? it.Service.Name : "Product")
+                            @* ── Info + Controls ── *@
+                            <div class="flex-grow-1 min-w-0" style="display:flex; flex-direction:column; gap:2px;">
+                                @* Row 1: Name + Price + Trash *@
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                    <div class="fw-semibold text-truncate" style="flex:1; font-size:13px;">@itemName</div>
+                                    <div class="fw-bold flex-shrink-0 cart-item-line-total" style="font-size:13px; white-space:nowrap;">@((unit * it.Quantity).ToString("N0")) VND</div>
+                                    <button type="button"
+                                            class="btn-cart-remove btn btn-sm p-0"
+                                            style="width:24px; height:24px; display:flex; align-items:center; justify-content:center; border-radius:4px; color:#9CA3AF; border:1px solid #e5e7eb; background:transparent; outline:none; box-shadow:none; flex-shrink:0;"
+                                            data-cart-item-id="@it.CartItemId"
+                                            aria-label="Remove @itemName from cart"
+                                            title="Remove">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6l-1 14H6L5 6"></path>
+                                            <path d="M10 11v6M14 11v6"></path>
+                                            <path d="M9 6V4h6v2"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                @* Row 2: Unit price *@
+                                <div class="small text-muted" style="font-size:11px;">@unit.ToString("N0") VND each</div>
+                                @* Row 3: Quantity controls *@
+                                <div style="display:flex; align-items:center; margin-top:2px;">
+                                    <div class="cart-qty-group" style="display:inline-flex; border:1px solid #D1D5DB; border-radius:6px; overflow:hidden; height:26px;">
+                                        <button type="button"
+                                                class="btn-cart-qty-minus"
+                                                style="width:26px; height:100%; display:flex; align-items:center; justify-content:center; border:none; background:#fff; color:#6B7280; cursor:pointer; font-size:14px; font-weight:600; transition:background .15s; outline:none; @(it.Quantity <= 1 ? "opacity:0.4; cursor:not-allowed;" : "")"
+                                                data-cart-item-id="@it.CartItemId"
+                                                @(it.Quantity <= 1 ? "disabled" : "")
+                                                aria-label="Decrease quantity of @itemName">
+                                            &minus;
+                                        </button>
+                                        <span class="cart-qty-display"
+                                              style="width:34px; height:100%; display:flex; align-items:center; justify-content:center; background:#F3F4F6; font-size:13px; font-weight:700; color:#374151; border-left:1px solid #D1D5DB; border-right:1px solid #D1D5DB; user-select:none;"
+                                              aria-label="Quantity: @it.Quantity">@it.Quantity</span>
+                                        <button type="button"
+                                                class="btn-cart-qty-plus"
+                                                style="width:26px; height:100%; display:flex; align-items:center; justify-content:center; border:none; background:#fff; color:#6B7280; cursor:pointer; font-size:14px; font-weight:600; transition:background .15s; outline:none;"
+                                                data-cart-item-id="@it.CartItemId"
+                                                aria-label="Increase quantity of @itemName">
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="small text-muted">x @it.Quantity • @unit.ToString("N0") VND</div>
-                    </div>
-                    <div class="ms-2 text-end">
-                        <div class="fw-bold">@((unit * it.Quantity).ToString("N0")) VND</div>
-                    </div>
-                </div>
-                            }
+                    }
                 </div>
             </li>
 

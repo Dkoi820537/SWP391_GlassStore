@@ -276,7 +276,8 @@ public class IndexModel : PageModel
                                         ci.Service != null ? ci.Service.Name : "Product";
                     decimal lineTotal = unitPrice * ci.Quantity;
                     subtotal += lineTotal;
-                    cartItemsList.Add(new { name, unitPrice, quantity = ci.Quantity, lineTotal });
+                    string? imageUrl = ci.Product?.ProductImages?.OrderByDescending(x => x.IsPrimary).FirstOrDefault()?.ImageUrl;
+                    cartItemsList.Add(new { cartItemId = ci.CartItemId, name, unitPrice, quantity = ci.Quantity, lineTotal, imageUrl });
                 }
             }
 
@@ -303,9 +304,140 @@ public class IndexModel : PageModel
         return Partial("_CartSummary");
     }
 
+    /// <summary>
+    /// AJAX: Remove a single item from the cart by cartItemId.
+    /// Returns updated cart data so the dropdown can be rebuilt client-side.
+    /// </summary>
+    public async Task<IActionResult> OnPostRemoveCartItemAsync([FromBody] RemoveCartItemRequest request)
+    {
+        if (request == null || request.CartItemId <= 0)
+            return new JsonResult(new { success = false, message = "Invalid request." });
+
+        if (!User.Identity?.IsAuthenticated ?? true)
+            return new JsonResult(new { success = false, message = "Please login." }) { StatusCode = 401 };
+
+        var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdStr, out var userId))
+            return new JsonResult(new { success = false, message = "User identity not found." }) { StatusCode = 401 };
+
+        try
+        {
+            await _cartService.RemoveItemAsync(request.CartItemId);
+
+            var cart = await _cartService.GetCartByUserIdAsync(userId);
+            var newCount = cart?.CartItems.Sum(i => i.Quantity) ?? 0;
+            decimal subtotal = 0m;
+            var cartItemsList = new List<object>();
+
+            if (cart?.CartItems != null)
+            {
+                foreach (var ci in cart.CartItems)
+                {
+                    decimal unitPrice = ci.Product != null ? ci.Product.Price : ci.Service != null ? ci.Service.Price : 0m;
+                    string name = ci.Product != null ? ci.Product.Name : ci.Service != null ? ci.Service.Name : "Product";
+                    decimal lineTotal = unitPrice * ci.Quantity;
+                    subtotal += lineTotal;
+                    string? imageUrl = ci.Product?.ProductImages?.OrderByDescending(x => x.IsPrimary).FirstOrDefault()?.ImageUrl;
+                    cartItemsList.Add(new { cartItemId = ci.CartItemId, name, unitPrice, quantity = ci.Quantity, lineTotal, imageUrl });
+                }
+            }
+
+            return new JsonResult(new { success = true, message = "Item removed.", cartCount = newCount, cartItems = cartItemsList, subtotal });
+        }
+        catch (Exception ex)
+        {
+            return new JsonResult(new { success = false, message = "Error: " + ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// AJAX: Clear all items from the cart.
+    /// Returns an empty cart response so the dropdown shows the empty state.
+    /// </summary>
+    public async Task<IActionResult> OnPostClearCartAsync()
+    {
+        if (!User.Identity?.IsAuthenticated ?? true)
+            return new JsonResult(new { success = false, message = "Please login." }) { StatusCode = 401 };
+
+        var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdStr, out var userId))
+            return new JsonResult(new { success = false, message = "User identity not found." }) { StatusCode = 401 };
+
+        try
+        {
+            await _cartService.ClearCartAsync(userId);
+            return new JsonResult(new { success = true, message = "Cart cleared.", cartCount = 0, cartItems = new List<object>(), subtotal = 0m });
+        }
+        catch (Exception ex)
+        {
+            return new JsonResult(new { success = false, message = "Error: " + ex.Message });
+        }
+    }
+
     public class AddToCartRequest
     {
         public int ProductId { get; set; }
         public int Quantity { get; set; }
+    }
+
+    public class RemoveCartItemRequest
+    {
+        public int CartItemId { get; set; }
+    }
+
+    public class UpdateCartItemQtyRequest
+    {
+        public int CartItemId { get; set; }
+        public int NewQuantity { get; set; }
+    }
+
+    /// <summary>
+    /// AJAX: Update the quantity of a single cart item.
+    /// If newQuantity is 0, the item is removed instead.
+    /// Returns updated cart data so the dropdown can be rebuilt client-side.
+    /// </summary>
+    public async Task<IActionResult> OnPostUpdateCartItemQtyAsync([FromBody] UpdateCartItemQtyRequest request)
+    {
+        if (request == null || request.CartItemId <= 0)
+            return new JsonResult(new { success = false, message = "Invalid request." });
+
+        if (!User.Identity?.IsAuthenticated ?? true)
+            return new JsonResult(new { success = false, message = "Please login." }) { StatusCode = 401 };
+
+        var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdStr, out var userId))
+            return new JsonResult(new { success = false, message = "User identity not found." }) { StatusCode = 401 };
+
+        try
+        {
+            if (request.NewQuantity <= 0)
+                await _cartService.RemoveItemAsync(request.CartItemId);
+            else
+                await _cartService.UpdateQuantityAsync(request.CartItemId, request.NewQuantity);
+
+            var cart = await _cartService.GetCartByUserIdAsync(userId);
+            var newCount = cart?.CartItems.Sum(i => i.Quantity) ?? 0;
+            decimal subtotal = 0m;
+            var cartItemsList = new List<object>();
+
+            if (cart?.CartItems != null)
+            {
+                foreach (var ci in cart.CartItems)
+                {
+                    decimal unitPrice = ci.Product != null ? ci.Product.Price : ci.Service != null ? ci.Service.Price : 0m;
+                    string name = ci.Product != null ? ci.Product.Name : ci.Service != null ? ci.Service.Name : "Product";
+                    decimal lineTotal = unitPrice * ci.Quantity;
+                    subtotal += lineTotal;
+                    string? imageUrl = ci.Product?.ProductImages?.OrderByDescending(x => x.IsPrimary).FirstOrDefault()?.ImageUrl;
+                    cartItemsList.Add(new { cartItemId = ci.CartItemId, name, unitPrice, quantity = ci.Quantity, lineTotal, imageUrl });
+                }
+            }
+
+            return new JsonResult(new { success = true, message = "Quantity updated.", cartCount = newCount, cartItems = cartItemsList, subtotal });
+        }
+        catch (Exception ex)
+        {
+            return new JsonResult(new { success = false, message = "Error: " + ex.Message });
+        }
     }
 }

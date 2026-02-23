@@ -62,8 +62,34 @@ namespace EyewearStore_SWP391.Pages.Account
                 return Page();
             }
 
-            var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, Input.Password);
-            if (result == PasswordVerificationResult.Failed)
+            // ✅ Xử lý cả 2 trường hợp: hash đúng chuẩn Identity hoặc plain text
+            bool isPasswordValid = false;
+            try
+            {
+                var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, Input.Password);
+                isPasswordValid = result != PasswordVerificationResult.Failed;
+
+                // Nếu hash cũ (V2), tự động re-hash lên V3
+                if (result == PasswordVerificationResult.SuccessRehashNeeded)
+                {
+                    user.PasswordHash = _passwordHasher.HashPassword(user, Input.Password);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch (FormatException)
+            {
+                // Password đang lưu dạng plain text → so sánh trực tiếp
+                isPasswordValid = user.PasswordHash == Input.Password;
+
+                // Tự động hash lại và lưu DB để lần sau dùng đúng chuẩn
+                if (isPasswordValid)
+                {
+                    user.PasswordHash = _passwordHasher.HashPassword(user, Input.Password);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            if (!isPasswordValid)
             {
                 ModelState.AddModelError("", "Invalid email or password");
                 return Page();
@@ -107,19 +133,19 @@ namespace EyewearStore_SWP391.Pages.Account
             }
             if (r == "sale" || r == "sale staff")
             {
-                return LocalRedirect("/Admin/SaleStaff");
+                return LocalRedirect("/Sale/Orders/Index");
             }
-            if (r == "operational" || r == "operational staff")
+            if (r == "staff" || r == "operational staff")
             {
-                return LocalRedirect("/Admin/Operational");
+                return LocalRedirect("/Staff/Orders/Index");
             }
-            if (r == "staff")
+            if (r == "support")
             {
-                return LocalRedirect("/Admin/Staff");
+                return LocalRedirect("/Support/Orders/Index");
             }
             if (r == "manager")
             {
-                return LocalRedirect("/Admin/Manager");
+                return LocalRedirect("/Manager/Index");
             }
             // default for customer
             return LocalRedirect("/Profile/Index");

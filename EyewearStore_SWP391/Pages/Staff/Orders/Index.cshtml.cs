@@ -13,7 +13,7 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
     /// <summary>
     /// Operations Staff Order Management - with pagination
     /// </summary>
-    [Authorize(Roles = "staff,operational,admin,Administrator")]
+    [Authorize(Roles = "staff,operational,admin,Administrator,support")]
     public class IndexModel : PageModel
     {
         private readonly EyewearStoreContext _context;

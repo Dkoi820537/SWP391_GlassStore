@@ -10,11 +10,9 @@
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
     <style>
         /* ==========================================
-           LENS DETAILS PAGE STYLES
-           (Mirrors FrameDetails page exactly)
-           ========================================== */
+                   LENS DETAILS PAGE STYLES
+                   ========================================== */
 
-        /* Breadcrumb Section */
         .lens-breadcrumb-section {
             background: #F8F9FA;
             padding: 16px 0;
@@ -32,33 +30,32 @@
             padding: 0 24px;
         }
 
-        .lens-breadcrumb li {
-            display: flex;
-            align-items: center;
-        }
+            .lens-breadcrumb li {
+                display: flex;
+                align-items: center;
+            }
 
-        .lens-breadcrumb a {
-            color: #666666;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
+            .lens-breadcrumb a {
+                color: #666666;
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
 
-        .lens-breadcrumb a:hover {
-            color: var(--shop-primary-teal);
-        }
+                .lens-breadcrumb a:hover {
+                    color: var(--shop-primary-teal);
+                }
 
-        .lens-breadcrumb .separator {
-            margin: 0 8px;
-            color: #999999;
-            font-size: 12px;
-        }
+            .lens-breadcrumb .separator {
+                margin: 0 8px;
+                color: #999999;
+                font-size: 12px;
+            }
 
-        .lens-breadcrumb .current {
-            color: var(--shop-primary-teal);
-            font-weight: 500;
-        }
+            .lens-breadcrumb .current {
+                color: var(--shop-primary-teal);
+                font-weight: 500;
+            }
 
-        /* Main Container */
         .lens-details-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -66,14 +63,12 @@
             background: var(--shop-white);
         }
 
-        /* Two Column Layout */
         .lens-details-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 48px;
         }
 
-        /* Left Column - Images */
         .lens-gallery {
             position: relative;
         }
@@ -89,12 +84,12 @@
             justify-content: center;
         }
 
-        .main-image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: opacity 0.3s ease;
-        }
+            .main-image-container img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: opacity 0.3s ease;
+            }
 
         .main-image-placeholder {
             display: flex;
@@ -104,11 +99,11 @@
             height: 100%;
         }
 
-        .main-image-placeholder i {
-            font-size: 120px;
-            color: var(--shop-primary-teal);
-            opacity: 0.3;
-        }
+            .main-image-placeholder i {
+                font-size: 120px;
+                color: var(--shop-primary-teal);
+                opacity: 0.3;
+            }
 
         .thumbnail-gallery {
             display: flex;
@@ -127,18 +122,16 @@
             transition: all 0.3s ease;
         }
 
-        .thumbnail-item:hover,
-        .thumbnail-item.active {
-            border-color: var(--shop-primary-teal);
-        }
+            .thumbnail-item:hover, .thumbnail-item.active {
+                border-color: var(--shop-primary-teal);
+            }
 
-        .thumbnail-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+            .thumbnail-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
 
-        /* Right Column - Product Info */
         .lens-info {
             padding-top: 16px;
         }
@@ -167,11 +160,10 @@
             gap: 8px;
         }
 
-        .lens-price .currency {
-            font-size: 24px;
-        }
+            .lens-price .currency {
+                font-size: 24px;
+            }
 
-        /* Stock Status Badge */
         .stock-badge {
             display: inline-flex;
             align-items: center;
@@ -183,22 +175,21 @@
             margin-bottom: 24px;
         }
 
-        .stock-badge.in-stock {
-            background: #28A745;
-            color: white;
-        }
+            .stock-badge.in-stock {
+                background: #28A745;
+                color: white;
+            }
 
-        .stock-badge.low-stock {
-            background: #FFA500;
-            color: white;
-        }
+            .stock-badge.low-stock {
+                background: #FFA500;
+                color: white;
+            }
 
-        .stock-badge.out-of-stock {
-            background: #DC3545;
-            color: white;
-        }
+            .stock-badge.out-of-stock {
+                background: #DC3545;
+                color: white;
+            }
 
-        /* Prescription Badge */
         .prescription-info {
             display: inline-flex;
             align-items: center;
@@ -211,17 +202,16 @@
             margin-left: 8px;
         }
 
-        .prescription-info.required {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
+            .prescription-info.required {
+                background: #d1ecf1;
+                color: #0c5460;
+            }
 
-        .prescription-info.not-required {
-            background: #f0f0f5;
-            color: #6c757d;
-        }
+            .prescription-info.not-required {
+                background: #f0f0f5;
+                color: #6c757d;
+            }
 
-        /* Description Box */
         .lens-description-box {
             margin: 24px 0;
             padding: 24px;
@@ -229,14 +219,13 @@
             border-radius: 12px;
         }
 
-        .lens-description-box p {
-            font-size: 16px;
-            line-height: 1.6;
-            color: #333333;
-            margin: 0;
-        }
+            .lens-description-box p {
+                font-size: 16px;
+                line-height: 1.6;
+                color: #333333;
+                margin: 0;
+            }
 
-        /* Specifications Section */
         .specs-section {
             margin: 24px 0;
         }
@@ -258,9 +247,9 @@
             border-bottom: 1px solid #E0E0E0;
         }
 
-        .specs-row:last-child {
-            border-bottom: none;
-        }
+            .specs-row:last-child {
+                border-bottom: none;
+            }
 
         .specs-label {
             width: 140px;
@@ -274,7 +263,6 @@
             flex: 1;
         }
 
-        /* Quantity Selector */
         .quantity-section {
             margin-top: 32px;
         }
@@ -308,15 +296,15 @@
             justify-content: center;
         }
 
-        .quantity-btn:hover:not(:disabled) {
-            border-color: var(--shop-primary-teal);
-            background: var(--shop-warm-peach-light);
-        }
+            .quantity-btn:hover:not(:disabled) {
+                border-color: var(--shop-primary-teal);
+                background: var(--shop-warm-peach-light);
+            }
 
-        .quantity-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+            .quantity-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
 
         .quantity-input {
             width: 80px;
@@ -328,12 +316,11 @@
             font-weight: 600;
         }
 
-        .quantity-input:focus {
-            outline: none;
-            border-color: var(--shop-primary-teal);
-        }
+            .quantity-input:focus {
+                outline: none;
+                border-color: var(--shop-primary-teal);
+            }
 
-        /* Add to Cart Button */
         .btn-add-to-cart {
             margin-top: 24px;
             width: 100%;
@@ -352,23 +339,22 @@
             gap: 10px;
         }
 
-        .btn-add-to-cart:hover:not(:disabled) {
-            background: #0052A3;
-            transform: translateY(-2px);
-        }
+            .btn-add-to-cart:hover:not(:disabled) {
+                background: #0052A3;
+                transform: translateY(-2px);
+            }
 
-        .btn-add-to-cart:active:not(:disabled) {
-            transform: translateY(0);
-            background: #003d7a;
-        }
+            .btn-add-to-cart:active:not(:disabled) {
+                transform: translateY(0);
+                background: #003d7a;
+            }
 
-        .btn-add-to-cart:disabled {
-            background: #CCCCCC;
-            cursor: not-allowed;
-            transform: none;
-        }
+            .btn-add-to-cart:disabled {
+                background: #CCCCCC;
+                cursor: not-allowed;
+                transform: none;
+            }
 
-        /* Add to Wishlist Button */
         .btn-add-wishlist {
             margin-top: 12px;
             width: 100%;
@@ -387,11 +373,15 @@
             gap: 10px;
         }
 
-        .btn-add-wishlist:hover {
-            background: #F5E6D3;
-        }
+            .btn-add-wishlist:hover:not(:disabled) {
+                background: #F5E6D3;
+            }
 
-        /* Error Message */
+            .btn-add-wishlist:disabled {
+                opacity: 0.7;
+                cursor: not-allowed;
+            }
+
         .error-alert {
             background: #FFF5F5;
             border: 1px solid #DC3545;
@@ -404,7 +394,6 @@
             gap: 8px;
         }
 
-        /* Success Message */
         .success-alert {
             background: #F0FFF4;
             border: 1px solid #28A745;
@@ -417,7 +406,6 @@
             gap: 8px;
         }
 
-        /* Tabs Section */
         .details-tabs-section {
             margin-top: 48px;
             max-width: 1200px;
@@ -444,23 +432,23 @@
             transition: all 0.3s ease;
         }
 
-        .tab-button:hover {
-            background: var(--shop-warm-peach-light);
-        }
+            .tab-button:hover {
+                background: var(--shop-warm-peach-light);
+            }
 
-        .tab-button.active {
-            font-weight: 600;
-        }
+            .tab-button.active {
+                font-weight: 600;
+            }
 
-        .tab-button.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--shop-primary-teal);
-        }
+                .tab-button.active::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 3px;
+                    background: var(--shop-primary-teal);
+                }
 
         .tab-content {
             display: none;
@@ -470,22 +458,22 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
-        .tab-content.active {
-            display: block;
-        }
+            .tab-content.active {
+                display: block;
+            }
 
-        .tab-content h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--shop-primary-teal);
-            margin: 0 0 16px;
-        }
+            .tab-content h3 {
+                font-size: 18px;
+                font-weight: 600;
+                color: var(--shop-primary-teal);
+                margin: 0 0 16px;
+            }
 
-        .tab-content p {
-            color: #666666;
-            line-height: 1.8;
-            margin: 0;
-        }
+            .tab-content p {
+                color: #666666;
+                line-height: 1.8;
+                margin: 0;
+            }
 
         .care-list {
             list-style: none;
@@ -493,27 +481,26 @@
             margin: 0;
         }
 
-        .care-list li {
-            padding: 12px 0;
-            padding-left: 32px;
-            position: relative;
-            color: #666666;
-            border-bottom: 1px solid #E0E0E0;
-        }
+            .care-list li {
+                padding: 12px 0;
+                padding-left: 32px;
+                position: relative;
+                color: #666666;
+                border-bottom: 1px solid #E0E0E0;
+            }
 
-        .care-list li:last-child {
-            border-bottom: none;
-        }
+                .care-list li:last-child {
+                    border-bottom: none;
+                }
 
-        .care-list li::before {
-            content: '\F26A';
-            font-family: 'bootstrap-icons';
-            position: absolute;
-            left: 0;
-            color: var(--shop-primary-teal);
-        }
+                .care-list li::before {
+                    content: '\F26A';
+                    font-family: 'bootstrap-icons';
+                    position: absolute;
+                    left: 0;
+                    color: var(--shop-primary-teal);
+                }
 
-        /* Related Products Section */
         .related-products-section {
             margin-top: 64px;
             max-width: 1200px;
@@ -544,10 +531,10 @@
             transition: all 0.3s ease;
         }
 
-        .related-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-        }
+            .related-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            }
 
         .related-card-image {
             aspect-ratio: 1;
@@ -555,12 +542,12 @@
             overflow: hidden;
         }
 
-        .related-card-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
+            .related-card-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s ease;
+            }
 
         .related-card:hover .related-card-image img {
             transform: scale(1.05);
@@ -574,11 +561,11 @@
             justify-content: center;
         }
 
-        .related-card-image-placeholder i {
-            font-size: 40px;
-            color: var(--shop-text-muted);
-            opacity: 0.5;
-        }
+            .related-card-image-placeholder i {
+                font-size: 40px;
+                color: var(--shop-text-muted);
+                opacity: 0.5;
+            }
 
         .related-card-info {
             padding: 16px;
@@ -607,7 +594,6 @@
             display: block;
         }
 
-        /* Mobile Sticky Bar */
         .mobile-sticky-bar {
             display: none;
             position: fixed;
@@ -646,7 +632,6 @@
             cursor: pointer;
         }
 
-        /* Responsive Design */
         @@media (max-width: 991px) {
             .lens-details-grid {
                 grid-template-columns: 1fr;
@@ -675,9 +660,9 @@
                 font-size: 28px;
             }
 
-            .lens-price .currency {
-                font-size: 18px;
-            }
+                .lens-price .currency {
+                    font-size: 18px;
+                }
 
             .related-grid {
                 grid-template-columns: 1fr;
@@ -714,7 +699,6 @@
 @if (Model.Lens != null)
 {
     <div class="lens-details-container">
-        <!-- Success/Error Messages -->
         @if (TempData["SuccessMessage"] != null)
         {
             <div class="success-alert">
@@ -740,7 +724,7 @@
         }
 
         <div class="lens-details-grid">
-            <!-- Left Column - Product Images -->
+            <!-- Left Column - Images -->
             <div class="lens-gallery">
                 <div class="main-image-container">
                     @if (!string.IsNullOrEmpty(Model.Lens.PrimaryImageUrl))
@@ -779,6 +763,7 @@
                     <span class="currency">@Model.Lens.Currency</span>
                     <span>@Model.Lens.Price.ToString("N0")</span>
                 </div>
+
                 @if (Model.Lens.IsPrescription && Model.Lens.PrescriptionFee > 0)
                 {
                     <p class="lens-price-with-rx" style="font-size: 16px; color: #666; margin: -8px 0 24px 0;">
@@ -839,7 +824,7 @@
                         </div>
                         <div class="specs-row">
                             <span class="specs-label">Lens Index:</span>
-                            <span class="specs-value">@(Model.Lens.LensIndex.HasValue ? Model.Lens.LensIndex.Value.ToString("F2") : "—")</span>
+                            <span class="specs-value">@(Model.Lens.LensIndex.HasValue? Model.Lens.LensIndex.Value.ToString("F2") : "—")</span>
                         </div>
                         <div class="specs-row">
                             <span class="specs-label">Prescription:</span>
@@ -853,7 +838,6 @@
                     <input type="hidden" asp-for="AddToCartInput.ProductId" />
                     <input type="hidden" asp-for="AddToCartInput.PrescriptionId" id="selectedPrescriptionId" />
 
-                    <!-- Quantity Selector -->
                     <div class="quantity-section">
                         <label class="quantity-label">Quantity</label>
                         <div class="quantity-input-wrapper">
@@ -870,7 +854,6 @@
                         </div>
                     </div>
 
-                    <!-- Add to Cart Button: opens prescription modal for prescription lenses, else submit -->
                     <button type="button" class="btn-add-to-cart" id="btnAddToCart" @(Model.Lens.IsInStock ? "" : "disabled")>
                         @if (Model.Lens.IsInStock)
                         {
@@ -887,7 +870,6 @@
 
                 @if (Model.Lens.IsPrescription)
                 {
-                    <!-- Prescription selection modal -->
                     <div class="modal fade" id="addToCartPrescriptionModal" tabindex="-1" aria-labelledby="prescriptionModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
@@ -917,11 +899,18 @@
                     </div>
                 }
 
-                <!-- Add to Wishlist Button (placeholder for future) -->
-                <button type="button" class="btn-add-wishlist" id="wishlistBtn">
-                    <i class="bi bi-heart"></i>
-                    <span>Add to Wishlist</span>
-                </button>
+                @* ── Add to Wishlist: CHỈ hiện khi hết hàng ── *@
+                @if (!Model.Lens.IsInStock)
+                {
+                    <button type="button"
+                            class="btn-add-wishlist"
+                            id="wishlistBtn"
+                            data-product-id="@Model.Lens.ProductId"
+                            data-in-wishlist="false">
+                        <i class="bi bi-heart"></i>
+                        <span>Save to Wishlist — Notify me when back</span>
+                    </button>
+                }
             </div>
         </div>
     </div>
@@ -943,7 +932,7 @@
                 }
                 else
                 {
-                    <text>Discover exceptional clarity and comfort with this premium eyewear lens. Crafted with precision optical technology and attention to detail, this lens offers both visual excellence and durability for everyday wear.</text>
+                    <text>Discover exceptional clarity and comfort with this premium eyewear lens.</text>
                 }
             </p>
         </div>
@@ -961,7 +950,7 @@
                 </div>
                 <div class="specs-row">
                     <span class="specs-label">Lens Index:</span>
-                    <span class="specs-value">@(Model.Lens.LensIndex.HasValue ? Model.Lens.LensIndex.Value.ToString("F2") : "—")</span>
+                    <span class="specs-value">@(Model.Lens.LensIndex.HasValue? Model.Lens.LensIndex.Value.ToString("F2") : "—")</span>
                 </div>
                 <div class="specs-row">
                     <span class="specs-label">Prescription:</span>
@@ -1015,9 +1004,7 @@
                             </div>
                             <div class="related-card-info">
                                 <h4 class="related-card-name">@related.Name</h4>
-                                <p class="related-card-price">
-                                    @related.Currency @related.Price.ToString("N0")
-                                </p>
+                                <p class="related-card-price">@related.Currency @related.Price.ToString("N0")</p>
                             </div>
                         </div>
                     </a>
@@ -1029,9 +1016,7 @@
     <!-- Mobile Sticky Bar -->
     <div class="mobile-sticky-bar" id="mobileStickyBar">
         <div class="mobile-sticky-content">
-            <div class="mobile-price">
-                @Model.Lens.Currency @Model.Lens.Price.ToString("N0")
-            </div>
+            <div class="mobile-price">@Model.Lens.Currency @Model.Lens.Price.ToString("N0")</div>
             <button type="button" class="mobile-add-btn" onclick="submitAddToCart()" @(Model.Lens.IsInStock ? "" : "disabled")>
                 @if (Model.Lens.IsInStock)
                 {
@@ -1049,9 +1034,7 @@ else
 {
     <div class="lens-details-container">
         <div class="empty-state" style="margin-top: 48px;">
-            <div class="empty-state-icon">
-                <i class="bi bi-exclamation-circle"></i>
-            </div>
+            <div class="empty-state-icon"><i class="bi bi-exclamation-circle"></i></div>
             <h2>Product Not Found</h2>
             <p>The lens you're looking for doesn't exist or has been removed.</p>
             <a asp-page="/Products/Index" class="btn-clear-filters">
@@ -1063,116 +1046,76 @@ else
 
 @section Scripts {
     <script>
-        // Image Gallery - Change main image on thumbnail click
+        // ── Image Gallery ────────────────────────────────────────────────────────
         function changeMainImage(imageUrl, thumbnailElement) {
             const mainImage = document.getElementById('mainProductImage');
             if (mainImage) {
-                // Fade out effect
                 mainImage.style.opacity = '0';
-                setTimeout(() => {
-                    mainImage.src = imageUrl;
-                    mainImage.style.opacity = '1';
-                }, 150);
+                setTimeout(() => { mainImage.src = imageUrl; mainImage.style.opacity = '1'; }, 150);
             }
-
-            // Update active thumbnail
-            document.querySelectorAll('.thumbnail-item').forEach(thumb => {
-                thumb.classList.remove('active');
-            });
+            document.querySelectorAll('.thumbnail-item').forEach(t => t.classList.remove('active'));
             thumbnailElement.classList.add('active');
         }
 
-        // Quantity Selector - Decrease
+        // ── Quantity Selector ────────────────────────────────────────────────────
         function decreaseQuantity() {
             const input = document.getElementById('quantityInput');
-            const currentValue = parseInt(input.value) || 1;
-            if (currentValue > 1) {
-                input.value = currentValue - 1;
-                updateQuantityButtons();
-            }
+            const v = parseInt(input.value) || 1;
+            if (v > 1) { input.value = v - 1; updateQuantityButtons(); }
         }
 
-        // Quantity Selector - Increase
         function increaseQuantity() {
             const input = document.getElementById('quantityInput');
-            const maxValue = parseInt(input.max) || 10;
-            const currentValue = parseInt(input.value) || 1;
-            if (currentValue < maxValue) {
-                input.value = currentValue + 1;
-                updateQuantityButtons();
-            }
+            const max = parseInt(input.max) || 10;
+            const v = parseInt(input.value) || 1;
+            if (v < max) { input.value = v + 1; updateQuantityButtons(); }
         }
 
-        // Update quantity buttons state
         function updateQuantityButtons() {
             const input = document.getElementById('quantityInput');
-            const decreaseBtn = document.getElementById('decreaseQty');
-            const increaseBtn = document.getElementById('increaseQty');
-            const currentValue = parseInt(input.value) || 1;
-            const maxValue = parseInt(input.max) || 10;
-
-            if (decreaseBtn) {
-                decreaseBtn.disabled = currentValue <= 1;
-            }
-            if (increaseBtn) {
-                increaseBtn.disabled = currentValue >= maxValue;
-            }
+            const v = parseInt(input.value) || 1;
+            const max = parseInt(input.max) || 10;
+            const dec = document.getElementById('decreaseQty');
+            const inc = document.getElementById('increaseQty');
+            if (dec) dec.disabled = v <= 1;
+            if (inc) inc.disabled = v >= max;
         }
 
-        // Validate quantity input
         document.getElementById('quantityInput')?.addEventListener('change', function () {
-            const maxValue = parseInt(this.max) || 10;
-            let value = parseInt(this.value) || 1;
-
-            if (value < 1) value = 1;
-            if (value > maxValue) value = maxValue;
-
-            this.value = value;
+            const max = parseInt(this.max) || 10;
+            let v = parseInt(this.value) || 1;
+            if (v < 1) v = 1;
+            if (v > max) v = max;
+            this.value = v;
             updateQuantityButtons();
         });
 
-        // Tab Navigation
+        // ── Tab Navigation ───────────────────────────────────────────────────────
         function showTab(tabName) {
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-
-            // Remove active class from all buttons
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.classList.remove('active');
-            });
-
-            // Show selected tab content
-            const tabContent = document.getElementById('tab-' + tabName);
-            if (tabContent) {
-                tabContent.classList.add('active');
-            }
-
-            // Add active class to clicked button
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tabName)?.classList.add('active');
             event.target.classList.add('active');
         }
 
-        // Mobile Sticky Bar - Show/Hide on scroll
-        let lastScrollTop = 0;
+        // ── Mobile Sticky Bar ────────────────────────────────────────────────────
         const stickyBar = document.getElementById('mobileStickyBar');
-
         window.addEventListener('scroll', function () {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            const formPosition = document.getElementById('addToCartForm')?.getBoundingClientRect().bottom || 0;
-
+            const formBottom = document.getElementById('addToCartForm')?.getBoundingClientRect().bottom || 0;
             if (window.innerWidth <= 991) {
-                if (formPosition < 0) {
-                    stickyBar.style.display = 'block';
-                } else {
-                    stickyBar.style.display = 'none';
-                }
+                stickyBar.style.display = formBottom < 0 ? 'block' : 'none';
             }
-
-            lastScrollTop = scrollTop;
         });
 
-        // Add to Cart: open prescription modal or submit form
+        function submitAddToCart() {
+            if (prescriptionModal) {
+                new bootstrap.Modal(prescriptionModal).show();
+            } else {
+                document.getElementById('addToCartForm').submit();
+            }
+        }
+
+        // ── Prescription Modal ───────────────────────────────────────────────────
         const prescriptionModal = document.getElementById('addToCartPrescriptionModal');
         const addToCartForm = document.getElementById('addToCartForm');
         const btnAddToCart = document.getElementById('btnAddToCart');
@@ -1180,8 +1123,7 @@ else
         if (btnAddToCart) {
             btnAddToCart.addEventListener('click', function () {
                 if (prescriptionModal) {
-                    const modal = new bootstrap.Modal(prescriptionModal);
-                    modal.show();
+                    new bootstrap.Modal(prescriptionModal).show();
                 } else {
                     addToCartForm.submit();
                 }
@@ -1198,35 +1140,121 @@ else
             });
         }
 
-        // Submit Add to Cart from mobile sticky bar (same logic: modal or submit)
-        function submitAddToCart() {
-            if (prescriptionModal) {
-                const modal = new bootstrap.Modal(prescriptionModal);
-                modal.show();
-            } else {
-                addToCartForm.submit();
-            }
-        }
-
-        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function () {
             updateQuantityButtons();
         });
 
-        // Wishlist button placeholder
-        document.getElementById('wishlistBtn')?.addEventListener('click', function () {
+        // ── Wishlist Logic ───────────────────────────────────────────────────────
+        (async function initWishlist() {
+            const btn = document.getElementById('wishlistBtn');
+            if (!btn) return; // sản phẩm còn hàng → không render nút → thoát
+
+            const productId = parseInt(btn.dataset.productId);
+
+            // Nếu đã đăng nhập, check xem đã wishlist chưa để highlight đúng trạng thái
             @if (User.Identity?.IsAuthenticated == true)
             {
-                <text>
-                alert('Wishlist feature coming soon!');
-                </text>
+                    <text>
+                    try {
+                        const res = await fetch('/api/wishlist/my');
+                        if (res.ok) {
+                            const items = await res.json();
+                            if (items.some(i => i.productId === productId)) {
+                                setWishlistActive(btn, true);
+                            }
+                        }
+                    } catch {}
+                    </text>
             }
-            else
-            {
-                <text>
-                window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
-                </text>
+
+            btn.addEventListener('click', async function () {
+                @if (User.Identity?.IsAuthenticated != true)
+                {
+                        <text>
+                        window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                        return;
+                        </text>
+                }
+
+                const isIn = btn.dataset.inWishlist === 'true';
+                btn.disabled = true;
+
+                try {
+                    if (isIn) {
+                        const res = await fetch('/api/wishlist/remove', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ productId })
+                        });
+                        if (res.ok) {
+                            setWishlistActive(btn, false);
+                            showWishlistToast('Removed from wishlist', '🤍');
+                        }
+                    } else {
+                        const res = await fetch('/api/wishlist/add', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ productId })
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                            setWishlistActive(btn, true);
+                            showWishlistToast("Saved! We'll email you when it's back ❤️", '♡');
+                        } else {
+                            showWishlistToast(data.message || 'Something went wrong', '⚠️');
+                        }
+                    }
+                } catch {
+                    showWishlistToast('Network error. Please try again.', '⚠️');
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+        })();
+
+        function setWishlistActive(btn, active) {
+            btn.dataset.inWishlist = active ? 'true' : 'false';
+            const icon = btn.querySelector('i');
+            const text = btn.querySelector('span');
+            if (active) {
+                icon.className = 'bi bi-heart-fill';
+                text.textContent = 'Saved to Wishlist ✓';
+                btn.style.background = '#fffbf5';
+                btn.style.borderColor = '#c9a96e';
+                btn.style.color = '#a07840';
+            } else {
+                icon.className = 'bi bi-heart';
+                text.textContent = 'Save to Wishlist — Notify me when back';
+                btn.style.background = '';
+                btn.style.borderColor = '';
+                btn.style.color = '';
             }
-        });
+        }
+
+        let _wlToastTimer;
+        function showWishlistToast(msg, icon = '♡') {
+            let toast = document.getElementById('wl-toast-detail');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'wl-toast-detail';
+                toast.style.cssText = [
+                    'position:fixed', 'bottom:28px', 'left:50%',
+                    'transform:translateX(-50%) translateY(100px)',
+                    'background:#0f0f0f', 'color:#fff', 'border-radius:12px',
+                    'padding:12px 22px', 'font-size:13px', 'font-weight:500',
+                    'display:flex', 'align-items:center', 'gap:8px',
+                    'box-shadow:0 8px 28px rgba(0,0,0,0.22)', 'z-index:9999',
+                    'white-space:nowrap',
+                    'transition:transform .35s cubic-bezier(0.34,1.56,0.64,1)'
+                ].join(';');
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = `<span style="font-size:16px">${icon}</span>${msg}`;
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+            clearTimeout(_wlToastTimer);
+            _wlToastTimer = setTimeout(() => {
+                toast.style.transform = 'translateX(-50%) translateY(100px)';
+            }, 3000);
+        }
     </script>
 }

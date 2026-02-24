@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using EyewearStore_SWP391.Services;
-using System.Threading.Tasks;
 
 namespace EyewearStore_SWP391.Controllers
 {
@@ -19,26 +18,26 @@ namespace EyewearStore_SWP391.Controllers
 
         // POST: api/wishlist/add
         [HttpPost("add")]
-        [Authorize] // require authenticated user
-        public async Task<IActionResult> Add([FromBody] AddWishlistDto dto)
+        [Authorize]
+        public async Task<IActionResult> Add([FromBody] WishlistProductDto dto)
         {
-            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(userIdStr, out int userId)) return Unauthorized();
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
 
-            var (success, message) = await _wishlistService.AddToWishlistAsync(userId, dto.ProductId);
-            if (!success) return BadRequest(new { message });
-            return Ok(new { message });
+            (bool success, string message) r = await _wishlistService.AddToWishlistAsync(userId.Value, dto.ProductId);
+            if (!r.success) return BadRequest(new { message = r.message });
+            return Ok(new { message = r.message });
         }
 
         // POST: api/wishlist/remove
         [HttpPost("remove")]
         [Authorize]
-        public async Task<IActionResult> Remove([FromBody] AddWishlistDto dto)
+        public async Task<IActionResult> Remove([FromBody] WishlistProductDto dto)
         {
-            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(userIdStr, out int userId)) return Unauthorized();
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
 
-            var ok = await _wishlistService.RemoveFromWishlistAsync(userId, dto.ProductId);
+            var ok = await _wishlistService.RemoveFromWishlistAsync(userId.Value, dto.ProductId);
             if (!ok) return NotFound(new { message = "Not found in wishlist" });
             return Ok(new { message = "Removed" });
         }
@@ -48,15 +47,47 @@ namespace EyewearStore_SWP391.Controllers
         [Authorize]
         public async Task<IActionResult> My()
         {
-            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(userIdStr, out int userId)) return Unauthorized();
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
 
-            var items = await _wishlistService.GetUserWishlistAsync(userId);
+            var items = await _wishlistService.GetUserWishlistAsync(userId.Value);
             return Ok(items);
+        }
+
+        // POST: api/wishlist/subscribe
+        [HttpPost("subscribe")]
+        [Authorize]
+        public async Task<IActionResult> Subscribe([FromBody] WishlistProductDto dto)
+        {
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
+            (bool success, string message) r = await _wishlistService.SetNotifyAsync(userId.Value, dto.ProductId, true);
+            if (!r.success) return BadRequest(new { message = r.message });
+            return Ok(new { message = "Subscribed! You'll receive an email when this item is back in stock." });
+        }
+
+        // POST: api/wishlist/unsubscribe
+        [HttpPost("unsubscribe")]
+        [Authorize]
+        public async Task<IActionResult> Unsubscribe([FromBody] WishlistProductDto dto)
+        {
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
+            (bool success, string message) r = await _wishlistService.SetNotifyAsync(userId.Value, dto.ProductId, false);
+            if (!r.success) return BadRequest(new { message = r.message });
+            return Ok(new { message = "Unsubscribed successfully." });
+        }
+
+        private int? GetUserId()
+        {
+            var str = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(str, out int id) ? id : null;
         }
     }
 
-    public class AddWishlistDto
+    public class WishlistProductDto
     {
         public int ProductId { get; set; }
     }

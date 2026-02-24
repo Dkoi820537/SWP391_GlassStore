@@ -3,156 +3,107 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using EyewearStore_SWP391.Models;
 using EyewearStore_SWP391.Models.ViewModels.Lens;
+using EyewearStore_SWP391.Services;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http;
 
-namespace EyewearStore_SWP391.Pages.Lenses;
-
-/// <summary>
-/// Page model for editing an existing lens product.
-/// Handles form display with pre-populated data, update with concurrency handling, and image upload.
-/// </summary>
-public class EditModel : PageModel
+namespace EyewearStore_SWP391.Pages.Lenses
 {
-    private readonly EyewearStoreContext _context;
-    private readonly IWebHostEnvironment _environment;
-
-    // Allowed file extensions
-    private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
-
-    // Maximum file size (5 MB)
-    private const long MaxFileSize = 5 * 1024 * 1024;
-
-    public EditModel(EyewearStoreContext context, IWebHostEnvironment environment)
+    public class EditModel : PageModel
     {
-        _context = context;
-        _environment = environment;
-    }
+        private readonly EyewearStoreContext _context;
+        private readonly IWebHostEnvironment _environment;
+        private readonly IWishlistService _wishlistService;
+        private readonly IConfiguration _configuration;
+        private readonly IServiceScopeFactory _scopeFactory;
 
-    /// <summary>
-    /// The input view model bound to the form
-    /// </summary>
-    [BindProperty]
-    public EditLensViewModel Input { get; set; } = new();
+        private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
+        private const long MaxFileSize = 5 * 1024 * 1024;
 
-    /// <summary>
-    /// List of existing images for this product
-    /// </summary>
-    public List<ProductImage> ExistingImages { get; set; } = new();
-
-    /// <summary>
-    /// Handles GET request - loads lens data for editing
-    /// </summary>
-    /// <param name="id">The ProductId of the lens to edit</param>
-    public async Task<IActionResult> OnGetAsync(int? id)
-    {
-        // Return NotFound if id is null
-        if (id == null)
+        public EditModel(
+            EyewearStoreContext context,
+            IWebHostEnvironment environment,
+            IWishlistService wishlistService,
+            IConfiguration configuration,
+            IServiceScopeFactory scopeFactory)
         {
-            return NotFound();
+            _context = context;
+            _environment = environment;
+            _wishlistService = wishlistService;
+            _configuration = configuration;
+            _scopeFactory = scopeFactory;
         }
 
-        // Query lens from database by ProductId
-        var lens = await _context.Lenses
-            .AsNoTracking()
-            .FirstOrDefaultAsync(l => l.ProductId == id);
+        [BindProperty]
+        public EditLensViewModel Input { get; set; } = new();
 
-        // Return NotFound if lens doesn't exist
-        if (lens == null)
+        public List<ProductImage> ExistingImages { get; set; } = new();
+
+        public async Task<IActionResult> OnGetAsync(int? id)
         {
-            return NotFound();
-        }
+            if (id == null) return NotFound();
 
-        // Get primary image URL
-        var primaryImage = await _context.ProductImages
-            .Where(pi => pi.ProductId == id && pi.IsPrimary && pi.IsActive)
-            .Select(pi => pi.ImageUrl)
-            .FirstOrDefaultAsync();
+            var lens = await _context.Lenses
+                .AsNoTracking()
+                .FirstOrDefaultAsync(l => l.ProductId == id);
 
-        // Get all existing images for this product
-        ExistingImages = await _context.ProductImages
-            .Where(pi => pi.ProductId == id && pi.IsActive)
-            .OrderByDescending(pi => pi.IsPrimary)
-            .ThenBy(pi => pi.SortOrder)
-            .ToListAsync();
+            if (lens == null) return NotFound();
 
-        // Map lens entity to EditLensViewModel Input
-        Input = new EditLensViewModel
-        {
-            ProductId = lens.ProductId,
-            Sku = lens.Sku,
-            Name = lens.Name,
-            Description = lens.Description,
-            Price = lens.Price,
-            Currency = lens.Currency,
-            InventoryQty = lens.InventoryQty,
-            Attributes = lens.Attributes,
-            IsActive = lens.IsActive,
-            // Lens-specific properties
-            LensType = lens.LensType,
-            LensIndex = lens.LensIndex,
-            IsPrescription = lens.IsPrescription,
-            // Existing image
-            ExistingImageUrl = primaryImage
-        };
+            var primaryImage = await _context.ProductImages
+                .Where(pi => pi.ProductId == id && pi.IsPrimary && pi.IsActive)
+                .Select(pi => pi.ImageUrl)
+                .FirstOrDefaultAsync();
 
-        return Page();
-    }
-
-    /// <summary>
-    /// Handles POST request - validates and updates the lens with optional new image
-    /// </summary>
-    public async Task<IActionResult> OnPostAsync()
-    {
-        // Validate image file if provided
-        if (Input.ImageFile != null)
-        {
-            // Validate file size
-            if (Input.ImageFile.Length > MaxFileSize)
-            {
-                ModelState.AddModelError("Input.ImageFile",
-                    $"Image file size exceeds maximum allowed size of {MaxFileSize / (1024 * 1024)} MB");
-            }
-
-            // Validate file extension
-            var extension = Path.GetExtension(Input.ImageFile.FileName).ToLowerInvariant();
-            if (!_allowedExtensions.Contains(extension))
-            {
-                ModelState.AddModelError("Input.ImageFile",
-                    $"Invalid file type. Allowed types: {string.Join(", ", _allowedExtensions)}");
-            }
-        }
-
-        // Check ModelState validity
-        if (!ModelState.IsValid)
-        {
-            // Reload existing images for display
             ExistingImages = await _context.ProductImages
-                .Where(pi => pi.ProductId == Input.ProductId && pi.IsActive)
+                .Where(pi => pi.ProductId == id && pi.IsActive)
                 .OrderByDescending(pi => pi.IsPrimary)
                 .ThenBy(pi => pi.SortOrder)
                 .ToListAsync();
+
+            Input = new EditLensViewModel
+            {
+                ProductId = lens.ProductId,
+                Sku = lens.Sku,
+                Name = lens.Name,
+                Description = lens.Description,
+                Price = lens.Price,
+                Currency = lens.Currency,
+                InventoryQty = lens.InventoryQty,
+                Attributes = lens.Attributes,
+                IsActive = lens.IsActive,
+                LensType = lens.LensType,
+                LensIndex = lens.LensIndex,
+                IsPrescription = lens.IsPrescription,
+                ExistingImageUrl = primaryImage
+            };
+
             return Page();
         }
 
-        // Find existing lens in database by Input.ProductId
-        var lens = await _context.Lenses
-            .FirstOrDefaultAsync(l => l.ProductId == Input.ProductId);
-
-        // Return NotFound if lens doesn't exist
-        if (lens == null)
+        public async Task<IActionResult> OnPostAsync()
         {
-            return NotFound();
-        }
-
-        // If SKU changed, check if new SKU already exists (excluding current lens)
-        if (lens.Sku != Input.Sku)
-        {
-            var skuExists = await _context.Products
-                .AnyAsync(p => p.Sku == Input.Sku && p.ProductId != Input.ProductId);
-
-            if (skuExists)
+            // Validate image
+            if (Input.ImageFile != null)
             {
-                ModelState.AddModelError("Input.Sku", "This SKU already exists. Please use a different SKU.");
-                // Reload existing images for display
+                if (Input.ImageFile.Length > MaxFileSize)
+                    ModelState.AddModelError("Input.ImageFile",
+                        $"Image file size exceeds maximum allowed size of {MaxFileSize / (1024 * 1024)} MB");
+
+                var extension = Path.GetExtension(Input.ImageFile.FileName).ToLowerInvariant();
+                if (!_allowedExtensions.Contains(extension))
+                    ModelState.AddModelError("Input.ImageFile",
+                        $"Invalid file type. Allowed types: {string.Join(", ", _allowedExtensions)}");
+            }
+
+            if (!ModelState.IsValid)
+            {
                 ExistingImages = await _context.ProductImages
                     .Where(pi => pi.ProductId == Input.ProductId && pi.IsActive)
                     .OrderByDescending(pi => pi.IsPrimary)
@@ -160,149 +111,168 @@ public class EditModel : PageModel
                     .ToListAsync();
                 return Page();
             }
-        }
 
-        // Update lens properties from Input
-        lens.Sku = Input.Sku;
-        lens.Name = Input.Name;
-        lens.Description = Input.Description;
-        lens.Price = Input.Price;
-        lens.Currency = Input.Currency;
-        lens.InventoryQty = Input.InventoryQty;
-        lens.Attributes = Input.Attributes;
-        lens.IsActive = Input.IsActive;
-        // Lens-specific properties
-        lens.LensType = Input.LensType;
-        lens.LensIndex = Input.LensIndex;
-        lens.IsPrescription = Input.IsPrescription;
-        // Set UpdatedAt to current UTC time
-        lens.UpdatedAt = DateTime.UtcNow;
+            var lens = await _context.Lenses
+                .FirstOrDefaultAsync(l => l.ProductId == Input.ProductId);
 
-        try
-        {
-            // Save changes
-            await _context.SaveChangesAsync();
+            if (lens == null) return NotFound();
 
-            // Handle image upload if provided
-            if (Input.ImageFile != null && Input.ImageFile.Length > 0)
+            // Check SKU uniqueness
+            if (lens.Sku != Input.Sku)
             {
-                await SaveProductImageAsync(lens.ProductId, Input.ImageFile, Input.ImageAltText);
+                var skuExists = await _context.Products
+                    .AnyAsync(p => p.Sku == Input.Sku && p.ProductId != Input.ProductId);
+
+                if (skuExists)
+                {
+                    ModelState.AddModelError("Input.Sku", "This SKU already exists.");
+                    ExistingImages = await _context.ProductImages
+                        .Where(pi => pi.ProductId == Input.ProductId && pi.IsActive)
+                        .OrderByDescending(pi => pi.IsPrimary)
+                        .ThenBy(pi => pi.SortOrder)
+                        .ToListAsync();
+                    return Page();
+                }
             }
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            // Handle concurrency exception - check if lens still exists
-            if (!LensExists(Input.ProductId))
+
+            // ── SNAPSHOT trước khi update ────────────────────────────────────────
+            var previousQty = lens.InventoryQty ?? 0;
+            var wasOutOfStock = previousQty <= 0;
+            var newQty = Input.InventoryQty ?? 0;
+            var isNowInStock = newQty > 0;
+
+            Console.WriteLine($"======================================");
+            Console.WriteLine($"[RESTOCK DEBUG] LensId={lens.ProductId}");
+            Console.WriteLine($"[RESTOCK DEBUG] previousQty={previousQty}, wasOutOfStock={wasOutOfStock}");
+            Console.WriteLine($"[RESTOCK DEBUG] newQty={newQty}, isNowInStock={isNowInStock}");
+            Console.WriteLine($"[RESTOCK DEBUG] Will notify: {wasOutOfStock && isNowInStock}");
+            Console.WriteLine($"======================================");
+
+            // Update properties
+            lens.Sku = Input.Sku;
+            lens.Name = Input.Name;
+            lens.Description = Input.Description;
+            lens.Price = Input.Price;
+            lens.Currency = Input.Currency;
+            lens.InventoryQty = Input.InventoryQty;
+            lens.Attributes = Input.Attributes;
+            lens.IsActive = Input.IsActive;
+            lens.LensType = Input.LensType;
+            lens.LensIndex = Input.LensIndex;
+            lens.IsPrescription = Input.IsPrescription;
+            lens.UpdatedAt = DateTime.UtcNow;
+
+            try
             {
-                return NotFound();
+                await _context.SaveChangesAsync();
+
+                if (Input.ImageFile != null && Input.ImageFile.Length > 0)
+                    await SaveProductImageAsync(lens.ProductId, Input.ImageFile, Input.ImageAltText);
             }
-            else
+            catch (DbUpdateConcurrencyException)
             {
-                throw;
+                if (!LensExists(Input.ProductId)) return NotFound();
+                else throw;
             }
+
+            // ── Trigger restock notification ─────────────────────────────────────
+            if (wasOutOfStock && isNowInStock)
+            {
+                var baseUrl = _configuration["BaseUrl"] ?? "https://localhost:7234";
+                var productUrl = $"{baseUrl}/Products/LensDetails/{lens.ProductId}";
+
+                Console.WriteLine($"[RESTOCK EMAIL] Triggering notify for LensId={lens.ProductId}");
+                Console.WriteLine($"[RESTOCK EMAIL] productUrl={productUrl}");
+
+                // Fire-and-forget but create a new DI scope inside the background task
+                _ = Task.Run(async () =>
+                {
+                    using var scope = _scopeFactory.CreateScope();
+                    try
+                    {
+                        var wishlistService = scope.ServiceProvider.GetRequiredService<IWishlistService>();
+                        Console.WriteLine($"[RESTOCK EMAIL] Calling NotifyRestockAsync (background scope)...");
+                        await wishlistService.NotifyRestockAsync(lens.ProductId, productUrl);
+                        Console.WriteLine($"[RESTOCK EMAIL] SUCCESS — emails processed for LensId={lens.ProductId}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[RESTOCK EMAIL ERROR] {ex.GetType().Name}: {ex.Message}");
+                        if (ex.InnerException != null)
+                            Console.WriteLine($"[RESTOCK EMAIL INNER] {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
+                        Console.WriteLine($"[RESTOCK EMAIL STACK] {ex.StackTrace}");
+                    }
+                });
+            }
+
+            return RedirectToPage("./Index");
         }
 
-        // Redirect to Index page on success
-        return RedirectToPage("./Index");
-    }
-
-    /// <summary>
-    /// Handles GET request to delete a specific image
-    /// </summary>
-    public async Task<IActionResult> OnGetDeleteImageAsync(int imageId, int productId)
-    {
-        var image = await _context.ProductImages.FindAsync(imageId);
-        if (image != null && image.ProductId == productId)
+        public async Task<IActionResult> OnGetDeleteImageAsync(int imageId, int productId)
         {
-            // Soft delete the image
-            image.IsActive = false;
+            var image = await _context.ProductImages.FindAsync(imageId);
+            if (image != null && image.ProductId == productId)
+            {
+                image.IsActive = false;
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToPage(new { id = productId });
+        }
+
+        public async Task<IActionResult> OnGetSetPrimaryImageAsync(int imageId, int productId)
+        {
+            var existingPrimary = await _context.ProductImages
+                .Where(pi => pi.ProductId == productId && pi.IsPrimary)
+                .ToListAsync();
+
+            foreach (var img in existingPrimary)
+                img.IsPrimary = false;
+
+            var image = await _context.ProductImages.FindAsync(imageId);
+            if (image != null && image.ProductId == productId)
+            {
+                image.IsPrimary = true;
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToPage(new { id = productId });
+        }
+
+        private async Task SaveProductImageAsync(int productId, IFormFile file, string? altText)
+        {
+            var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "products", productId.ToString());
+            if (!Directory.Exists(uploadFolder))
+                Directory.CreateDirectory(uploadFolder);
+
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+            var uniqueId = Guid.NewGuid().ToString("N")[..8];
+            var fileName = $"{timestamp}_{uniqueId}{extension}";
+            var filePath = Path.Combine(uploadFolder, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+                await file.CopyToAsync(stream);
+
+            var imageUrl = $"/uploads/products/{productId}/{fileName}";
+
+            var hasPrimaryImage = await _context.ProductImages
+                .AnyAsync(pi => pi.ProductId == productId && pi.IsPrimary && pi.IsActive);
+
+            var productImage = new ProductImage
+            {
+                ProductId = productId,
+                ImageUrl = imageUrl,
+                AltText = altText ?? Input.Name,
+                IsPrimary = !hasPrimaryImage,
+                SortOrder = 0,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _context.ProductImages.AddAsync(productImage);
             await _context.SaveChangesAsync();
         }
 
-        return RedirectToPage(new { id = productId });
-    }
-
-    /// <summary>
-    /// Handles GET request to set an image as primary
-    /// </summary>
-    public async Task<IActionResult> OnGetSetPrimaryImageAsync(int imageId, int productId)
-    {
-        // Unset all primary images for this product
-        var existingPrimary = await _context.ProductImages
-            .Where(pi => pi.ProductId == productId && pi.IsPrimary)
-            .ToListAsync();
-
-        foreach (var img in existingPrimary)
-        {
-            img.IsPrimary = false;
-        }
-
-        // Set the new primary
-        var image = await _context.ProductImages.FindAsync(imageId);
-        if (image != null && image.ProductId == productId)
-        {
-            image.IsPrimary = true;
-            await _context.SaveChangesAsync();
-        }
-
-        return RedirectToPage(new { id = productId });
-    }
-
-    /// <summary>
-    /// Saves the uploaded image to disk and creates a ProductImage record
-    /// </summary>
-    private async Task SaveProductImageAsync(int productId, IFormFile file, string? altText)
-    {
-        // Create upload directory if it doesn't exist
-        var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "products", productId.ToString());
-        if (!Directory.Exists(uploadFolder))
-        {
-            Directory.CreateDirectory(uploadFolder);
-        }
-
-        // Generate unique filename
-        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-        var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-        var uniqueId = Guid.NewGuid().ToString("N")[..8];
-        var fileName = $"{timestamp}_{uniqueId}{extension}";
-        var filePath = Path.Combine(uploadFolder, fileName);
-
-        // Save file to disk
-        using (var stream = new FileStream(filePath, FileMode.Create))
-        {
-            await file.CopyToAsync(stream);
-        }
-
-        // Create image URL (relative path)
-        var imageUrl = $"/uploads/products/{productId}/{fileName}";
-
-        // Check if there are any existing primary images
-        var hasPrimaryImage = await _context.ProductImages
-            .AnyAsync(pi => pi.ProductId == productId && pi.IsPrimary && pi.IsActive);
-
-        // Create ProductImage record in database
-        var productImage = new ProductImage
-        {
-            ProductId = productId,
-            ImageUrl = imageUrl,
-            AltText = altText ?? Input.Name, // Use product name as default alt text
-            IsPrimary = !hasPrimaryImage, // Only set as primary if no existing primary
-            SortOrder = 0,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        await _context.ProductImages.AddAsync(productImage);
-        await _context.SaveChangesAsync();
-    }
-
-    /// <summary>
-    /// Helper method to check if a lens exists
-    /// </summary>
-    /// <param name="id">The ProductId to check</param>
-    /// <returns>True if the lens exists, false otherwise</returns>
-    private bool LensExists(int id)
-    {
-        return _context.Lenses.Any(l => l.ProductId == id);
+        private bool LensExists(int id) => _context.Lenses.Any(l => l.ProductId == id);
     }
 }

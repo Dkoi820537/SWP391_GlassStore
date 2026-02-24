@@ -6,10 +6,10 @@
 }
 
 @section Styles {
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --ink: #0f0f0f;
+            --ink: #0d0c0a;
             --parchment: #faf8f5;
             --cream: #f5f0e8;
             --gold: #c9a96e;
@@ -18,145 +18,141 @@
             --dust: #e8e0d0;
             --muted: #7a7060;
             --danger: #c0392b;
+            --teal: #2a7d6f;
+            --teal-light: #e0f5f2;
         }
 
         body {
             background: var(--parchment);
         }
 
-        /* ─── Hero ─── */
-        .wishlist-hero {
-            background: linear-gradient(135deg, #0f0f0f 0%, #1a1610 50%, #2a2015 100%);
-            padding: 64px 0 48px;
+        /* ── Hero ── */
+        .wl-hero {
+            background: linear-gradient(135deg, #0d0c0a 0%, #1c1810 60%, #251e14 100%);
+            padding: 72px 0 52px;
             position: relative;
             overflow: hidden;
         }
 
-            .wishlist-hero::before {
+            .wl-hero::before {
                 content: '';
                 position: absolute;
                 inset: 0;
-                background: radial-gradient(ellipse 80% 60% at 60% 50%, rgba(201,169,110,0.12) 0%, transparent 70%);
+                background: radial-gradient(ellipse 70% 80% at 70% 50%, rgba(201,169,110,0.10) 0%, transparent 65%);
             }
 
-            .wishlist-hero::after {
+            .wl-hero::after {
                 content: '♡';
                 position: absolute;
-                right: 8%;
+                right: 6%;
                 top: 50%;
                 transform: translateY(-50%);
-                font-size: 180px;
+                font-size: 220px;
                 line-height: 1;
-                color: rgba(201,169,110,0.06);
-                font-family: 'Playfair Display', serif;
+                color: rgba(201,169,110,0.05);
                 pointer-events: none;
             }
 
-            .wishlist-hero .container {
+            .wl-hero .container {
                 position: relative;
                 z-index: 1;
             }
 
         .hero-eyebrow {
             font-family: 'DM Sans', sans-serif;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             color: var(--gold);
             text-transform: uppercase;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
         .hero-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 700;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.4rem, 5vw, 4rem);
+            font-weight: 600;
             color: #fff;
-            margin: 0 0 12px;
+            margin: 0 0 10px;
             line-height: 1.1;
         }
 
-            .hero-title span {
+            .hero-title em {
                 color: var(--gold);
                 font-style: italic;
             }
 
-        .hero-subtitle {
+        .hero-sub {
             font-family: 'DM Sans', sans-serif;
-            color: rgba(255,255,255,0.5);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 300;
+            color: rgba(255,255,255,0.45);
+            max-width: 420px;
+            line-height: 1.6;
         }
 
-        .hero-count-badge {
+        .hero-pill {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(201,169,110,0.15);
-            border: 1px solid rgba(201,169,110,0.3);
+            background: rgba(201,169,110,0.13);
+            border: 1px solid rgba(201,169,110,0.28);
             border-radius: 100px;
-            padding: 6px 16px;
+            padding: 7px 18px;
             font-family: 'DM Sans', sans-serif;
-            font-size: 13px;
-            color: var(--gold);
-            margin-top: 16px;
+            font-size: 12px;
+            color: var(--gold-light);
+            margin-top: 20px;
         }
 
-        /* ─── Layout ─── */
-        .wishlist-wrapper {
-            max-width: 1100px;
+        /* ── Wrapper ── */
+        .wl-wrapper {
+            max-width: 1120px;
             margin: 0 auto;
-            padding: 48px 24px 80px;
+            padding: 52px 24px 96px;
         }
 
-        /* ─── Empty ─── */
-        .wishlist-empty {
+        /* ── Empty ── */
+        .wl-empty {
             text-align: center;
-            padding: 80px 24px;
+            padding: 96px 24px;
             background: white;
-            border-radius: 20px;
+            border-radius: 24px;
             border: 1px solid var(--dust);
         }
 
         .empty-icon {
-            width: 90px;
-            height: 90px;
-            margin: 0 auto 24px;
-            background: var(--cream);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
+            font-size: 64px;
+            margin-bottom: 20px;
         }
 
         .empty-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 24px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
             font-weight: 600;
             color: var(--ink);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .empty-desc {
             font-family: 'DM Sans', sans-serif;
-            color: var(--muted);
             font-size: 14px;
-            max-width: 360px;
-            margin: 0 auto 28px;
-            line-height: 1.6;
+            color: var(--muted);
+            max-width: 380px;
+            margin: 0 auto 32px;
+            line-height: 1.7;
         }
 
-        .btn-shop-now {
+        .btn-browse {
             display: inline-flex;
             align-items: center;
             gap: 8px;
             background: var(--ink);
-            color: #fff;
+            color: white;
             font-family: 'DM Sans', sans-serif;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
             padding: 14px 32px;
             border-radius: 8px;
@@ -164,117 +160,109 @@
             transition: all 0.3s;
         }
 
-            .btn-shop-now:hover {
+            .btn-browse:hover {
                 background: var(--gold);
                 color: white;
                 transform: translateY(-2px);
             }
 
-        /* ─── Info banner ─── */
-        .restock-info {
+        /* ── Info Banner ── */
+        .wl-banner {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 14px;
-            background: linear-gradient(135deg, #fffbf5, #fff8ed);
+            background: linear-gradient(135deg, #fffdf9, #fff8ed);
             border: 1px solid var(--gold-light);
             border-left: 4px solid var(--gold);
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin-bottom: 32px;
+            border-radius: 14px;
+            padding: 16px 22px;
+            margin-bottom: 36px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: #6b5a3e;
+            line-height: 1.6;
         }
 
-            .restock-info .icon {
-                font-size: 20px;
-                flex-shrink: 0;
-                margin-top: 1px;
+            .wl-banner strong {
+                color: var(--gold-dark);
             }
 
-            .restock-info p {
-                font-family: 'DM Sans', sans-serif;
-                font-size: 13px;
-                color: #6b5a3e;
-                margin: 0;
-                line-height: 1.6;
-            }
-
-                .restock-info p strong {
-                    color: var(--gold-dark);
-                }
-
-        /* ─── Grid ─── */
-        .wishlist-grid {
+        /* ── Grid ── */
+        .wl-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 28px;
         }
 
-        /* ─── Card ─── */
-        .wishlist-card {
+        /* ── Card ── */
+        .wl-card {
             background: white;
-            border-radius: 16px;
+            border-radius: 20px;
             border: 1px solid var(--dust);
             overflow: hidden;
             position: relative;
-            transition: box-shadow 0.3s, transform 0.3s;
+            transition: box-shadow 0.35s, transform 0.35s;
         }
 
-            .wishlist-card:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            .wl-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 24px 64px rgba(0,0,0,0.10);
             }
 
-        .card-remove-btn {
+        /* Remove btn */
+        .btn-remove {
             position: absolute;
             top: 12px;
             right: 12px;
             z-index: 10;
             width: 34px;
             height: 34px;
-            background: rgba(255,255,255,0.95);
+            background: rgba(255,255,255,0.92);
             border: 1px solid var(--dust);
             border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 15px;
-            color: #999;
+            font-size: 14px;
+            color: #aaa;
             transition: all 0.2s;
             backdrop-filter: blur(4px);
         }
 
-            .card-remove-btn:hover {
+            .btn-remove:hover {
                 background: #fff0ee;
-                border-color: #f5c6c0;
+                border-color: #f5c0bc;
                 color: var(--danger);
                 transform: scale(1.1);
             }
 
-        .card-image {
+        /* Card image */
+        .card-img {
             aspect-ratio: 4/3;
             overflow: hidden;
             background: var(--cream);
             position: relative;
         }
 
-            .card-image img {
+            .card-img img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                transition: transform 0.5s ease;
+                transition: transform 0.55s ease;
             }
 
-        .wishlist-card:hover .card-image img {
-            transform: scale(1.05);
+        .wl-card:hover .card-img img {
+            transform: scale(1.06);
         }
 
-        .card-image-placeholder {
+        .card-img-placeholder {
             width: 100%;
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
+            font-size: 52px;
             color: var(--dust);
         }
 
@@ -283,17 +271,18 @@
             bottom: 10px;
             left: 10px;
             font-family: 'DM Sans', sans-serif;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 700;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
             text-transform: uppercase;
             padding: 4px 10px;
             border-radius: 100px;
-            background: rgba(15,15,15,0.85);
+            background: rgba(13,12,10,0.82);
             color: var(--gold-light);
             backdrop-filter: blur(4px);
         }
 
+        /* Stock badge */
         .stock-badge {
             display: inline-flex;
             align-items: center;
@@ -320,67 +309,69 @@
                 height: 6px;
                 border-radius: 50%;
                 background: currentColor;
-                animation: pulse-dot 1.5s infinite;
+                animation: blink 1.6s infinite;
             }
 
-        @@keyframes pulse-dot {
+        @@keyframes blink {
             0%, 100% {
-                opacity: 1;
+                opacity: 1
             }
 
             50% {
-                opacity: 0.4;
+                opacity: .35
             }
         }
 
+        /* Card body */
         .card-body {
-            padding: 18px 20px 20px;
+            padding: 20px 22px 22px;
         }
 
         .card-name {
-            font-family: 'Playfair Display', serif;
-            font-size: 17px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 19px;
             font-weight: 600;
             color: var(--ink);
-            margin: 0 0 4px;
+            margin: 10px 0 3px;
             line-height: 1.3;
         }
 
         .card-sku {
             font-family: 'DM Sans', sans-serif;
-            font-size: 11px;
-            color: #bbb;
+            font-size: 10px;
+            color: #ccc;
             letter-spacing: 0.5px;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
         .card-meta {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
 
         .card-price {
-            font-family: 'Playfair Display', serif;
-            font-size: 22px;
-            font-weight: 700;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
+            font-weight: 600;
             color: var(--ink);
         }
 
-            .card-price .currency {
-                font-size: 14px;
+            .card-price .cur {
+                font-size: 15px;
                 color: var(--muted);
                 font-weight: 400;
-                margin-right: 2px;
+                margin-right: 1px;
             }
 
         .card-date {
             font-family: 'DM Sans', sans-serif;
             font-size: 11px;
-            color: #bbb;
+            color: #ccc;
         }
 
+        /* ── Action buttons ── */
         .card-actions {
             display: flex;
             gap: 8px;
@@ -392,9 +383,9 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            padding: 10px;
+            padding: 11px;
             border: 1.5px solid var(--dust);
-            border-radius: 8px;
+            border-radius: 10px;
             font-family: 'DM Sans', sans-serif;
             font-size: 12px;
             font-weight: 600;
@@ -406,36 +397,19 @@
 
             .btn-details:hover {
                 border-color: var(--ink);
-                color: var(--ink);
                 background: var(--cream);
+                color: var(--ink);
             }
 
-        .btn-notify-active {
+        .btn-cart {
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            padding: 10px;
-            background: linear-gradient(135deg, #f0f7ff, #e8f0fe);
-            border: 1.5px solid #c5d9f7;
-            border-radius: 8px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 12px;
-            font-weight: 600;
-            color: #2c6cb0;
-            cursor: default;
-        }
-
-        .btn-add-cart-active {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 10px;
+            padding: 11px;
             background: var(--ink);
-            border-radius: 8px;
+            border-radius: 10px;
             font-family: 'DM Sans', sans-serif;
             font-size: 12px;
             font-weight: 600;
@@ -443,31 +417,473 @@
             color: white;
             border: none;
             cursor: pointer;
+            transition: all 0.25s;
+        }
+
+            .btn-cart:hover {
+                background: var(--gold);
+                transform: translateY(-1px);
+            }
+
+        /* ── Bell / Notify button ── */
+        .btn-bell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            border: 1.5px solid;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+
+            /* OFF state — belinha apagado */
+            .btn-bell.off {
+                background: white;
+                border-color: var(--dust);
+                color: var(--muted);
+            }
+
+                .btn-bell.off:hover {
+                    border-color: var(--gold);
+                    color: var(--gold-dark);
+                    background: #fffbf5;
+                }
+
+                .btn-bell.off .bell-icon {
+                    animation: none;
+                }
+
+            /* ON state — ativado */
+            .btn-bell.on {
+                background: linear-gradient(135deg, #fffbf0, #fff4e0);
+                border-color: var(--gold);
+                color: var(--gold-dark);
+            }
+
+                .btn-bell.on .bell-icon {
+                    display: inline-block;
+                    animation: ring 2s ease-in-out infinite;
+                    transform-origin: top center;
+                }
+
+        @@keyframes ring {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+
+            10% {
+                transform: rotate(15deg);
+            }
+
+            20% {
+                transform: rotate(-13deg);
+            }
+
+            30% {
+                transform: rotate(10deg);
+            }
+
+            40% {
+                transform: rotate(-8deg);
+            }
+
+            50% {
+                transform: rotate(5deg);
+            }
+
+            60% {
+                transform: rotate(0deg);
+            }
+        }
+
+        /* Shine sweep on ON state */
+        .btn-bell.on::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            animation: shine 3s ease-in-out infinite;
+        }
+
+        @@keyframes shine {
+            0% {
+                left: -100%;
+            }
+
+            30% {
+                left: 130%;
+            }
+
+            100% {
+                left: 130%;
+            }
+        }
+
+        /* ── Notify modal ── */
+        .notify-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(13,12,10,0.55);
+            backdrop-filter: blur(6px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+            .notify-backdrop.open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+        .notify-modal {
+            background: white;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 440px;
+            padding: 40px 36px 36px;
+            position: relative;
+            transform: translateY(24px) scale(0.97);
+            transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+            box-shadow: 0 32px 80px rgba(0,0,0,0.18);
+        }
+
+        .notify-backdrop.open .notify-modal {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: var(--cream);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.2s;
         }
 
-            .btn-add-cart-active:hover {
-                background: var(--gold);
+            .modal-close:hover {
+                background: var(--dust);
+                color: var(--ink);
             }
 
-        /* ─── Pagination ─── */
-        .wl-pagination {
+        .modal-bell-icon {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, #fff8ed, #ffe8c0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 24px;
+            animation: ring 2s ease-in-out infinite;
+            transform-origin: top center;
+        }
+
+        .modal-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--ink);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .modal-product-name {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: var(--muted);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+            .modal-product-name strong {
+                color: var(--ink);
+            }
+
+        .modal-email-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--cream);
+            border: 1.5px solid var(--dust);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+        }
+
+            .modal-email-row i {
+                color: var(--gold);
+                font-size: 16px;
+                flex-shrink: 0;
+            }
+
+            .modal-email-row span {
+                font-family: 'DM Sans', sans-serif;
+                font-size: 13px;
+                color: var(--ink);
+                font-weight: 500;
+            }
+
+            .modal-email-row small {
+                font-size: 11px;
+                color: var(--muted);
+                display: block;
+            }
+
+        .modal-desc {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: var(--muted);
+            text-align: center;
+            line-height: 1.7;
+            margin-bottom: 28px;
+        }
+
+            .modal-desc strong {
+                color: var(--gold-dark);
+            }
+
+        .btn-subscribe {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+            .btn-subscribe:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(160,120,64,0.4);
+            }
+
+            .btn-subscribe:active {
+                transform: none;
+            }
+
+            .btn-subscribe:disabled {
+                opacity: 0.7;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+        .btn-cancel-sub {
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: var(--muted);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+            .btn-cancel-sub:hover {
+                color: var(--ink);
+            }
+
+        /* ── Unsubscribe confirm modal ── */
+        .unsub-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(13,12,10,0.55);
+            backdrop-filter: blur(6px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+            .unsub-backdrop.open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+        .unsub-modal {
+            background: white;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 400px;
+            padding: 36px;
+            transform: translateY(24px) scale(0.97);
+            transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+            box-shadow: 0 32px 80px rgba(0,0,0,0.18);
+            text-align: center;
+        }
+
+        .unsub-backdrop.open .unsub-modal {
+            transform: translateY(0) scale(1);
+        }
+
+        .unsub-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+        }
+
+        .unsub-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 8px;
+        }
+
+        .unsub-desc {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .unsub-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-unsub-confirm {
+            flex: 1;
+            padding: 12px;
+            background: #fff0ee;
+            color: var(--danger);
+            border: 1.5px solid #f5c0bc;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .btn-unsub-confirm:hover {
+                background: var(--danger);
+                color: white;
+            }
+
+        .btn-unsub-cancel {
+            flex: 1;
+            padding: 12px;
+            background: var(--cream);
+            color: var(--ink);
+            border: 1.5px solid var(--dust);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .btn-unsub-cancel:hover {
+                background: var(--dust);
+            }
+
+        /* ── Toast ── */
+        .wl-toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: var(--ink);
+            color: white;
+            border-radius: 14px;
+            padding: 14px 22px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 10px 36px rgba(0,0,0,0.28);
+            transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            z-index: 3000;
+            white-space: nowrap;
+        }
+
+            .wl-toast.show {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            .wl-toast .toast-icon {
+                font-size: 18px;
+            }
+
+        .toast-undo-btn {
+            background: var(--gold);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: background 0.2s;
+        }
+
+            .toast-undo-btn:hover {
+                background: var(--gold-dark);
+            }
+
+        /* ── Pagination ── */
+        .wl-pagi {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 6px;
-            margin-top: 48px;
+            margin-top: 56px;
         }
 
-        .wl-page-btn {
-            min-width: 38px;
-            height: 38px;
+        .wl-pg {
+            min-width: 40px;
+            height: 40px;
             padding: 0 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             border: 1.5px solid var(--dust);
-            border-radius: 8px;
+            border-radius: 10px;
             font-family: 'DM Sans', sans-serif;
             font-size: 13px;
             font-weight: 500;
@@ -477,156 +893,96 @@
             transition: all 0.2s;
         }
 
-            .wl-page-btn:hover {
+            .wl-pg:hover {
                 border-color: var(--gold);
-                color: var(--gold);
+                color: var(--gold-dark);
             }
 
-            .wl-page-btn.active {
+            .wl-pg.active {
                 background: var(--ink);
                 color: white;
                 border-color: var(--ink);
                 font-weight: 700;
             }
 
-            .wl-page-btn.disabled {
-                opacity: 0.35;
+            .wl-pg.disabled {
+                opacity: 0.3;
                 pointer-events: none;
             }
 
-        .wl-page-ellipsis {
-            font-family: 'DM Sans', sans-serif;
-            font-size: 13px;
-            color: var(--muted);
-            padding: 0 4px;
-        }
-
-        /* ─── Toast ─── */
-        .toast-confirm {
-            position: fixed;
-            bottom: 28px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--ink);
-            color: white;
-            border-radius: 14px;
-            padding: 16px 24px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 14px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
-            z-index: 1000;
-            white-space: nowrap;
-        }
-
-            .toast-confirm.show {
-                transform: translateX(-50%) translateY(0);
-            }
-
-        .toast-undo {
-            background: var(--gold);
-            color: white;
-            border: none;
-            padding: 6px 16px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: 'DM Sans', sans-serif;
-            transition: background 0.2s;
-        }
-
-            .toast-undo:hover {
-                background: var(--gold-dark);
-            }
-
         @@media (max-width: 640px) {
-            .wishlist-grid {
+            .wl-grid {
                 grid-template-columns: 1fr;
             }
 
-            .wishlist-hero {
-                padding: 40px 0 32px;
+            .wl-hero {
+                padding: 44px 0 36px;
             }
 
             .hero-title {
-                font-size: 2rem;
+                font-size: 2.2rem;
             }
         }
     </style>
 }
 
 <!-- Hero -->
-<div class="wishlist-hero">
+<div class="wl-hero">
     <div class="container">
         <div class="hero-eyebrow">Your Collection</div>
-        <h1 class="hero-title">My <span>Wishlist</span></h1>
-        <p class="hero-subtitle">Items saved while out of stock — we'll alert you the moment they return.</p>
-        <div class="hero-count-badge">
+        <h1 class="hero-title">My <em>Wishlist</em></h1>
+        <p class="hero-sub">Save items you love — ring the bell to get an email the moment they're back in stock.</p>
+        <div class="hero-pill">
             <i class="bi bi-heart-fill"></i>
-            <span id="wishlist-count">
-                @Model.TotalItems item@(Model.TotalItems != 1 ? "s" : "") saved
-            </span>
+            <span id="wishlist-count">@Model.TotalItems item@(Model.TotalItems != 1 ? "s" : "") saved</span>
         </div>
     </div>
 </div>
 
-<div class="wishlist-wrapper">
+<div class="wl-wrapper">
 
     @if (!Model.Items.Any() && Model.CurrentPage == 1)
     {
-        <div class="wishlist-empty">
+        <div class="wl-empty">
             <div class="empty-icon">🕶️</div>
             <div class="empty-title">Your wishlist is empty</div>
-            <p class="empty-desc">When a product you love is out of stock, save it here. We'll email you the moment it's back.</p>
-            <a href="/Products" class="btn-shop-now"><i class="bi bi-bag"></i> Browse Collection</a>
+            <p class="empty-desc">When a product you love is out of stock, save it here. Ring the bell and we'll email you the instant it returns.</p>
+            <a href="/Products" class="btn-browse"><i class="bi bi-bag"></i> Browse Collection</a>
         </div>
     }
     else
     {
-        <!-- Info banner -->
-        <div class="restock-info">
-            <span class="icon">🔔</span>
-            <p>
-                <strong>Automatic restock alerts are enabled.</strong>
-                You'll receive an email notification at <strong>@User.Identity!.Name</strong>
-                as soon as any of these items becomes available again.
-            </p>
+        <div class="wl-banner">
+            <span style="font-size:20px">🔔</span>
+            <span>Ring the <strong>bell icon</strong> on any out-of-stock item to receive an email notification when it's back. You can unsubscribe anytime.</span>
         </div>
 
-        <div class="wishlist-grid" id="wishlist-grid">
+        <div class="wl-grid" id="wl-grid">
             @foreach (var item in Model.Items)
             {
-                @* Xác định details URL đúng dựa vào ProductType *@
                 var detailsUrl = item.ProductType == "Frame"
                 ? $"/Products/FrameDetails/{item.ProductId}"
                 : $"/Products/LensDetails/{item.ProductId}";
 
-                <div class="wishlist-card" id="card-@item.ProductId" data-product-id="@item.ProductId">
-                    <!-- Remove -->
-                    <button class="card-remove-btn" onclick="removeItem(@item.ProductId)" title="Remove from wishlist">
+                <div class="wl-card" id="card-@item.ProductId" data-product-id="@item.ProductId">
+                    <button class="btn-remove" onclick="removeItem(@item.ProductId)" title="Remove from wishlist">
                         <i class="bi bi-x"></i>
                     </button>
 
-                    <!-- Image -->
-                    <div class="card-image">
+                    <div class="card-img">
                         @if (!string.IsNullOrEmpty(item.PrimaryImageUrl))
                         {
                             <img src="@item.PrimaryImageUrl" alt="@item.ProductName" loading="lazy" />
                         }
                         else
                         {
-                            <div class="card-image-placeholder">🕶️</div>
+                            <div class="card-img-placeholder">🕶️</div>
                         }
                         <span class="type-chip">@item.ProductType</span>
                     </div>
 
-                    <!-- Body -->
                     <div class="card-body">
-                        <div style="margin-bottom:10px;">
+                        <div>
                             @if (item.IsInStock)
                             {
                                 <span class="stock-badge in"><span class="dot"></span> Back in Stock!</span>
@@ -642,23 +998,29 @@
 
                         <div class="card-meta">
                             <div class="card-price">
-                                <span class="currency">₫</span>@item.Price.ToString("N0")
+                                <span class="cur">₫</span>@item.Price.ToString("N0")
                             </div>
-                            <div class="card-date">Added @item.AddedAt.ToString("MMM dd, yyyy")</div>
+                            <div class="card-date">@item.AddedAt.ToString("MMM dd, yyyy")</div>
                         </div>
 
                         <div class="card-actions">
                             @if (item.IsInStock)
                             {
-                                <button class="btn-add-cart-active" onclick="addToCartFromWishlist(@item.ProductId)">
+                                <!-- Back in stock: show Add to Cart -->
+                                <button class="btn-cart" onclick="addToCart(@item.ProductId)">
                                     <i class="bi bi-cart-plus"></i> Add to Cart
                                 </button>
                             }
                             else
                             {
-                                <div class="btn-notify-active" title="You'll be notified by email when this item is back">
-                                    <i class="bi bi-bell-fill"></i> Notified
-                                </div>
+                                <!-- Out of stock: show bell button -->
+                                <button class="btn-bell @(item.NotifyOnRestock ? "on" : "off")"
+                                        id="bell-@item.ProductId"
+                                        onclick="handleBell(@item.ProductId, '@System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(item.ProductName)', @item.NotifyOnRestock.ToString().ToLower())"
+                                        title="@(item.NotifyOnRestock ? "Subscribed — click to unsubscribe" : "Click to get notified by email")">
+                                    <span class="bell-icon"><i class="bi bi-bell-fill"></i></span>
+                                    <span class="bell-label">@(item.NotifyOnRestock ? "Notified" : "Notify Me")</span>
+                                </button>
                             }
                             <a href="@detailsUrl" class="btn-details">
                                 <i class="bi bi-eye"></i> Details
@@ -669,105 +1031,207 @@
             }
         </div>
 
-        @* ── Pagination ── *@
         @if (Model.TotalPages > 1)
         {
-            <nav class="wl-pagination" aria-label="Wishlist pagination">
-
-                @* Prev *@
+            <nav class="wl-pagi">
                 @if (Model.HasPreviousPage)
                 {
-                    <a class="wl-page-btn"
-                       asp-page="/Customer/Wishlist"
-                       asp-route-CurrentPage="@(Model.CurrentPage - 1)">
-                        <i class="bi bi-chevron-left"></i>
-                    </a>
+                    <a class="wl-pg" asp-page="/Customer/Wishlist" asp-route-CurrentPage="@(Model.CurrentPage - 1)"><i class="bi bi-chevron-left"></i></a>
                 }
                 else
                 {
-                    <span class="wl-page-btn disabled"><i class="bi bi-chevron-left"></i></span>
+
+                    <span class="wl-pg disabled"><i class="bi bi-chevron-left"></i></span>
                 }
 
-                @* Page numbers *@
                 @{
-                    int start = Math.Max(1, Model.CurrentPage - 2);
-                    int end = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
-                    if (end - start < 4)
-                    {
-                        if (start == 1) end = Math.Min(5, Model.TotalPages);
-                        else if (end == Model.TotalPages) start = Math.Max(1, Model.TotalPages - 4);
-                    }
+                    int ps = Math.Max(1, Model.CurrentPage - 2); int pe = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
                 }
-
-                @if (start > 1)
+                @if (ps > 1)
                 {
-                    <a class="wl-page-btn" asp-page="/Customer/Wishlist" asp-route-CurrentPage="1">1</a>
-                    @if (start > 2)
-                    {
-                        <span class="wl-page-ellipsis">…</span>
-                    }
+                    <a class="wl-pg" asp-page="/Customer/Wishlist" asp-route-CurrentPage="1">1</a>
                 }
-
-                @for (int i = start; i <= end; i++)
+                @for (int i = ps; i <= pe; i++)
                 {
                     @if (i == Model.CurrentPage)
                     {
-                        <span class="wl-page-btn active">@i</span>
+                        <span class="wl-pg active">@i</span>
                     }
                     else
                     {
-                        <a class="wl-page-btn" asp-page="/Customer/Wishlist" asp-route-CurrentPage="@i">@i</a>
+
+                        <a class="wl-pg" asp-page="/Customer/Wishlist" asp-route-CurrentPage="@i">@i</a>
                     }
                 }
-
-                @if (end < Model.TotalPages)
+                @if (pe < Model.TotalPages)
                 {
-                    @if (end < Model.TotalPages - 1)
-                    {
-                        <span class="wl-page-ellipsis">…</span>
-                    }
-                    <a class="wl-page-btn" asp-page="/Customer/Wishlist" asp-route-CurrentPage="@Model.TotalPages">@Model.TotalPages</a>
+                    <a class="wl-pg" asp-page="/Customer/Wishlist" asp-route-CurrentPage="@Model.TotalPages">@Model.TotalPages</a>
                 }
 
-                @* Next *@
                 @if (Model.HasNextPage)
                 {
-                    <a class="wl-page-btn"
-                       asp-page="/Customer/Wishlist"
-                       asp-route-CurrentPage="@(Model.CurrentPage + 1)">
-                        <i class="bi bi-chevron-right"></i>
-                    </a>
+                    <a class="wl-pg" asp-page="/Customer/Wishlist" asp-route-CurrentPage="@(Model.CurrentPage + 1)"><i class="bi bi-chevron-right"></i></a>
                 }
                 else
                 {
-                    <span class="wl-page-btn disabled"><i class="bi bi-chevron-right"></i></span>
-                }
 
+                    <span class="wl-pg disabled"><i class="bi bi-chevron-right"></i></span>
+                }
             </nav>
         }
     }
 </div>
 
-<!-- Toast -->
-<div class="toast-confirm" id="removeToast">
-    <span id="toastMsg">Item removed from wishlist</span>
-    <button class="toast-undo" id="toastUndoBtn">Undo</button>
+<!-- ── Subscribe Modal ── -->
+<div class="notify-backdrop" id="notifyBackdrop" onclick="closeNotifyModal(event)">
+    <div class="notify-modal">
+        <button class="modal-close" onclick="closeNotifyModal()"><i class="bi bi-x"></i></button>
+        <div class="modal-bell-icon">🔔</div>
+        <div class="modal-title">Get Notified</div>
+        <div class="modal-product-name">We'll send an email when <strong id="modal-product-name"></strong> is back in stock.</div>
+
+        <div class="modal-email-row">
+            <i class="bi bi-envelope-fill"></i>
+            <div>
+                <span>@User.Identity?.Name</span>
+                <small>Email notification will be sent here</small>
+            </div>
+        </div>
+
+        <p class="modal-desc">
+            One email, no spam. We'll notify you <strong>once</strong> when the item restocks.
+            You can unsubscribe anytime from your wishlist.
+        </p>
+
+        <button class="btn-subscribe" id="modal-subscribe-btn" onclick="confirmSubscribe()">
+            <i class="bi bi-bell-fill"></i> Yes, Notify Me!
+        </button>
+        <button class="btn-cancel-sub" onclick="closeNotifyModal()">No thanks</button>
+    </div>
+</div>
+
+<!-- ── Unsubscribe Confirm Modal ── -->
+<div class="unsub-backdrop" id="unsubBackdrop" onclick="closeUnsubModal(event)">
+    <div class="unsub-modal">
+        <div class="unsub-icon">🔕</div>
+        <div class="unsub-title">Turn Off Notifications?</div>
+        <p class="unsub-desc">You'll no longer receive email alerts for <strong id="unsub-product-name"></strong> when it's back in stock.</p>
+        <div class="unsub-row">
+            <button class="btn-unsub-confirm" onclick="confirmUnsubscribe()">Turn Off</button>
+            <button class="btn-unsub-cancel" onclick="closeUnsubModal()">Keep Notified</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Toast ── -->
+<div class="wl-toast" id="wl-toast">
+    <span class="toast-icon" id="toast-icon">🔔</span>
+    <span id="toast-msg">Notification enabled</span>
+    <button class="toast-undo-btn" id="toast-undo-btn" style="display:none">Undo</button>
 </div>
 
 @section Scripts {
     <script>
-        let removeTimeout = null;
-        let lastRemovedId = null;
+        // ── State ───────────────────────────────────────────────────────────────
+        let _pendingProductId = null;
+        let _pendingProductName = '';
+        let _removeTimeout = null;
+        let _lastRemovedId = null;
+        let _toastTimer = null;
 
-        async function removeItem(productId) {
+        // ── Bell handler ────────────────────────────────────────────────────────
+        function handleBell(productId, productName, isOn) {
+            _pendingProductId = productId;
+            _pendingProductName = productName;
+
+            if (isOn) {
+                // Already subscribed → ask to unsubscribe
+                document.getElementById('unsub-product-name').textContent = productName;
+                document.getElementById('unsubBackdrop').classList.add('open');
+            } else {
+                // Not subscribed → show subscribe modal
+                document.getElementById('modal-product-name').textContent = productName;
+                document.getElementById('notifyBackdrop').classList.add('open');
+            }
+        }
+
+        // ── Subscribe ────────────────────────────────────────────────────────────
+        async function confirmSubscribe() {
+            const btn = document.getElementById('modal-subscribe-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Sending…';
+
+            try {
+                const res = await fetch('/api/wishlist/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId: _pendingProductId })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    setBellState(_pendingProductId, true);
+                    closeNotifyModal();
+                    showToast('🔔', "You're subscribed! We'll email you when it's back.", false);
+                } else {
+                    showToast('⚠️', data.message || 'Something went wrong.', false);
+                    closeNotifyModal();
+                }
+            } catch {
+                showToast('⚠️', 'Network error. Try again.', false);
+                closeNotifyModal();
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-bell-fill"></i> Yes, Notify Me!';
+            }
+        }
+
+        // ── Unsubscribe ──────────────────────────────────────────────────────────
+        async function confirmUnsubscribe() {
+            closeUnsubModal();
+            try {
+                const res = await fetch('/api/wishlist/unsubscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId: _pendingProductId })
+                });
+                if (res.ok) {
+                    setBellState(_pendingProductId, false);
+                    showToast('🔕', 'Notifications turned off.', false);
+                }
+            } catch {
+                showToast('⚠️', 'Network error. Try again.', false);
+            }
+        }
+
+        // ── Bell UI state ────────────────────────────────────────────────────────
+        function setBellState(productId, isOn) {
+            const btn = document.getElementById('bell-' + productId);
+            if (!btn) return;
+            if (isOn) {
+                btn.className = 'btn-bell on';
+                btn.querySelector('.bell-label').textContent = 'Notified';
+                btn.title = 'Subscribed — click to unsubscribe';
+                btn.setAttribute('onclick', `handleBell(${productId}, '${_pendingProductName}', true)`);
+            } else {
+                btn.className = 'btn-bell off';
+                btn.querySelector('.bell-label').textContent = 'Notify Me';
+                btn.title = 'Click to get notified by email';
+                btn.setAttribute('onclick', `handleBell(${productId}, '${_pendingProductName}', false)`);
+            }
+        }
+
+        // ── Remove item ──────────────────────────────────────────────────────────
+        function removeItem(productId) {
             const card = document.getElementById('card-' + productId);
             card.style.transition = 'opacity 0.3s, transform 0.3s';
             card.style.opacity = '0.4';
             card.style.transform = 'scale(0.97)';
-            lastRemovedId = productId;
-            showToast('Removed from wishlist');
+            _lastRemovedId = productId;
 
-            removeTimeout = setTimeout(async () => {
+            showToast('🗑️', 'Removed from wishlist', true);
+
+            _removeTimeout = setTimeout(async () => {
                 try {
                     const res = await fetch('/api/wishlist/remove', {
                         method: 'POST',
@@ -778,66 +1242,76 @@
                         card.remove();
                         updateCount();
                     } else {
-                        card.style.opacity = '1';
-                        card.style.transform = '';
+                        restoreCard(card);
                     }
-                } catch {
-                    card.style.opacity = '1';
-                    card.style.transform = '';
-                }
-            }, 3000);
+                } catch { restoreCard(card); }
+            }, 3200);
         }
 
-        function showToast(msg) {
-            const toast = document.getElementById('removeToast');
-            document.getElementById('toastMsg').textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 4000);
+        function restoreCard(card) {
+            card.style.opacity = '1';
+            card.style.transform = '';
         }
-
-        document.getElementById('toastUndoBtn').addEventListener('click', () => {
-            if (removeTimeout) { clearTimeout(removeTimeout); removeTimeout = null; }
-            const card = document.getElementById('card-' + lastRemovedId);
-            if (card) { card.style.opacity = '1'; card.style.transform = ''; }
-            document.getElementById('removeToast').classList.remove('show');
-        });
 
         function updateCount() {
-            const cards = document.querySelectorAll('.wishlist-card').length;
+            const n = document.querySelectorAll('.wl-card').length;
             const el = document.getElementById('wishlist-count');
-            if (el) el.textContent = cards + ' item' + (cards !== 1 ? 's' : '') + ' saved';
-            if (cards === 0) {
-                document.getElementById('wishlist-grid')?.parentElement
-                    ?.insertAdjacentHTML('afterbegin', `
-                    <div class="wishlist-empty" style="margin-top:0">
+            if (el) el.textContent = n + ' item' + (n !== 1 ? 's' : '') + ' saved';
+            if (n === 0) {
+                document.getElementById('wl-grid')?.parentElement?.insertAdjacentHTML('afterbegin',
+                    `<div class="wl-empty" style="margin-top:0">
                         <div class="empty-icon">🕶️</div>
                         <div class="empty-title">Your wishlist is empty</div>
-                        <p class="empty-desc">Browse the shop and save out-of-stock items to your wishlist.</p>
-                        <a href="/Products" class="btn-shop-now"><i class="bi bi-bag"></i> Browse Collection</a>
+                        <p class="empty-desc">Browse the shop and save out-of-stock items to get notified when they return.</p>
+                        <a href="/Products" class="btn-browse"><i class="bi bi-bag"></i> Browse Collection</a>
                     </div>`);
-                document.getElementById('wishlist-grid')?.remove();
-                document.querySelector('.restock-info')?.remove();
-                document.querySelector('.wl-pagination')?.remove();
+                document.getElementById('wl-grid')?.remove();
+                document.querySelector('.wl-banner')?.remove();
             }
         }
 
-        async function addToCartFromWishlist(productId) {
+        // ── Add to cart ──────────────────────────────────────────────────────────
+        async function addToCart(productId) {
             try {
-                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
-                const res = await fetch('/Products?handler=AddToCart', {
+                const res = await fetch('/api/cart/add', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': token ?? ''
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ productId, quantity: 1 })
                 });
-                const data = await res.json();
-                showToast(data.success ? '✓ Added to cart!' : (data.message || 'Error'));
+                showToast('🛒', res.ok ? 'Added to cart!' : 'Error adding to cart.', false);
             } catch {
-                showToast('Error adding to cart');
+                showToast('⚠️', 'Network error.', false);
             }
         }
+
+        // ── Toast ────────────────────────────────────────────────────────────────
+        function showToast(icon, msg, showUndo) {
+            const toast = document.getElementById('wl-toast');
+            document.getElementById('toast-icon').textContent = icon;
+            document.getElementById('toast-msg').textContent = msg;
+            const undoBtn = document.getElementById('toast-undo-btn');
+            undoBtn.style.display = showUndo ? 'inline-block' : 'none';
+
+            toast.classList.add('show');
+            clearTimeout(_toastTimer);
+            _toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        document.getElementById('toast-undo-btn').addEventListener('click', () => {
+            if (_removeTimeout) { clearTimeout(_removeTimeout); _removeTimeout = null; }
+            const card = document.getElementById('card-' + _lastRemovedId);
+            if (card) restoreCard(card);
+            document.getElementById('wl-toast').classList.remove('show');
+        });
+
+        // ── Modal helpers ────────────────────────────────────────────────────────
+        function closeNotifyModal(e) {
+            if (e && e.target !== document.getElementById('notifyBackdrop')) return;
+            document.getElementById('notifyBackdrop').classList.remove('open');
+        }
+        function closeUnsubModal(e) {
+            if (e && e.target !== document.getElementById('unsubBackdrop')) return;
+            document.getElementById('unsubBackdrop').classList.remove('open');
+        }
     </script>
-    @Html.AntiForgeryToken()
 }

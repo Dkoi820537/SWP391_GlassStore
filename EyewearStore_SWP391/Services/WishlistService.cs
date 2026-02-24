@@ -1,5 +1,6 @@
 ﻿using EyewearStore_SWP391.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace EyewearStore_SWP391.Services
         Task<int> GetUserWishlistCountAsync(int userId);
         Task<bool> IsInWishlistAsync(int userId, int productId);
         Task NotifyRestockAsync(int productId, string productUrl);
+        Task<(bool success, string message)> SetNotifyAsync(int userId, int productId, bool notify);
     }
 
     public class WishlistItemDto
@@ -22,12 +24,13 @@ namespace EyewearStore_SWP391.Services
         public int WishlistId { get; set; }
         public int ProductId { get; set; }
         public string ProductName { get; set; } = "";
-        public string ProductType { get; set; } = "";   // ← THÊM: "Frame" hoặc "Lens"
+        public string ProductType { get; set; } = "";
         public string Sku { get; set; } = "";
         public decimal Price { get; set; }
         public string? PrimaryImageUrl { get; set; }
         public bool IsInStock { get; set; }
         public int? InventoryQty { get; set; }
+        public bool NotifyOnRestock { get; set; }
         public DateTime AddedAt { get; set; }
     }
 
@@ -68,14 +71,14 @@ namespace EyewearStore_SWP391.Services
             {
                 UserId = userId,
                 ProductId = productId,
-                NotifyOnRestock = true,
+                NotifyOnRestock = false,    // default OFF (user must press bell)
                 CreatedAt = DateTime.UtcNow
             };
 
             _context.Wishlists.Add(wishlist);
             await _context.SaveChangesAsync();
 
-            return (true, "Added to wishlist! We'll notify you when it's back in stock.");
+            return (true, "Added to wishlist! Ring the bell to get notified when it's back.");
         }
 
         public async Task<bool> RemoveFromWishlistAsync(int userId, int productId)
@@ -104,7 +107,7 @@ namespace EyewearStore_SWP391.Services
                     WishlistId = w.WishlistId,
                     ProductId = w.ProductId,
                     ProductName = w.Product.Name,
-                    ProductType = w.Product.ProductType,   // ← map ProductType
+                    ProductType = w.Product.ProductType,
                     Sku = w.Product.Sku,
                     Price = w.Product.Price,
                     PrimaryImageUrl = w.Product.ProductImages
@@ -113,6 +116,7 @@ namespace EyewearStore_SWP391.Services
                         .FirstOrDefault(),
                     IsInStock = w.Product.InventoryQty > 0,
                     InventoryQty = w.Product.InventoryQty,
+                    NotifyOnRestock = w.NotifyOnRestock,
                     AddedAt = w.CreatedAt
                 })
                 .ToListAsync();
@@ -131,13 +135,31 @@ namespace EyewearStore_SWP391.Services
                 .AnyAsync(w => w.UserId == userId && w.ProductId == productId);
         }
 
+        public async Task<(bool success, string message)> SetNotifyAsync(int userId, int productId, bool notify)
+        {
+            var item = await _context.Wishlists
+                .FirstOrDefaultAsync(w => w.UserId == userId && w.ProductId == productId);
+
+            if (item == null)
+                return (false, "Item not found in your wishlist.");
+
+            item.NotifyOnRestock = notify;
+            await _context.SaveChangesAsync();
+
+            return (true, notify ? "Subscribed successfully." : "Unsubscribed successfully.");
+        }
+
         public async Task NotifyRestockAsync(int productId, string productUrl)
         {
+            Console.WriteLine($"[WISHLIST] NotifyRestockAsync called for product {productId}");
+
             var wishlistUsers = await _context.Wishlists
                 .Where(w => w.ProductId == productId && w.NotifyOnRestock)
                 .Include(w => w.User)
                 .Include(w => w.Product)
                 .ToListAsync();
+
+            Console.WriteLine($"[WISHLIST] Found {wishlistUsers.Count} subscribers (NotifyOnRestock = true)");
 
             if (!wishlistUsers.Any()) return;
 
@@ -145,6 +167,12 @@ namespace EyewearStore_SWP391.Services
 
             foreach (var wishlist in wishlistUsers)
             {
+                if (wishlist.User == null || string.IsNullOrWhiteSpace(wishlist.User.Email))
+                {
+                    Console.WriteLine($"[WISHLIST] Skipping wishlist {wishlist.WishlistId} - no user/email");
+                    continue;
+                }
+
                 try
                 {
                     await _emailService.SendRestockNotificationAsync(
@@ -153,11 +181,26 @@ namespace EyewearStore_SWP391.Services
                         product.Name,
                         productUrl
                     );
+
+                    // disable notify so user won't receive duplicate notifications
+                    wishlist.NotifyOnRestock = false;
+
+                    Console.WriteLine($"[WISHLIST] Sent restock email to {wishlist.User.Email} (wishlist {wishlist.WishlistId})");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Failed to send restock email to {wishlist.User.Email}: {ex.Message}");
+                    Console.WriteLine($"[WISHLIST] Failed to send restock email to {wishlist.User.Email}: {ex.GetType().Name}: {ex.Message}");
                 }
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                Console.WriteLine($"[WISHLIST] Updated wishlist records after notifications for product {productId}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[WISHLIST] Failed to save wishlist changes: {ex.GetType().Name}: {ex.Message}");
             }
         }
     }

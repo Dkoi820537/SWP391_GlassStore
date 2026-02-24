@@ -10,8 +10,8 @@
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
     <style>
         /* ==========================================
-           FRAME DETAILS PAGE STYLES
-           ========================================== */
+                   FRAME DETAILS PAGE STYLES
+                   ========================================== */
 
         /* Breadcrumb Section */
         .frame-breadcrumb-section {
@@ -31,31 +31,31 @@
             padding: 0 24px;
         }
 
-        .frame-breadcrumb li {
-            display: flex;
-            align-items: center;
-        }
+            .frame-breadcrumb li {
+                display: flex;
+                align-items: center;
+            }
 
-        .frame-breadcrumb a {
-            color: #666666;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
+            .frame-breadcrumb a {
+                color: #666666;
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
 
-        .frame-breadcrumb a:hover {
-            color: var(--shop-primary-teal);
-        }
+                .frame-breadcrumb a:hover {
+                    color: var(--shop-primary-teal);
+                }
 
-        .frame-breadcrumb .separator {
-            margin: 0 8px;
-            color: #999999;
-            font-size: 12px;
-        }
+            .frame-breadcrumb .separator {
+                margin: 0 8px;
+                color: #999999;
+                font-size: 12px;
+            }
 
-        .frame-breadcrumb .current {
-            color: var(--shop-primary-teal);
-            font-weight: 500;
-        }
+            .frame-breadcrumb .current {
+                color: var(--shop-primary-teal);
+                font-weight: 500;
+            }
 
         /* Main Container */
         .frame-details-container {
@@ -88,12 +88,12 @@
             justify-content: center;
         }
 
-        .main-image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: opacity 0.3s ease;
-        }
+            .main-image-container img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: opacity 0.3s ease;
+            }
 
         .main-image-placeholder {
             display: flex;
@@ -103,11 +103,11 @@
             height: 100%;
         }
 
-        .main-image-placeholder i {
-            font-size: 120px;
-            color: var(--shop-primary-teal);
-            opacity: 0.3;
-        }
+            .main-image-placeholder i {
+                font-size: 120px;
+                color: var(--shop-primary-teal);
+                opacity: 0.3;
+            }
 
         .thumbnail-gallery {
             display: flex;
@@ -126,16 +126,16 @@
             transition: all 0.3s ease;
         }
 
-        .thumbnail-item:hover,
-        .thumbnail-item.active {
-            border-color: var(--shop-primary-teal);
-        }
+            .thumbnail-item:hover,
+            .thumbnail-item.active {
+                border-color: var(--shop-primary-teal);
+            }
 
-        .thumbnail-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+            .thumbnail-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
 
         /* Right Column - Product Info */
         .frame-info {
@@ -166,9 +166,9 @@
             gap: 8px;
         }
 
-        .frame-price .currency {
-            font-size: 24px;
-        }
+            .frame-price .currency {
+                font-size: 24px;
+            }
 
         /* Stock Status Badge */
         .stock-badge {
@@ -182,20 +182,20 @@
             margin-bottom: 24px;
         }
 
-        .stock-badge.in-stock {
-            background: #28A745;
-            color: white;
-        }
+            .stock-badge.in-stock {
+                background: #28A745;
+                color: white;
+            }
 
-        .stock-badge.low-stock {
-            background: #FFA500;
-            color: white;
-        }
+            .stock-badge.low-stock {
+                background: #FFA500;
+                color: white;
+            }
 
-        .stock-badge.out-of-stock {
-            background: #DC3545;
-            color: white;
-        }
+            .stock-badge.out-of-stock {
+                background: #DC3545;
+                color: white;
+            }
 
         /* Description Box */
         .frame-description-box {
@@ -205,12 +205,12 @@
             border-radius: 12px;
         }
 
-        .frame-description-box p {
-            font-size: 16px;
-            line-height: 1.6;
-            color: #333333;
-            margin: 0;
-        }
+            .frame-description-box p {
+                font-size: 16px;
+                line-height: 1.6;
+                color: #333333;
+                margin: 0;
+            }
 
         /* Specifications Section */
         .specs-section {
@@ -234,9 +234,9 @@
             border-bottom: 1px solid #E0E0E0;
         }
 
-        .specs-row:last-child {
-            border-bottom: none;
-        }
+            .specs-row:last-child {
+                border-bottom: none;
+            }
 
         .specs-label {
             width: 140px;
@@ -284,15 +284,15 @@
             justify-content: center;
         }
 
-        .quantity-btn:hover:not(:disabled) {
-            border-color: var(--shop-primary-teal);
-            background: var(--shop-warm-peach-light);
-        }
+            .quantity-btn:hover:not(:disabled) {
+                border-color: var(--shop-primary-teal);
+                background: var(--shop-warm-peach-light);
+            }
 
-        .quantity-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+            .quantity-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
 
         .quantity-input {
             width: 80px;
@@ -304,10 +304,10 @@
             font-weight: 600;
         }
 
-        .quantity-input:focus {
-            outline: none;
-            border-color: var(--shop-primary-teal);
-        }
+            .quantity-input:focus {
+                outline: none;
+                border-color: var(--shop-primary-teal);
+            }
 
         /* Add to Cart Button */
         .btn-add-to-cart {
@@ -328,21 +328,21 @@
             gap: 10px;
         }
 
-        .btn-add-to-cart:hover:not(:disabled) {
-            background: #0052A3;
-            transform: translateY(-2px);
-        }
+            .btn-add-to-cart:hover:not(:disabled) {
+                background: #0052A3;
+                transform: translateY(-2px);
+            }
 
-        .btn-add-to-cart:active:not(:disabled) {
-            transform: translateY(0);
-            background: #003d7a;
-        }
+            .btn-add-to-cart:active:not(:disabled) {
+                transform: translateY(0);
+                background: #003d7a;
+            }
 
-        .btn-add-to-cart:disabled {
-            background: #CCCCCC;
-            cursor: not-allowed;
-            transform: none;
-        }
+            .btn-add-to-cart:disabled {
+                background: #CCCCCC;
+                cursor: not-allowed;
+                transform: none;
+            }
 
         /* Add to Wishlist Button */
         .btn-add-wishlist {
@@ -363,9 +363,14 @@
             gap: 10px;
         }
 
-        .btn-add-wishlist:hover {
-            background: #F5E6D3;
-        }
+            .btn-add-wishlist:hover:not(:disabled) {
+                background: #F5E6D3;
+            }
+
+            .btn-add-wishlist:disabled {
+                opacity: 0.7;
+                cursor: not-allowed;
+            }
 
         /* Error Message */
         .error-alert {
@@ -420,23 +425,23 @@
             transition: all 0.3s ease;
         }
 
-        .tab-button:hover {
-            background: var(--shop-warm-peach-light);
-        }
+            .tab-button:hover {
+                background: var(--shop-warm-peach-light);
+            }
 
-        .tab-button.active {
-            font-weight: 600;
-        }
+            .tab-button.active {
+                font-weight: 600;
+            }
 
-        .tab-button.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--shop-primary-teal);
-        }
+                .tab-button.active::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 3px;
+                    background: var(--shop-primary-teal);
+                }
 
         .tab-content {
             display: none;
@@ -446,22 +451,22 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
-        .tab-content.active {
-            display: block;
-        }
+            .tab-content.active {
+                display: block;
+            }
 
-        .tab-content h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--shop-primary-teal);
-            margin: 0 0 16px;
-        }
+            .tab-content h3 {
+                font-size: 18px;
+                font-weight: 600;
+                color: var(--shop-primary-teal);
+                margin: 0 0 16px;
+            }
 
-        .tab-content p {
-            color: #666666;
-            line-height: 1.8;
-            margin: 0;
-        }
+            .tab-content p {
+                color: #666666;
+                line-height: 1.8;
+                margin: 0;
+            }
 
         .care-list {
             list-style: none;
@@ -469,25 +474,25 @@
             margin: 0;
         }
 
-        .care-list li {
-            padding: 12px 0;
-            padding-left: 32px;
-            position: relative;
-            color: #666666;
-            border-bottom: 1px solid #E0E0E0;
-        }
+            .care-list li {
+                padding: 12px 0;
+                padding-left: 32px;
+                position: relative;
+                color: #666666;
+                border-bottom: 1px solid #E0E0E0;
+            }
 
-        .care-list li:last-child {
-            border-bottom: none;
-        }
+                .care-list li:last-child {
+                    border-bottom: none;
+                }
 
-        .care-list li::before {
-            content: '\F26A';
-            font-family: 'bootstrap-icons';
-            position: absolute;
-            left: 0;
-            color: var(--shop-primary-teal);
-        }
+                .care-list li::before {
+                    content: '\F26A';
+                    font-family: 'bootstrap-icons';
+                    position: absolute;
+                    left: 0;
+                    color: var(--shop-primary-teal);
+                }
 
         /* Related Products Section */
         .related-products-section {
@@ -520,10 +525,10 @@
             transition: all 0.3s ease;
         }
 
-        .related-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-        }
+            .related-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            }
 
         .related-card-image {
             aspect-ratio: 1;
@@ -531,12 +536,12 @@
             overflow: hidden;
         }
 
-        .related-card-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
+            .related-card-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s ease;
+            }
 
         .related-card:hover .related-card-image img {
             transform: scale(1.05);
@@ -550,11 +555,11 @@
             justify-content: center;
         }
 
-        .related-card-image-placeholder i {
-            font-size: 40px;
-            color: var(--shop-text-muted);
-            opacity: 0.5;
-        }
+            .related-card-image-placeholder i {
+                font-size: 40px;
+                color: var(--shop-text-muted);
+                opacity: 0.5;
+            }
 
         .related-card-info {
             padding: 16px;
@@ -651,9 +656,9 @@
                 font-size: 28px;
             }
 
-            .frame-price .currency {
-                font-size: 18px;
-            }
+                .frame-price .currency {
+                    font-size: 18px;
+                }
 
             .related-grid {
                 grid-template-columns: 1fr;
@@ -842,11 +847,18 @@
                     </button>
                 </form>
 
-                <!-- Add to Wishlist Button (placeholder for future) -->
-                <button type="button" class="btn-add-wishlist" id="wishlistBtn">
-                    <i class="bi bi-heart"></i>
-                    <span>Add to Wishlist</span>
-                </button>
+                @* ── Add to Wishlist: CHỈ hiện khi hết hàng ── *@
+                @if (!Model.Frame.IsInStock)
+                {
+                    <button type="button"
+                            class="btn-add-wishlist"
+                            id="wishlistBtn"
+                            data-product-id="@Model.Frame.ProductId"
+                            data-in-wishlist="false">
+                        <i class="bi bi-heart"></i>
+                        <span>Save to Wishlist — Notify me when back</span>
+                    </button>
+                }
             </div>
         </div>
     </div>
@@ -992,139 +1004,192 @@ else
 
 @section Scripts {
     <script>
-        // Image Gallery - Change main image on thumbnail click
+        // ── Image Gallery ────────────────────────────────────────────────────────
         function changeMainImage(imageUrl, thumbnailElement) {
             const mainImage = document.getElementById('mainProductImage');
             if (mainImage) {
-                // Fade out effect
                 mainImage.style.opacity = '0';
                 setTimeout(() => {
                     mainImage.src = imageUrl;
                     mainImage.style.opacity = '1';
                 }, 150);
             }
-
-            // Update active thumbnail
-            document.querySelectorAll('.thumbnail-item').forEach(thumb => {
-                thumb.classList.remove('active');
-            });
+            document.querySelectorAll('.thumbnail-item').forEach(thumb => thumb.classList.remove('active'));
             thumbnailElement.classList.add('active');
         }
 
-        // Quantity Selector - Decrease
+        // ── Quantity Selector ────────────────────────────────────────────────────
         function decreaseQuantity() {
             const input = document.getElementById('quantityInput');
             const currentValue = parseInt(input.value) || 1;
-            if (currentValue > 1) {
-                input.value = currentValue - 1;
-                updateQuantityButtons();
-            }
+            if (currentValue > 1) { input.value = currentValue - 1; updateQuantityButtons(); }
         }
 
-        // Quantity Selector - Increase
         function increaseQuantity() {
             const input = document.getElementById('quantityInput');
             const maxValue = parseInt(input.max) || 10;
             const currentValue = parseInt(input.value) || 1;
-            if (currentValue < maxValue) {
-                input.value = currentValue + 1;
-                updateQuantityButtons();
-            }
+            if (currentValue < maxValue) { input.value = currentValue + 1; updateQuantityButtons(); }
         }
 
-        // Update quantity buttons state
         function updateQuantityButtons() {
             const input = document.getElementById('quantityInput');
-            const decreaseBtn = document.getElementById('decreaseQty');
-            const increaseBtn = document.getElementById('increaseQty');
             const currentValue = parseInt(input.value) || 1;
             const maxValue = parseInt(input.max) || 10;
-
-            if (decreaseBtn) {
-                decreaseBtn.disabled = currentValue <= 1;
-            }
-            if (increaseBtn) {
-                increaseBtn.disabled = currentValue >= maxValue;
-            }
+            const decreaseBtn = document.getElementById('decreaseQty');
+            const increaseBtn = document.getElementById('increaseQty');
+            if (decreaseBtn) decreaseBtn.disabled = currentValue <= 1;
+            if (increaseBtn) increaseBtn.disabled = currentValue >= maxValue;
         }
 
-        // Validate quantity input
         document.getElementById('quantityInput')?.addEventListener('change', function () {
             const maxValue = parseInt(this.max) || 10;
             let value = parseInt(this.value) || 1;
-
             if (value < 1) value = 1;
             if (value > maxValue) value = maxValue;
-
             this.value = value;
             updateQuantityButtons();
         });
 
-        // Tab Navigation
+        // ── Tab Navigation ───────────────────────────────────────────────────────
         function showTab(tabName) {
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-
-            // Remove active class from all buttons
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.classList.remove('active');
-            });
-
-            // Show selected tab content
-            const tabContent = document.getElementById('tab-' + tabName);
-            if (tabContent) {
-                tabContent.classList.add('active');
-            }
-
-            // Add active class to clicked button
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tabName)?.classList.add('active');
             event.target.classList.add('active');
         }
 
-        // Mobile Sticky Bar - Show/Hide on scroll
-        let lastScrollTop = 0;
+        // ── Mobile Sticky Bar ────────────────────────────────────────────────────
         const stickyBar = document.getElementById('mobileStickyBar');
-
         window.addEventListener('scroll', function () {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            const formPosition = document.getElementById('addToCartForm')?.getBoundingClientRect().bottom || 0;
-
+            const formBottom = document.getElementById('addToCartForm')?.getBoundingClientRect().bottom || 0;
             if (window.innerWidth <= 991) {
-                if (formPosition < 0) {
-                    stickyBar.style.display = 'block';
-                } else {
-                    stickyBar.style.display = 'none';
-                }
+                stickyBar.style.display = formBottom < 0 ? 'block' : 'none';
             }
-
-            lastScrollTop = scrollTop;
         });
 
-        // Submit Add to Cart from mobile sticky bar
         function submitAddToCart() {
             document.getElementById('addToCartForm').submit();
         }
 
-        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function () {
             updateQuantityButtons();
         });
 
-        // Wishlist button placeholder
-        document.getElementById('wishlistBtn')?.addEventListener('click', function () {
+        // ── Wishlist Logic ───────────────────────────────────────────────────────
+        (async function initWishlist() {
+            const btn = document.getElementById('wishlistBtn');
+            if (!btn) return; // sản phẩm còn hàng → không render nút → thoát
+
+            const productId = parseInt(btn.dataset.productId);
+
+            // Nếu đã đăng nhập, check xem đã wishlist chưa để highlight đúng trạng thái
             @if (User.Identity?.IsAuthenticated == true)
             {
-                <text>
-                alert('Wishlist feature coming soon!');
-                </text>
+                    <text>
+                    try {
+                        const res = await fetch('/api/wishlist/my');
+                        if (res.ok) {
+                            const items = await res.json();
+                            if (items.some(i => i.productId === productId)) {
+                                setWishlistActive(btn, true);
+                            }
+                        }
+                    } catch {}
+                    </text>
             }
-            else
-            {
-                <text>
-                window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
-                </text>
+
+            btn.addEventListener('click', async function () {
+                // Chưa đăng nhập → redirect login
+                @if (User.Identity?.IsAuthenticated != true)
+                {
+                        <text>
+                        window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                        return;
+                        </text>
+                }
+
+                const isIn = btn.dataset.inWishlist === 'true';
+                btn.disabled = true;
+
+                try {
+                    if (isIn) {
+                        // Đang trong wishlist → xoá
+                        const res = await fetch('/api/wishlist/remove', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ productId })
+                        });
+                        if (res.ok) {
+                            setWishlistActive(btn, false);
+                            showWishlistToast('Removed from wishlist', '🤍');
+                        }
+                    } else {
+                        // Chưa trong wishlist → thêm
+                        const res = await fetch('/api/wishlist/add', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ productId })
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                            setWishlistActive(btn, true);
+                            showWishlistToast("Saved! We'll email you when it's back ❤️", '♡');
+                        } else {
+                            showWishlistToast(data.message || 'Something went wrong', '⚠️');
+                        }
+                    }
+                } catch {
+                    showWishlistToast('Network error. Please try again.', '⚠️');
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+        })();
+
+        function setWishlistActive(btn, active) {
+            btn.dataset.inWishlist = active ? 'true' : 'false';
+            const icon = btn.querySelector('i');
+            const text = btn.querySelector('span');
+            if (active) {
+                icon.className = 'bi bi-heart-fill';
+                text.textContent = 'Saved to Wishlist ✓';
+                btn.style.background = '#fffbf5';
+                btn.style.borderColor = '#c9a96e';
+                btn.style.color = '#a07840';
+            } else {
+                icon.className = 'bi bi-heart';
+                text.textContent = 'Save to Wishlist — Notify me when back';
+                btn.style.background = '';
+                btn.style.borderColor = '';
+                btn.style.color = '';
             }
-        });
+        }
+
+        let _wlToastTimer;
+        function showWishlistToast(msg, icon = '♡') {
+            let toast = document.getElementById('wl-toast-detail');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'wl-toast-detail';
+                toast.style.cssText = [
+                    'position:fixed', 'bottom:28px', 'left:50%',
+                    'transform:translateX(-50%) translateY(100px)',
+                    'background:#0f0f0f', 'color:#fff', 'border-radius:12px',
+                    'padding:12px 22px', 'font-size:13px', 'font-weight:500',
+                    'display:flex', 'align-items:center', 'gap:8px',
+                    'box-shadow:0 8px 28px rgba(0,0,0,0.22)', 'z-index:9999',
+                    'white-space:nowrap',
+                    'transition:transform .35s cubic-bezier(0.34,1.56,0.64,1)'
+                ].join(';');
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = `<span style="font-size:16px">${icon}</span>${msg}`;
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+            clearTimeout(_wlToastTimer);
+            _wlToastTimer = setTimeout(() => {
+                toast.style.transform = 'translateX(-50%) translateY(100px)';
+            }, 3000);
+        }
     </script>
 }

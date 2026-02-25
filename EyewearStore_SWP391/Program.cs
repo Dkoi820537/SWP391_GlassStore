@@ -49,6 +49,7 @@ builder.Services.AddScoped<IStripeService, StripeService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IWishlistService, WishlistService>();
 builder.Services.AddSingleton<IOtpService, OtpService>();
+builder.Services.AddScoped<IServiceService, ServiceService>();
 // Configure Stripe
 Stripe.StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 

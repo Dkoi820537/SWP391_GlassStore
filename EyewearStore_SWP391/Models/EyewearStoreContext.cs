@@ -282,15 +282,26 @@ public partial class EyewearStoreContext : DbContext
                 .HasMaxLength(200)
                 .IsRequired()
                 .HasColumnName("name");
+            entity.Property(e => e.Description)
+                .HasColumnName("description");
             entity.Property(e => e.Price)
                 .HasColumnType("decimal(18,2)")
                 .IsRequired()
                 .HasColumnName("price");
+            entity.Property(e => e.DurationMin)
+                .HasColumnName("duration_min");
+            entity.Property(e => e.ImageUrl)
+                .HasMaxLength(500)
+                .HasColumnName("image_url");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("SYSDATETIME()")
                 .HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnName("updated_at");
         });
-
         // =========================
         // PRODUCT IMAGES
         // =========================

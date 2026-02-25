@@ -1,0 +1,551 @@
+﻿@page
+@model EyewearStore_SWP391.Pages.Admin.Services.CreateModel
+@{
+    ViewData["Title"] = "New Service";
+    Layout = "_Layout";
+}
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0c0e14;
+            --surf: #13151e;
+            --surf2: #1a1d28;
+            --bdr: rgba(255,255,255,0.07);
+            --acc: #6c63ff;
+            --gold: #f5c842;
+            --txt: #e8eaf0;
+            --muted: #6b7080;
+            --ok: #34d399;
+            --err: #f87171;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--txt);
+        }
+
+        .fw {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 40px 28px 80px;
+        }
+
+        /* breadcrumb */
+        .bc {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Epilogue',sans-serif;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 26px;
+        }
+
+            .bc a {
+                color: var(--muted);
+                text-decoration: none;
+                transition: color .2s;
+            }
+
+                .bc a:hover {
+                    color: var(--acc);
+                }
+
+            .bc span.sep {
+                color: var(--bdr);
+            }
+
+        /* page heading */
+        .ph h1 {
+            font-family: 'Syne',sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0 0 4px;
+        }
+
+        .ph p {
+            font-family: 'Epilogue',sans-serif;
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0 0 28px;
+        }
+
+        /* form card */
+        .fc {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        .fs {
+            padding: 26px 30px;
+            border-bottom: 1px solid var(--bdr);
+        }
+
+            .fs:last-of-type {
+                border-bottom: none;
+            }
+
+        .sl {
+            font-family: 'Syne',sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--acc);
+            margin: 0 0 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .sl::after {
+                content: '';
+                flex: 1;
+                height: 1px;
+                background: var(--bdr);
+            }
+
+        .fr {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+            .fr.one {
+                grid-template-columns: 1fr;
+            }
+
+        .fg {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+            .fg label {
+                font-family: 'Epilogue',sans-serif;
+                font-size: 11px;
+                font-weight: 600;
+                color: var(--muted);
+                text-transform: uppercase;
+                letter-spacing: .8px;
+            }
+
+        .req {
+            color: var(--err);
+            margin-left: 2px;
+        }
+
+        .si {
+            background: var(--surf2);
+            border: 1px solid var(--bdr);
+            border-radius: 9px;
+            padding: 11px 14px;
+            color: var(--txt);
+            font-family: 'Epilogue',sans-serif;
+            font-size: 14px;
+            transition: border-color .2s,box-shadow .2s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+            .si:focus {
+                outline: none;
+                border-color: var(--acc);
+                box-shadow: 0 0 0 3px rgba(108,99,255,.14);
+            }
+
+            .si::placeholder {
+                color: var(--muted);
+            }
+
+        textarea.si {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .si.input-validation-error {
+            border-color: var(--err);
+        }
+
+        .field-validation-error {
+            font-family: 'Epilogue',sans-serif;
+            font-size: 11px;
+            color: var(--err);
+        }
+
+        .hint {
+            font-family: 'Epilogue',sans-serif;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        /* price wrapper */
+        .pw {
+            position: relative;
+        }
+
+            .pw .si {
+                padding-right: 44px;
+            }
+
+        .psuf {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: 'Syne',sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        /* toggle */
+        .tgl-wrap {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: var(--surf2);
+            border: 1px solid var(--bdr);
+            border-radius: 9px;
+            padding: 13px 15px;
+        }
+
+        .tgl {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+            .tgl input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+        .tslider {
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,.07);
+            border-radius: 100px;
+            cursor: pointer;
+            transition: background .3s;
+        }
+
+            .tslider::before {
+                content: '';
+                position: absolute;
+                width: 18px;
+                height: 18px;
+                left: 3px;
+                top: 3px;
+                background: var(--muted);
+                border-radius: 50%;
+                transition: transform .3s,background .3s;
+            }
+
+        .tgl input:checked + .tslider {
+            background: rgba(52,211,153,.3);
+        }
+
+            .tgl input:checked + .tslider::before {
+                transform: translateX(20px);
+                background: var(--ok);
+            }
+
+        .tgl-txt {
+            font-family: 'Epilogue',sans-serif;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+            .tgl-txt strong {
+                color: var(--txt);
+                display: block;
+                font-size: 14px;
+            }
+
+        /* upload zone */
+        .upzone {
+            border: 2px dashed var(--bdr);
+            border-radius: 13px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .3s;
+            background: var(--surf2);
+        }
+
+            .upzone:hover, .upzone.drag {
+                border-color: var(--acc);
+                background: rgba(108,99,255,.05);
+            }
+
+            .upzone input {
+                display: none;
+            }
+
+            .upzone .ui {
+                font-size: 34px;
+                margin-bottom: 8px;
+                opacity: .4;
+            }
+
+            .upzone h4 {
+                font-family: 'Syne',sans-serif;
+                font-size: 14px;
+                color: var(--txt);
+                margin: 0 0 3px;
+            }
+
+            .upzone p {
+                font-family: 'Epilogue',sans-serif;
+                font-size: 11px;
+                color: var(--muted);
+                margin: 0;
+            }
+
+        .prev {
+            display: none;
+            margin-top: 14px;
+            text-align: center;
+        }
+
+            .prev.show {
+                display: block;
+            }
+
+            .prev img {
+                max-width: 180px;
+                max-height: 140px;
+                border-radius: 9px;
+                object-fit: cover;
+                border: 1px solid var(--bdr);
+            }
+
+        .btn-rprev {
+            margin-top: 7px;
+            background: rgba(248,113,113,.15);
+            color: var(--err);
+            border: none;
+            border-radius: 6px;
+            padding: 5px 13px;
+            font-family: 'Epilogue',sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+            .btn-rprev:hover {
+                background: var(--err);
+                color: #fff;
+            }
+
+        /* actions bar */
+        .fa {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 22px 30px;
+            background: var(--surf2);
+            border-top: 1px solid var(--bdr);
+        }
+
+        .btn-submit {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--acc);
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            padding: 11px 26px;
+            font-family: 'Epilogue',sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+            .btn-submit:hover {
+                background: #5a52e0;
+                transform: translateY(-1px);
+                box-shadow: 0 6px 20px rgba(108,99,255,.35);
+            }
+
+        .btn-cancel {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--bdr);
+            border-radius: 9px;
+            padding: 11px 18px;
+            font-family: 'Epilogue',sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all .2s;
+        }
+
+            .btn-cancel:hover {
+                color: var(--txt);
+                border-color: rgba(255,255,255,.2);
+            }
+
+        .validation-summary-errors {
+            background: rgba(248,113,113,.1);
+            border: 1px solid rgba(248,113,113,.3);
+            border-radius: 9px;
+            padding: 13px 17px;
+            margin: 22px 30px 0;
+            font-family: 'Epilogue',sans-serif;
+            font-size: 13px;
+            color: var(--err);
+        }
+
+        @@media(max-width:580px) {
+            .fr {
+                grid-template-columns: 1fr;
+            }
+
+            .fw {
+                padding: 22px 14px 60px;
+            }
+
+            .fs {
+                padding: 20px 18px;
+            }
+        }
+    </style>
+}
+
+<div class="fw">
+    <div class="bc">
+        <a asp-page="Index"><i class="bi bi-gear"></i> Services</a>
+        <span class="sep">/</span>
+        <span>New Service</span>
+    </div>
+    <div class="ph">
+        <h1>✨ New Service</h1>
+        <p>Add a lens fitting, customization or repair service to the catalogue</p>
+    </div>
+
+    <div class="fc">
+        <form method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+            <!-- Basic Info -->
+            <div class="fs">
+                <div class="sl"><i class="bi bi-info-circle"></i> Basic Information</div>
+                <div class="fr one">
+                    <div class="fg">
+                        <label asp-for="Input.Name">Service Name <span class="req">*</span></label>
+                        <input asp-for="Input.Name" class="si" placeholder="e.g., Progressive Lens Fitting" />
+                        <span asp-validation-for="Input.Name" class="field-validation-error"></span>
+                    </div>
+                </div>
+                <div class="fr one">
+                    <div class="fg">
+                        <label asp-for="Input.Description">Description</label>
+                        <textarea asp-for="Input.Description" class="si" rows="3"
+                                  placeholder="Describe what this service includes…"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price & Duration -->
+            <div class="fs">
+                <div class="sl"><i class="bi bi-tag"></i> Pricing &amp; Duration</div>
+                <div class="fr">
+                    <div class="fg">
+                        <label asp-for="Input.Price">Price <span class="req">*</span></label>
+                        <div class="pw">
+                            <input asp-for="Input.Price" class="si" type="number" min="0" step="1000" placeholder="0" />
+                            <span class="psuf">₫</span>
+                        </div>
+                        <span asp-validation-for="Input.Price" class="field-validation-error"></span>
+                    </div>
+                    <div class="fg">
+                        <label asp-for="Input.DurationMin">Duration (minutes)</label>
+                        <input asp-for="Input.DurationMin" class="si" type="number" min="1" placeholder="e.g., 30" />
+                        <span class="hint">Leave blank if duration varies</span>
+                        <span asp-validation-for="Input.DurationMin" class="field-validation-error"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image -->
+            <div class="fs">
+                <div class="sl"><i class="bi bi-image"></i> Service Image</div>
+                <label class="upzone" id="upzone" for="imgIn">
+                    <div class="ui">🖼️</div>
+                    <h4>Drop image here or click to upload</h4>
+                    <p>JPG, PNG, WEBP — max 5 MB</p>
+                    <input type="file" id="imgIn" name="Input.ImageFile" accept=".jpg,.jpeg,.png,.webp" />
+                </label>
+                <div class="prev" id="prev">
+                    <img id="prevImg" src="" alt="Preview" />
+                    <br>
+                    <button type="button" class="btn-rprev" id="removeBtn">
+                        <i class="bi bi-trash3"></i> Remove
+                    </button>
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div class="fs">
+                <div class="sl"><i class="bi bi-toggles"></i> Status</div>
+                <div class="tgl-wrap">
+                    <label class="tgl">
+                        <input asp-for="Input.IsActive" type="checkbox" checked />
+                        <span class="tslider"></span>
+                    </label>
+                    <div class="tgl-txt">
+                        <strong>Active</strong>
+                        Visible to customers and can be added to cart
+                    </div>
+                </div>
+            </div>
+
+            <div class="fa">
+                <a asp-page="Index" class="btn-cancel"><i class="bi bi-x"></i> Cancel</a>
+                <button type="submit" class="btn-submit"><i class="bi bi-check-lg"></i> Create Service</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const zone = document.getElementById('upzone');
+        const inp  = document.getElementById('imgIn');
+        const prev = document.getElementById('prev');
+        const img  = document.getElementById('prevImg');
+        const rem  = document.getElementById('removeBtn');
+
+        inp.addEventListener('change', e => show(e.target.files[0]));
+        zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+        zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+        zone.addEventListener('drop', e => {
+            e.preventDefault(); zone.classList.remove('drag');
+            const f = e.dataTransfer.files[0];
+            if (f) { inp.files = e.dataTransfer.files; show(f); }
+        });
+        rem.addEventListener('click', () => { inp.value=''; img.src=''; prev.classList.remove('show'); });
+
+        function show(f) {
+            if (!f) return;
+            const r = new FileReader();
+            r.onload = e => { img.src = e.target.result; prev.classList.add('show'); };
+            r.readAsDataURL(f);
+        }
+    </script>
+}

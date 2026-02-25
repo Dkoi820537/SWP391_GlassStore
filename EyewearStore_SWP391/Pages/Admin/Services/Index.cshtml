@@ -1,0 +1,1069 @@
+﻿@page
+@model EyewearStore_SWP391.Pages.Admin.Services.IndexModel
+@{
+    ViewData["Title"] = "Service Management";
+    Layout = "_Layout";
+    bool filterTrue = Model.FilterActive == true;
+    bool filterFalse = Model.FilterActive == false;
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ── THEME TOKENS ─────────────────────────────────────────── */
+        :root {
+            --bg: #f5f6fa;
+            --bg2: #eceef5;
+            --surf: #ffffff;
+            --surf2: #f0f2f8;
+            --surf3: #e8eaf2;
+            --bdr: rgba(99,102,141,0.12);
+            --bdr2: rgba(99,102,141,0.22);
+            --acc: #5b5bdb;
+            --acc-h: #4747c2;
+            --acc-glow: rgba(91,91,219,0.20);
+            --gold: #b06c00;
+            --txt: #12132a;
+            --txt2: #40415e;
+            --muted: #8b8da8;
+            --ok: #0e9f6e;
+            --ok-bg: rgba(14,159,110,0.10);
+            --ok-bdr: rgba(14,159,110,0.28);
+            --err: #d94040;
+            --err-bg: rgba(217,64,64,0.10);
+            --err-bdr: rgba(217,64,64,0.28);
+            --shadow-sm: 0 1px 3px rgba(18,19,42,0.07), 0 1px 2px rgba(18,19,42,0.04);
+            --shadow-md: 0 4px 14px rgba(18,19,42,0.09), 0 2px 4px rgba(18,19,42,0.05);
+            --shadow-lg: 0 12px 32px rgba(18,19,42,0.12);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --tr: .2s cubic-bezier(.4,0,.2,1);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f1019;
+            --bg2: #161824;
+            --surf: #1c1f2e;
+            --surf2: #232638;
+            --surf3: #2a2e42;
+            --bdr: rgba(255,255,255,0.07);
+            --bdr2: rgba(255,255,255,0.14);
+            --acc: #7c7cff;
+            --acc-h: #6a6aee;
+            --acc-glow: rgba(124,124,255,0.22);
+            --gold: #f5c842;
+            --txt: #e8eaf6;
+            --txt2: #a8aac8;
+            --muted: #6b6d88;
+            --ok: #34d399;
+            --ok-bg: rgba(52,211,153,0.10);
+            --ok-bdr: rgba(52,211,153,0.28);
+            --err: #f87171;
+            --err-bg: rgba(248,113,113,0.10);
+            --err-bdr: rgba(248,113,113,0.28);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.28);
+            --shadow-md: 0 4px 14px rgba(0,0,0,0.32);
+            --shadow-lg: 0 12px 32px rgba(0,0,0,0.44);
+        }
+
+        /* ── BASE ─────────────────────────────────────────────────── */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--txt);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background var(--tr), color var(--tr);
+            margin: 0;
+        }
+
+        /* ── LAYOUT ───────────────────────────────────────────────── */
+        .sv-wrap {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 36px 28px 80px;
+        }
+
+        /* ── HEADER ───────────────────────────────────────────────── */
+        .sv-hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .sv-hdr-left h1 {
+            font-size: 1.85rem;
+            font-weight: 800;
+            margin: 0 0 4px;
+            letter-spacing: -.6px;
+            color: var(--txt);
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .h-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--acc), var(--acc-h));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            box-shadow: 0 4px 14px var(--acc-glow);
+            flex-shrink: 0;
+        }
+
+        .sv-hdr-left p {
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .sv-hdr-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ── THEME TOGGLE ─────────────────────────────────────────── */
+        .theme-toggle {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--bdr);
+            background: var(--surf);
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all var(--tr);
+            box-shadow: var(--shadow-sm);
+        }
+
+            .theme-toggle:hover {
+                border-color: var(--acc);
+                color: var(--acc);
+                background: var(--acc-glow);
+                transform: rotate(15deg);
+            }
+
+        /* ── BTN NEW ──────────────────────────────────────────────── */
+        .btn-new {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: linear-gradient(135deg, var(--acc), var(--acc-h));
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all var(--tr);
+            box-shadow: 0 4px 14px var(--acc-glow);
+        }
+
+            .btn-new:hover {
+                color: #fff;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 22px var(--acc-glow);
+            }
+
+            .btn-new:active {
+                transform: translateY(0);
+            }
+
+        /* ── STATS ────────────────────────────────────────────────── */
+        .sv-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .sc {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: var(--radius-lg);
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow var(--tr), border-color var(--tr), background var(--tr);
+        }
+
+            .sc:hover {
+                box-shadow: var(--shadow-md);
+                border-color: var(--bdr2);
+            }
+
+        .sc-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+            .sc-icon.p {
+                background: rgba(91,91,219,.12);
+                color: var(--acc);
+            }
+
+            .sc-icon.g {
+                background: var(--ok-bg);
+                color: var(--ok);
+            }
+
+            .sc-icon.r {
+                background: var(--err-bg);
+                color: var(--err);
+            }
+
+        .sc-lbl {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 3px;
+        }
+
+        .sc-val {
+            font-family: 'DM Mono', monospace;
+            font-size: 26px;
+            font-weight: 500;
+            color: var(--txt);
+            letter-spacing: -.5px;
+        }
+
+        /* ── ALERTS ───────────────────────────────────────────────── */
+        .alert-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 18px;
+            font-size: 13px;
+            font-weight: 600;
+            animation: slideDown .3s ease;
+        }
+
+        @@keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-bar.ok {
+            background: var(--ok-bg);
+            border: 1px solid var(--ok-bdr);
+            color: var(--ok);
+        }
+
+        .alert-bar.er {
+            background: var(--err-bg);
+            border: 1px solid var(--err-bdr);
+            color: var(--err);
+        }
+
+        /* ── FILTER ───────────────────────────────────────────────── */
+        .sv-filter {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            margin-bottom: 18px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            box-shadow: var(--shadow-sm);
+            transition: background var(--tr), border-color var(--tr);
+        }
+
+        .fg {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            min-width: 140px;
+        }
+
+            .fg label {
+                font-size: 10px;
+                font-weight: 700;
+                color: var(--muted);
+                text-transform: uppercase;
+                letter-spacing: 1.1px;
+            }
+
+        .sv-inp {
+            background: var(--surf2);
+            border: 1px solid var(--bdr);
+            border-radius: var(--radius-sm);
+            padding: 9px 12px;
+            color: var(--txt);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            transition: border-color var(--tr), background var(--tr), box-shadow var(--tr);
+            width: 100%;
+        }
+
+            .sv-inp:focus {
+                outline: none;
+                border-color: var(--acc);
+                box-shadow: 0 0 0 3px var(--acc-glow);
+                background: var(--surf);
+            }
+
+            .sv-inp::placeholder {
+                color: var(--muted);
+            }
+
+            .sv-inp option {
+                background: var(--surf);
+                color: var(--txt);
+            }
+
+        .btn-filter {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--acc);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 9px 16px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--tr);
+        }
+
+            .btn-filter:hover {
+                background: var(--acc-h);
+                box-shadow: 0 4px 12px var(--acc-glow);
+            }
+
+        .btn-reset {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--surf2);
+            color: var(--muted);
+            border: 1px solid var(--bdr);
+            border-radius: var(--radius-sm);
+            padding: 9px 14px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--tr);
+            text-decoration: none;
+        }
+
+            .btn-reset:hover {
+                color: var(--txt);
+                border-color: var(--bdr2);
+                background: var(--surf3);
+            }
+
+        /* ── TABLE ────────────────────────────────────────────────── */
+        .sv-tbl-wrap {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: background var(--tr), border-color var(--tr);
+        }
+
+        .sv-tbl {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .sv-tbl thead tr {
+                background: var(--surf2);
+                border-bottom: 1px solid var(--bdr);
+            }
+
+            .sv-tbl th {
+                font-size: 10px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1.5px;
+                color: var(--muted);
+                padding: 13px 18px;
+                text-align: left;
+                white-space: nowrap;
+            }
+
+            .sv-tbl td {
+                padding: 14px 18px;
+                border-bottom: 1px solid var(--bdr);
+                vertical-align: middle;
+            }
+
+            .sv-tbl tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+            .sv-tbl tbody tr {
+                transition: background var(--tr);
+            }
+
+                .sv-tbl tbody tr:hover {
+                    background: var(--surf2);
+                }
+
+        /* ── SERVICE CELL ─────────────────────────────────────────── */
+        .svc-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .svc-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 11px;
+            object-fit: cover;
+            border: 1px solid var(--bdr);
+            flex-shrink: 0;
+        }
+
+        .svc-no-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 11px;
+            background: var(--surf2);
+            border: 1.5px dashed var(--bdr2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--muted);
+            flex-shrink: 0;
+        }
+
+        .svc-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--txt);
+            margin: 0 0 3px;
+        }
+
+        .svc-desc {
+            font-size: 11px;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 240px;
+        }
+
+        /* ── CELLS ────────────────────────────────────────────────── */
+        .cell-price {
+            font-family: 'DM Mono', monospace;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gold);
+            white-space: nowrap;
+        }
+
+        .cell-dur {
+            font-size: 13px;
+            color: var(--txt2);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .cell-date {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        /* ── BADGES ───────────────────────────────────────────────── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+            .badge.on {
+                background: var(--ok-bg);
+                color: var(--ok);
+                border: 1px solid var(--ok-bdr);
+            }
+
+            .badge.off {
+                background: var(--err-bg);
+                color: var(--err);
+                border: 1px solid var(--err-bdr);
+            }
+
+        .bdot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: blink 1.8s infinite;
+        }
+
+        @@keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .25;
+            }
+        }
+
+        /* ── ACTION BTNS ──────────────────────────────────────────── */
+        .act-row {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-end;
+        }
+
+        .btn-act {
+            width: 34px;
+            height: 34px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--bdr);
+            background: var(--surf2);
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all var(--tr);
+            text-decoration: none;
+        }
+
+            .btn-act.edit:hover {
+                border-color: var(--acc);
+                color: var(--acc);
+                background: rgba(91,91,219,.09);
+            }
+
+            .btn-act.tog:hover {
+                border-color: var(--ok);
+                color: var(--ok);
+                background: var(--ok-bg);
+            }
+
+            .btn-act.del:hover {
+                border-color: var(--err);
+                color: var(--err);
+                background: var(--err-bg);
+            }
+
+        /* ── EMPTY ────────────────────────────────────────────────── */
+        .sv-empty {
+            text-align: center;
+            padding: 80px 24px;
+        }
+
+            .sv-empty .ei {
+                font-size: 56px;
+                opacity: .22;
+                margin-bottom: 16px;
+                display: block;
+            }
+
+            .sv-empty h3 {
+                font-size: 20px;
+                font-weight: 800;
+                color: var(--txt);
+                margin: 0 0 6px;
+            }
+
+            .sv-empty p {
+                font-size: 13px;
+                color: var(--muted);
+                margin: 0;
+            }
+
+        /* ── PAGINATION ───────────────────────────────────────────── */
+        .sv-pagi {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-top: 1px solid var(--bdr);
+            flex-wrap: wrap;
+            gap: 10px;
+            background: var(--surf2);
+        }
+
+        .pi {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .pp {
+            display: flex;
+            gap: 4px;
+        }
+
+        .pg {
+            min-width: 36px;
+            height: 36px;
+            padding: 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--bdr);
+            border-radius: var(--radius-sm);
+            background: var(--surf);
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all var(--tr);
+        }
+
+            .pg:hover {
+                border-color: var(--acc);
+                color: var(--acc);
+                background: rgba(91,91,219,.07);
+            }
+
+            .pg.active {
+                background: var(--acc);
+                border-color: var(--acc);
+                color: #fff;
+            }
+
+            .pg.disabled {
+                opacity: .3;
+                pointer-events: none;
+            }
+
+        /* ── TOAST ────────────────────────────────────────────────── */
+        .ftoast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(90px);
+            background: var(--surf);
+            border: 1px solid var(--bdr2);
+            border-radius: var(--radius-md);
+            padding: 12px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--txt);
+            box-shadow: var(--shadow-lg);
+            transition: transform .38s cubic-bezier(.34,1.56,.64,1);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+        }
+
+            .ftoast.show {
+                transform: translateX(-50%) translateY(0);
+            }
+
+        /* ── RESPONSIVE ───────────────────────────────────────────── */
+        @@media (max-width: 900px) {
+            .sv-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @@media (max-width: 600px) {
+            .sv-wrap {
+                padding: 24px 14px 60px;
+            }
+
+            .sv-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .sv-hdr {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+}
+
+<div class="sv-wrap">
+
+    <!-- HEADER -->
+    <div class="sv-hdr">
+        <div class="sv-hdr-left">
+            <h1>
+                <span class="h-icon">⚙️</span>
+                Services
+            </h1>
+            <p>Manage lens fitting, frame customization &amp; repair services</p>
+        </div>
+        <div class="sv-hdr-right">
+            <button class="theme-toggle" id="themeToggle" title="Toggle Dark / Light" onclick="toggleTheme()">
+                <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+            </button>
+            <a asp-page="Create" class="btn-new">
+                <i class="bi bi-plus-lg"></i> New Service
+            </a>
+        </div>
+    </div>
+
+    <!-- ALERTS -->
+    @if (TempData["Success"] is string okMsg)
+    {
+        <div class="alert-bar ok"><i class="bi bi-check-circle-fill"></i> @okMsg</div>
+    }
+    @if (TempData["Error"] is string erMsg)
+    {
+        <div class="alert-bar er"><i class="bi bi-exclamation-triangle-fill"></i> @erMsg</div>
+    }
+
+    <!-- STATS -->
+    <div class="sv-stats">
+        <div class="sc">
+            <div class="sc-icon p"><i class="bi bi-gear-wide-connected"></i></div>
+            <div>
+                <div class="sc-lbl">Total Services</div>
+                <div class="sc-val">@Model.Stats.Total</div>
+            </div>
+        </div>
+        <div class="sc">
+            <div class="sc-icon g"><i class="bi bi-check-circle-fill"></i></div>
+            <div>
+                <div class="sc-lbl">Active</div>
+                <div class="sc-val">@Model.Stats.Active</div>
+            </div>
+        </div>
+        <div class="sc">
+            <div class="sc-icon r"><i class="bi bi-pause-circle-fill"></i></div>
+            <div>
+                <div class="sc-lbl">Inactive</div>
+                <div class="sc-val">@Model.Stats.Inactive</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTER -->
+    <form method="get" class="sv-filter">
+        <div class="fg" style="flex:2">
+            <label>Search</label>
+            <input class="sv-inp" type="text" name="SearchTerm"
+                   value="@Model.SearchTerm" placeholder="Search by name or description…" />
+        </div>
+        <div class="fg" style="max-width:165px">
+            <label>Status</label>
+            <select class="sv-inp" name="FilterActive">
+                <option value="">All Statuses</option>
+                @if (filterTrue)
+                {
+                    <option value="true" selected="selected">Active</option>
+                    <option value="false">Inactive</option>
+                }
+                else if (filterFalse)
+                {
+                    <option value="true">Active</option>
+                    <option value="false" selected="selected">Inactive</option>
+                }
+                else
+                {
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                }
+            </select>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-end">
+            <button type="submit" class="btn-filter">
+                <i class="bi bi-search"></i> Search
+            </button>
+            <a asp-page="Index" class="btn-reset">
+                <i class="bi bi-x-lg"></i> Reset
+            </a>
+        </div>
+    </form>
+
+    <!-- TABLE -->
+    <div class="sv-tbl-wrap">
+        @if (Model.Items.Any())
+        {
+            <div style="overflow-x:auto">
+                <table class="sv-tbl">
+                    <thead>
+                        <tr>
+                            <th style="width:54px">ID</th>
+                            <th>Service</th>
+                            <th>Price</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th style="text-align:right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in Model.Items)
+                        {
+                            string iconClass = s.IsActive ? "pause-fill" : "play-fill";
+                            string toggleTitle = s.IsActive ? "Deactivate" : "Activate";
+                            string badgeClass = s.IsActive ? "on" : "off";
+                            string badgeLabel = s.IsActive ? "Active" : "Inactive";
+                            string duration = s.DurationMin.HasValue ? s.DurationMin + " min" : "—";
+                            string desc = s.Description ?? "No description provided.";
+                            string encodedName = System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.Name);
+
+                            <tr>
+                                <td style="color:var(--muted);font-family:'DM Mono',monospace;font-size:12px">
+                                    #@s.ServiceId
+                                </td>
+                                <td>
+                                    <div class="svc-cell">
+                                        @if (!string.IsNullOrEmpty(s.ImageUrl))
+                                        {
+                                            <img src="@s.ImageUrl" class="svc-thumb" alt="@s.Name" />
+                                        }
+                                        else
+                                        {
+                                            <div class="svc-no-img">⚙️</div>
+                                        }
+                                        <div>
+                                            <div class="svc-name">@s.Name</div>
+                                            <div class="svc-desc">@desc</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="cell-price">@s.Price.ToString("N0") ₫</td>
+                                <td class="cell-dur">
+                                    @if (s.DurationMin.HasValue)
+                                    {
+                                        <span>
+                                            <i class="bi bi-clock"
+                                               style="font-size:11px;margin-right:4px;opacity:.55"></i>@duration
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span style="color:var(--muted)">—</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge @badgeClass">
+                                        <span class="bdot"></span>@badgeLabel
+                                    </span>
+                                </td>
+                                <td class="cell-date">@s.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <div class="act-row">
+                                        <a asp-page="Edit" asp-route-id="@s.ServiceId"
+                                           class="btn-act edit" title="Edit service">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </a>
+                                        <button class="btn-act tog" title="@toggleTitle"
+                                                onclick="doToggle(@s.ServiceId)">
+                                            <i class="bi bi-@iconClass"></i>
+                                        </button>
+                                        <button class="btn-act del" title="Delete service"
+                                                onclick="doDelete(@s.ServiceId, '@encodedName')">
+                                            <i class="bi bi-trash3-fill"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                int ps = Math.Max(1, Model.CurrentPage - 2);
+                int pe = Math.Min(Model.TotalPages, ps + 4);
+                int from = (Model.CurrentPage - 1) * IndexModel.PageSize + 1;
+                int to = Math.Min(Model.CurrentPage * IndexModel.PageSize, Model.TotalCount);
+
+                <div class="sv-pagi">
+                    <div class="pi">
+                        Showing <strong>@from–@to</strong> of <strong>@Model.TotalCount</strong> services
+                    </div>
+                    <div class="pp">
+                        @if (Model.HasPreviousPage)
+                        {
+                            <a class="pg" asp-page="Index"
+                               asp-route-SearchTerm="@Model.SearchTerm"
+                               asp-route-FilterActive="@Model.FilterActive"
+                               asp-route-CurrentPage="@(Model.CurrentPage - 1)">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="pg disabled"><i class="bi bi-chevron-left"></i></span>
+                        }
+
+                        @for (int i = ps; i <= pe; i++)
+                        {
+                            if (i == Model.CurrentPage)
+                            {
+                                <span class="pg active">@i</span>
+                            }
+                            else
+                            {
+                                <a class="pg" asp-page="Index"
+                                   asp-route-SearchTerm="@Model.SearchTerm"
+                                   asp-route-FilterActive="@Model.FilterActive"
+                                   asp-route-CurrentPage="@i">@i</a>
+                            }
+                        }
+
+                        @if (Model.HasNextPage)
+                        {
+                            <a class="pg" asp-page="Index"
+                               asp-route-SearchTerm="@Model.SearchTerm"
+                               asp-route-FilterActive="@Model.FilterActive"
+                               asp-route-CurrentPage="@(Model.CurrentPage + 1)">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="pg disabled"><i class="bi bi-chevron-right"></i></span>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="sv-empty">
+                <span class="ei">⚙️</span>
+                <h3>No services found</h3>
+                <p>
+                    @if (string.IsNullOrEmpty(Model.SearchTerm))
+                    {
+                        <text>Create your first service to get started.</text>
+                    }
+                    else
+                    {
+                        <text>No results match your search. Try adjusting the filters.</text>
+                    }
+                </p>
+            </div>
+        }
+    </div>
+
+</div>
+
+<div class="ftoast" id="ftoast"></div>
+
+@section Scripts {
+    <script>
+        /* ── THEME ──────────────────────────────────────────────── */
+        (function () {
+            const saved = localStorage.getItem('sv-theme') || 'light';
+            applyTheme(saved, false);
+        })();
+
+        function applyTheme(theme, animate) {
+            const root = document.documentElement;
+            if (animate) root.style.transition = 'background .3s, color .3s';
+            root.setAttribute('data-theme', theme);
+            const icon = document.getElementById('themeIcon');
+            if (icon) {
+                icon.className = theme === 'dark'
+                    ? 'bi bi-sun-fill'
+                    : 'bi bi-moon-stars-fill';
+            }
+            if (animate) setTimeout(() => (root.style.transition = ''), 400);
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            const next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('sv-theme', next);
+            applyTheme(next, true);
+        }
+
+        /* ── TOGGLE STATUS ──────────────────────────────────────── */
+        async function doToggle(id) {
+            try {
+                const r = await fetch(`/api/services/${id}/toggle`, { method: 'POST' });
+                if (r.ok) {
+                    toast('✓ Status updated');
+                    setTimeout(() => location.reload(), 900);
+                } else {
+                    toast('⚠️ Toggle failed');
+                }
+            } catch {
+                toast('⚠️ Network error');
+            }
+        }
+
+        /* ── DELETE ─────────────────────────────────────────────── */
+        function doDelete(id, name) {
+            if (!confirm(`Delete service "${name}"?\nThis action cannot be undone.`)) return;
+            deleteService(id);
+        }
+
+        async function deleteService(id) {
+            try {
+                const r = await fetch(`/api/services/${id}`, { method: 'DELETE' });
+                if (r.ok) {
+                    toast('✓ Service deleted');
+                    setTimeout(() => location.reload(), 900);
+                } else {
+                    const d = await r.json().catch(() => ({}));
+                    toast('⚠️ ' + (d.message || 'Delete failed'));
+                }
+            } catch {
+                toast('⚠️ Network error');
+            }
+        }
+
+        /* ── TOAST ──────────────────────────────────────────────── */
+        let _toastTimer;
+        function toast(msg) {
+            const el = document.getElementById('ftoast');
+            el.textContent = msg;
+            el.classList.add('show');
+            clearTimeout(_toastTimer);
+            _toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+        }
+    </script>
+}

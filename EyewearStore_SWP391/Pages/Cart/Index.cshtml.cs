@@ -24,15 +24,44 @@ namespace EyewearStore_SWP391.Pages.Cart
         public decimal PrescriptionFeesTotal { get; set; }
         public List<PrescriptionProfile> Prescriptions { get; set; } = new();
 
+        /// <summary>
+        /// Dictionary lensProductId → Product, dùng để hiển thị tên + giá Lens
+        /// trong các CartItem của đơn gia công.
+        /// </summary>
+        public Dictionary<int, Product> LensProducts { get; set; } = new();
+
         public async Task<IActionResult> OnGetAsync()
         {
-            if (!User.Identity.IsAuthenticated) return Challenge();
+            if (!User.Identity!.IsAuthenticated) return Challenge();
             var uid = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
             Cart = await _cartService.GetCartByUserIdAsync(uid);
-            var (subtotalBase, prescriptionFees, grandTotal) = await _cartService.GetCartTotalsBreakdownAsync(uid);
+
+            // Load Lens products cho các đơn gia công
+            if (Cart != null)
+            {
+                var lensIds = Cart.CartItems
+                    .Select(ci => CartService.ExtractLensProductId(ci.TempPrescriptionJson))
+                    .Where(id => id.HasValue)
+                    .Select(id => id!.Value)
+                    .Distinct()
+                    .ToList();
+
+                if (lensIds.Any())
+                {
+                    LensProducts = await _context.Products
+                        .Where(p => lensIds.Contains(p.ProductId))
+                        .ToDictionaryAsync(p => p.ProductId);
+                }
+            }
+
+            var (subtotalBase, prescriptionFees, grandTotal) =
+                await _cartService.GetCartTotalsBreakdownAsync(uid);
+
             SubtotalBase = subtotalBase;
             PrescriptionFeesTotal = prescriptionFees;
             Total = grandTotal;
+
             await LoadPrescriptionsAsync(uid);
             return Page();
         }
@@ -52,10 +81,7 @@ namespace EyewearStore_SWP391.Pages.Cart
                 await _cartService.UpdateQuantityAsync(cartItemId, quantity);
                 TempData["SuccessMessage"] = "Cart updated successfully";
             }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = ex.Message;
-            }
+            catch (Exception ex) { TempData["ErrorMessage"] = ex.Message; }
             return RedirectToPage();
         }
 
@@ -81,10 +107,7 @@ namespace EyewearStore_SWP391.Pages.Cart
                 await _cartService.UpdateItemPrescriptionAsync(cartItemId, tempPrescriptionJson);
                 TempData["SuccessMessage"] = "Prescription updated successfully";
             }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = ex.Message;
-            }
+            catch (Exception ex) { TempData["ErrorMessage"] = ex.Message; }
             return RedirectToPage();
         }
 
@@ -96,10 +119,7 @@ namespace EyewearStore_SWP391.Pages.Cart
                 await _cartService.UpdateItemPrescriptionByIdAsync(cartItemId, prescriptionId, uid);
                 TempData["SuccessMessage"] = "Prescription updated for this item.";
             }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = ex.Message;
-            }
+            catch (Exception ex) { TempData["ErrorMessage"] = ex.Message; }
             return RedirectToPage();
         }
     }

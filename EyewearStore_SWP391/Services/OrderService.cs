@@ -1,295 +1,295 @@
-using EyewearStore_SWP391.Models;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+    using EyewearStore_SWP391.Models;
+    using Microsoft.EntityFrameworkCore;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
 
-namespace EyewearStore_SWP391.Services
-{
-    /// <summary>
-    /// Handles order lifecycle: creation from cart, payment confirmation,
-    /// inventory reduction, and cancellation.
-    /// 
-    /// IMPORTANT: This implementation does NOT change DB schema.
-    /// Prescription selection is persisted inside OrderItem.SnapshotJson.
-    /// </summary>
-    public class OrderService : IOrderService
+    namespace EyewearStore_SWP391.Services
     {
-        private readonly EyewearStoreContext _context;
-        private readonly ICartService _cartService;
-        private readonly ILogger<OrderService> _logger;
-
-        public OrderService(EyewearStoreContext context, ICartService cartService, ILogger<OrderService> logger)
+        /// <summary>
+        /// Handles order lifecycle: creation from cart, payment confirmation,
+        /// inventory reduction, and cancellation.
+        /// 
+        /// IMPORTANT: This implementation does NOT change DB schema.
+        /// Prescription selection is persisted inside OrderItem.SnapshotJson.
+        /// </summary>
+        public class OrderService : IOrderService
         {
-            _context = context;
-            _cartService = cartService;
-            _logger = logger;
-        }
+            private readonly EyewearStoreContext _context;
+            private readonly ICartService _cartService;
+            private readonly ILogger<OrderService> _logger;
 
-        public async Task<Order> CreatePendingOrderAsync(int userId, int addressId, int? prescriptionId = null)
-        {
-            using var tx = await _context.Database.BeginTransactionAsync();
-            try
+            public OrderService(EyewearStoreContext context, ICartService cartService, ILogger<OrderService> logger)
             {
-                var cart = await _context.Carts
-                    .Include(c => c.CartItems)
-                        .ThenInclude(ci => ci.Product)
-                            .ThenInclude(p => p.ProductImages)
-                    .Include(c => c.CartItems)
-                        .ThenInclude(ci => ci.Service) // OK if CartItem has Service nav
-                    .FirstOrDefaultAsync(c => c.UserId == userId);
+                _context = context;
+                _cartService = cartService;
+                _logger = logger;
+            }
 
-                if (cart == null || !cart.CartItems.Any())
-                    throw new InvalidOperationException("Cart is empty");
-
-                // Validate address ownership
-                var address = await _context.Addresses
-                    .FirstOrDefaultAsync(a => a.AddressId == addressId && a.UserId == userId);
-                if (address == null)
-                    throw new InvalidOperationException("Invalid address");
-
-                // Validate prescription if provided (must belong to user and active)
-                PrescriptionProfile? prescription = null;
-                if (prescriptionId.HasValue && prescriptionId.Value > 0)
+            public async Task<Order> CreatePendingOrderAsync(int userId, int addressId, int? prescriptionId = null)
+            {
+                using var tx = await _context.Database.BeginTransactionAsync();
+                try
                 {
-                    prescription = await _context.PrescriptionProfiles
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(p => p.PrescriptionId == prescriptionId.Value && p.UserId == userId && p.IsActive);
+                    var cart = await _context.Carts
+                        .Include(c => c.CartItems)
+                            .ThenInclude(ci => ci.Product)
+                                .ThenInclude(p => p.ProductImages)
+                        .Include(c => c.CartItems)
+                            .ThenInclude(ci => ci.Service) // OK if CartItem has Service nav
+                        .FirstOrDefaultAsync(c => c.UserId == userId);
 
-                    if (prescription == null)
-                        throw new InvalidOperationException("Invalid or inactive prescription selected.");
-                }
+                    if (cart == null || !cart.CartItems.Any())
+                        throw new InvalidOperationException("Cart is empty");
 
-                // Validate stock availability
-                foreach (var ci in cart.CartItems)
-                {
-                    if (ci.Product == null) continue;
-                    if (!ci.Product.IsActive)
-                        throw new InvalidOperationException($"Product \"{ci.Product.Name}\" is no longer available.");
-                    if (ci.Product.InventoryQty.HasValue && ci.Product.InventoryQty < ci.Quantity)
-                        throw new InvalidOperationException($"Insufficient stock for \"{ci.Product.Name}\".");
-                }
+                    // Validate address ownership
+                    var address = await _context.Addresses
+                        .FirstOrDefaultAsync(a => a.AddressId == addressId && a.UserId == userId);
+                    if (address == null)
+                        throw new InvalidOperationException("Invalid address");
 
-                // Build OrderItems (store snapshot JSON with product/service/prescription)
-                var orderItems = new List<OrderItem>();
-                decimal totalAmount = 0m;
-
-                foreach (var ci in cart.CartItems)
-                {
-                    decimal unitPrice = ci.Product?.Price ?? 0m;
-                    string? serviceName = null;
-                    if (ci.Service != null)
+                    // Validate prescription if provided (must belong to user and active)
+                    PrescriptionProfile? prescription = null;
+                    if (prescriptionId.HasValue && prescriptionId.Value > 0)
                     {
-                        unitPrice += ci.Service.Price;
-                        serviceName = ci.Service.Name;
+                        prescription = await _context.PrescriptionProfiles
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(p => p.PrescriptionId == prescriptionId.Value && p.UserId == userId && p.IsActive);
+
+                        if (prescription == null)
+                            throw new InvalidOperationException("Invalid or inactive prescription selected.");
                     }
 
-                    var snapshotObj = new
+                    // Validate stock availability
+                    foreach (var ci in cart.CartItems)
                     {
-                        ProductName = ci.Product?.Name,
-                        ProductType = ci.Product?.ProductType,
-                        ServiceName = serviceName,
-                        ImageUrl = ci.Product?.ProductImages?
-                                    .Where(img => img.IsPrimary && img.IsActive)
-                                    .Select(img => img.ImageUrl)
-                                    .FirstOrDefault(),
-                        Prescription = prescription == null ? null : new
+                        if (ci.Product == null) continue;
+                        if (!ci.Product.IsActive)
+                            throw new InvalidOperationException($"Product \"{ci.Product.Name}\" is no longer available.");
+                        if (ci.Product.InventoryQty.HasValue && ci.Product.InventoryQty < ci.Quantity)
+                            throw new InvalidOperationException($"Insufficient stock for \"{ci.Product.Name}\".");
+                    }
+
+                    // Build OrderItems (store snapshot JSON with product/service/prescription)
+                    var orderItems = new List<OrderItem>();
+                    decimal totalAmount = 0m;
+
+                    foreach (var ci in cart.CartItems)
+                    {
+                        decimal unitPrice = ci.Product?.Price ?? 0m;
+                        string? serviceName = null;
+                        if (ci.Service != null)
                         {
-                            Id = prescription.PrescriptionId,
-                            Name = prescription.ProfileName,
-                            RightSph = prescription.RightSph,
-                            RightCyl = prescription.RightCyl,
-                            RightAxis = prescription.RightAxis,
-                            LeftSph = prescription.LeftSph,
-                            LeftCyl = prescription.LeftCyl,
-                            LeftAxis = prescription.LeftAxis
+                            unitPrice += ci.Service.Price;
+                            serviceName = ci.Service.Name;
                         }
-                    };
 
-                    var oi = new OrderItem
+                        var snapshotObj = new
+                        {
+                            ProductName = ci.Product?.Name,
+                            ProductType = ci.Product?.ProductType,
+                            ServiceName = serviceName,
+                            ImageUrl = ci.Product?.ProductImages?
+                                        .Where(img => img.IsPrimary && img.IsActive)
+                                        .Select(img => img.ImageUrl)
+                                        .FirstOrDefault(),
+                            Prescription = prescription == null ? null : new
+                            {
+                                Id = prescription.PrescriptionId,
+                                Name = prescription.ProfileName,
+                                RightSph = prescription.RightSph,
+                                RightCyl = prescription.RightCyl,
+                                RightAxis = prescription.RightAxis,
+                                LeftSph = prescription.LeftSph,
+                                LeftCyl = prescription.LeftCyl,
+                                LeftAxis = prescription.LeftAxis
+                            }
+                        };
+
+                        var oi = new OrderItem
+                        {
+                            ProductId = ci.ProductId,
+                            PrescriptionId = prescription?.PrescriptionId, // works if OrderItem has this property (ok)
+                            UnitPrice = unitPrice,
+                            Quantity = ci.Quantity,
+                            IsBundle = false,
+                            SnapshotJson = System.Text.Json.JsonSerializer.Serialize(snapshotObj)
+                        };
+
+                        orderItems.Add(oi);
+                        totalAmount += unitPrice * ci.Quantity;
+                    }
+
+                    // Create Order (ONLY use fields present in the Order model)
+                    var order = new Order
                     {
-                        ProductId = ci.ProductId,
-                        PrescriptionId = prescription?.PrescriptionId, // works if OrderItem has this property (ok)
-                        UnitPrice = unitPrice,
-                        Quantity = ci.Quantity,
-                        IsBundle = false,
-                        SnapshotJson = System.Text.Json.JsonSerializer.Serialize(snapshotObj)
+                        UserId = userId,
+                        AddressId = addressId,
+                        Status = "Pending",
+                        TotalAmount = totalAmount,
+                        PaymentMethod = "Stripe",
+                        CreatedAt = DateTime.UtcNow
                     };
 
-                    orderItems.Add(oi);
-                    totalAmount += unitPrice * ci.Quantity;
+                    _context.Orders.Add(order);
+                    await _context.SaveChangesAsync();
+
+                    // Attach OrderId to items and save
+                    foreach (var oi in orderItems) oi.OrderId = order.OrderId;
+                    _context.OrderItems.AddRange(orderItems);
+                    await _context.SaveChangesAsync();
+
+                    await tx.CommitAsync();
+
+                    _logger.LogInformation("Created pending order {OrderId} for user {UserId} total {Total}",
+                        order.OrderId, userId, totalAmount);
+
+                    return order;
                 }
-
-                // Create Order (ONLY use fields present in the Order model)
-                var order = new Order
+                catch
                 {
-                    UserId = userId,
-                    AddressId = addressId,
-                    Status = "Pending",
-                    TotalAmount = totalAmount,
-                    PaymentMethod = "Stripe",
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                _context.Orders.Add(order);
-                await _context.SaveChangesAsync();
-
-                // Attach OrderId to items and save
-                foreach (var oi in orderItems) oi.OrderId = order.OrderId;
-                _context.OrderItems.AddRange(orderItems);
-                await _context.SaveChangesAsync();
-
-                await tx.CommitAsync();
-
-                _logger.LogInformation("Created pending order {OrderId} for user {UserId} total {Total}",
-                    order.OrderId, userId, totalAmount);
-
-                return order;
+                    await tx.RollbackAsync();
+                    throw;
+                }
             }
-            catch
+
+            public async Task<Order?> GetOrderByIdAsync(int orderId)
             {
-                await tx.RollbackAsync();
-                throw;
+                return await _context.Orders
+                    .Include(o => o.OrderItems)
+                        .ThenInclude(oi => oi.Product)
+                            .ThenInclude(p => p.ProductImages)
+                    .Include(o => o.Address)
+                    .Include(o => o.User)
+                    .FirstOrDefaultAsync(o => o.OrderId == orderId);
             }
-        }
 
-        public async Task<Order?> GetOrderByIdAsync(int orderId)
-        {
-            return await _context.Orders
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Product)
-                        .ThenInclude(p => p.ProductImages)
-                .Include(o => o.Address)
-                .Include(o => o.User)
-                .FirstOrDefaultAsync(o => o.OrderId == orderId);
-        }
+            public async Task<Order?> GetOrderByStripeSessionIdAsync(string sessionId)
+            {
+                return await _context.Orders
+                    .Include(o => o.OrderItems)
+                        .ThenInclude(oi => oi.Product)
+                    .FirstOrDefaultAsync(o => o.StripeSessionId == sessionId);
+            }
 
-        public async Task<Order?> GetOrderByStripeSessionIdAsync(string sessionId)
-        {
-            return await _context.Orders
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Product)
-                .FirstOrDefaultAsync(o => o.StripeSessionId == sessionId);
-        }
+            public async Task<List<Order>> GetOrdersByUserIdAsync(int userId)
+            {
+                return await _context.Orders
+                    .Where(o => o.UserId == userId)
+                    .Include(o => o.OrderItems)
+                        .ThenInclude(oi => oi.Product)
+                    .OrderByDescending(o => o.CreatedAt)
+                    .ToListAsync();
+            }
 
-        public async Task<List<Order>> GetOrdersByUserIdAsync(int userId)
-        {
-            return await _context.Orders
-                .Where(o => o.UserId == userId)
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Product)
-                .OrderByDescending(o => o.CreatedAt)
-                .ToListAsync();
-        }
+            public async Task MarkOrderPaidAsync(int orderId, string paymentIntentId)
+            {
+                using var tx = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    var order = await _context.Orders
+                        .Include(o => o.OrderItems)
+                        .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
-        public async Task MarkOrderPaidAsync(int orderId, string paymentIntentId)
-        {
-            using var tx = await _context.Database.BeginTransactionAsync();
-            try
+                    if (order == null)
+                    {
+                        _logger.LogWarning("MarkOrderPaidAsync: order {OrderId} not found", orderId);
+                        return;
+                    }
+
+                    if (order.Status == "Pending Confirmation")
+                    {
+                        _logger.LogInformation("Order {OrderId} already Pending Confirmation", orderId);
+                        return;
+                    }
+
+                    order.Status = "Pending Confirmation";
+                    order.StripePaymentIntentId = paymentIntentId;
+
+                    // Reduce inventory
+                    foreach (var oi in order.OrderItems)
+                    {
+                        var product = await _context.Products.FindAsync(oi.ProductId);
+                        if (product != null && product.InventoryQty.HasValue)
+                        {
+                            product.InventoryQty -= oi.Quantity;
+                            if (product.InventoryQty < 0) product.InventoryQty = 0;
+
+                            // If Product has UpdatedAt, try to set it via reflection (safe-guard)
+                            var prop = product.GetType().GetProperty("UpdatedAt");
+                            if (prop != null && prop.CanWrite)
+                            {
+                                prop.SetValue(product, DateTime.UtcNow);
+                            }
+                        }
+                    }
+
+                    await _context.SaveChangesAsync();
+
+                    // Clear cart
+                    await _cartService.ClearCartAsync(order.UserId);
+
+                    await tx.CommitAsync();
+
+                    _logger.LogInformation("Order {OrderId} marked Pending Confirmation, inventory reduced, cart cleared for user {UserId}",
+                        orderId, order.UserId);
+                }
+                catch
+                {
+                    await tx.RollbackAsync();
+                    throw;
+                }
+            }
+
+            public async Task CancelOrderAsync(int orderId)
+            {
+                var order = await _context.Orders.FindAsync(orderId);
+                if (order == null) return;
+
+                if (order.Status == "Pending")
+                {
+                    order.Status = "Cancelled";
+                    await _context.SaveChangesAsync();
+                    _logger.LogInformation("Order {OrderId} cancelled", orderId);
+                }
+            }
+
+            public async Task<Order> ConfirmOrderAsync(int orderId, string stripeSessionId)
             {
                 var order = await _context.Orders
                     .Include(o => o.OrderItems)
                     .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
-                if (order == null)
+                if (order == null) throw new InvalidOperationException("Order not found");
+
+                order.Status = "Confirmed";
+                order.StripeSessionId = stripeSessionId;
+                // Do not set UpdatedAt if Order model doesn't have it
+
+                // Clear user's cart items
+                var cart = await _context.Carts
+                    .Include(c => c.CartItems)
+                    .FirstOrDefaultAsync(c => c.UserId == order.UserId);
+                if (cart != null)
                 {
-                    _logger.LogWarning("MarkOrderPaidAsync: order {OrderId} not found", orderId);
-                    return;
-                }
-
-                if (order.Status == "Pending Confirmation")
-                {
-                    _logger.LogInformation("Order {OrderId} already Pending Confirmation", orderId);
-                    return;
-                }
-
-                order.Status = "Pending Confirmation";
-                order.StripePaymentIntentId = paymentIntentId;
-
-                // Reduce inventory
-                foreach (var oi in order.OrderItems)
-                {
-                    var product = await _context.Products.FindAsync(oi.ProductId);
-                    if (product != null && product.InventoryQty.HasValue)
-                    {
-                        product.InventoryQty -= oi.Quantity;
-                        if (product.InventoryQty < 0) product.InventoryQty = 0;
-
-                        // If Product has UpdatedAt, try to set it via reflection (safe-guard)
-                        var prop = product.GetType().GetProperty("UpdatedAt");
-                        if (prop != null && prop.CanWrite)
-                        {
-                            prop.SetValue(product, DateTime.UtcNow);
-                        }
-                    }
+                    _context.CartItems.RemoveRange(cart.CartItems);
                 }
 
                 await _context.SaveChangesAsync();
-
-                // Clear cart
-                await _cartService.ClearCartAsync(order.UserId);
-
-                await tx.CommitAsync();
-
-                _logger.LogInformation("Order {OrderId} marked Pending Confirmation, inventory reduced, cart cleared for user {UserId}",
-                    orderId, order.UserId);
+                return order;
             }
-            catch
+
+            public async Task<List<Order>> GetUserOrdersAsync(int userId)
             {
-                await tx.RollbackAsync();
-                throw;
+                return await _context.Orders
+                    .Where(o => o.UserId == userId)
+                    .Include(o => o.OrderItems)
+                        .ThenInclude(oi => oi.Product)
+                    .Include(o => o.OrderItems)
+                        .ThenInclude(oi => oi.Prescription) // If model has nav; otherwise SnapshotJson stores prescription
+                    .OrderByDescending(o => o.CreatedAt)
+                    .ToListAsync();
             }
-        }
-
-        public async Task CancelOrderAsync(int orderId)
-        {
-            var order = await _context.Orders.FindAsync(orderId);
-            if (order == null) return;
-
-            if (order.Status == "Pending")
-            {
-                order.Status = "Cancelled";
-                await _context.SaveChangesAsync();
-                _logger.LogInformation("Order {OrderId} cancelled", orderId);
-            }
-        }
-
-        public async Task<Order> ConfirmOrderAsync(int orderId, string stripeSessionId)
-        {
-            var order = await _context.Orders
-                .Include(o => o.OrderItems)
-                .FirstOrDefaultAsync(o => o.OrderId == orderId);
-
-            if (order == null) throw new InvalidOperationException("Order not found");
-
-            order.Status = "Confirmed";
-            order.StripeSessionId = stripeSessionId;
-            // Do not set UpdatedAt if Order model doesn't have it
-
-            // Clear user's cart items
-            var cart = await _context.Carts
-                .Include(c => c.CartItems)
-                .FirstOrDefaultAsync(c => c.UserId == order.UserId);
-            if (cart != null)
-            {
-                _context.CartItems.RemoveRange(cart.CartItems);
-            }
-
-            await _context.SaveChangesAsync();
-            return order;
-        }
-
-        public async Task<List<Order>> GetUserOrdersAsync(int userId)
-        {
-            return await _context.Orders
-                .Where(o => o.UserId == userId)
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Product)
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Prescription) // If model has nav; otherwise SnapshotJson stores prescription
-                .OrderByDescending(o => o.CreatedAt)
-                .ToListAsync();
         }
     }
-}

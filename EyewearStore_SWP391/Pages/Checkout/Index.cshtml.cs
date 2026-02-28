@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Text.Json;
 using EyewearStore_SWP391.DTOs;
 using EyewearStore_SWP391.Models;
 using EyewearStore_SWP391.Services;
@@ -34,6 +35,8 @@ namespace EyewearStore_SWP391.Pages.Checkout
         public List<Address> Addresses { get; set; } = new();
         public Address? DefaultAddress { get; set; }
 
+        // LensProducts dùng để hiển thị tên lens trong checkout page
+        public Dictionary<int, Product> LensProducts { get; set; } = new();
 
         [BindProperty]
         public int SelectedAddressId { get; set; }
@@ -66,12 +69,13 @@ namespace EyewearStore_SWP391.Pages.Checkout
                 return RedirectToPage("/Cart/Index");
             }
 
+            // Load lens products để hiển thị tên trên checkout page
+            await LoadLensProductsAsync(Cart);
             await LoadAddressesAsync(userId);
 
             return Page();
         }
 
-        // ✅✅✅ FIXED METHOD - TẠO ORDER VỚI ADDRESS SNAPSHOT ✅✅✅
         public async Task<IActionResult> OnPostCheckoutAsync()
         {
             if (!User.Identity?.IsAuthenticated ?? true)
@@ -79,7 +83,7 @@ namespace EyewearStore_SWP391.Pages.Checkout
 
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            // ✅ STEP 1: Get or create address
+            // STEP 1: Get or create address
             Address? selectedAddress = null;
 
             if (SelectedAddressId == 0 &&
@@ -87,7 +91,6 @@ namespace EyewearStore_SWP391.Pages.Checkout
                 !string.IsNullOrWhiteSpace(NewPhone) &&
                 !string.IsNullOrWhiteSpace(NewAddressLine))
             {
-                // User is adding new address inline
                 selectedAddress = new Address
                 {
                     UserId = userId,
@@ -107,7 +110,6 @@ namespace EyewearStore_SWP391.Pages.Checkout
             }
             else if (SelectedAddressId > 0)
             {
-                // User selected existing address
                 selectedAddress = await _context.Addresses
                     .AsNoTracking()
                     .FirstOrDefaultAsync(a => a.AddressId == SelectedAddressId && a.UserId == userId);
@@ -117,18 +119,15 @@ namespace EyewearStore_SWP391.Pages.Checkout
             {
                 TempData["ErrorMessage"] = "Please select or add a shipping address.";
                 Cart = await _cartService.GetCartByUserIdAsync(userId);
-                var (subtotalBase, prescriptionFees, grandTotal) = await _cartService.GetCartTotalsBreakdownAsync(userId);
-                SubtotalBase = subtotalBase;
-                PrescriptionFeesTotal = prescriptionFees;
-                Total = grandTotal;
+                var (sb, pf, gt) = await _cartService.GetCartTotalsBreakdownAsync(userId);
+                SubtotalBase = sb; PrescriptionFeesTotal = pf; Total = gt;
+                await LoadLensProductsAsync(Cart);
                 await LoadAddressesAsync(userId);
-
                 return Page();
             }
 
             try
             {
-                // Get cart with per-item prescription data and totals breakdown
                 var cart = await _cartService.GetCartByUserIdAsync(userId);
                 var (subtotalBase, prescriptionFeesTotal, total) = await _cartService.GetCartTotalsBreakdownAsync(userId);
 
@@ -138,7 +137,18 @@ namespace EyewearStore_SWP391.Pages.Checkout
                     return RedirectToPage("/Cart/Index");
                 }
 
-                // CREATE ORDER WITH ADDRESS SNAPSHOT
+                // Load lens products để tính giá đúng
+                var lensIds = cart.CartItems
+                    .Select(ci => CartService.ExtractLensProductId(ci.TempPrescriptionJson))
+                    .Where(id => id.HasValue).Select(id => id!.Value).Distinct().ToList();
+
+                var lensProducts = lensIds.Any()
+                    ? await _context.Products
+                        .Where(p => lensIds.Contains(p.ProductId))
+                        .ToDictionaryAsync(p => p.ProductId)
+                    : new Dictionary<int, Product>();
+
+                // CREATE ORDER
                 var order = new Order
                 {
                     UserId = userId,
@@ -155,23 +165,54 @@ namespace EyewearStore_SWP391.Pages.Checkout
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
 
-                // Create order items: preserve per-item PrescriptionId and PrescriptionFee from cart
+                // CREATE ORDER ITEMS
                 foreach (var cartItem in cart.CartItems)
                 {
+                    var lensId = CartService.ExtractLensProductId(cartItem.TempPrescriptionJson);
+                    bool isServiceOrder = lensId.HasValue;
+
+                    // Tính unitPrice: Frame + Lens (nếu gia công) + Service
                     decimal unitPrice = cartItem.Product?.Price ?? 0m;
+
+                    Product? lensProduct = null;
+                    if (isServiceOrder && lensId.HasValue && lensProducts.TryGetValue(lensId.Value, out var lp))
+                    {
+                        lensProduct = lp;
+                        unitPrice += lp.Price;
+                    }
+
                     if (cartItem.Service != null)
                         unitPrice += cartItem.Service.Price;
+
+                    // Encode thông tin gia công vào SnapshotJson
+                    string? snapshotJson = null;
+                    if (isServiceOrder)
+                    {
+                        snapshotJson = JsonSerializer.Serialize(new
+                        {
+                            // Thông tin đơn gia công
+                            isServiceOrder = true,
+                            lensProductId = lensId!.Value,
+                            lensProductName = lensProduct?.Name ?? "",
+                            lensPrice = lensProduct?.Price ?? 0m,
+                            serviceId = cartItem.ServiceId,
+                            serviceName = cartItem.Service?.Name ?? "",
+                            servicePrice = cartItem.Service?.Price ?? 0m,
+                            framePrice = cartItem.Product?.Price ?? 0m,
+                            frameName = cartItem.Product?.Name ?? ""
+                        });
+                    }
 
                     var orderItem = new OrderItem
                     {
                         OrderId = order.OrderId,
-                        ProductId = cartItem.ProductId,
+                        ProductId = cartItem.ProductId,   // luôn là Frame
                         PrescriptionId = cartItem.PrescriptionId,
                         PrescriptionFee = cartItem.PrescriptionFee,
                         Quantity = cartItem.Quantity,
-                        UnitPrice = unitPrice,
+                        UnitPrice = unitPrice,            // Frame + Lens + Service
                         IsBundle = false,
-                        SnapshotJson = null
+                        SnapshotJson = snapshotJson          // null nếu đơn thường
                     };
 
                     _context.OrderItems.Add(orderItem);
@@ -179,10 +220,9 @@ namespace EyewearStore_SWP391.Pages.Checkout
 
                 await _context.SaveChangesAsync();
 
-                // ── COD PATH: skip Stripe, reduce inventory, clear cart, redirect ──
+                // COD PATH
                 if (PaymentMethod == "COD")
                 {
-                    // Reduce inventory
                     foreach (var oi in order.OrderItems)
                     {
                         var product = await _context.Products.FindAsync(oi.ProductId);
@@ -193,24 +233,26 @@ namespace EyewearStore_SWP391.Pages.Checkout
                         }
                     }
                     await _context.SaveChangesAsync();
-
-                    // Clear cart
                     await _cartService.ClearCartAsync(userId);
-
                     return RedirectToPage("/Checkout/Success", new { order_id = order.OrderId });
                 }
 
-                // ── STRIPE PATH (existing flow) ──
+                // STRIPE PATH
                 var lineItems = new List<StripeLineItemDto>();
 
                 foreach (var ci in cart.CartItems)
                 {
+                    var lensId = CartService.ExtractLensProductId(ci.TempPrescriptionJson);
                     decimal unitPrice = ci.Product?.Price ?? 0m;
-                    if (ci.Service != null)
-                        unitPrice += ci.Service.Price;
+                    if (lensId.HasValue && lensProducts.TryGetValue(lensId.Value, out var lp2))
+                        unitPrice += lp2.Price;
+                    if (ci.Service != null) unitPrice += ci.Service.Price;
                     decimal unitTotal = unitPrice + ci.PrescriptionFee;
 
-                    var itemName = ci.Product?.Name ?? ci.Service?.Name ?? "Product";
+                    // Tên item hiển thị trên Stripe
+                    var itemName = ci.Product?.Name ?? "Product";
+                    if (lensId.HasValue && lensProducts.TryGetValue(lensId.Value, out var lp3))
+                        itemName += $" + {lp3.Name}";
                     if (ci.Service != null)
                         itemName += $" + {ci.Service.Name}";
                     if (ci.PrescriptionId.HasValue && ci.Prescription != null)
@@ -238,7 +280,6 @@ namespace EyewearStore_SWP391.Pages.Checkout
                     });
                 }
 
-                // ✅ STEP 7: Create Stripe session
                 var baseUrl = $"{Request.Scheme}://{Request.Host}";
                 var successUrl = $"{baseUrl}/Checkout/Success";
                 var cancelUrl = $"{baseUrl}/Checkout/Cancel";
@@ -248,11 +289,7 @@ namespace EyewearStore_SWP391.Pages.Checkout
                              ?? "";
 
                 var stripeUrl = await _stripeService.CreateCheckoutSessionAsync(
-                    order.OrderId,
-                    lineItems,
-                    successUrl,
-                    cancelUrl,
-                    userEmail);
+                    order.OrderId, lineItems, successUrl, cancelUrl, userEmail);
 
                 return Redirect(stripeUrl);
             }
@@ -260,13 +297,25 @@ namespace EyewearStore_SWP391.Pages.Checkout
             {
                 TempData["ErrorMessage"] = ex.Message;
                 Cart = await _cartService.GetCartByUserIdAsync(userId);
-                var (subtotalBase, prescriptionFees, grandTotal) = await _cartService.GetCartTotalsBreakdownAsync(userId);
-                SubtotalBase = subtotalBase;
-                PrescriptionFeesTotal = prescriptionFees;
-                Total = grandTotal;
+                var (sb, pf, gt) = await _cartService.GetCartTotalsBreakdownAsync(userId);
+                SubtotalBase = sb; PrescriptionFeesTotal = pf; Total = gt;
+                await LoadLensProductsAsync(Cart);
                 await LoadAddressesAsync(userId);
-
                 return Page();
+            }
+        }
+
+        private async Task LoadLensProductsAsync(Models.Cart? cart)
+        {
+            if (cart == null) return;
+            var lensIds = cart.CartItems
+                .Select(ci => CartService.ExtractLensProductId(ci.TempPrescriptionJson))
+                .Where(id => id.HasValue).Select(id => id!.Value).Distinct().ToList();
+            if (lensIds.Any())
+            {
+                LensProducts = await _context.Products
+                    .Where(p => lensIds.Contains(p.ProductId))
+                    .ToDictionaryAsync(p => p.ProductId);
             }
         }
 
@@ -284,7 +333,5 @@ namespace EyewearStore_SWP391.Pages.Checkout
             if (DefaultAddress != null && SelectedAddressId == 0)
                 SelectedAddressId = DefaultAddress.AddressId;
         }
-
-
     }
 }

@@ -24,8 +24,8 @@
                     @if (Model.Orders.Any())
                     {
                         <span class="badge" style="background: var(--primary-gold);
-                                                            font-size: 1.2rem;
-                                                            vertical-align: middle;">
+                                                       font-size: 1.2rem;
+                                                       vertical-align: middle;">
                             @Model.Orders.Count
                         </span>
                     }
@@ -40,10 +40,8 @@
                 <a asp-page="/Index"
                    class="btn btn-primary"
                    style="padding: 0.875rem 2rem;
-                                  background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
-                                  border: none;
-                                  border-radius: 8px;
-                                  font-weight: 600;">
+                              background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+                              border: none; border-radius: 8px; font-weight: 600;">
                     <i class="bi bi-shop me-2"></i>Continue Shopping
                 </a>
             }
@@ -53,12 +51,9 @@
     @if (!Model.Orders.Any())
     {
         <!-- ===== EMPTY STATE ===== -->
-        <div class="card" style="border: none;
-                                          border-radius: 16px;
-                                          box-shadow: var(--shadow-lg);
-                                          text-align: center;
-                                          padding: 5rem 3rem;
-                                          background: linear-gradient(135deg, var(--white) 0%, var(--secondary-cream) 100%);">
+        <div class="card" style="border: none; border-radius: 16px; box-shadow: var(--shadow-lg);
+                                     text-align: center; padding: 5rem 3rem;
+                                     background: linear-gradient(135deg, var(--white) 0%, var(--secondary-cream) 100%);">
             <div style="font-size: 6rem; opacity: 0.2; margin-bottom: 2rem;">🛒</div>
             <h2 style="color: var(--primary-navy); margin-bottom: 1rem; font-family: var(--font-secondary);">
                 No Orders Yet
@@ -69,9 +64,8 @@
             <a asp-page="/Index"
                class="btn btn-primary btn-lg"
                style="padding: 1.25rem 3rem;
-                              background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
-                              border: none;
-                              border-radius: 10px;">
+                          background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+                          border: none; border-radius: 10px;">
                 <i class="bi bi-shop me-2"></i>Shop Now
             </a>
         </div>
@@ -82,22 +76,18 @@
         <div class="row g-4">
             @foreach (var order in Model.Orders)
             {
-                // compute helpers directly (KHÔNG dùng @{ } ở đây)
                 var canReturn = (order.Status == "Delivered" || order.Status == "Completed")
                 && (DateTime.UtcNow - order.CreatedAt).TotalDays <= 30;
                 var daysLeft = 30 - (int)(DateTime.UtcNow - order.CreatedAt).TotalDays;
 
                 <div class="col-12">
                     <div class="card order-card"
-                         style="border: none;
-                                                border-radius: 16px;
-                                                box-shadow: var(--shadow-md);
-                                                overflow: hidden;
-                                                transition: all 0.3s ease;">
+                         style="border: none; border-radius: 16px; box-shadow: var(--shadow-md);
+                                        overflow: hidden; transition: all 0.3s ease;">
 
                         <!-- Card Header -->
                         <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
-                                                    padding: 1.5rem 2rem;">
+                                            padding: 1.5rem 2rem;">
                             <div class="row align-items-center">
                                 <div class="col-md-7">
                                     <h4 style="color: white; margin: 0 0 0.5rem 0; font-weight: 600;">
@@ -152,16 +142,13 @@
                                 </div>
                             }
 
-                            <!-- ✅ PRESCRIPTION INDICATOR -->
+                            <!-- Prescription indicator -->
                             @if (order.HasPrescription)
                             {
                                 <div class="alert"
-                                     style="background: linear-gradient(135deg, rgba(156, 39, 176, 0.08) 0%, rgba(186, 104, 200, 0.05) 100%);
-                                                                    border: none;
-                                                                    border-left: 4px solid #9c27b0;
-                                                                    border-radius: 10px;
-                                                                    padding: 1rem 1.25rem;
-                                                                    margin-bottom: 1.5rem;">
+                                     style="background: linear-gradient(135deg, rgba(156,39,176,0.08) 0%, rgba(186,104,200,0.05) 100%);
+                                                        border: none; border-left: 4px solid #9c27b0;
+                                                        border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.5rem;">
                                     <div class="d-flex align-items-center">
                                         <div style="font-size: 2rem; margin-right: 1rem; color: #9c27b0;">👓</div>
                                         <div>
@@ -177,64 +164,31 @@
                             <!-- Order Info Grid -->
                             <div class="row g-4 mb-4">
                                 <div class="col-md-4">
-                                    <div class="info-box" style="background: var(--light-gray);
-                                                                                  padding: 1.25rem;
-                                                                                  border-radius: 12px;
-                                                                                  height: 100%;">
+                                    <div class="info-box" style="background: var(--light-gray); padding: 1.25rem; border-radius: 12px; height: 100%;">
                                         <div class="d-flex align-items-start">
-                                            <i class="bi bi-geo-alt-fill"
-                                               style="color: var(--primary-gold);
-                                                                      font-size: 1.5rem;
-                                                                      margin-right: 0.75rem;"></i>
+                                            <i class="bi bi-geo-alt-fill" style="color: var(--primary-gold); font-size: 1.5rem; margin-right: 0.75rem;"></i>
                                             <div>
-                                                <small style="color: var(--secondary-warm-gray);
-                                                                              font-size: 0.85rem;
-                                                                              text-transform: uppercase;
-                                                                              letter-spacing: 0.5px;">
-                                                    Shipping To
-                                                </small>
-                                                <div style="color: var(--primary-navy); font-weight: 600; margin-top: 0.25rem;">
-                                                    @order.ReceiverName
-                                                </div>
-                                                <div style="color: var(--dark-gray); font-size: 0.9rem;">
-                                                    @order.Phone
-                                                </div>
-                                                <div style="color: var(--dark-gray); font-size: 0.9rem;">
-                                                    @order.AddressLine
-                                                </div>
+                                                <small style="color: var(--secondary-warm-gray); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Shipping To</small>
+                                                <div style="color: var(--primary-navy); font-weight: 600; margin-top: 0.25rem;">@order.ReceiverName</div>
+                                                <div style="color: var(--dark-gray); font-size: 0.9rem;">@order.Phone</div>
+                                                <div style="color: var(--dark-gray); font-size: 0.9rem;">@order.AddressLine</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="col-md-4">
-                                    <div class="info-box" style="background: var(--light-gray);
-                                                                                  padding: 1.25rem;
-                                                                                  border-radius: 12px;
-                                                                                  height: 100%;">
+                                    <div class="info-box" style="background: var(--light-gray); padding: 1.25rem; border-radius: 12px; height: 100%;">
                                         <div class="d-flex align-items-start">
-                                            <i class="bi bi-credit-card-fill"
-                                               style="color: var(--success);
-                                                                      font-size: 1.5rem;
-                                                                      margin-right: 0.75rem;"></i>
+                                            <i class="bi bi-credit-card-fill" style="color: var(--success); font-size: 1.5rem; margin-right: 0.75rem;"></i>
                                             <div>
-                                                <small style="color: var(--secondary-warm-gray);
-                                                                              font-size: 0.85rem;
-                                                                              text-transform: uppercase;
-                                                                              letter-spacing: 0.5px;">
-                                                    Payment
-                                                </small>
-                                                <div style="color: var(--primary-navy); font-weight: 600; margin-top: 0.25rem;">
-                                                    @order.PaymentMethod
-                                                </div>
+                                                <small style="color: var(--secondary-warm-gray); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Payment</small>
+                                                <div style="color: var(--primary-navy); font-weight: 600; margin-top: 0.25rem;">@order.PaymentMethod</div>
                                                 @if (!string.IsNullOrEmpty(order.TrackingNumber))
                                                 {
                                                     <div style="margin-top: 0.5rem;">
                                                         <small style="color: var(--secondary-warm-gray);">Tracking:</small>
-                                                        <code style="background: white;
-                                                                                             padding: 0.25rem 0.5rem;
-                                                                                             border-radius: 4px;
-                                                                                             font-size: 0.85rem;">
+                                                        <code style="background: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem;">
                                                             @order.TrackingNumber
                                                         </code>
                                                     </div>
@@ -245,32 +199,15 @@
                                 </div>
 
                                 <div class="col-md-4">
-                                    <div class="info-box" style="background: var(--light-gray);
-                                                                                  padding: 1.25rem;
-                                                                                  border-radius: 12px;
-                                                                                  height: 100%;">
+                                    <div class="info-box" style="background: var(--light-gray); padding: 1.25rem; border-radius: 12px; height: 100%;">
                                         <div class="d-flex align-items-start">
-                                            <i class="bi bi-box-seam-fill"
-                                               style="color: var(--secondary-teal);
-                                                                      font-size: 1.5rem;
-                                                                      margin-right: 0.75rem;"></i>
+                                            <i class="bi bi-box-seam-fill" style="color: var(--secondary-teal); font-size: 1.5rem; margin-right: 0.75rem;"></i>
                                             <div>
-                                                <small style="color: var(--secondary-warm-gray);
-                                                                              font-size: 0.85rem;
-                                                                              text-transform: uppercase;
-                                                                              letter-spacing: 0.5px;">
-                                                    Order Total
-                                                </small>
-                                                <div style="color: var(--primary-gold);
-                                                                           font-weight: 700;
-                                                                           font-size: 1.5rem;
-                                                                           font-family: var(--font-secondary);
-                                                                           margin-top: 0.25rem;">
+                                                <small style="color: var(--secondary-warm-gray); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Order Total</small>
+                                                <div style="color: var(--primary-gold); font-weight: 700; font-size: 1.5rem; font-family: var(--font-secondary); margin-top: 0.25rem;">
                                                     @order.TotalAmount.ToString("N0") VND
                                                 </div>
-                                                <div style="color: var(--dark-gray); font-size: 0.9rem;">
-                                                    @order.ItemCount item(s)
-                                                </div>
+                                                <div style="color: var(--dark-gray); font-size: 0.9rem;">@order.ItemCount item(s)</div>
                                             </div>
                                         </div>
                                     </div>
@@ -279,37 +216,66 @@
 
                             <!-- Products List -->
                             <div class="products-section mb-4">
-                                <h6 style="color: var(--primary-navy);
-                                                          font-weight: 600;
-                                                          border-bottom: 2px solid var(--medium-gray);
-                                                          padding-bottom: 0.75rem;
-                                                          margin-bottom: 1.25rem;">
+                                <h6 style="color: var(--primary-navy); font-weight: 600;
+                                                   border-bottom: 2px solid var(--medium-gray);
+                                                   padding-bottom: 0.75rem; margin-bottom: 1.25rem;">
                                     <i class="bi bi-bag-check me-2"></i>Products in Order
                                 </h6>
 
                                 @foreach (var product in order.Products)
                                 {
                                     <div class="product-item"
-                                         style="background: white;
-                                                                        border: 2px solid var(--medium-gray);
-                                                                        border-radius: 12px;
-                                                                        padding: 1.25rem;
-                                                                        margin-bottom: 1rem;">
+                                         style="background: white; border: 2px solid var(--medium-gray);
+                                                            border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem;">
                                         <div class="row align-items-center">
                                             <div class="col-md-7">
                                                 <h6 style="color: var(--primary-navy); font-weight: 600; margin-bottom: 0.5rem;">
+                                                    @if (product.IsServiceOrder)
+                                                    {
+                                                        <span style="font-size: 12px; background: #f0f0ff; color: #5b5bdb;
+                                                                                     border-radius: 6px; padding: 2px 8px; font-weight: 600;
+                                                                                     margin-right: 6px;">
+                                                            🔧 Gia công
+                                                        </span>
+                                                    }
                                                     @product.Name
                                                 </h6>
-                                                <div style="color: var(--secondary-warm-gray); font-size: 0.9rem;">
-                                                    <span class="badge" style="background: var(--light-gray); color: var(--dark-gray);">
-                                                        SKU: @product.Sku
+
+                                                @if (product.IsServiceOrder)
+                                                {
+                                                    <!-- Breakdown đơn gia công -->
+                                                    <div style="background: #f8f9fc; border-radius: 8px;
+                                                                                padding: 8px 12px; font-size: 12px; line-height: 2;
+                                                                                color: var(--secondary-warm-gray); margin-bottom: 6px;">
+                                                        <div>🕶 Frame: <strong style="color: var(--primary-navy);">@product.FramePrice?.ToString("N0") VND</strong></div>
+                                                        <div>⭕ Lens (@product.LensName): <strong style="color: var(--primary-navy);">@product.LensPrice?.ToString("N0") VND</strong></div>
+                                                        <div>⚙️ Dịch vụ (@product.ServiceName): <strong style="color: var(--primary-navy);">@product.ServicePrice?.ToString("N0") VND</strong></div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div style="color: var(--secondary-warm-gray); font-size: 0.9rem;">
+                                                        <span class="badge" style="background: var(--light-gray); color: var(--dark-gray);">
+                                                            SKU: @product.Sku
+                                                        </span>
+                                                        <span class="ms-2">Qty: <strong>×@product.Quantity</strong></span>
+                                                    </div>
+                                                }
+
+                                                @if (product.PrescriptionId.HasValue && product.Prescription != null)
+                                                {
+                                                    <span class="badge bg-secondary mt-1">
+                                                        👓 Rx: @product.Prescription.ProfileName
                                                     </span>
-                                                    <span class="ms-2">Qty: <strong>×@product.Quantity</strong></span>
-                                                </div>
+                                                }
                                             </div>
+
                                             <div class="col-md-5 text-md-end">
+                                                <div style="color: var(--secondary-warm-gray); font-size: 0.85rem;">
+                                                    @product.UnitPrice.ToString("N0") VND × @product.Quantity
+                                                </div>
                                                 <div style="color: var(--primary-navy); font-weight: 700; font-size: 1.25rem;">
-                                                    @product.UnitPrice.ToString("N0") VND
+                                                    @((product.UnitPrice * product.Quantity).ToString("N0")) VND
                                                 </div>
                                             </div>
                                         </div>
@@ -317,20 +283,16 @@
                                 }
                             </div>
 
-                            <!-- ✅ ACTION BUTTONS WITH REQUEST RETURN -->
+                            <!-- Action Buttons -->
                             <div class="d-flex gap-2 flex-wrap justify-content-end mt-4">
                                 @if (canReturn)
                                 {
                                     <a asp-page="/Customer/RequestReturn"
                                        asp-route-orderId="@order.OrderId"
                                        class="btn btn-warning"
-                                       style="padding: 0.75rem 1.5rem;
-                                                          border-radius: 8px;
-                                                          font-weight: 600;
+                                       style="padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600;
                                                           background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
-                                                          border: none;
-                                                          color: white;
-                                                          box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);">
+                                                          border: none; color: white; box-shadow: 0 2px 8px rgba(255,152,0,0.3);">
                                         <i class="bi bi-arrow-repeat me-1"></i>Request Return
                                     </a>
                                 }
@@ -338,9 +300,7 @@
                                 @if (order.Status == "Pending")
                                 {
                                     <button class="btn btn-outline-danger"
-                                            style="padding: 0.75rem 1.5rem;
-                                                                       border-radius: 8px;
-                                                                       font-weight: 600;">
+                                            style="padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600;">
                                         <i class="bi bi-x-circle me-1"></i>Cancel Order
                                     </button>
                                 }
@@ -349,10 +309,8 @@
                                         data-bs-toggle="modal"
                                         data-bs-target="#modal@(order.OrderId)"
                                         style="padding: 0.75rem 2rem;
-                                                               background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-light) 100%);
-                                                               border: none;
-                                                               border-radius: 8px;
-                                                               font-weight: 600;">
+                                                       background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-light) 100%);
+                                                       border: none; border-radius: 8px; font-weight: 600;">
                                     <i class="bi bi-eye me-1"></i>View Details
                                 </button>
                             </div>
@@ -361,10 +319,11 @@
                             {
                                 <div class="alert alert-warning mt-3" style="border-radius: 8px; border-left: 4px solid #ff9800;">
                                     <i class="bi bi-exclamation-triangle me-2"></i>
-                                    <strong>Hurry!</strong> You have only <strong>@daysLeft days</strong> left to request a return for this order.
+                                    <strong>Hurry!</strong> You have only <strong>@daysLeft days</strong> left to request a return.
                                 </div>
                             }
-                            else if ((DateTime.UtcNow - order.CreatedAt).TotalDays > 30 && (order.Status == "Delivered" || order.Status == "Completed"))
+                            else if ((DateTime.UtcNow - order.CreatedAt).TotalDays > 30
+                            && (order.Status == "Delivered" || order.Status == "Completed"))
                             {
                                 <div class="alert alert-secondary mt-3" style="border-radius: 8px;">
                                     <i class="bi bi-info-circle me-2"></i>
@@ -374,8 +333,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Modal (keep or add your modal code here) -->
             }
         </div>
     }
@@ -404,7 +361,7 @@
 
     .btn-warning:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4) !important;
+        box-shadow: 0 4px 12px rgba(255,152,0,0.4) !important;
     }
 
     .info-box {

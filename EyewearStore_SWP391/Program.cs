@@ -52,7 +52,13 @@ builder.Services.AddSingleton<IOtpService, OtpService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
 // Configure Stripe
 Stripe.StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
-
+var realKey = Stripe.StripeConfiguration.ApiKey ?? "(null)";
+var sample = realKey.Length >= 6 ? realKey.Substring(0, 6) + "..." + realKey.Substring(realKey.Length - 3) : realKey;
+Console.WriteLine($"[DEBUG] Stripe key sample: {sample} (length: {realKey.Length})");
+if (!realKey.StartsWith("sk_"))
+{
+    Console.WriteLine("[WARN] Stripe key does NOT start with 'sk_'. That's wrong for a secret key.");
+}
 // Authentication (cookie) - secure defaults and RememberMe handling
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

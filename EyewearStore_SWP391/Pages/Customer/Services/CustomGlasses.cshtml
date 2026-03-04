@@ -1,7 +1,7 @@
 ﻿@page
-@model EyewearStore_SWP391.Pages.Customer.Services.OrderModel
+@model EyewearStore_SWP391.Pages.Customer.Services.CustomGlassesModel
 @{
-    ViewData["Title"] = "Custom Lens Fitting";
+    ViewData["Title"] = "Custom Glasses";
     Layout = "_Layout";
 }
 
@@ -10,7 +10,6 @@
         :root {
             --navy: #0f1e3c;
             --gold: #b8862a;
-            --gold-l: #d4a74a;
             --acc: #2563eb;
             --ok: #059669;
             --txt: #0f172a;
@@ -20,10 +19,9 @@
             --bg: #f8fafc;
             --bg2: #f0f4ff;
             --bdr: #e2e8f0;
-            --radius: 16px;
         }
 
-        * {
+        *, *::before, *::after {
             box-sizing: border-box;
         }
 
@@ -33,7 +31,6 @@
             padding: 40px 24px 100px;
         }
 
-        /* ── BACK LINK ── */
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -43,14 +40,13 @@
             color: var(--muted);
             text-decoration: none;
             margin-bottom: 32px;
-            transition: color 0.2s;
+            transition: color .2s;
         }
 
             .back-link:hover {
                 color: var(--txt);
             }
 
-        /* ── PAGE HEADER ── */
         .clf-header {
             display: flex;
             align-items: flex-start;
@@ -61,10 +57,10 @@
         }
 
         .clf-header-left h1 {
-            font-size: clamp(1.6rem, 4vw, 2.4rem);
+            font-size: clamp(1.6rem,4vw,2.4rem);
             font-weight: 900;
             color: var(--navy);
-            letter-spacing: -0.8px;
+            letter-spacing: -.8px;
             margin: 0 0 8px;
         }
 
@@ -79,27 +75,25 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: rgba(184,134,42,0.1);
-            border: 1px solid rgba(184,134,42,0.25);
+            background: rgba(184,134,42,.1);
+            border: 1px solid rgba(184,134,42,.25);
             color: var(--gold);
             border-radius: 100px;
             padding: 6px 14px;
             font-size: 12px;
             font-weight: 700;
-            letter-spacing: 0.8px;
+            letter-spacing: .8px;
             white-space: nowrap;
             flex-shrink: 0;
             margin-top: 4px;
         }
 
-        /* ── PROGRESS STEPPER ── */
         .stepper {
             display: flex;
             align-items: center;
             margin-bottom: 44px;
             overflow-x: auto;
             padding: 4px 2px 8px;
-            gap: 0;
         }
 
         .stepper-item {
@@ -129,7 +123,7 @@
             font-size: 20px;
             font-weight: 800;
             color: var(--muted);
-            transition: all 0.25s ease;
+            transition: all .25s;
             position: relative;
             z-index: 1;
         }
@@ -138,7 +132,7 @@
             background: var(--navy);
             border-color: var(--navy);
             color: white;
-            box-shadow: 0 4px 18px rgba(15,30,60,0.25);
+            box-shadow: 0 4px 18px rgba(15,30,60,.25);
             transform: scale(1.05);
         }
 
@@ -155,7 +149,7 @@
             color: var(--muted);
             text-align: center;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
+            letter-spacing: .8px;
             white-space: nowrap;
         }
 
@@ -173,14 +167,13 @@
             background: var(--bdr);
             min-width: 20px;
             margin-bottom: 28px;
-            transition: background 0.3s ease;
+            transition: background .3s;
         }
 
             .stepper-line.done {
                 background: var(--ok);
             }
 
-        /* ── STEP COUNT PILL ── */
         .step-count {
             display: inline-flex;
             align-items: center;
@@ -195,7 +188,6 @@
             margin-bottom: 12px;
         }
 
-        /* ── PANEL ── */
         .clf-panel {
             display: none;
         }
@@ -213,7 +205,7 @@
                 font-weight: 800;
                 color: var(--txt);
                 margin: 0 0 4px;
-                letter-spacing: -0.4px;
+                letter-spacing: -.4px;
             }
 
             .panel-heading p {
@@ -222,10 +214,9 @@
                 margin: 0;
             }
 
-        /* ── PRODUCT GRID ── */
         .prod-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            grid-template-columns: repeat(auto-fill,minmax(170px,1fr));
             gap: 14px;
             margin-bottom: 28px;
         }
@@ -235,7 +226,7 @@
             border-radius: 14px;
             padding: 18px 14px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all .2s;
             background: var(--surf);
             text-align: center;
             position: relative;
@@ -243,18 +234,18 @@
 
             .prod-card:hover {
                 border-color: var(--navy);
-                box-shadow: 0 6px 20px rgba(15,30,60,0.1);
+                box-shadow: 0 6px 20px rgba(15,30,60,.1);
                 transform: translateY(-2px);
             }
 
             .prod-card.selected {
                 border-color: var(--navy);
-                background: rgba(15,30,60,0.03);
-                box-shadow: 0 0 0 4px rgba(15,30,60,0.08);
+                background: rgba(15,30,60,.03);
+                box-shadow: 0 0 0 4px rgba(15,30,60,.08);
             }
 
                 .prod-card.selected::after {
-                    content: '✓';
+                    content: 'checkmark';
                     position: absolute;
                     top: 8px;
                     right: 10px;
@@ -306,10 +297,9 @@
             color: var(--gold);
         }
 
-        /* ── SERVICE CARDS ── */
         .svc-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            grid-template-columns: repeat(auto-fill,minmax(210px,1fr));
             gap: 14px;
             margin-bottom: 28px;
         }
@@ -319,25 +309,25 @@
             border-radius: 14px;
             padding: 20px 18px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all .2s;
             background: var(--surf);
             position: relative;
         }
 
             .svc-card:hover {
                 border-color: var(--navy);
-                box-shadow: 0 6px 20px rgba(15,30,60,0.1);
+                box-shadow: 0 6px 20px rgba(15,30,60,.1);
                 transform: translateY(-2px);
             }
 
             .svc-card.selected {
                 border-color: var(--navy);
-                background: rgba(15,30,60,0.03);
-                box-shadow: 0 0 0 4px rgba(15,30,60,0.08);
+                background: rgba(15,30,60,.03);
+                box-shadow: 0 0 0 4px rgba(15,30,60,.08);
             }
 
                 .svc-card.selected::after {
-                    content: '✓';
+                    content: 'checkmark';
                     position: absolute;
                     top: 10px;
                     right: 12px;
@@ -392,18 +382,17 @@
             font-weight: 500;
         }
 
-        /* ── SUMMARY (STEP 4) ── */
         .summary-card {
             background: var(--surf);
             border: 2px solid var(--bdr);
             border-radius: 18px;
             overflow: hidden;
             margin-bottom: 24px;
-            box-shadow: 0 4px 20px rgba(15,30,60,0.06);
+            box-shadow: 0 4px 20px rgba(15,30,60,.06);
         }
 
         .summary-header {
-            background: linear-gradient(135deg, var(--navy) 0%, #1a2f54 100%);
+            background: linear-gradient(135deg,var(--navy),#1a2f54);
             padding: 18px 24px;
             display: flex;
             align-items: center;
@@ -435,7 +424,7 @@
             }
 
             .sum-row.total-row {
-                background: rgba(184,134,42,0.05);
+                background: rgba(184,134,42,.05);
                 margin: 0 -24px;
                 padding: 18px 24px;
                 border-bottom: none;
@@ -503,7 +492,6 @@
             color: var(--gold);
         }
 
-        /* ── NAV BUTTONS ── */
         .nav-btns {
             display: flex;
             gap: 12px;
@@ -524,7 +512,7 @@
             font-size: 13.5px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all .2s;
             text-decoration: none;
         }
 
@@ -537,7 +525,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: linear-gradient(135deg, var(--navy) 0%, #1a2f54 100%);
+            background: linear-gradient(135deg,var(--navy),#1a2f54);
             color: white;
             border: none;
             border-radius: 10px;
@@ -545,17 +533,17 @@
             font-size: 13.5px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 14px rgba(15,30,60,0.2);
+            transition: all .2s;
+            box-shadow: 0 4px 14px rgba(15,30,60,.2);
         }
 
             .btn-next:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 8px 24px rgba(15,30,60,0.25);
+                box-shadow: 0 8px 24px rgba(15,30,60,.25);
             }
 
             .btn-next:disabled {
-                opacity: 0.35;
+                opacity: .35;
                 cursor: not-allowed;
                 transform: none;
                 box-shadow: none;
@@ -565,7 +553,7 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            background: linear-gradient(135deg,#059669,#047857);
             color: white;
             border: none;
             border-radius: 10px;
@@ -573,17 +561,15 @@
             font-size: 15px;
             font-weight: 800;
             cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 16px rgba(5,150,105,0.3);
-            letter-spacing: 0.3px;
+            transition: all .2s;
+            box-shadow: 0 4px 16px rgba(5,150,105,.3);
         }
 
             .btn-add-cart:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 8px 24px rgba(5,150,105,0.35);
+                box-shadow: 0 8px 24px rgba(5,150,105,.35);
             }
 
-        /* ── EMPTY ── */
         .empty-state {
             text-align: center;
             padding: 48px 24px;
@@ -595,12 +581,11 @@
 
             .empty-state .ei {
                 font-size: 44px;
-                opacity: 0.3;
+                opacity: .3;
                 display: block;
                 margin-bottom: 12px;
             }
 
-        /* ── STICKY MINI SUMMARY ── */
         .mini-sel {
             display: flex;
             gap: 8px;
@@ -613,7 +598,7 @@
             align-items: center;
             gap: 6px;
             background: var(--bg2);
-            border: 1px solid rgba(37,99,235,0.2);
+            border: 1px solid rgba(37,99,235,.2);
             border-radius: 100px;
             padding: 5px 12px;
             font-size: 12px;
@@ -625,70 +610,69 @@
 
 <div class="clf-wrap">
 
-    <!-- Back -->
-    <a href="/Customer/Services" class="back-link">
-        <i class="bi bi-arrow-left"></i> All Services
+    <a href="javascript:history.back()" class="back-link">
+        <i class="bi bi-arrow-left"></i> Back
     </a>
 
-    <!-- Header -->
     <div class="clf-header">
         <div class="clf-header-left">
-            <h1>🔭 Custom Lens Fitting</h1>
-            <p>Select a frame, choose your lenses, and pick a fitting service.<br>We'll assemble your perfect pair in-store.</p>
+            <h1>🔭 Custom Glasses</h1>
+            <p>Pick a frame, choose your lens, select a fitting service.<br>We'll assemble your perfect pair in-store.</p>
         </div>
-        <div class="clf-badge">✦ Most Popular Service</div>
+        <div class="clf-badge">&#10022; Most Popular</div>
     </div>
 
-    <!-- Stepper -->
     <div class="stepper" id="stepperBar">
         <div class="stepper-item active clickable" id="si1" onclick="tryGoStep(1)">
             <div class="stepper-circle">🕶</div>
             <div class="stepper-label">Frame</div>
         </div>
         <div class="stepper-line" id="ln12"></div>
-        <div class="stepper-item" id="si2" onclick="tryGoStep(2)">
-            <div class="stepper-circle">⭕</div>
+        <div class="stepper-item clickable" id="si2" onclick="tryGoStep(2)">
+            <div class="stepper-circle">&#9711;</div>
             <div class="stepper-label">Lens</div>
         </div>
         <div class="stepper-line" id="ln23"></div>
-        <div class="stepper-item" id="si3" onclick="tryGoStep(3)">
-            <div class="stepper-circle">⚙️</div>
+        <div class="stepper-item clickable" id="si3" onclick="tryGoStep(3)">
+            <div class="stepper-circle">&#9881;</div>
             <div class="stepper-label">Service</div>
         </div>
         <div class="stepper-line" id="ln34"></div>
         <div class="stepper-item" id="si4">
-            <div class="stepper-circle">✓</div>
+            <div class="stepper-circle">&#10003;</div>
             <div class="stepper-label">Review</div>
         </div>
     </div>
 
-    <!-- ── STEP 1: FRAME ── -->
+    <!-- STEP 1: FRAME -->
     <div class="clf-panel active" id="panel1">
         <div class="panel-heading">
             <div class="step-count"><i class="bi bi-1-circle"></i> Step 1 of 4</div>
             <h2>Choose Your Frame</h2>
             <p>Select the frame you'd like your lenses fitted into</p>
         </div>
-
         @if (Model.Frames.Any())
         {
             <div class="prod-grid" id="frameGrid">
                 @foreach (var f in Model.Frames)
                 {
                     var img = f.ProductImages?.OrderByDescending(x => x.IsPrimary).FirstOrDefault()?.ImageUrl;
-                    <div class="prod-card" data-id="@f.ProductId" data-name="@f.Name"
-                         data-price="@f.Price" data-img="@(img ?? "")" onclick="selectFrame(this)">
+                    <div class="prod-card"
+                         data-id="@f.ProductId"
+                         data-name="@f.Name"
+                         data-price="@f.Price"
+                         data-img="@(img ?? "")"
+                         onclick="selectFrame(this)">
                         @if (!string.IsNullOrEmpty(img))
                         {
                             <img src="@img" class="prod-img" alt="@f.Name" />
                         }
                         else
                         {
-
                             <div class="prod-img-ph">🕶</div>
                         }
                         <div class="prod-name">@f.Name</div>
-                        <div class="prod-price">@f.Price.ToString("N0") ₫</div>
+                        <div class="prod-price">@f.Price.ToString("N0") &#x20AB;</div>
                     </div>
                 }
             </div>
@@ -696,10 +680,10 @@
         else
         {
             <div class="empty-state">
-                <span class="ei">🕶</span><p>No frames in stock right now. Check back soon!</p>
+                <span class="ei">🕶</span>
+                <p>No frames in stock right now. Check back soon!</p>
             </div>
         }
-
         <div class="nav-btns">
             <button class="btn-next" id="btnN1" onclick="goStep(2)" disabled>
                 Next: Choose Lens <i class="bi bi-arrow-right"></i>
@@ -707,35 +691,36 @@
         </div>
     </div>
 
-    <!-- ── STEP 2: LENS ── -->
+    <!-- STEP 2: LENS -->
     <div class="clf-panel" id="panel2">
         <div class="panel-heading">
             <div class="step-count"><i class="bi bi-2-circle"></i> Step 2 of 4</div>
             <h2>Choose Your Lens</h2>
             <p>Select the lens type to be fitted into your chosen frame</p>
         </div>
-
-        <div class="mini-sel" id="miniSel2"><!-- filled by JS --></div>
-
+        <div class="mini-sel" id="miniSel2"></div>
         @if (Model.Lenses.Any())
         {
             <div class="prod-grid" id="lensGrid">
                 @foreach (var l in Model.Lenses)
                 {
                     var img = l.ProductImages?.OrderByDescending(x => x.IsPrimary).FirstOrDefault()?.ImageUrl;
-                    <div class="prod-card" data-id="@l.ProductId" data-name="@l.Name"
-                         data-price="@l.Price" data-img="@(img ?? "")" onclick="selectLens(this)">
+                    <div class="prod-card"
+                         data-id="@l.ProductId"
+                         data-name="@l.Name"
+                         data-price="@l.Price"
+                         data-img="@(img ?? "")"
+                         onclick="selectLens(this)">
                         @if (!string.IsNullOrEmpty(img))
                         {
                             <img src="@img" class="prod-img" alt="@l.Name" />
                         }
                         else
                         {
-
-                            <div class="prod-img-ph">⭕</div>
+                            <div class="prod-img-ph">&#9711;</div>
                         }
                         <div class="prod-name">@l.Name</div>
-                        <div class="prod-price">@l.Price.ToString("N0") ₫</div>
+                        <div class="prod-price">@l.Price.ToString("N0") &#x20AB;</div>
                     </div>
                 }
             </div>
@@ -743,10 +728,10 @@
         else
         {
             <div class="empty-state">
-                <span class="ei">⭕</span><p>No lenses available. Please check back later.</p>
+                <span class="ei">&#9711;</span>
+                <p>No lenses available. Please check back later.</p>
             </div>
         }
-
         <div class="nav-btns">
             <button class="btn-back" onclick="goStep(1)"><i class="bi bi-arrow-left"></i> Back</button>
             <button class="btn-next" id="btnN2" onclick="goStep(3)" disabled>
@@ -755,33 +740,33 @@
         </div>
     </div>
 
-    <!-- ── STEP 3: SERVICE ── -->
+    <!-- STEP 3: SERVICE -->
     <div class="clf-panel" id="panel3">
         <div class="panel-heading">
             <div class="step-count"><i class="bi bi-3-circle"></i> Step 3 of 4</div>
             <h2>Choose a Fitting Service</h2>
             <p>Select the workmanship tier for your order</p>
         </div>
-
-        <div class="mini-sel" id="miniSel3"><!-- filled by JS --></div>
-
+        <div class="mini-sel" id="miniSel3"></div>
         @if (Model.Services.Any())
         {
             <div class="svc-grid" id="serviceGrid">
                 @foreach (var s in Model.Services)
                 {
-                    <div class="svc-card" data-id="@s.ServiceId" data-name="@s.Name"
+                    <div class="svc-card"
+                         data-id="@s.ServiceId"
+                         data-name="@s.Name"
                          data-price="@s.Price"
                          data-dur="@(s.DurationMin.HasValue? s.DurationMin + " min" : "")"
                          onclick="selectService(this)">
-                        <span class="svc-icon">⚙️</span>
+                        <span class="svc-icon">&#9881;</span>
                         <div class="svc-name">@s.Name</div>
                         @if (!string.IsNullOrEmpty(s.Description))
                         {
                             <div class="svc-desc">@s.Description</div>
                         }
                         <div class="svc-meta">
-                            <div class="svc-price">@s.Price.ToString("N0") ₫</div>
+                            <div class="svc-price">@s.Price.ToString("N0") &#x20AB;</div>
                             @if (s.DurationMin.HasValue)
                             {
                                 <div class="svc-dur"><i class="bi bi-clock"></i> @s.DurationMin min</div>
@@ -794,10 +779,10 @@
         else
         {
             <div class="empty-state">
-                <span class="ei">⚙️</span><p>No fitting services available right now.</p>
+                <span class="ei">&#9881;</span>
+                <p>No fitting services available right now.</p>
             </div>
         }
-
         <div class="nav-btns">
             <button class="btn-back" onclick="goStep(2)"><i class="bi bi-arrow-left"></i> Back</button>
             <button class="btn-next" id="btnN3" onclick="goStep(4)" disabled>
@@ -806,30 +791,25 @@
         </div>
     </div>
 
-    <!-- ── STEP 4: REVIEW ── -->
+    <!-- STEP 4: REVIEW -->
     <div class="clf-panel" id="panel4">
         <div class="panel-heading">
             <div class="step-count"><i class="bi bi-4-circle"></i> Step 4 of 4</div>
             <h2>Review Your Order</h2>
             <p>Confirm your selections before adding to cart</p>
         </div>
-
         <div class="summary-card">
             <div class="summary-header">
-                <i class="bi bi-receipt" style="color:rgba(255,255,255,0.7);font-size:16px;"></i>
-                <h3>Order Summary — Custom Lens Fitting</h3>
+                <i class="bi bi-receipt" style="color:rgba(255,255,255,.7);font-size:16px"></i>
+                <h3>Order Summary — Custom Glasses</h3>
             </div>
-            <div class="summary-body" id="summaryBody">
-                <!-- populated by JS -->
-            </div>
+            <div class="summary-body" id="summaryBody"></div>
         </div>
-
         <form method="post" asp-page="/Cart/Add" id="addForm">
             <input type="hidden" name="ProductId" id="fFrameId" />
             <input type="hidden" name="LensProductId" id="fLensId" />
             <input type="hidden" name="ServiceId" id="fServiceId" />
             <input type="hidden" name="Quantity" value="1" />
-
             <div class="nav-btns">
                 <button type="button" class="btn-back" onclick="goStep(3)">
                     <i class="bi bi-arrow-left"></i> Back
@@ -848,67 +828,50 @@
         let sel = { frame: null, lens: null, service: null };
         const steps = 4;
 
-        /* ── NAVIGATION ── */
         function tryGoStep(n) {
             if (n >= 2 && !sel.frame)   { shake('panel1'); return; }
             if (n >= 3 && !sel.lens)    { shake('panel2'); return; }
             if (n >= 4 && !sel.service) { shake('panel3'); return; }
             goStep(n);
         }
-
         function goStep(n) {
-            for (let i = 1; i <= steps; i++) {
+            for (let i = 1; i <= steps; i++)
                 document.getElementById('panel' + i)?.classList.toggle('active', i === n);
-            }
             updateStepper(n);
             if (n === 2) renderMini('miniSel2', ['frame']);
-            if (n === 3) renderMini('miniSel3', ['frame','lens']);
+            if (n === 3) renderMini('miniSel3', ['frame', 'lens']);
             if (n === 4) buildSummary();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
         function updateStepper(cur) {
             for (let i = 1; i <= steps; i++) {
-                const el = document.getElementById('si' + i);
-                if (!el) continue;
-                el.classList.remove('active','done');
-                if (i < cur)       el.classList.add('done');
+                const el = document.getElementById('si' + i); if (!el) continue;
+                el.classList.remove('active', 'done');
+                if (i < cur)        el.classList.add('done');
                 else if (i === cur) el.classList.add('active');
             }
-            [['ln12',2],['ln23',3],['ln34',4]].forEach(([id, thresh]) => {
-                const el = document.getElementById(id);
-                if (el) el.classList.toggle('done', cur >= thresh);
-            });
+            [['ln12',2],['ln23',3],['ln34',4]].forEach(([id, t]) =>
+                document.getElementById(id)?.classList.toggle('done', cur >= t));
         }
-
-        /* ── SHAKE FEEDBACK ── */
         function shake(panelId) {
             const el = document.getElementById(panelId);
-            el.style.transition = 'transform 0.08s ease';
-            let t = 0;
-            const shakes = [4,-4,3,-3,2,-2,0];
+            let t = 0; const s = [4,-4,3,-3,2,-2,0];
             const next = () => {
-                if (t >= shakes.length) { el.style.transform = ''; return; }
-                el.style.transform = `translateX(${shakes[t]}px)`;
-                t++; setTimeout(next, 60);
+                if (t >= s.length) { el.style.transform = ''; return; }
+                el.style.transform = 'translateX(' + s[t] + 'px)'; t++;
+                setTimeout(next, 60);
             };
             next();
         }
-
-        /* ── MINI SELECTION PILLS ── */
         function renderMini(containerId, keys) {
-            const icons = { frame:'🕶', lens:'⭕', service:'⚙️' };
-            const el = document.getElementById(containerId);
-            if (!el) return;
+            const icons = { frame: '🕶', lens: 'O', service: 'S' };
+            const el = document.getElementById(containerId); if (!el) return;
             el.innerHTML = keys.filter(k => sel[k]).map(k =>
-                `<div class="mini-pill">${icons[k]} ${sel[k].name}
-                 <strong style="margin-left:4px;color:#b8862a">
-                   ${sel[k].price.toLocaleString('vi-VN')} ₫
-                 </strong></div>`
+                '<div class="mini-pill">' + icons[k] + ' ' + sel[k].name +
+                '<strong style="margin-left:4px;color:#b8862a">' +
+                sel[k].price.toLocaleString('vi-VN') + ' &#x20AB;</strong></div>'
             ).join('');
         }
-
-        /* ── SELECT HELPERS ── */
         function selectFrame(card) {
             document.querySelectorAll('#frameGrid .prod-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
@@ -930,40 +893,37 @@
                             price: parseFloat(card.dataset.price), dur: card.dataset.dur };
             document.getElementById('btnN3').disabled = false;
         }
-
-        /* ── BUILD SUMMARY ── */
         function buildSummary() {
             const f = sel.frame, l = sel.lens, s = sel.service;
             const total = f.price + l.price + s.price;
-
-            const thumb = (img, emoji) => img
-                ? `<img src="${img}" class="sum-thumb" />`
-                : `<div class="sum-thumb-ph">${emoji}</div>`;
-
+            const thumb = (img, em) => img
+                ? '<img src="' + img + '" class="sum-thumb" />'
+                : '<div class="sum-thumb-ph">' + em + '</div>';
             const rows = [
                 { label: 'Frame',           emoji: '🕶', item: f },
-                { label: 'Lens',            emoji: '⭕', item: l },
-                { label: 'Fitting Service', emoji: '⚙️', item: s }
-            ].map(({ label, emoji, item }) => `
-                <div class="sum-row">
-                    <div class="sum-item-left">
-                        ${thumb(item.img || '', emoji)}
-                        <div class="sum-item-info">
-                            <div class="lbl">${label}</div>
-                            <div class="val">${item.name}${item.dur ? `<span style="font-size:11px;color:#94a3b8;margin-left:6px">· ${item.dur}</span>` : ''}</div>
-                        </div>
-                    </div>
-                    <div class="sum-price">${item.price.toLocaleString('vi-VN')} ₫</div>
-                </div>`).join('');
+                { label: 'Lens',            emoji: 'O',  item: l },
+                { label: 'Fitting Service', emoji: 'S',  item: s }
+            ].map(function(r) {
+                return '<div class="sum-row">' +
+                    '<div class="sum-item-left">' +
+                    thumb(r.item.img || '', r.emoji) +
+                    '<div class="sum-item-info">' +
+                    '<div class="lbl">' + r.label + '</div>' +
+                    '<div class="val">' + r.item.name +
+                    (r.item.dur ? '<span style="font-size:11px;color:#94a3b8;margin-left:6px">· ' + r.item.dur + '</span>' : '') +
+                    '</div></div></div>' +
+                    '<div class="sum-price">' + r.item.price.toLocaleString('vi-VN') + ' &#x20AB;</div>' +
+                    '</div>';
+            }).join('');
 
-            document.getElementById('summaryBody').innerHTML = rows + `
-                <div class="sum-row total-row">
-                    <div class="total-label">Total</div>
-                    <div class="total-price">${total.toLocaleString('vi-VN')} ₫</div>
-                </div>`;
+            document.getElementById('summaryBody').innerHTML = rows +
+                '<div class="sum-row total-row">' +
+                '<div class="total-label">Total</div>' +
+                '<div class="total-price">' + total.toLocaleString('vi-VN') + ' &#x20AB;</div>' +
+                '</div>';
 
-            document.getElementById('fFrameId').value  = f.id;
-            document.getElementById('fLensId').value   = l.id;
+            document.getElementById('fFrameId').value   = f.id;
+            document.getElementById('fLensId').value    = l.id;
             document.getElementById('fServiceId').value = s.id;
         }
 

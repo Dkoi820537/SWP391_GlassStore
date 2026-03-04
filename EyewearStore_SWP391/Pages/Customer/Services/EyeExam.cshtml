@@ -1,0 +1,413 @@
+﻿@page
+@model EyewearStore_SWP391.Pages.Customer.Services.EyeExamModel
+@{
+    ViewData["Title"] = "Eye Exam";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --navy: #0f1e3c;
+            --ok: #059669;
+            --txt: #0f172a;
+            --txt2: #475569;
+            --muted: #94a3b8;
+            --surf: #fff;
+            --bg: #f8fafc;
+            --bg2: #f0f4ff;
+            --bdr: #e2e8f0;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        .ee-wrap {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 40px 24px 100px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+            text-decoration: none;
+            margin-bottom: 32px;
+            transition: color .2s;
+        }
+
+            .back-link:hover {
+                color: var(--txt);
+            }
+
+        .ee-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+            .ee-header .icon {
+                font-size: 52px;
+                display: block;
+                margin-bottom: 16px;
+            }
+
+            .ee-header h1 {
+                font-size: clamp(1.5rem,4vw,2.2rem);
+                font-weight: 900;
+                color: var(--txt);
+                margin: 0 0 8px;
+                letter-spacing: -.5px;
+            }
+
+            .ee-header p {
+                font-size: 14px;
+                color: var(--txt2);
+                margin: 0;
+            }
+
+        /* What's included cards */
+        .included-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .inc-card {
+            background: var(--surf);
+            border: 1.5px solid var(--bdr);
+            border-radius: 12px;
+            padding: 18px 16px;
+            text-align: center;
+        }
+
+            .inc-card .ic-icon {
+                font-size: 24px;
+                margin-bottom: 8px;
+            }
+
+            .inc-card .ic-name {
+                font-size: 13px;
+                font-weight: 700;
+                color: var(--txt);
+            }
+
+            .inc-card .ic-desc {
+                font-size: 11.5px;
+                color: var(--muted);
+                margin-top: 3px;
+                line-height: 1.4;
+            }
+
+        /* Form */
+        .form-card {
+            background: var(--surf);
+            border: 2px solid var(--bdr);
+            border-radius: 18px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(15,30,60,.06);
+        }
+
+            .form-card h2 {
+                font-size: 1.15rem;
+                font-weight: 800;
+                color: var(--txt);
+                margin: 0 0 22px;
+                display: flex;
+                align-items: center;
+                gap: 9px;
+            }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+            .form-row.one {
+                grid-template-columns: 1fr;
+            }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+            .form-group label {
+                font-size: 10.5px;
+                font-weight: 800;
+                color: var(--muted);
+                text-transform: uppercase;
+                letter-spacing: 1.1px;
+            }
+
+        .form-inp {
+            background: var(--bg);
+            border: 1.5px solid var(--bdr);
+            border-radius: 10px;
+            padding: 11px 14px;
+            font-size: 14px;
+            color: var(--txt);
+            transition: border-color .2s,box-shadow .2s;
+            width: 100%;
+            font-family: inherit;
+        }
+
+            .form-inp:focus {
+                outline: none;
+                border-color: #2563eb;
+                box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+            }
+
+            .form-inp::placeholder {
+                color: var(--muted);
+            }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill,minmax(110px,1fr));
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .time-chip {
+            border: 2px solid var(--bdr);
+            border-radius: 8px;
+            padding: 9px 6px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--txt2);
+            transition: all .2s;
+        }
+
+            .time-chip:hover {
+                border-color: #2563eb;
+                color: #2563eb;
+                background: rgba(37,99,235,.04);
+            }
+
+            .time-chip.sel {
+                border-color: #2563eb;
+                background: rgba(37,99,235,.08);
+                color: #2563eb;
+            }
+
+            .time-chip input {
+                display: none;
+            }
+
+        .divider {
+            height: 1px;
+            background: var(--bdr);
+            margin: 20px 0;
+        }
+
+        .btn-submit {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg,var(--navy),#1a2f54);
+            color: #fff;
+            border: none;
+            border-radius: 11px;
+            padding: 14px 36px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all .2s;
+            box-shadow: 0 4px 16px rgba(15,30,60,.22);
+        }
+
+            .btn-submit:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(15,30,60,.28);
+            }
+
+        .success-box {
+            display: none;
+            text-align: center;
+            padding: 40px 24px;
+            background: rgba(5,150,105,.05);
+            border: 2px solid rgba(5,150,105,.2);
+            border-radius: 16px;
+        }
+
+            .success-box .si {
+                font-size: 48px;
+                margin-bottom: 12px;
+            }
+
+            .success-box h3 {
+                font-size: 1.2rem;
+                font-weight: 800;
+                color: var(--ok);
+                margin: 0 0 6px;
+            }
+
+            .success-box p {
+                font-size: 14px;
+                color: var(--txt2);
+                margin: 0;
+            }
+
+        @@media (max-width:560px) {
+            .form-row
+
+        {
+            grid-template-columns: 1fr;
+        }
+
+        }
+    </style>
+}
+
+<div class="ee-wrap">
+    <a href="javascript:history.back()" class="back-link"><i class="bi bi-arrow-left"></i> Back</a>
+
+    <div class="ee-header">
+        <span class="icon">👁</span>
+        <h1>Eye Exam &amp; Consultation</h1>
+        <p>Book a professional eye examination with one of our certified optometrists.</p>
+    </div>
+
+    <!-- What's included -->
+    <div class="included-grid">
+        <div class="inc-card">
+            <div class="ic-icon">🔬</div>
+            <div class="ic-name">Vision Acuity Test</div>
+            <div class="ic-desc">Full near &amp; far vision screening</div>
+        </div>
+        <div class="inc-card">
+            <div class="ic-icon">📋</div>
+            <div class="ic-name">Refraction Test</div>
+            <div class="ic-desc">Accurate prescription measurement</div>
+        </div>
+        <div class="inc-card">
+            <div class="ic-icon">💡</div>
+            <div class="ic-name">Lens Recommendation</div>
+            <div class="ic-desc">Best lens type for your vision needs</div>
+        </div>
+        <div class="inc-card">
+            <div class="ic-icon">🩺</div>
+            <div class="ic-name">Eye Health Check</div>
+            <div class="ic-desc">Basic eye health screening included</div>
+        </div>
+    </div>
+
+    <!-- Booking Form -->
+    <div class="form-card" id="bookingForm">
+        <h2><i class="bi bi-calendar-check" style="color:#2563eb"></i> Book Your Appointment</h2>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Full Name *</label>
+                <input type="text" class="form-inp" id="nameInput" placeholder="Your full name" />
+            </div>
+            <div class="form-group">
+                <label>Phone Number *</label>
+                <input type="tel" class="form-inp" id="phoneInput" placeholder="0901 234 567" />
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Email (optional)</label>
+                <input type="email" class="form-inp" id="emailInput" placeholder="you@email.com" />
+            </div>
+            <div class="form-group">
+                <label>Preferred Date *</label>
+                <input type="date" class="form-inp" id="dateInput"
+                       min='@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")' />
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:14px">
+            <label>Preferred Time *</label>
+            <div class="time-grid" id="timeGrid">
+                @{
+                    var slots = new[] { "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30" };
+                }
+                @foreach (var slot in slots)
+                {
+                    <div class="time-chip" data-time="@slot" onclick="selectTime(this)">@slot</div>
+                }
+            </div>
+        </div>
+
+        <div class="form-row one">
+            <div class="form-group">
+                <label>Notes (optional)</label>
+                <textarea class="form-inp" id="notesInput" rows="3"
+                          placeholder="Any symptoms, concerns, or special requests..."></textarea>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+            <div style="font-size:13px;color:var(--muted)">
+                <i class="bi bi-clock me-1"></i>~30 min session &nbsp;|&nbsp;
+                <i class="bi bi-geo-alt me-1"></i>In-store only
+            </div>
+            <button class="btn-submit" onclick="submitBooking()">
+                <i class="bi bi-calendar-check"></i> Request Appointment
+            </button>
+        </div>
+
+        <div id="errorMsg" style="display:none;margin-top:12px;font-size:13px;color:#dc2626;font-weight:600;"></div>
+    </div>
+
+    <!-- Success -->
+    <div class="success-box" id="successBox">
+        <div class="si">🎉</div>
+        <h3>Appointment Requested!</h3>
+        <p>
+            We'll contact you within 24 hours to confirm your slot.<br>
+            Check your phone or email for confirmation.
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let selectedTime = null;
+
+        function selectTime(chip) {
+            document.querySelectorAll('#timeGrid .time-chip').forEach(c => c.classList.remove('sel'));
+            chip.classList.add('sel');
+            selectedTime = chip.dataset.time;
+        }
+
+        function submitBooking() {
+            const name  = document.getElementById('nameInput').value.trim();
+            const phone = document.getElementById('phoneInput').value.trim();
+            const date  = document.getElementById('dateInput').value;
+            const err   = document.getElementById('errorMsg');
+
+            if (!name)         { showErr('Please enter your full name.'); return; }
+            if (!phone)        { showErr('Please enter your phone number.'); return; }
+            if (!date)         { showErr('Please select a preferred date.'); return; }
+            if (!selectedTime) { showErr('Please select a preferred time slot.'); return; }
+
+            err.style.display = 'none';
+            document.getElementById('bookingForm').style.display = 'none';
+            document.getElementById('successBox').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showErr(msg) {
+            const el = document.getElementById('errorMsg');
+            el.textContent = '⚠️ ' + msg;
+            el.style.display = 'block';
+        }
+    </script>
+}

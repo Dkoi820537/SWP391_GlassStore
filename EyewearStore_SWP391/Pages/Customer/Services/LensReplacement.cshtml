@@ -1,0 +1,682 @@
+﻿@* ══════════════════════════════════════════════════════════════
+   Pages/Customer/Services/LensReplacement.cshtml
+   Flow: Lens → Service → Review (2 steps, no frame)
+   ══════════════════════════════════════════════════════════════ *@
+@page
+@model EyewearStore_SWP391.Pages.Customer.Services.LensReplacementModel
+@{
+    ViewData["Title"] = "Lens Replacement";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --ok: #059669;
+            --grn: #0d9e6a;
+            --txt: #0f172a;
+            --txt2: #475569;
+            --muted: #94a3b8;
+            --surf: #fff;
+            --bg: #f8fafc;
+            --bg2: #f0faf5;
+            --bdr: #e2e8f0;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        .lr-wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px 100px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+            text-decoration: none;
+            margin-bottom: 32px;
+            transition: color .2s;
+        }
+
+            .back-link:hover {
+                color: var(--txt);
+            }
+
+        .lr-header {
+            margin-bottom: 36px;
+        }
+
+            .lr-header h1 {
+                font-size: clamp(1.5rem,4vw,2.2rem);
+                font-weight: 900;
+                color: var(--txt);
+                margin: 0 0 8px;
+                letter-spacing: -.6px;
+            }
+
+            .lr-header p {
+                font-size: 14px;
+                color: var(--txt2);
+                margin: 0;
+            }
+
+        .notice-bar {
+            background: rgba(13,158,106,.08);
+            border: 1px solid rgba(13,158,106,.2);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #0d7a52;
+            font-weight: 600;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stepper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 38px;
+            overflow-x: auto;
+            padding: 4px 2px 8px;
+        }
+
+        .stepper-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 7px;
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .stepper-circle {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: var(--bdr);
+            border: 2.5px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--muted);
+            transition: all .25s;
+        }
+
+        .stepper-item.active .stepper-circle {
+            background: var(--grn);
+            border-color: var(--grn);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(13,158,106,.3);
+            transform: scale(1.06);
+        }
+
+        .stepper-item.done .stepper-circle {
+            background: #047857;
+            border-color: #047857;
+            color: #fff;
+        }
+
+        .stepper-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            text-align: center;
+        }
+
+        .stepper-item.active .stepper-label {
+            color: var(--grn);
+        }
+
+        .stepper-item.done .stepper-label {
+            color: #047857;
+        }
+
+        .stepper-line {
+            flex: 1;
+            height: 2px;
+            background: var(--bdr);
+            min-width: 20px;
+            margin-bottom: 26px;
+            transition: background .3s;
+        }
+
+            .stepper-line.done {
+                background: #047857;
+            }
+
+        .lr-panel {
+            display: none;
+        }
+
+            .lr-panel.active {
+                display: block;
+            }
+
+        .panel-heading {
+            margin-bottom: 22px;
+        }
+
+            .panel-heading h2 {
+                font-size: 1.4rem;
+                font-weight: 800;
+                color: var(--txt);
+                margin: 0 0 4px;
+            }
+
+            .panel-heading p {
+                font-size: 13.5px;
+                color: var(--txt2);
+                margin: 0;
+            }
+
+        .step-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--grn);
+            background: rgba(13,158,106,.1);
+            border-radius: 100px;
+            padding: 3px 12px;
+            margin-bottom: 10px;
+        }
+
+        .item-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill,minmax(160px,1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .item-card {
+            border: 2px solid var(--bdr);
+            border-radius: 13px;
+            padding: 16px 12px;
+            cursor: pointer;
+            transition: all .2s;
+            background: var(--surf);
+            text-align: center;
+            position: relative;
+        }
+
+            .item-card:hover {
+                border-color: var(--grn);
+                box-shadow: 0 6px 18px rgba(13,158,106,.1);
+                transform: translateY(-2px);
+            }
+
+            .item-card.sel {
+                border-color: var(--grn);
+                background: rgba(13,158,106,.04);
+                box-shadow: 0 0 0 4px rgba(13,158,106,.1);
+            }
+
+                .item-card.sel::after {
+                    content: '✓';
+                    position: absolute;
+                    top: 8px;
+                    right: 10px;
+                    width: 20px;
+                    height: 20px;
+                    background: var(--ok);
+                    color: #fff;
+                    border-radius: 50%;
+                    font-size: 10px;
+                    font-weight: 800;
+                    line-height: 20px;
+                    text-align: center;
+                }
+
+        .item-img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 9px;
+            margin: 0 auto 9px;
+            display: block;
+        }
+
+        .item-img-ph {
+            width: 70px;
+            height: 70px;
+            border-radius: 9px;
+            margin: 0 auto 9px;
+            background: var(--bg2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+        }
+
+        .item-name {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--txt);
+            margin-bottom: 3px;
+        }
+
+        .item-price {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--grn);
+        }
+
+        .svc-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .svc-row {
+            background: var(--surf);
+            border: 2px solid var(--bdr);
+            border-radius: 12px;
+            padding: 16px 18px;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+            .svc-row:hover {
+                border-color: var(--grn);
+            }
+
+            .svc-row.sel {
+                border-color: var(--grn);
+                background: rgba(13,158,106,.04);
+            }
+
+        .svc-row-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: rgba(13,158,106,.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .svc-row-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--txt);
+        }
+
+        .svc-row-desc {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .svc-row-price {
+            margin-left: auto;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--grn);
+            white-space: nowrap;
+        }
+
+        .sum-box {
+            background: var(--surf);
+            border: 2px solid var(--bdr);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 22px;
+            box-shadow: 0 4px 18px rgba(0,0,0,.05);
+        }
+
+        .sum-head {
+            background: linear-gradient(135deg,#064e35,#0d9e6a);
+            padding: 15px 22px;
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255,255,255,.85);
+        }
+
+        .sum-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 22px;
+            border-bottom: 1px solid var(--bdr);
+        }
+
+            .sum-row:last-child {
+                border-bottom: none;
+            }
+
+            .sum-row.total-row {
+                background: rgba(13,158,106,.05);
+            }
+
+        .sum-thumb {
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            object-fit: cover;
+            background: var(--bg);
+            border: 1px solid var(--bdr);
+            flex-shrink: 0;
+        }
+
+        .sum-ph {
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            background: var(--bg2);
+            border: 1px solid var(--bdr);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .sum-lbl {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+        }
+
+        .sum-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--txt);
+        }
+
+        .sum-val {
+            margin-left: auto;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--grn);
+            white-space: nowrap;
+        }
+
+        .sum-total-lbl {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--txt);
+        }
+
+        .sum-total-val {
+            margin-left: auto;
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--grn);
+        }
+
+        .nav-btns {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--bg);
+            color: var(--txt2);
+            border: 1.5px solid var(--bdr);
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+            .btn-back:hover {
+                background: #e2e8f0;
+            }
+
+        .btn-next {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg,var(--grn),#047857);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 26px;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s;
+            box-shadow: 0 4px 14px rgba(13,158,106,.28);
+        }
+
+            .btn-next:hover {
+                transform: translateY(-2px);
+            }
+
+            .btn-next:disabled {
+                opacity: .35;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg,#0f172a,#1e293b);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 34px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all .2s;
+            box-shadow: 0 4px 14px rgba(15,23,42,.22);
+        }
+
+            .btn-add:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(15,23,42,.28);
+            }
+
+        .empty-card {
+            text-align: center;
+            padding: 44px 24px;
+            background: var(--bg);
+            border-radius: 13px;
+            border: 2px dashed var(--bdr);
+            color: var(--muted);
+        }
+    </style>
+}
+
+<div class="lr-wrap">
+    <a href="javascript:history.back()" class="back-link"><i class="bi bi-arrow-left"></i> Back</a>
+
+    <div class="lr-header">
+        <h1>⭕ Lens Replacement</h1>
+        <p>Bring your existing frame into the store — pick new lenses and we'll swap them in.</p>
+    </div>
+
+    <div class="notice-bar">
+        <i class="bi bi-info-circle-fill"></i>
+        Bring your current frame to the store. You only need to select and pay for the new lenses + fitting service.
+    </div>
+
+    <div class="stepper">
+        <div class="stepper-item active" id="ls1"><div class="stepper-circle">⭕</div><div class="stepper-label">New Lens</div></div>
+        <div class="stepper-line" id="ll12"></div>
+        <div class="stepper-item" id="ls2"><div class="stepper-circle">⚙️</div><div class="stepper-label">Service</div></div>
+        <div class="stepper-line" id="ll23"></div>
+        <div class="stepper-item" id="ls3"><div class="stepper-circle">✓</div><div class="stepper-label">Review</div></div>
+    </div>
+
+    <!-- STEP 1: LENS -->
+    <div class="lr-panel active" id="lp1">
+        <div class="panel-heading">
+            <div class="step-badge">Step 1 of 3</div>
+            <h2>Choose your new lens</h2>
+            <p>Select the lens type you want fitted into your frame</p>
+        </div>
+        @if (Model.Lenses.Any())
+        {
+            <div class="item-grid" id="lensGrid">
+                @foreach (var l in Model.Lenses)
+                {
+                    var img = l.ProductImages?.OrderByDescending(x => x.IsPrimary).FirstOrDefault()?.ImageUrl;
+                    <div class="item-card" data-id="@l.ProductId" data-name="@l.Name"
+                         data-price="@l.Price" data-img="@(img ?? "")" onclick="lSelectLens(this)">
+                        @if (!string.IsNullOrEmpty(img))
+                        {
+                            <img src="@img" class="item-img" alt="@l.Name" />
+                        }
+                        else
+                        {
+
+                            <div class="item-img-ph">⭕</div>
+                        }
+                        <div class="item-name">@l.Name</div>
+                        <div class="item-price">@l.Price.ToString("N0") ₫</div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+
+            <div class="empty-card">No lenses available at the moment.</div>
+        }
+        <div class="nav-btns">
+            <button class="btn-next" id="lBtn1" onclick="lGoStep(2)" disabled>
+                Next — Service <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- STEP 2: SERVICE -->
+    <div class="lr-panel" id="lp2">
+        <div class="panel-heading">
+            <div class="step-badge">Step 2 of 3</div>
+            <h2>Select fitting service</h2>
+            <p>Choose how you'd like the lens fitted</p>
+        </div>
+        @if (Model.Services.Any())
+        {
+            <div class="svc-list" id="svcGrid">
+                @foreach (var s in Model.Services)
+                {
+                    <div class="svc-row" data-id="@s.ServiceId" data-name="@s.Name"
+                         data-price="@s.Price" onclick="lSelectService(this)">
+                        <div class="svc-row-icon">⚙️</div>
+                        <div>
+                            <div class="svc-row-name">@s.Name</div>
+                            @if (!string.IsNullOrEmpty(s.Description))
+                            {
+                                <div class="svc-row-desc">@s.Description</div>
+                            }
+                            @if (s.DurationMin.HasValue)
+                            {
+                                <div class="svc-row-desc">⏱ @s.DurationMin min</div>
+                            }
+                        </div>
+                        <div class="svc-row-price">@s.Price.ToString("N0") ₫</div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+
+            <div class="empty-card">No services available.</div>
+        }
+        <div class="nav-btns">
+            <button class="btn-back" onclick="lGoStep(1)"><i class="bi bi-arrow-left"></i> Back</button>
+            <button class="btn-next" id="lBtn2" onclick="lGoStep(3)" disabled>
+                Review <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- STEP 3: REVIEW -->
+    <div class="lr-panel" id="lp3">
+        <div class="panel-heading">
+            <div class="step-badge">Step 3 of 3</div>
+            <h2>Review Lens Replacement</h2>
+            <p>Confirm your order details</p>
+        </div>
+        <div class="sum-box" id="lSummary"></div>
+        <form method="post" asp-page="/Cart/Add" id="lForm">
+            <input type="hidden" name="ProductId" id="lLensId" />
+            <input type="hidden" name="ServiceId" id="lServiceId" />
+            <input type="hidden" name="Quantity" value="1" />
+            <div class="nav-btns">
+                <button type="button" class="btn-back" onclick="lGoStep(2)"><i class="bi bi-arrow-left"></i> Back</button>
+                <button type="submit" class="btn-add"><i class="bi bi-cart-plus"></i> Add to Cart</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let lSel = { lens: null, svc: null };
+        function lGoStep(n) {
+            if (n>1 && !lSel.lens) { lShake('lp1'); return; }
+            if (n>2 && !lSel.svc)  { lShake('lp2'); return; }
+            [1,2,3].forEach(i => document.getElementById('lp'+i).classList.toggle('active', i===n));
+            [1,2,3].forEach(i => {
+                const el=document.getElementById('ls'+i); if(!el) return;
+                el.classList.remove('active','done');
+                if(i<n) el.classList.add('done'); else if(i===n) el.classList.add('active');
+            });
+            [['ll12',2],['ll23',3]].forEach(([id,t]) => document.getElementById(id)?.classList.toggle('done',n>=t));
+            if(n===3) lBuildSummary();
+            window.scrollTo({top:0,behavior:'smooth'});
+        }
+        function lShake(id) {
+            const el=document.getElementById(id); let t=0; const s=[5,-5,3,-3,1,-1,0];
+            const next=()=>{if(t>=s.length){el.style.transform='';return;}el.style.transform=`translateX(${s[t]}px)`;t++;setTimeout(next,60);};next();
+        }
+        function lSelectLens(card) {
+            document.querySelectorAll('#lensGrid .item-card').forEach(c=>c.classList.remove('sel'));
+            card.classList.add('sel');
+            lSel.lens={id:card.dataset.id,name:card.dataset.name,price:+card.dataset.price,img:card.dataset.img};
+            document.getElementById('lBtn1').disabled=false;
+        }
+        function lSelectService(card) {
+            document.querySelectorAll('#svcGrid .svc-row').forEach(c=>c.classList.remove('sel'));
+            card.classList.add('sel');
+            lSel.svc={id:card.dataset.id,name:card.dataset.name,price:+card.dataset.price};
+            document.getElementById('lBtn2').disabled=false;
+        }
+        function lBuildSummary() {
+            const l=lSel.lens, s=lSel.svc, total=l.price+s.price;
+            const img=l.img?`<img src="${l.img}" class="sum-thumb"/>`:`<div class="sum-ph">⭕</div>`;
+            document.getElementById('lSummary').innerHTML=`
+                <div class="sum-head">ORDER SUMMARY — LENS REPLACEMENT</div>
+                <div class="sum-row">${img}<div><div class="sum-lbl">New Lens</div><div class="sum-name">${l.name}</div></div><div class="sum-val">${l.price.toLocaleString('vi-VN')} ₫</div></div>
+                <div class="sum-row"><div class="sum-ph">⚙️</div><div><div class="sum-lbl">Service</div><div class="sum-name">${s.name}</div></div><div class="sum-val">${s.price.toLocaleString('vi-VN')} ₫</div></div>
+                <div class="sum-row total-row"><div class="sum-total-lbl">Total</div><div class="sum-total-val">${total.toLocaleString('vi-VN')} ₫</div></div>`;
+            document.getElementById('lLensId').value   = l.id;
+            document.getElementById('lServiceId').value= s.id;
+        }
+    </script>
+}

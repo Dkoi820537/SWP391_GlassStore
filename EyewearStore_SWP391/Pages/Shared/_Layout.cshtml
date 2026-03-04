@@ -7,22 +7,16 @@
     <title>@ViewData["Title"] - OptiPlus Eyewear</title>
     <meta name="description" content="Premium eyewear store offering quality glasses, frames, and lenses. Find your perfect style." />
 
-    <!-- Bootstrap 5 CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
-    <!-- Bootstrap Icons (REQUIRED for Order Management pages) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/homepage.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/EyewearStore_SWP391.styles.css" asp-append-version="true" />
 
-    <!-- Page-specific Styles Section -->
     @await RenderSectionAsync("Styles", required: false)
 
     <style>
-        /* ── Wishlist nav icon (header) ── */
+        /* ── Wishlist nav icon ── */
         .nav-wishlist-btn {
             position: relative;
             display: flex;
@@ -57,15 +51,88 @@
                 font-size: 10px;
                 font-weight: 700;
                 border-radius: 100px;
-                display: flex;
+                display: none;
                 align-items: center;
                 justify-content: center;
                 padding: 0 3px;
                 line-height: 1;
-                display: none; /* ẩn mặc định, JS sẽ show khi có items */
             }
 
-        /* ── My Wishlist dropdown item ── */
+        /* ── Services dropdown ── */
+        .services-dropdown-menu {
+            min-width: 240px;
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.08);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+        }
+
+        .svc-drop-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #0f172a;
+            transition: background .15s;
+            cursor: pointer;
+        }
+
+            .svc-drop-item:hover {
+                background: #f0f4ff;
+                color: #2563eb;
+            }
+
+        .svc-drop-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+            .svc-drop-icon.blue {
+                background: rgba(37,99,235,0.1);
+            }
+
+            .svc-drop-icon.amber {
+                background: rgba(184,134,42,0.1);
+            }
+
+            .svc-drop-icon.green {
+                background: rgba(5,150,105,0.1);
+            }
+
+            .svc-drop-icon.slate {
+                background: rgba(71,85,105,0.1);
+            }
+
+        .svc-drop-text {
+            line-height: 1.2;
+        }
+
+        .svc-drop-name {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .svc-drop-desc {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 1px;
+        }
+
+        .svc-drop-divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 6px 0;
+        }
+
+        /* ── Dropdown wishlist item ── */
         .dropdown-item-wishlist {
             padding: 0.75rem 1rem;
             background: linear-gradient(135deg, rgba(201,169,110,0.06) 0%, rgba(232,208,176,0.06) 100%);
@@ -88,7 +155,7 @@
                 color: #fff;
                 font-weight: 700;
                 margin-left: auto;
-                display: none; /* JS sẽ show */
+                display: none;
             }
     </style>
 </head>
@@ -101,17 +168,20 @@
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                        data-bs-target="#mainNavbar" aria-controls="mainNavbar"
+                        aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="mainNavbar">
                     <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+
                         <li class="nav-item">
                             <a class="nav-link" asp-page="/Index">
                                 <i class="bi bi-house-door me-1"></i>Home
                             </a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="/Products">
                                 <i class="bi bi-shop me-1"></i>Shop
@@ -127,11 +197,66 @@
                             </li>
                         }
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="#services">
+                        <!-- ══ SERVICES DROPDOWN ══ -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#"
+                               id="servicesDropdown" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-gear me-1"></i>Services
                             </a>
+                            <ul class="dropdown-menu services-dropdown-menu p-2"
+                                aria-labelledby="servicesDropdown">
+
+                                <!-- Custom Glasses -->
+                                <li>
+                                    <a class="svc-drop-item" asp-page="/Customer/Services/CustomGlasses">
+                                        <div class="svc-drop-icon blue">🔭</div>
+                                        <div class="svc-drop-text">
+                                            <div class="svc-drop-name">Custom Glasses</div>
+                                            <div class="svc-drop-desc">Frame + Lens, fitted your way</div>
+                                        </div>
+                                    </a>
+                                </li>
+
+                                <li><div class="svc-drop-divider"></div></li>
+
+                                <!-- Frame Repair -->
+                                <li>
+                                    <a class="svc-drop-item" asp-page="/Customer/Services/FrameRepair">
+                                        <div class="svc-drop-icon amber">🛠</div>
+                                        <div class="svc-drop-text">
+                                            <div class="svc-drop-name">Frame Repair</div>
+                                            <div class="svc-drop-desc">Fix bent frames &amp; loose hinges</div>
+                                        </div>
+                                    </a>
+                                </li>
+
+                                <!-- Lens Replacement -->
+                                <li>
+                                    <a class="svc-drop-item" asp-page="/Customer/Services/LensReplacement">
+                                        <div class="svc-drop-icon green">⭕</div>
+                                        <div class="svc-drop-text">
+                                            <div class="svc-drop-name">Lens Replacement</div>
+                                            <div class="svc-drop-desc">New lenses into your existing frame</div>
+                                        </div>
+                                    </a>
+                                </li>
+
+                                <!-- Eye Exam -->
+                                <li>
+                                    <a class="svc-drop-item" asp-page="/Customer/Services/EyeExam">
+                                        <div class="svc-drop-icon slate">👁</div>
+                                        <div class="svc-drop-text">
+                                            <div class="svc-drop-name">Eye Exam</div>
+                                            <div class="svc-drop-desc">Book a professional exam &amp; prescription</div>
+                                        </div>
+                                    </a>
+                                </li>
+
+                            </ul>
                         </li>
+                        <!-- ══ END SERVICES DROPDOWN ══ -->
+
                         <li class="nav-item">
                             <a class="nav-link" href="#footer">
                                 <i class="bi bi-envelope me-1"></i>Contact
@@ -142,69 +267,31 @@
                         @if (User.IsInRole("admin"))
                         {
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-danger fw-semibold" href="#" id="adminDropdown" role="button"
-                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle text-danger fw-semibold" href="#"
+                                   id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-shield-lock me-1"></i>Admin
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="adminDropdown">
-                                    <li>
-                                        <a class="dropdown-item" asp-page="/Admin/Index">
-                                            <i class="bi bi-speedometer2 me-2"></i>Admin Dashboard
-                                        </a>
-                                    </li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/Index"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</a></li>
                                     <li><hr class="dropdown-divider" /></li>
                                     <li class="dropdown-header text-muted small">Products</li>
-                                    <li>
-                                        <a class="dropdown-item" asp-page="/Lenses/Index">
-                                            <i class="bi bi-eye me-2"></i>Lens Management
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-page="/Frames/Index">
-                                            <i class="bi bi-eyeglasses me-2"></i>Frame Management
-                                        </a>
-                                    </li>
+                                    <li><a class="dropdown-item" asp-page="/Lenses/Index"><i class="bi bi-eye me-2"></i>Lens Management</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Frames/Index"><i class="bi bi-eyeglasses me-2"></i>Frame Management</a></li>
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-page="/Sale/Orders/Index">
-                                            <i class="bi bi-cart-check me-2"></i>Order Management
-                                        </a>
-                                    </li>
+                                    <li><a class="dropdown-item" asp-page="/Sale/Orders/Index"><i class="bi bi-cart-check me-2"></i>Order Management</a></li>
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-page="/Support/Orders/Index">
-                                            <i class="bi bi-people me-2"></i>Sale Staff
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-page="/Staff/Orders/Index">
-                                            <i class="bi bi-people-fill me-2"></i>Staff
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-page="/Manager/Index">
-                                            <i class="bi bi-person-badge me-2"></i>Managers
-                                        </a>
-                                    </li>
+                                    <li><a class="dropdown-item" asp-page="/Support/Orders/Index"><i class="bi bi-people me-2"></i>Sale Staff</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Staff/Orders/Index"><i class="bi bi-people-fill me-2"></i>Staff</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Manager/Index"><i class="bi bi-person-badge me-2"></i>Managers</a></li>
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-page="/Admin/Users/Index">
-                                            <i class="bi bi-people me-2"></i>User Management
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-page="/Admin/AdminRole">
-                                            <i class="bi bi-key me-2"></i>Admin Roles
-                                        </a>
-                                    </li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/Users/Index"><i class="bi bi-people me-2"></i>User Management</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/AdminRole"><i class="bi bi-key me-2"></i>Admin Roles</a></li>
                                 </ul>
                             </li>
                         }
                     </ul>
 
                     <ul class="navbar-nav align-items-center">
-
-                        @* ── WISHLIST ICON (chỉ hiện khi đã login) ── *@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item me-1">
@@ -220,19 +307,18 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown"
-                                   role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
+                                   id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span class="me-2 avatar-inline" aria-hidden="true">
                                         <i class="bi bi-person-circle fs-4"></i>
                                     </span>
                                     <span class="user-name">@User.Identity.Name</span>
                                 </a>
-
-                                <ul class="dropdown-menu dropdown-menu-end user-menu shadow" aria-labelledby="userDropdown" style="min-width: 280px;">
+                                <ul class="dropdown-menu dropdown-menu-end user-menu shadow" aria-labelledby="userDropdown" style="min-width:280px">
                                     <li class="px-3 py-2">
                                         <div class="d-flex align-items-center">
                                             <div class="avatar rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3"
-                                                 style="width: 50px; height: 50px;">
+                                                 style="width:50px;height:50px">
                                                 <i class="bi bi-person-circle fs-3"></i>
                                             </div>
                                             <div class="user-meta">
@@ -243,51 +329,31 @@
                                             </div>
                                         </div>
                                     </li>
-
                                     <li><hr class="dropdown-divider" /></li>
-
+                                    <li><a class="dropdown-item d-flex align-items-center" asp-page="/Profile/Index" style="padding:.75rem 1rem"><i class="bi bi-person-lines-fill me-2 text-primary"></i><span>My Profile</span></a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" asp-page="/Customer/MyOrders" style="padding:.75rem 1rem"><i class="bi bi-box-seam me-2 text-success"></i><span>My Orders</span></a></li>
                                     <li>
-                                        <a class="dropdown-item d-flex align-items-center" asp-page="/Profile/Index" style="padding: 0.75rem 1rem;">
-                                            <i class="bi bi-person-lines-fill me-2 text-primary"></i>
-                                            <span>My Profile</span>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center" asp-page="/Customer/MyOrders" style="padding: 0.75rem 1rem;">
-                                            <i class="bi bi-box-seam me-2 text-success"></i>
-                                            <span>My Orders</span>
-                                        </a>
-                                    </li>
-
-                                    @* ── MY WISHLIST ── *@
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center dropdown-item-wishlist"
-                                           asp-page="/Customer/Wishlist">
-                                            <i class="bi bi-heart-fill me-2" style="color: #c9a96e;"></i>
+                                        <a class="dropdown-item d-flex align-items-center dropdown-item-wishlist" asp-page="/Customer/Wishlist">
+                                            <i class="bi bi-heart-fill me-2" style="color:#c9a96e"></i>
                                             <span class="wl-label">My Wishlist</span>
                                             <span class="wl-badge" id="dropdownWlCount"></span>
                                         </a>
                                     </li>
-
                                     <li>
                                         <a class="dropdown-item d-flex align-items-center" asp-page="/Customer/Prescriptions/Index"
-                                           style="padding: 0.75rem 1rem; background: linear-gradient(135deg, rgba(156, 39, 176, 0.05) 0%, rgba(186, 104, 200, 0.05) 100%);">
-                                            <i class="bi bi-eyeglasses me-2" style="color: #9c27b0;"></i>
-                                            <span style="font-weight: 600; color: #9c27b0;">My Prescriptions</span>
-                                            <span class="badge bg-purple ms-auto" style="background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);">New</span>
+                                           style="padding:.75rem 1rem;background:linear-gradient(135deg,rgba(156,39,176,0.05),rgba(186,104,200,0.05))">
+                                            <i class="bi bi-eyeglasses me-2" style="color:#9c27b0"></i>
+                                            <span style="font-weight:600;color:#9c27b0">My Prescriptions</span>
+                                            <span class="badge ms-auto" style="background:linear-gradient(135deg,#9c27b0,#ba68c8)">New</span>
                                         </a>
                                     </li>
-
                                     <li><hr class="dropdown-divider" /></li>
-
                                     <li>
                                         <form method="post" asp-page="/Account/Logout" class="m-0">
                                             @Html.AntiForgeryToken()
                                             <button type="submit" class="btn btn-link dropdown-item text-danger p-0 d-flex align-items-center"
-                                                    style="width:100%; text-decoration: none; padding: 0.75rem 1rem !important;">
-                                                <i class="bi bi-box-arrow-right me-2"></i>
-                                                <span>Logout</span>
+                                                    style="width:100%;text-decoration:none;padding:.75rem 1rem!important">
+                                                <i class="bi bi-box-arrow-right me-2"></i><span>Logout</span>
                                             </button>
                                         </form>
                                     </li>
@@ -296,16 +362,8 @@
                         }
                         else
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-page="/Account/Login">
-                                    <i class="bi bi-box-arrow-in-right me-1"></i>Login
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link btn btn-primary text-white ms-2" asp-page="/Account/Register">
-                                    <i class="bi bi-person-plus me-1"></i>Register
-                                </a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link" asp-page="/Account/Login"><i class="bi bi-box-arrow-in-right me-1"></i>Login</a></li>
+                            <li class="nav-item"><a class="nav-link btn btn-primary text-white ms-2" asp-page="/Account/Register"><i class="bi bi-person-plus me-1"></i>Register</a></li>
                         }
                     </ul>
                 </div>
@@ -313,31 +371,20 @@
         </nav>
     </header>
 
-    <!-- Main Content -->
     <main role="main" class="flex-grow-1">
         @RenderBody()
     </main>
 
-    <!-- Footer -->
     <footer class="footer-optiplus" id="footer">
         <div class="footer-container">
             <div class="footer-content">
                 <div class="footer-brand">
                     <h3>OptiPlus</h3>
-                    <p>
-                        Your trusted destination for premium eyewear.
-                        We combine style, quality, and affordability to help you see the world better.
-                    </p>
+                    <p>Your trusted destination for premium eyewear. We combine style, quality, and affordability to help you see the world better.</p>
                     <div class="social-icons">
-                        <a href="#" class="social-icon" aria-label="Facebook">
-                            <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg>
-                        </a>
-                        <a href="#" class="social-icon" aria-label="Instagram">
-                            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></svg>
-                        </a>
-                        <a href="#" class="social-icon" aria-label="Twitter">
-                            <svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" /></svg>
-                        </a>
+                        <a href="#" class="social-icon" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg></a>
+                        <a href="#" class="social-icon" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></svg></a>
+                        <a href="#" class="social-icon" aria-label="Twitter"><svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" /></svg></a>
                     </div>
                 </div>
                 <div class="footer-column">
@@ -345,18 +392,17 @@
                     <ul>
                         <li><a href="/Index">Home</a></li>
                         <li><a href="/Products">Shop</a></li>
-                        <li><a href="#services">Services</a></li>
-                        <li><a href="/About">About Us</a></li>
+                        <li><a href="/Customer/Services/CustomGlasses">Services</a></li>
                         <li><a href="#footer">Contact</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h4>Services</h4>
                     <ul>
-                        <li><a href="#">Eye Exams</a></li>
-                        <li><a href="#">Frame Fitting</a></li>
-                        <li><a href="#">Lens Replacement</a></li>
-                        <li><a href="#">Repairs</a></li>
+                        <li><a href="/Customer/Services/CustomGlasses">Custom Glasses</a></li>
+                        <li><a href="/Customer/Services/FrameRepair">Frame Repair</a></li>
+                        <li><a href="/Customer/Services/LensReplacement">Lens Replacement</a></li>
+                        <li><a href="/Customer/Services/EyeExam">Eye Exam</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -364,8 +410,7 @@
                     <ul>
                         <li><a href="mailto:info@optiplus.com">info@optiplus.com</a></li>
                         <li><a href="tel:+1234567890">+1 (234) 567-890</a></li>
-                        <li><a href="#">123 Vision Street</a></li>
-                        <li><a href="#">New York, NY 10001</a></li>
+                        <li><a href="#">123 Vision Street, New York</a></li>
                     </ul>
                 </div>
             </div>
@@ -375,21 +420,13 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
-    @* Global antiforgery token for AJAX requests (cart remove/clear, etc.) *@
     @Html.AntiForgeryToken()
-
-    @* Cart dropdown actions - must be global since the dropdown is in the layout *@
     <script src="~/js/shop-cart.js" asp-append-version="true"></script>
-
-    <!-- Page-specific Scripts Section -->
     @await RenderSectionAsync("Scripts", required: false)
 
-    @* ── Wishlist count badge (load 1 lần cho toàn bộ site) ── *@
     @if (User.Identity.IsAuthenticated)
     {
         <script>
@@ -400,44 +437,14 @@
                     const items = await res.json();
                     const count = items.length;
                     if (count === 0) return;
-
-                    // Icon badge trên navbar
                     const navBadge = document.getElementById('navWlCount');
-                    if (navBadge) {
-                        navBadge.textContent = count > 99 ? '99+' : count;
-                        navBadge.style.display = 'flex';
-                    }
-
-                    // Badge trong dropdown
+                    if (navBadge) { navBadge.textContent = count > 99 ? '99+' : count; navBadge.style.display = 'flex'; }
                     const dropBadge = document.getElementById('dropdownWlCount');
-                    if (dropBadge) {
-                        dropBadge.textContent = count > 99 ? '99+' : count;
-                        dropBadge.style.display = 'inline-flex';
-                    }
-
-                    // Icon đổi sang heart-fill khi có items
+                    if (dropBadge) { dropBadge.textContent = count > 99 ? '99+' : count; dropBadge.style.display = 'inline-flex'; }
                     const heartIcon = document.querySelector('.nav-wishlist-btn i');
                     if (heartIcon) heartIcon.className = 'bi bi-heart-fill';
-
                 } catch {}
             })();
-        </script>
-    }
-
-    <!-- Global Toast Notification for TempData -->
-    @if (TempData["Success"] != null || TempData["Error"] != null)
-    {
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                @if (TempData["Success"] != null)
-                {
-                        <text>console.log('Success: @TempData["Success"]');</text>
-                }
-                @if (TempData["Error"] != null)
-                {
-                        <text>console.log('Error: @TempData["Error"]');</text>
-                }
-            });
         </script>
     }
 </body>

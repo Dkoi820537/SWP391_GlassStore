@@ -1,0 +1,695 @@
+﻿@page
+@model EyewearStore_SWP391.Pages.Customer.Services.FrameRepairModel
+@{
+    ViewData["Title"] = "Frame Repair";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --amber: #b8862a;
+            --amber-d: #9a6e1c;
+            --ok: #059669;
+            --txt: #0f172a;
+            --txt2: #475569;
+            --muted: #94a3b8;
+            --surf: #fff;
+            --bg: #f8fafc;
+            --bg2: #fffbf0;
+            --bdr: #e2e8f0;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        .rp-wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px 100px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+            text-decoration: none;
+            margin-bottom: 32px;
+            transition: color .2s;
+        }
+
+            .back-link:hover {
+                color: var(--txt);
+            }
+
+        .rp-header {
+            margin-bottom: 36px;
+        }
+
+            .rp-header h1 {
+                font-size: clamp(1.5rem,4vw,2.2rem);
+                font-weight: 900;
+                color: var(--txt);
+                margin: 0 0 8px;
+                letter-spacing: -.6px;
+            }
+
+            .rp-header p {
+                font-size: 14px;
+                color: var(--txt2);
+                margin: 0;
+            }
+
+        /* Stepper */
+        .stepper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            overflow-x: auto;
+            padding: 4px 2px 8px;
+        }
+
+        .stepper-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 7px;
+            flex: 1;
+            min-width: 80px;
+            cursor: default;
+        }
+
+        .stepper-circle {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: var(--bdr);
+            border: 2.5px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--muted);
+            transition: all .25s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stepper-item.active .stepper-circle {
+            background: var(--amber);
+            border-color: var(--amber);
+            color: white;
+            box-shadow: 0 4px 16px rgba(184,134,42,.28);
+            transform: scale(1.06);
+        }
+
+        .stepper-item.done .stepper-circle {
+            background: var(--ok);
+            border-color: var(--ok);
+            color: white;
+        }
+
+        .stepper-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .stepper-item.active .stepper-label {
+            color: var(--amber);
+        }
+
+        .stepper-item.done .stepper-label {
+            color: var(--ok);
+        }
+
+        .stepper-line {
+            flex: 1;
+            height: 2px;
+            background: var(--bdr);
+            min-width: 20px;
+            margin-bottom: 26px;
+            transition: background .3s;
+        }
+
+            .stepper-line.done {
+                background: var(--ok);
+            }
+
+        /* Panel */
+        .rp-panel {
+            display: none;
+        }
+
+            .rp-panel.active {
+                display: block;
+            }
+
+        .panel-heading {
+            margin-bottom: 22px;
+        }
+
+            .panel-heading h2 {
+                font-size: 1.4rem;
+                font-weight: 800;
+                color: var(--txt);
+                margin: 0 0 4px;
+            }
+
+            .panel-heading p {
+                font-size: 13.5px;
+                color: var(--txt2);
+                margin: 0;
+            }
+
+        .step-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--amber);
+            background: rgba(184,134,42,.1);
+            border-radius: 100px;
+            padding: 3px 12px;
+            margin-bottom: 10px;
+            letter-spacing: .5px;
+        }
+
+        /* Grid */
+        .item-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill,minmax(160px,1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .item-card {
+            border: 2px solid var(--bdr);
+            border-radius: 13px;
+            padding: 16px 12px;
+            cursor: pointer;
+            transition: all .2s;
+            background: var(--surf);
+            text-align: center;
+            position: relative;
+        }
+
+            .item-card:hover {
+                border-color: var(--amber);
+                box-shadow: 0 6px 18px rgba(184,134,42,.12);
+                transform: translateY(-2px);
+            }
+
+            .item-card.sel {
+                border-color: var(--amber);
+                background: rgba(184,134,42,.04);
+                box-shadow: 0 0 0 4px rgba(184,134,42,.1);
+            }
+
+                .item-card.sel::after {
+                    content: '✓';
+                    position: absolute;
+                    top: 8px;
+                    right: 10px;
+                    width: 20px;
+                    height: 20px;
+                    background: var(--ok);
+                    color: #fff;
+                    border-radius: 50%;
+                    font-size: 10px;
+                    font-weight: 800;
+                    line-height: 20px;
+                    text-align: center;
+                }
+
+        .item-img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 9px;
+            margin: 0 auto 9px;
+            display: block;
+            background: var(--bg);
+        }
+
+        .item-img-ph {
+            width: 70px;
+            height: 70px;
+            border-radius: 9px;
+            margin: 0 auto 9px;
+            background: var(--bg2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+        }
+
+        .item-name {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--txt);
+            margin-bottom: 3px;
+        }
+
+        .item-price {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--amber);
+        }
+
+        /* Repair service list */
+        .svc-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .svc-row {
+            background: var(--surf);
+            border: 2px solid var(--bdr);
+            border-radius: 12px;
+            padding: 16px 18px;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+            .svc-row:hover {
+                border-color: var(--amber);
+            }
+
+            .svc-row.sel {
+                border-color: var(--amber);
+                background: rgba(184,134,42,.04);
+            }
+
+        .svc-row-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: rgba(184,134,42,.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .svc-row-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--txt);
+        }
+
+        .svc-row-desc {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .svc-row-price {
+            margin-left: auto;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--amber);
+            white-space: nowrap;
+        }
+
+        /* Summary */
+        .sum-box {
+            background: var(--surf);
+            border: 2px solid var(--bdr);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 22px;
+            box-shadow: 0 4px 18px rgba(0,0,0,.05);
+        }
+
+        .sum-head {
+            background: linear-gradient(135deg,#7a5000,#b8862a);
+            padding: 15px 22px;
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255,255,255,.85);
+            letter-spacing: .4px;
+        }
+
+        .sum-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 22px;
+            border-bottom: 1px solid var(--bdr);
+        }
+
+            .sum-row:last-child {
+                border-bottom: none;
+            }
+
+            .sum-row.total-row {
+                background: rgba(184,134,42,.05);
+            }
+
+        .sum-thumb {
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            object-fit: cover;
+            background: var(--bg);
+            border: 1px solid var(--bdr);
+            flex-shrink: 0;
+        }
+
+        .sum-ph {
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            background: var(--bg2);
+            border: 1px solid var(--bdr);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .sum-lbl {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+        }
+
+        .sum-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--txt);
+        }
+
+        .sum-val {
+            margin-left: auto;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--amber);
+            white-space: nowrap;
+        }
+
+        .sum-total-lbl {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--txt);
+        }
+
+        .sum-total-val {
+            margin-left: auto;
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--amber);
+        }
+
+        /* Buttons */
+        .nav-btns {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--bg);
+            color: var(--txt2);
+            border: 1.5px solid var(--bdr);
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+            .btn-back:hover {
+                background: #e2e8f0;
+                color: var(--txt);
+            }
+
+        .btn-next {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg,var(--amber),var(--amber-d));
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 26px;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s;
+            box-shadow: 0 4px 14px rgba(184,134,42,.28);
+        }
+
+            .btn-next:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 22px rgba(184,134,42,.32);
+            }
+
+            .btn-next:disabled {
+                opacity: .35;
+                cursor: not-allowed;
+                transform: none;
+                box-shadow: none;
+            }
+
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg,#059669,#047857);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 34px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all .2s;
+            box-shadow: 0 4px 14px rgba(5,150,105,.28);
+        }
+
+            .btn-add:hover {
+                transform: translateY(-2px);
+            }
+
+        .empty-card {
+            text-align: center;
+            padding: 44px 24px;
+            background: var(--bg);
+            border-radius: 13px;
+            border: 2px dashed var(--bdr);
+            color: var(--muted);
+        }
+    </style>
+}
+
+<div class="rp-wrap">
+
+    <a href="javascript:history.back()" class="back-link"><i class="bi bi-arrow-left"></i> Back</a>
+
+    <div class="rp-header">
+        <h1>🛠 Frame Repair</h1>
+        <p>Bent frame, broken hinge, or loose nose pads? Select your frame and the repair service you need.</p>
+    </div>
+
+    <!-- Stepper -->
+    <div class="stepper">
+        <div class="stepper-item active" id="rs1"><div class="stepper-circle">🕶</div><div class="stepper-label">Frame</div></div>
+        <div class="stepper-line" id="rl12"></div>
+        <div class="stepper-item" id="rs2"><div class="stepper-circle">🛠</div><div class="stepper-label">Repair</div></div>
+        <div class="stepper-line" id="rl23"></div>
+        <div class="stepper-item" id="rs3"><div class="stepper-circle">✓</div><div class="stepper-label">Review</div></div>
+    </div>
+
+    <!-- STEP 1: FRAME -->
+    <div class="rp-panel active" id="rp1">
+        <div class="panel-heading">
+            <div class="step-badge">Step 1 of 3</div>
+            <h2>Which frame needs repair?</h2>
+            <p>Choose the frame model from our catalogue</p>
+        </div>
+        @if (Model.Frames.Any())
+        {
+            <div class="item-grid" id="frameGrid">
+                @foreach (var f in Model.Frames)
+                {
+                    var img = f.ProductImages?.OrderByDescending(x => x.IsPrimary).FirstOrDefault()?.ImageUrl;
+                    <div class="item-card" data-id="@f.ProductId" data-name="@f.Name"
+                         data-price="@f.Price" data-img="@(img ?? "")" onclick="rSelectFrame(this)">
+                        @if (!string.IsNullOrEmpty(img))
+                        {
+                            <img src="@img" class="item-img" alt="@f.Name" />
+                        }
+                        else
+                        {
+
+                            <div class="item-img-ph">🕶</div>
+                        }
+                        <div class="item-name">@f.Name</div>
+                        <div class="item-price" style="color:var(--muted);font-weight:500">for reference</div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+
+            <div class="empty-card">No frames in catalogue.</div>
+        }
+        <div class="nav-btns">
+            <button class="btn-next" id="rBtn1" onclick="rGoStep(2)" disabled>
+                Next — Choose Repair <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- STEP 2: REPAIR SERVICE -->
+    <div class="rp-panel" id="rp2">
+        <div class="panel-heading">
+            <div class="step-badge">Step 2 of 3</div>
+            <h2>Select repair type</h2>
+            <p>What kind of fix does your frame need?</p>
+        </div>
+        @if (Model.Services.Any())
+        {
+            <div class="svc-list" id="repairGrid">
+                @foreach (var s in Model.Services)
+                {
+                    <div class="svc-row" data-id="@s.ServiceId" data-name="@s.Name"
+                         data-price="@s.Price" onclick="rSelectService(this)">
+                        <div class="svc-row-icon">🛠</div>
+                        <div>
+                            <div class="svc-row-name">@s.Name</div>
+                            @if (!string.IsNullOrEmpty(s.Description))
+                            {
+                                <div class="svc-row-desc">@s.Description</div>
+                            }
+                            @if (s.DurationMin.HasValue)
+                            {
+                                <div class="svc-row-desc" style="margin-top:2px">⏱ @s.DurationMin min</div>
+                            }
+                        </div>
+                        <div class="svc-row-price">@s.Price.ToString("N0") ₫</div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+
+            <div class="empty-card">No repair services available. Please check back later.</div>
+        }
+        <div class="nav-btns">
+            <button class="btn-back" onclick="rGoStep(1)"><i class="bi bi-arrow-left"></i> Back</button>
+            <button class="btn-next" id="rBtn2" onclick="rGoStep(3)" disabled>
+                Review <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- STEP 3: REVIEW -->
+    <div class="rp-panel" id="rp3">
+        <div class="panel-heading">
+            <div class="step-badge">Step 3 of 3</div>
+            <h2>Review Repair Order</h2>
+            <p>Confirm before adding to cart</p>
+        </div>
+        <div class="sum-box" id="rSummary"></div>
+        <form method="post" asp-page="/Cart/Add" id="rForm">
+            <input type="hidden" name="ProductId" id="rFrameId" />
+            <input type="hidden" name="ServiceId" id="rServiceId" />
+            <input type="hidden" name="Quantity" value="1" />
+            <div class="nav-btns">
+                <button type="button" class="btn-back" onclick="rGoStep(2)"><i class="bi bi-arrow-left"></i> Back</button>
+                <button type="submit" class="btn-add"><i class="bi bi-cart-plus"></i> Add to Cart</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        let rSel = { frame: null, svc: null };
+
+        function rGoStep(n) {
+            if (n>1 && !rSel.frame) { rShake('rp1'); return; }
+            if (n>2 && !rSel.svc)   { rShake('rp2'); return; }
+            [1,2,3].forEach(i => document.getElementById('rp'+i).classList.toggle('active', i===n));
+            // stepper
+            [1,2,3].forEach(i => {
+                const el=document.getElementById('rs'+i); if(!el) return;
+                el.classList.remove('active','done');
+                if(i<n) el.classList.add('done');
+                else if(i===n) el.classList.add('active');
+            });
+            [['rl12',2],['rl23',3]].forEach(([id,t]) =>
+                document.getElementById(id)?.classList.toggle('done', n>=t));
+            if (n===3) rBuildSummary();
+            window.scrollTo({top:0,behavior:'smooth'});
+        }
+        function rShake(id) {
+            const el=document.getElementById(id); let t=0;
+            const s=[5,-5,4,-4,2,-2,0];
+            const next=()=>{if(t>=s.length){el.style.transform='';return;}el.style.transform=`translateX(${s[t]}px)`;t++;setTimeout(next,60);};
+            next();
+        }
+        function rSelectFrame(card) {
+            document.querySelectorAll('#frameGrid .item-card').forEach(c=>c.classList.remove('sel'));
+            card.classList.add('sel');
+            rSel.frame={id:card.dataset.id,name:card.dataset.name,img:card.dataset.img};
+            document.getElementById('rBtn1').disabled=false;
+        }
+        function rSelectService(card) {
+            document.querySelectorAll('#repairGrid .svc-row').forEach(c=>c.classList.remove('sel'));
+            card.classList.add('sel');
+            rSel.svc={id:card.dataset.id,name:card.dataset.name,price:+card.dataset.price};
+            document.getElementById('rBtn2').disabled=false;
+        }
+        function rBuildSummary() {
+            const f=rSel.frame, s=rSel.svc;
+            const img=f.img?`<img src="${f.img}" class="sum-thumb"/>`:`<div class="sum-ph">🕶</div>`;
+            document.getElementById('rSummary').innerHTML=`
+                <div class="sum-head">ORDER SUMMARY — FRAME REPAIR</div>
+                <div class="sum-row">
+                    ${img}
+                    <div><div class="sum-lbl">Frame (reference)</div><div class="sum-name">${f.name}</div></div>
+                    <div class="sum-val" style="color:var(--muted)">—</div>
+                </div>
+                <div class="sum-row">
+                    <div class="sum-ph">🛠</div>
+                    <div><div class="sum-lbl">Repair Service</div><div class="sum-name">${s.name}</div></div>
+                    <div class="sum-val">${s.price.toLocaleString('vi-VN')} ₫</div>
+                </div>
+                <div class="sum-row total-row">
+                    <div class="sum-total-lbl">Total</div>
+                    <div class="sum-total-val">${s.price.toLocaleString('vi-VN')} ₫</div>
+                </div>`;
+            document.getElementById('rFrameId').value   = f.id;
+            document.getElementById('rServiceId').value = s.id;
+        }
+    </script>
+}

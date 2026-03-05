@@ -23,7 +23,7 @@ namespace EyewearStore_SWP391.Migrations
                 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id = OBJECT_ID('cart_items') AND name = 'IX_cart_items_prescription_id')
                     CREATE INDEX [IX_cart_items_prescription_id] ON [cart_items]([prescription_id]);
                 IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_cart_items_prescription')
-                    ALTER TABLE [cart_items] ADD CONSTRAINT [FK_cart_items_prescription] FOREIGN KEY ([prescription_id]) REFERENCES [prescription_profiles]([prescription_id]) ON DELETE SET NULL;
+                    ALTER TABLE [cart_items] ADD CONSTRAINT [FK_cart_items_prescription] FOREIGN KEY ([prescription_id]) REFERENCES [prescription_profiles]([prescription_id]) ON DELETE NO ACTION;
             ");
         }
 

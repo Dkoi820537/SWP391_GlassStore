@@ -411,7 +411,7 @@ public partial class EyewearStoreContext : DbContext
             entity.HasOne(d => d.Prescription)
                 .WithMany()
                 .HasForeignKey(d => d.PrescriptionId)
-                .OnDelete(DeleteBehavior.SetNull)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_cart_items_prescription");
         });
 

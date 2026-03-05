@@ -132,6 +132,81 @@
             margin: 6px 0;
         }
 
+        /* ── Shop dropdown ── */
+        .shop-dropdown-menu {
+            min-width: 250px;
+            padding: 8px;
+            border-radius: 12px;
+            border: none;
+            background: #2d6e6e;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+            margin-top: 8px !important;
+        }
+
+        .shop-drop-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: rgba(255,255,255,0.92);
+            transition: background .15s, color .15s;
+            cursor: pointer;
+        }
+
+            .shop-drop-item:hover {
+                background: rgba(255,255,255,0.12);
+                color: #fff;
+            }
+
+        .shop-drop-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+            .shop-drop-icon.frames  { background: rgba(255,255,255,0.13); color: #fff; }
+            .shop-drop-icon.lenses  { background: rgba(255,255,255,0.13); color: #fff; }
+            .shop-drop-icon.rx      { background: rgba(255,255,255,0.13); color: #fff; }
+
+        .shop-drop-text {
+            line-height: 1.2;
+        }
+
+        .shop-drop-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .shop-drop-desc {
+            font-size: 11px;
+            color: rgba(255,255,255,0.55);
+            margin-top: 1px;
+        }
+
+        .shop-drop-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.15);
+            margin: 6px 0;
+        }
+
+        .shop-chevron {
+            font-size: 10px;
+            margin-left: 2px;
+            transition: transform .2s;
+        }
+
+        .nav-item.dropdown.show .shop-chevron {
+            transform: rotate(180deg);
+        }
+
         /* ── Dropdown wishlist item ── */
         .dropdown-item-wishlist {
             padding: 0.75rem 1rem;
@@ -182,20 +257,60 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Products">
+                        <!-- ══ SHOP DROPDOWN ══ -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#"
+                               id="shopDropdown" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-shop me-1"></i>Shop
+                                <i class="bi bi-chevron-down shop-chevron"></i>
                             </a>
-                        </li>
+                            <ul class="dropdown-menu shop-dropdown-menu p-2"
+                                aria-labelledby="shopDropdown">
 
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-page="/Customer/Prescriptions/Index">
-                                    <i class="bi bi-eyeglasses me-1"></i>Prescriptions
-                                </a>
-                            </li>
-                        }
+                                <!-- Frames -->
+                                <li>
+                                    <a class="shop-drop-item" href="/Products?type=frames">
+                                        <div class="shop-drop-icon frames"><i class="bi bi-eyeglasses"></i></div>
+                                        <div class="shop-drop-text">
+                                            <div class="shop-drop-name">Frames</div>
+                                            <div class="shop-drop-desc">Browse all eyeglass frames</div>
+                                        </div>
+                                    </a>
+                                </li>
+
+                                <li><div class="shop-drop-divider"></div></li>
+
+                                <!-- Lenses -->
+                                <li>
+                                    <a class="shop-drop-item" href="/Products?type=lenses">
+                                        <div class="shop-drop-icon lenses"><i class="bi bi-circle"></i></div>
+                                        <div class="shop-drop-text">
+                                            <div class="shop-drop-name">Lenses</div>
+                                            <div class="shop-drop-desc">Prescription & specialty lenses</div>
+                                        </div>
+                                    </a>
+                                </li>
+
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <li><div class="shop-drop-divider"></div></li>
+
+                                    <!-- Prescription Profile -->
+                                    <li>
+                                        <a class="shop-drop-item" asp-page="/Customer/Prescriptions/Index">
+                                            <div class="shop-drop-icon rx"><i class="bi bi-clipboard2-pulse"></i></div>
+                                            <div class="shop-drop-text">
+                                                <div class="shop-drop-name">Prescription Profile</div>
+                                                <div class="shop-drop-desc">View & manage your prescriptions</div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                }
+
+                            </ul>
+                        </li>
+                        <!-- ══ END SHOP DROPDOWN ══ -->
 
                         <!-- ══ SERVICES DROPDOWN ══ -->
                         <li class="nav-item dropdown">

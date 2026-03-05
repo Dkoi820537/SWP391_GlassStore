@@ -98,6 +98,17 @@ body {
     color: var(--color-white) !important;
 }
 
+/* Keep dropdown toggles (Shop, Services) visible on the teal navbar */
+.navbar-optiplus .dropdown-toggle:hover {
+    background-color: var(--color-teal-dark) !important;
+    color: var(--color-white) !important;
+}
+
+.navbar-optiplus .nav-item.dropdown.show>.dropdown-toggle {
+    background-color: var(--color-teal-dark) !important;
+    color: var(--color-white) !important;
+}
+
 /* ============================================
    HERO SECTION
    ============================================ */

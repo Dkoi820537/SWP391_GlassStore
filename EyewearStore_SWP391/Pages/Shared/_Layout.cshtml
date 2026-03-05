@@ -58,79 +58,7 @@
                 line-height: 1;
             }
 
-        /* ── Services dropdown ── */
-        .services-dropdown-menu {
-            min-width: 240px;
-            padding: 8px;
-            border-radius: 12px;
-            border: 1px solid rgba(0,0,0,0.08);
-            box-shadow: 0 8px 28px rgba(0,0,0,0.12);
-        }
 
-        .svc-drop-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #0f172a;
-            transition: background .15s;
-            cursor: pointer;
-        }
-
-            .svc-drop-item:hover {
-                background: #f0f4ff;
-                color: #2563eb;
-            }
-
-        .svc-drop-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-
-            .svc-drop-icon.blue {
-                background: rgba(37,99,235,0.1);
-            }
-
-            .svc-drop-icon.amber {
-                background: rgba(184,134,42,0.1);
-            }
-
-            .svc-drop-icon.green {
-                background: rgba(5,150,105,0.1);
-            }
-
-            .svc-drop-icon.slate {
-                background: rgba(71,85,105,0.1);
-            }
-
-        .svc-drop-text {
-            line-height: 1.2;
-        }
-
-        .svc-drop-name {
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .svc-drop-desc {
-            font-size: 11px;
-            color: #94a3b8;
-            margin-top: 1px;
-        }
-
-        .svc-drop-divider {
-            height: 1px;
-            background: #e2e8f0;
-            margin: 6px 0;
-        }
 
         /* ── Shop dropdown ── */
         .shop-dropdown-menu {
@@ -270,7 +198,7 @@
 
                                 <!-- Frames -->
                                 <li>
-                                    <a class="shop-drop-item" href="/Products?type=frames">
+                                    <a class="shop-drop-item" href="/Products?ProductTypeFilter=Frame">
                                         <div class="shop-drop-icon frames"><i class="bi bi-eyeglasses"></i></div>
                                         <div class="shop-drop-text">
                                             <div class="shop-drop-name">Frames</div>
@@ -283,7 +211,7 @@
 
                                 <!-- Lenses -->
                                 <li>
-                                    <a class="shop-drop-item" href="/Products?type=lenses">
+                                    <a class="shop-drop-item" href="/Products?ProductTypeFilter=Lens">
                                         <div class="shop-drop-icon lenses"><i class="bi bi-circle"></i></div>
                                         <div class="shop-drop-text">
                                             <div class="shop-drop-name">Lenses</div>
@@ -318,52 +246,57 @@
                                id="servicesDropdown" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-gear me-1"></i>Services
+                                <i class="bi bi-chevron-down shop-chevron"></i>
                             </a>
-                            <ul class="dropdown-menu services-dropdown-menu p-2"
+                            <ul class="dropdown-menu shop-dropdown-menu p-2"
                                 aria-labelledby="servicesDropdown">
 
                                 <!-- Custom Glasses -->
                                 <li>
-                                    <a class="svc-drop-item" asp-page="/Customer/Services/CustomGlasses">
-                                        <div class="svc-drop-icon blue">🔭</div>
-                                        <div class="svc-drop-text">
-                                            <div class="svc-drop-name">Custom Glasses</div>
-                                            <div class="svc-drop-desc">Frame + Lens, fitted your way</div>
+                                    <a class="shop-drop-item" asp-page="/Customer/Services/CustomGlasses">
+                                        <div class="shop-drop-icon frames"><i class="bi bi-eyeglasses"></i></div>
+                                        <div class="shop-drop-text">
+                                            <div class="shop-drop-name">Custom Glasses</div>
+                                            <div class="shop-drop-desc">Frame + Lens, fitted your way</div>
                                         </div>
                                     </a>
                                 </li>
 
-                                <li><div class="svc-drop-divider"></div></li>
+                                <li><div class="shop-drop-divider"></div></li>
 
                                 <!-- Frame Repair -->
                                 <li>
-                                    <a class="svc-drop-item" asp-page="/Customer/Services/FrameRepair">
-                                        <div class="svc-drop-icon amber">🛠</div>
-                                        <div class="svc-drop-text">
-                                            <div class="svc-drop-name">Frame Repair</div>
-                                            <div class="svc-drop-desc">Fix bent frames &amp; loose hinges</div>
+                                    <a class="shop-drop-item" asp-page="/Customer/Services/FrameRepair">
+                                        <div class="shop-drop-icon lenses"><i class="bi bi-tools"></i></div>
+                                        <div class="shop-drop-text">
+                                            <div class="shop-drop-name">Frame Repair</div>
+                                            <div class="shop-drop-desc">Fix bent frames &amp; loose hinges</div>
                                         </div>
                                     </a>
                                 </li>
+
+                                <li><div class="shop-drop-divider"></div></li>
 
                                 <!-- Lens Replacement -->
                                 <li>
-                                    <a class="svc-drop-item" asp-page="/Customer/Services/LensReplacement">
-                                        <div class="svc-drop-icon green">⭕</div>
-                                        <div class="svc-drop-text">
-                                            <div class="svc-drop-name">Lens Replacement</div>
-                                            <div class="svc-drop-desc">New lenses into your existing frame</div>
+                                    <a class="shop-drop-item" asp-page="/Customer/Services/LensReplacement">
+                                        <div class="shop-drop-icon rx"><i class="bi bi-arrow-repeat"></i></div>
+                                        <div class="shop-drop-text">
+                                            <div class="shop-drop-name">Lens Replacement</div>
+                                            <div class="shop-drop-desc">New lenses into your existing frame</div>
                                         </div>
                                     </a>
                                 </li>
 
+                                <li><div class="shop-drop-divider"></div></li>
+
                                 <!-- Eye Exam -->
                                 <li>
-                                    <a class="svc-drop-item" asp-page="/Customer/Services/EyeExam">
-                                        <div class="svc-drop-icon slate">👁</div>
-                                        <div class="svc-drop-text">
-                                            <div class="svc-drop-name">Eye Exam</div>
-                                            <div class="svc-drop-desc">Book a professional exam &amp; prescription</div>
+                                    <a class="shop-drop-item" asp-page="/Customer/Services/EyeExam">
+                                        <div class="shop-drop-icon frames"><i class="bi bi-eye"></i></div>
+                                        <div class="shop-drop-text">
+                                            <div class="shop-drop-name">Eye Exam</div>
+                                            <div class="shop-drop-desc">Book a professional exam &amp; prescription</div>
                                         </div>
                                     </a>
                                 </li>

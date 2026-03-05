@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
 using EyewearStore_SWP391.Models;
 using EyewearStore_SWP391.Services;
+using Stripe.Checkout;
 
 namespace EyewearStore_SWP391.Pages.Checkout;
 
@@ -79,6 +80,26 @@ public class SuccessModel : PageModel
         }
 
         IsCodOrder = false;
+
+        // Fallback for local testing without webhooks: Check status and manually mark as paid
+        if (Order.Status == "Pending")
+        {
+            try
+            {
+                var service = new SessionService();
+                var session = await service.GetAsync(session_id);
+                
+                if (session.PaymentStatus == "paid" && !string.IsNullOrEmpty(session.PaymentIntentId))
+                {
+                    await _orderService.MarkOrderPaidAsync(Order.OrderId, session.PaymentIntentId);
+                    Order = await _orderService.GetOrderByIdAsync(Order.OrderId); // reload
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to verify Stripe session on success page");
+            }
+        }
 
         try
         {

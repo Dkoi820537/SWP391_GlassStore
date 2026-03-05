@@ -670,6 +670,11 @@ public partial class EyewearStoreContext : DbContext
                 .HasColumnName("updated_at");
             entity.Property(e => e.CompletedAt)
                 .HasColumnName("completed_at");
+            entity.Property(e => e.StripePaymentIntentId)
+                .HasMaxLength(200)
+                .HasColumnName("stripe_payment_intent_id");
+            entity.Property(e => e.RefundResolvedAt)
+                .HasColumnName("refund_resolved_at");
 
             // Relationship: Return -> OrderItem
             entity.HasOne(d => d.OrderItem)

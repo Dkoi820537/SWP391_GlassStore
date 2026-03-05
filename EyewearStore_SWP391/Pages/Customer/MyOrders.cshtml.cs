@@ -41,6 +41,7 @@ namespace EyewearStore_SWP391.Pages.Customer
 
         public class OrderProductViewModel
         {
+            public int OrderItemId { get; set; }
             public string Name { get; set; } = "";
             public string Sku { get; set; } = "";
             public int Quantity { get; set; }
@@ -57,6 +58,9 @@ namespace EyewearStore_SWP391.Pages.Customer
             public string? ServiceName { get; set; }
             public decimal? ServicePrice { get; set; }
             public decimal? FramePrice { get; set; }
+
+            // Refund status
+            public string? RefundStatus { get; set; }
         }
 
         public class PrescriptionViewModel
@@ -130,6 +134,8 @@ namespace EyewearStore_SWP391.Pages.Customer
                         .ThenInclude(oi => oi.Product)
                     .Include(o => o.OrderItems)
                         .ThenInclude(oi => oi.Prescription)
+                    .Include(o => o.OrderItems)
+                        .ThenInclude(oi => oi.Returns)
                     .Include(o => o.Shipments)
                     .OrderByDescending(o => o.CreatedAt)
                     .AsNoTracking()
@@ -159,8 +165,14 @@ namespace EyewearStore_SWP391.Pages.Customer
                             ? $"{oi.Product?.Name ?? "Frame"} + {lensName} + {serviceName}"
                             : (oi.Product?.Name ?? "Product");
 
+                        // Get latest refund status for this item
+                        var latestReturn = oi.Returns?
+                            .OrderByDescending(r => r.CreatedAt)
+                            .FirstOrDefault();
+
                         return new OrderProductViewModel
                         {
+                            OrderItemId = oi.OrderItemId,
                             Name = displayName,
                             Sku = oi.Product?.Sku ?? "N/A",
                             Quantity = oi.Quantity,
@@ -183,7 +195,10 @@ namespace EyewearStore_SWP391.Pages.Customer
                             LensPrice = lensPrice,
                             ServiceName = serviceName,
                             ServicePrice = servicePrice,
-                            FramePrice = framePrice
+                            FramePrice = framePrice,
+
+                            // Refund
+                            RefundStatus = latestReturn?.Status
                         };
                     }).ToList()
                 }).ToList();

@@ -64,6 +64,12 @@ public partial class Return
     [Column("completed_at")]
     public DateTime? CompletedAt { get; set; }
 
+    [Column("stripe_payment_intent_id")]
+    public string? StripePaymentIntentId { get; set; }
+
+    [Column("refund_resolved_at")]
+    public DateTime? RefundResolvedAt { get; set; }
+
     // Navigation properties
     public virtual OrderItem OrderItem { get; set; } = null!;
     public virtual User? User { get; set; }

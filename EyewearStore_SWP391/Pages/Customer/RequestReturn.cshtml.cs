@@ -3,13 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using EyewearStore_SWP391.Models;
+using EyewearStore_SWP391.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using System.IO;
 
 namespace EyewearStore_SWP391.Pages.Customer
 {
@@ -17,30 +16,41 @@ namespace EyewearStore_SWP391.Pages.Customer
     public class RequestReturnModel : PageModel
     {
         private readonly EyewearStoreContext _context;
-        private readonly IWebHostEnvironment _environment;
+        private readonly IEmailService _emailService;
+        private readonly IConfiguration _configuration;
 
-        public RequestReturnModel(EyewearStoreContext context, IWebHostEnvironment environment)
+        public RequestReturnModel(EyewearStoreContext context, IEmailService emailService, IConfiguration configuration)
         {
             _context = context;
-            _environment = environment;
+            _emailService = emailService;
+            _configuration = configuration;
         }
 
         public Order? Order { get; set; }
 
-        [BindProperty]
-        public List<int> SelectedOrderItemIds { get; set; } = new();
+        // ── View Models ──────────────────────────────────────────────────────
+        public class RefundItemViewModel
+        {
+            public int OrderItemId { get; set; }
+            public string ProductName { get; set; } = "";
+            public string Sku { get; set; } = "";
+            public int Quantity { get; set; }
+            public decimal UnitPrice { get; set; }
+            public string? RefundStatus { get; set; } // null = no request, "Pending", "Approved", "Rejected"
+            public bool CanRequestRefund { get; set; }
+        }
+
+        public List<RefundItemViewModel> Items { get; set; } = new();
+        public bool CanRefund { get; set; }
+        public int DaysLeft { get; set; }
 
         [BindProperty]
-        public string ReturnType { get; set; } = "Refund";
+        public int RefundOrderItemId { get; set; }
 
         [BindProperty]
-        public string? ReasonCategory { get; set; }
+        public string? RefundReason { get; set; }
 
-        [BindProperty]
-        public string? Description { get; set; }
-
-        [BindProperty]
-        public List<IFormFile>? Images { get; set; }
+        // ── OnGetAsync ───────────────────────────────────────────────────────
 
         public async Task<IActionResult> OnGetAsync(int orderId)
         {
@@ -61,19 +71,39 @@ namespace EyewearStore_SWP391.Pages.Customer
                 return RedirectToPage("/Customer/MyOrders");
             }
 
-            // Check 30-day return window
-            if ((DateTime.UtcNow - Order.CreatedAt).TotalDays > 30)
-            {
-                TempData["ErrorMessage"] = "This order is past the 30-day return window.";
-                return RedirectToPage("/Customer/MyOrders");
-            }
+            // Check eligibility: must be Completed and within 7 days
+            var daysSinceOrder = (DateTime.UtcNow - Order.CreatedAt).TotalDays;
+            CanRefund = Order.Status == "Completed" && daysSinceOrder <= 7;
+            DaysLeft = Math.Max(0, 7 - (int)daysSinceOrder);
 
-            // ✅ FIX: KHÔNG FILTER - Hiển thị tất cả items
-            // Validation sẽ làm ở OnPost thay vì OnGet
-            // Để user thấy form ngay cả khi có return rồi
+            // Build items list with refund status
+            Items = Order.OrderItems.Select(oi =>
+            {
+                var existingReturn = oi.Returns
+                    .Where(r => r.Status == "Pending" || r.Status == "Approved")
+                    .OrderByDescending(r => r.CreatedAt)
+                    .FirstOrDefault();
+
+                // Also check for any return at all (even rejected)
+                var anyReturn = oi.Returns.OrderByDescending(r => r.CreatedAt).FirstOrDefault();
+
+                return new RefundItemViewModel
+                {
+                    OrderItemId = oi.OrderItemId,
+                    ProductName = oi.Product?.Name ?? "Product",
+                    Sku = oi.Product?.Sku ?? "N/A",
+                    Quantity = oi.Quantity,
+                    UnitPrice = oi.UnitPrice,
+                    RefundStatus = anyReturn?.Status,
+                    // Can request only if: order is eligible, no pending/approved return exists
+                    CanRequestRefund = CanRefund && existingReturn == null
+                };
+            }).ToList();
 
             return Page();
         }
+
+        // ── OnPostAsync — Submit Refund Request ─────────────────────────────
 
         public async Task<IActionResult> OnPostAsync(int orderId)
         {
@@ -81,23 +111,18 @@ namespace EyewearStore_SWP391.Pages.Customer
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                 return RedirectToPage("/Account/Login");
 
-            // Validation
-            if (SelectedOrderItemIds == null || !SelectedOrderItemIds.Any())
+            // Validate reason
+            if (string.IsNullOrWhiteSpace(RefundReason))
             {
-                TempData["ErrorMessage"] = "Please select at least one item to return.";
+                TempData["ErrorMessage"] = "Please provide a reason for the refund request.";
                 return await OnGetAsync(orderId);
             }
 
-            if (string.IsNullOrWhiteSpace(ReasonCategory))
-            {
-                TempData["ErrorMessage"] = "Please select a reason for return.";
-                return await OnGetAsync(orderId);
-            }
-
-            // Load order
+            // Load order with ownership check
             var order = await _context.Orders
                 .Include(o => o.OrderItems!)
                     .ThenInclude(oi => oi.Returns)
+                .Include(o => o.User)
                 .FirstOrDefaultAsync(o => o.OrderId == orderId && o.UserId == userId);
 
             if (order == null)
@@ -106,101 +131,140 @@ namespace EyewearStore_SWP391.Pages.Customer
                 return RedirectToPage("/Customer/MyOrders");
             }
 
-            // ✅ VALIDATION: Chỉ check items được chọn, không filter toàn bộ
-            var validatedItemIds = new List<int>();
-
-            foreach (var itemId in SelectedOrderItemIds.Distinct())
+            // Validate order status and 7-day window
+            if (order.Status != "Completed")
             {
-                var orderItem = order.OrderItems.FirstOrDefault(oi => oi.OrderItemId == itemId);
-                if (orderItem == null) continue;
-
-                // Chỉ skip item nếu có return PENDING hoặc APPROVED
-                // Cho phép return lại nếu trước đó bị REJECTED
-                var hasPendingReturn = orderItem.Returns
-                    .Any(r => r.Status == "Pending" || r.Status == "Approved");
-
-                if (!hasPendingReturn)
-                {
-                    validatedItemIds.Add(itemId);
-                }
+                TempData["ErrorMessage"] = "Refund can only be requested for completed orders.";
+                return RedirectToPage("/Customer/MyOrders");
             }
 
-            if (!validatedItemIds.Any())
+            if ((DateTime.UtcNow - order.CreatedAt).TotalDays > 7)
             {
-                TempData["ErrorMessage"] = "Selected items already have pending return requests.";
+                TempData["ErrorMessage"] = "The 7-day refund window has expired for this order.";
+                return RedirectToPage("/Customer/MyOrders");
+            }
+
+            // Validate the specific order item
+            var orderItem = order.OrderItems.FirstOrDefault(oi => oi.OrderItemId == RefundOrderItemId);
+            if (orderItem == null)
+            {
+                TempData["ErrorMessage"] = "Invalid order item selected.";
+                return await OnGetAsync(orderId);
+            }
+
+            // Block duplicate: check for existing Pending or Approved return
+            var hasPendingReturn = orderItem.Returns
+                .Any(r => r.Status == "Pending" || r.Status == "Approved");
+
+            if (hasPendingReturn)
+            {
+                TempData["ErrorMessage"] = "A refund request already exists for this item.";
+                return await OnGetAsync(orderId);
+            }
+
+            // Validate StripePaymentIntentId exists on the order
+            if (string.IsNullOrEmpty(order.StripePaymentIntentId))
+            {
+                TempData["ErrorMessage"] = "This order does not have a valid payment reference for processing a refund. Please contact support.";
                 return await OnGetAsync(orderId);
             }
 
             try
             {
-                // Handle image uploads
-                List<string> imageUrls = new();
-                if (Images != null && Images.Any())
+                // Create the return/refund request
+                var returnRequest = new Return
                 {
-                    var uploadsFolder = Path.Combine(_environment.WebRootPath ?? ".", "uploads", "returns");
-                    Directory.CreateDirectory(uploadsFolder);
+                    OrderItemId = RefundOrderItemId,
+                    UserId = userId,
+                    Quantity = orderItem.Quantity,
+                    ReturnType = "Refund",
+                    ReasonCategory = "Refund Request",
+                    Reason = RefundReason,
+                    Description = RefundReason,
+                    Status = "Pending",
+                    RefundAmount = orderItem.UnitPrice * orderItem.Quantity,
+                    StripePaymentIntentId = order.StripePaymentIntentId,
+                    CreatedAt = DateTime.UtcNow
+                };
 
-                    foreach (var image in Images.Take(5))
-                    {
-                        if (image.Length > 0 && image.Length <= 5 * 1024 * 1024)
-                        {
-                            var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(image.FileName)}";
-                            var filePath = Path.Combine(uploadsFolder, fileName);
-
-                            using (var stream = new FileStream(filePath, FileMode.Create))
-                            {
-                                await image.CopyToAsync(stream);
-                            }
-
-                            imageUrls.Add($"/uploads/returns/{fileName}");
-                        }
-                    }
-                }
-
-                // Create return requests
-                var now = DateTime.UtcNow;
-
-                foreach (var itemId in validatedItemIds)
-                {
-                    var orderItem = order.OrderItems.First(oi => oi.OrderItemId == itemId);
-
-                    // Get return quantity
-                    var quantityKey = $"ReturnQuantities_{itemId}";
-                    var quantityStr = Request.Form[quantityKey].FirstOrDefault();
-                    int returnQuantity = int.TryParse(quantityStr, out var qty)
-                        ? Math.Min(qty, orderItem.Quantity)
-                        : orderItem.Quantity;
-
-                    var returnRequest = new Return
-                    {
-                        OrderItemId = itemId,
-                        UserId = userId,
-                        Quantity = returnQuantity,
-                        ReturnType = ReturnType,
-                        ReasonCategory = ReasonCategory,
-                        Reason = ReasonCategory,
-                        Description = Description,
-                        ImageUrls = imageUrls.Any()
-                            ? System.Text.Json.JsonSerializer.Serialize(imageUrls)
-                            : null,
-                        Status = "Pending",
-                        RefundAmount = orderItem.UnitPrice * returnQuantity,
-                        CreatedAt = now
-                    };
-
-                    _context.Returns.Add(returnRequest);
-                }
-
+                _context.Returns.Add(returnRequest);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Return request submitted successfully! We'll review it within 24-48 hours.";
+                // Send email notification to sales staff
+                try
+                {
+                    var staffEmails = await _context.Users
+                        .Where(u => (u.Role == "sale" || u.Role == "sales" || u.Role == "admin") && u.IsActive)
+                        .Select(u => u.Email)
+                        .ToListAsync();
+
+                    var customerName = order.User?.FullName ?? "Customer";
+                    var productName = orderItem.Product?.Name ?? "Product";
+
+                    foreach (var staffEmail in staffEmails.Take(5)) // Limit to avoid spam
+                    {
+                        await _emailService.SendEmailAsync(
+                            staffEmail,
+                            $"🔔 New Refund Request — Order #{order.OrderId}",
+                            BuildStaffNotificationEmail(customerName, productName, order.OrderId, RefundReason)
+                        );
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Log but don't fail the request
+                    Console.WriteLine($"Failed to send staff notification email: {ex.Message}");
+                }
+
+                TempData["SuccessMessage"] = "Refund request submitted successfully! Our team will review it within 24–48 hours.";
                 return RedirectToPage("/Customer/MyOrders");
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Error: {ex.Message}";
+                TempData["ErrorMessage"] = $"Error submitting refund request: {ex.Message}";
                 return await OnGetAsync(orderId);
             }
+        }
+
+        // ── Email Templates ──────────────────────────────────────────────────
+
+        private string BuildStaffNotificationEmail(string customerName, string productName, int orderId, string? reason)
+        {
+            return $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }}
+        .container {{ max-width: 600px; margin: 40px auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }}
+        .header {{ background: linear-gradient(135deg, #1a2332 0%, #2c4a6e 100%); padding: 30px; text-align: center; }}
+        .header h1 {{ color: white; margin: 0; font-size: 24px; }}
+        .content {{ padding: 30px; }}
+        .info-box {{ background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 15px 0; border-left: 4px solid #ff9800; }}
+        .footer {{ background: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 13px; }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <h1>🔔 New Refund Request</h1>
+        </div>
+        <div class='content'>
+            <p style='font-size: 16px; color: #333;'>A new refund request has been submitted and requires your review.</p>
+            <div class='info-box'>
+                <p><strong>Customer:</strong> {customerName}</p>
+                <p><strong>Order:</strong> #{orderId}</p>
+                <p><strong>Product:</strong> {productName}</p>
+                <p><strong>Reason:</strong> {reason ?? "No reason provided"}</p>
+            </div>
+            <p style='color: #666; font-size: 14px;'>Please review this request in the <strong>Refund Requests</strong> management page.</p>
+        </div>
+        <div class='footer'>
+            <p>© {DateTime.Now.Year} OptiPlus Eyewear. Internal notification.</p>
+        </div>
+    </div>
+</body>
+</html>";
         }
     }
 }

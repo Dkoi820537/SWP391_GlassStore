@@ -1,0 +1,415 @@
+@page
+@model EyewearStore_SWP391.Pages.Sale.Refunds.IndexModel
+@{
+    ViewData["Title"] = "Refund Requests";
+}
+
+<div class="container py-5">
+    <!-- Page Header -->
+    <div class="mb-5">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
+                <li class="breadcrumb-item"><a asp-page="/Sale/Orders/Index">Orders</a></li>
+                <li class="breadcrumb-item active">Refund Requests</li>
+            </ol>
+        </nav>
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1 style="font-family: var(--font-secondary);
+                           color: var(--primary-navy);
+                           font-size: 2.5rem;
+                           margin-bottom: 0.5rem;">
+                    💳 Refund Requests
+                </h1>
+                <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin: 0;">
+                    Manage customer refund requests
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 10px; border: none; border-left: 4px solid #4caf50;">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px; border: none; border-left: 4px solid #f44336;">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-sm);
+                                               background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);">
+                <div class="card-body text-center py-3">
+                    <div style="font-size: 2rem; font-weight: 700; color: #e65100;">@Model.PendingCount</div>
+                    <div style="color: #bf360c; font-size: 0.9rem; font-weight: 600;">Pending</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-sm);
+                                               background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
+                <div class="card-body text-center py-3">
+                    <div style="font-size: 2rem; font-weight: 700; color: #2e7d32;">@Model.ApprovedCount</div>
+                    <div style="color: #1b5e20; font-size: 0.9rem; font-weight: 600;">Approved</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-sm);
+                                               background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);">
+                <div class="card-body text-center py-3">
+                    <div style="font-size: 2rem; font-weight: 700; color: #c62828;">@Model.RejectedCount</div>
+                    <div style="color: #b71c1c; font-size: 0.9rem; font-weight: 600;">Rejected</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-sm);
+                                               background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
+                <div class="card-body text-center py-3">
+                    <div style="font-size: 2rem; font-weight: 700; color: #1565c0;">@Model.TotalCount</div>
+                    <div style="color: #0d47a1; font-size: 0.9rem; font-weight: 600;">Total</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="mb-4">
+        <div class="btn-group" role="group">
+            <a asp-page="/Sale/Refunds/Index" asp-route-filter="Pending"
+               class="btn @(Model.CurrentFilter == "Pending" ? "btn-warning" : "btn-outline-warning")"
+               style="border-radius: 8px 0 0 8px; font-weight: 600; padding: 0.5rem 1.25rem;">
+                <i class="bi bi-hourglass-split me-1"></i>Pending (@Model.PendingCount)
+            </a>
+            <a asp-page="/Sale/Refunds/Index" asp-route-filter="Approved"
+               class="btn @(Model.CurrentFilter == "Approved" ? "btn-success" : "btn-outline-success")"
+               style="font-weight: 600; padding: 0.5rem 1.25rem;">
+                <i class="bi bi-check-circle me-1"></i>Approved (@Model.ApprovedCount)
+            </a>
+            <a asp-page="/Sale/Refunds/Index" asp-route-filter="Rejected"
+               class="btn @(Model.CurrentFilter == "Rejected" ? "btn-danger" : "btn-outline-danger")"
+               style="font-weight: 600; padding: 0.5rem 1.25rem;">
+                <i class="bi bi-x-circle me-1"></i>Rejected (@Model.RejectedCount)
+            </a>
+            <a asp-page="/Sale/Refunds/Index" asp-route-filter="All"
+               class="btn @(Model.CurrentFilter == "All" ? "btn-primary" : "btn-outline-primary")"
+               style="border-radius: 0 8px 8px 0; font-weight: 600; padding: 0.5rem 1.25rem;">
+                <i class="bi bi-list-ul me-1"></i>All (@Model.TotalCount)
+            </a>
+        </div>
+    </div>
+
+    <!-- Refund Requests Table -->
+    <div class="card" style="border: none; border-radius: 16px; box-shadow: var(--shadow-md); overflow: hidden;">
+        <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+                    padding: 1.25rem 2rem;">
+            <h5 style="color: white; margin: 0; font-weight: 600;">
+                <i class="bi bi-table me-2"></i>@Model.CurrentFilter Refund Requests
+            </h5>
+        </div>
+
+        @if (Model.RefundRequests.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" style="font-size: 0.95rem;">
+                    <thead style="background: #f8f9fa;">
+                        <tr>
+                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700;">#ID</th>
+                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700;">Customer</th>
+                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700;">Product</th>
+                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700;">Order</th>
+                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700;">Amount</th>
+                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700;">Reason</th>
+                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700;">Requested</th>
+                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700;">Status</th>
+                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.RefundRequests)
+                        {
+                            <tr style="vertical-align: middle;">
+                                <td style="padding: 1rem 1.25rem;">
+                                    <span style="font-weight: 700; color: var(--primary-navy);">#@item.ReturnId</span>
+                                </td>
+                                <td style="padding: 1rem 1.25rem;">
+                                    <div style="font-weight: 600; color: var(--primary-navy);">@item.CustomerName</div>
+                                    <div style="font-size: 0.8rem; color: var(--secondary-warm-gray);">@item.CustomerEmail</div>
+                                </td>
+                                <td style="padding: 1rem 1.25rem;">
+                                    <div style="font-weight: 600;">@item.ProductName</div>
+                                    <div style="font-size: 0.8rem; color: var(--secondary-warm-gray);">Qty: @item.Quantity</div>
+                                </td>
+                                <td style="padding: 1rem 1.25rem;">
+                                    <a asp-page="/Sale/Orders/Details" asp-route-id="@item.OrderId"
+                                       style="color: var(--primary-gold); font-weight: 600; text-decoration: none;">
+                                        #@item.OrderId
+                                    </a>
+                                </td>
+                                <td style="padding: 1rem 1.25rem;">
+                                    <span style="font-weight: 700; color: var(--primary-gold);">
+                                        @item.RefundAmount.ToString("N0") VND
+                                    </span>
+                                </td>
+                                <td style="padding: 1rem 1.25rem; max-width: 200px;">
+                                    <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                                         title="@item.Reason">
+                                        @(item.Reason?.Length > 50 ? item.Reason.Substring(0, 50) + "..." : item.Reason)
+                                    </div>
+                                </td>
+                                <td style="padding: 1rem 1.25rem;">
+                                    <div style="font-size: 0.9rem;">@item.CreatedAt.ToString("MMM dd, yyyy")</div>
+                                    <div style="font-size: 0.8rem; color: var(--secondary-warm-gray);">
+                                        @(item.DaysAgo == 0 ? "Today" : $"{item.DaysAgo}d ago")
+                                    </div>
+                                </td>
+                                <td style="padding: 1rem 1.25rem;">
+                                    @if (item.Status == "Pending")
+                                    {
+                                        <span class="badge" style="background: linear-gradient(135deg, #ff9800, #ffb74d);
+                                                                   padding: 0.4rem 0.75rem; border-radius: 12px; font-size: 0.8rem;">
+                                            <i class="bi bi-hourglass-split me-1"></i>Pending
+                                        </span>
+                                    }
+                                    else if (item.Status == "Approved")
+                                    {
+                                        <span class="badge" style="background: linear-gradient(135deg, #4caf50, #66bb6a);
+                                                                   padding: 0.4rem 0.75rem; border-radius: 12px; font-size: 0.8rem;">
+                                            <i class="bi bi-check-circle me-1"></i>Approved
+                                        </span>
+                                        @if (item.RefundResolvedAt.HasValue)
+                                        {
+                                            <div style="font-size: 0.75rem; color: var(--secondary-warm-gray); margin-top: 2px;">
+                                                @item.RefundResolvedAt.Value.ToString("MMM dd")
+                                            </div>
+                                        }
+                                    }
+                                    else if (item.Status == "Rejected")
+                                    {
+                                        <span class="badge" style="background: linear-gradient(135deg, #f44336, #ef5350);
+                                                                   padding: 0.4rem 0.75rem; border-radius: 12px; font-size: 0.8rem;">
+                                            <i class="bi bi-x-circle me-1"></i>Rejected
+                                        </span>
+                                        @if (item.RefundResolvedAt.HasValue)
+                                        {
+                                            <div style="font-size: 0.75rem; color: var(--secondary-warm-gray); margin-top: 2px;">
+                                                @item.RefundResolvedAt.Value.ToString("MMM dd")
+                                            </div>
+                                        }
+                                    }
+                                </td>
+                                <td style="padding: 1rem 1.25rem; text-align: center;">
+                                    @if (item.Status == "Pending")
+                                    {
+                                        <div class="d-flex gap-2 justify-content-center">
+                                            <!-- Approve Button -->
+                                            <form method="post" asp-page-handler="Approve" style="display:inline;">
+                                                <input type="hidden" name="returnId" value="@item.ReturnId" />
+                                                <button type="button" class="btn btn-sm btn-approve"
+                                                        onclick="confirmApprove(this.closest('form'), @item.ReturnId, '@item.CustomerName.Replace("'", "\\'")' , '@item.RefundAmount.ToString("N0")')">
+                                                    <i class="bi bi-check-lg me-1"></i>Approve
+                                                </button>
+                                            </form>
+
+                                            <!-- Reject Button -->
+                                            <button type="button" class="btn btn-sm btn-reject"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#rejectModal"
+                                                    onclick="setRejectId(@item.ReturnId, '@item.CustomerName.Replace("'", "\\'")' )">
+                                                <i class="bi bi-x-lg me-1"></i>Reject
+                                            </button>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span style="color: var(--secondary-warm-gray); font-size: 0.85rem;">—</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5" style="color: var(--secondary-warm-gray);">
+                <i class="bi bi-inbox" style="font-size: 4rem; opacity: 0.2;"></i>
+                <h5 class="mt-3" style="color: var(--primary-navy);">No @Model.CurrentFilter.ToLower() refund requests</h5>
+                <p>There are no refund requests matching this filter.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Approve Confirmation Modal -->
+<div class="modal fade" id="approveModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border: none; border-radius: 16px; overflow: hidden;">
+            <div style="background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); padding: 1.25rem 1.5rem;">
+                <h5 class="modal-title" style="color: white; margin: 0;">
+                    <i class="bi bi-check-circle me-2"></i>Confirm Refund Approval
+                </h5>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem;">
+                <p>Are you sure you want to <strong>approve</strong> this refund?</p>
+                <div class="alert alert-info" style="border-radius: 8px; border: none; background: rgba(33,150,243,0.08); font-size: 0.9rem;">
+                    <p class="mb-1"><strong>Customer:</strong> <span id="approveCustomerName"></span></p>
+                    <p class="mb-1"><strong>Refund Amount:</strong> <span id="approveAmount"></span> VND</p>
+                    <p class="mb-0"><i class="bi bi-info-circle me-1"></i>This will initiate a Stripe refund and notify the customer via email.</p>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #eee;">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
+                <button type="button" class="btn btn-success" id="confirmApproveBtn" style="border-radius: 8px; font-weight: 600;">
+                    <i class="bi bi-check-lg me-1"></i>Yes, Approve Refund
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border: none; border-radius: 16px; overflow: hidden;">
+            <div style="background: linear-gradient(135deg, #f44336 0%, #ef5350 100%); padding: 1.25rem 1.5rem;">
+                <h5 class="modal-title" style="color: white; margin: 0;">
+                    <i class="bi bi-x-circle me-2"></i>Reject Refund — <span id="rejectCustomerName"></span>
+                </h5>
+            </div>
+            <form method="post" asp-page-handler="Reject">
+                <input type="hidden" name="returnId" id="rejectReturnId" />
+                <div class="modal-body" style="padding: 1.5rem;">
+                    <div class="mb-3">
+                        <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
+                            Reason for rejection (optional)
+                        </label>
+                        <textarea name="rejectionReason" class="form-control" rows="3"
+                                  placeholder="Explain why this refund request is being rejected..."
+                                  style="border-radius: 8px; border: 2px solid var(--medium-gray);"></textarea>
+                    </div>
+                    <div class="alert alert-warning" style="border-radius: 8px; border: none; font-size: 0.9rem;">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        The customer will be notified via email about this decision.
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #eee;">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
+                    <button type="submit" class="btn btn-danger" style="border-radius: 8px; font-weight: 600;">
+                        <i class="bi bi-x-lg me-1"></i>Reject Refund
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--secondary-warm-gray);
+    }
+
+    .breadcrumb-item a {
+        color: var(--primary-gold);
+        text-decoration: none;
+    }
+
+    .stat-card {
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.12) !important;
+    }
+
+    .table th {
+        border-bottom: 2px solid var(--medium-gray);
+        white-space: nowrap;
+    }
+
+    .table td {
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(212, 165, 116, 0.04);
+    }
+
+    .btn-approve {
+        background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+        border: none;
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-approve:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(76,175,80,0.35);
+        color: white;
+    }
+
+    .btn-reject {
+        background: linear-gradient(135deg, #f44336 0%, #ef5350 100%);
+        border: none;
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-reject:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(244,67,54,0.35);
+        color: white;
+    }
+</style>
+
+<script>
+    let pendingApproveForm = null;
+
+    function confirmApprove(form, returnId, customerName, amount) {
+        pendingApproveForm = form;
+        document.getElementById('approveCustomerName').textContent = customerName;
+        document.getElementById('approveAmount').textContent = amount;
+        var modal = new bootstrap.Modal(document.getElementById('approveModal'));
+        modal.show();
+    }
+
+    document.getElementById('confirmApproveBtn').addEventListener('click', function () {
+        if (pendingApproveForm) {
+            pendingApproveForm.submit();
+        }
+    });
+
+    function setRejectId(returnId, customerName) {
+        document.getElementById('rejectReturnId').value = returnId;
+        document.getElementById('rejectCustomerName').textContent = customerName;
+    }
+</script>

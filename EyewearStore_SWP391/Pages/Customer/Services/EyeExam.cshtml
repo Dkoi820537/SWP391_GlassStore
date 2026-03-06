@@ -1,413 +1,846 @@
 ﻿@page
 @model EyewearStore_SWP391.Pages.Customer.Services.EyeExamModel
 @{
-    ViewData["Title"] = "Eye Exam";
+    ViewData["Title"] = "Eye Exam & Consultation";
     Layout = "_Layout";
+    bool success = TempData["BookingSuccess"] as string == "true";
+    string? bName = TempData["BookingName"] as string;
+    string? bDate = TempData["BookingDate"] as string;
+    string? bTime = TempData["BookingTime"] as string;
 }
 
 @section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --navy: #0f1e3c;
-            --ok: #059669;
-            --txt: #0f172a;
-            --txt2: #475569;
-            --muted: #94a3b8;
-            --surf: #fff;
-            --bg: #f8fafc;
-            --bg2: #f0f4ff;
-            --bdr: #e2e8f0;
+            --ink: #0a0a0f;
+            --cream: #f8f6f2;
+            --indigo: #2a2a7a;
+            --indigo-pale: #eeeeff;
+            --indigo-mid: #4a4acf;
+            --indigo-glow: rgba(74,74,207,.18);
+            --gold: #b8862a;
+            --teal: #0e7a68;
+            --steel: #6b7280;
+            --mist: #e5e2dd;
+            --bdr: #e0dbd3;
+            --ok: #2d7a5f;
+            --err: #c0392b;
         }
 
         *, *::before, *::after {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0
         }
 
-        .ee-wrap {
-            max-width: 780px;
+        .ee-page {
+            min-height: 100vh;
+            background: var(--cream);
+            font-family: 'DM Sans',sans-serif;
+            color: var(--ink);
+        }
+
+        /* ── HERO ── */
+        .ee-hero {
+            background: linear-gradient(160deg,#0a0a1a 0%,#12123a 40%,#1a1a5a 100%);
+            padding: 64px 32px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ee-hero-orb1 {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle,rgba(74,74,207,.22) 0%,transparent 70%);
+            top: -100px;
+            right: -80px;
+            pointer-events: none;
+        }
+
+        .ee-hero-orb2 {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle,rgba(184,134,42,.15) 0%,transparent 70%);
+            bottom: 20px;
+            left: 10%;
+            pointer-events: none;
+        }
+
+        .ee-hero-inner {
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 40px 24px 100px;
+            position: relative;
+            z-index: 1;
         }
 
-        .back-link {
+        .ee-back {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--muted);
+            gap: 6px;
+            color: rgba(255,255,255,.4);
             text-decoration: none;
-            margin-bottom: 32px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: .8px;
+            text-transform: uppercase;
             transition: color .2s;
+            margin-bottom: 28px;
         }
 
-            .back-link:hover {
-                color: var(--txt);
+            .ee-back:hover {
+                color: rgba(255,255,255,.85);
             }
 
-        .ee-header {
-            text-align: center;
-            margin-bottom: 36px;
-        }
-
-            .ee-header .icon {
-                font-size: 52px;
-                display: block;
-                margin-bottom: 16px;
-            }
-
-            .ee-header h1 {
-                font-size: clamp(1.5rem,4vw,2.2rem);
-                font-weight: 900;
-                color: var(--txt);
-                margin: 0 0 8px;
-                letter-spacing: -.5px;
-            }
-
-            .ee-header p {
-                font-size: 14px;
-                color: var(--txt2);
-                margin: 0;
-            }
-
-        /* What's included cards */
-        .included-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
-            gap: 12px;
-            margin-bottom: 32px;
-        }
-
-        .inc-card {
-            background: var(--surf);
-            border: 1.5px solid var(--bdr);
-            border-radius: 12px;
-            padding: 18px 16px;
-            text-align: center;
-        }
-
-            .inc-card .ic-icon {
-                font-size: 24px;
-                margin-bottom: 8px;
-            }
-
-            .inc-card .ic-name {
-                font-size: 13px;
-                font-weight: 700;
-                color: var(--txt);
-            }
-
-            .inc-card .ic-desc {
-                font-size: 11.5px;
-                color: var(--muted);
-                margin-top: 3px;
-                line-height: 1.4;
-            }
-
-        /* Form */
-        .form-card {
-            background: var(--surf);
-            border: 2px solid var(--bdr);
-            border-radius: 18px;
-            padding: 32px;
-            box-shadow: 0 4px 20px rgba(15,30,60,.06);
-        }
-
-            .form-card h2 {
-                font-size: 1.15rem;
-                font-weight: 800;
-                color: var(--txt);
-                margin: 0 0 22px;
-                display: flex;
-                align-items: center;
-                gap: 9px;
-            }
-
-        .form-row {
+        .ee-hero-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 14px;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .ee-hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(74,74,207,.2);
+            border: 1px solid rgba(74,74,207,.4);
+            color: rgba(255,255,255,.75);
+            border-radius: 100px;
+            padding: 5px 14px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .7px;
+            margin-bottom: 16px;
+        }
+
+        .ee-hero-title {
+            font-family: 'Cormorant Garamond',serif;
+            font-size: clamp(2.2rem,5vw,3.8rem);
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.08;
+            letter-spacing: -.4px;
             margin-bottom: 14px;
         }
 
-            .form-row.one {
-                grid-template-columns: 1fr;
+            .ee-hero-title em {
+                color: #9999ff;
+                font-style: italic;
             }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+        .ee-hero-sub {
+            font-size: 14px;
+            color: rgba(255,255,255,.55);
+            line-height: 1.65;
+            margin-bottom: 24px;
         }
 
-            .form-group label {
-                font-size: 10.5px;
-                font-weight: 800;
-                color: var(--muted);
-                text-transform: uppercase;
-                letter-spacing: 1.1px;
+        .ee-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .ee-stat {
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 12px;
+            padding: 14px 20px;
+            min-width: 110px;
+        }
+
+        .ee-stat-val {
+            font-family: 'Cormorant Garamond',serif;
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .ee-stat-lbl {
+            font-size: 11px;
+            color: rgba(255,255,255,.45);
+            margin-top: 3px;
+        }
+
+        /* Includes grid */
+        .ee-includes-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .ee-inc-card {
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            transition: background .2s;
+        }
+
+            .ee-inc-card:hover {
+                background: rgba(255,255,255,.1);
             }
 
-        .form-inp {
-            background: var(--bg);
+        .ee-inc-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .ee-inc-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,.85);
+        }
+
+        .ee-inc-desc {
+            font-size: 11px;
+            color: rgba(255,255,255,.4);
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+
+        /* ── WAVE DIVIDER ── */
+        .ee-wave {
+            background: linear-gradient(160deg,#0a0a1a,#1a1a5a);
+            line-height: 0;
+        }
+
+            .ee-wave svg {
+                display: block;
+                width: 100%;
+            }
+
+        /* ── MAIN BODY ── */
+        .ee-body {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 48px 32px 80px;
+        }
+
+        /* ── SUCCESS STATE ── */
+        .ee-success {
+            background: #fff;
+            border: 1px solid var(--bdr);
+            border-radius: 20px;
+            padding: 56px 40px;
+            text-align: center;
+            box-shadow: 0 4px 24px rgba(0,0,0,.06);
+        }
+
+        .ee-success-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .ee-success h2 {
+            font-family: 'Cormorant Garamond',serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--ok);
+            margin-bottom: 8px;
+        }
+
+        .ee-success-sub {
+            font-size: 15px;
+            color: var(--steel);
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+
+        .ee-booking-ref {
+            background: var(--indigo-pale);
+            border: 1px solid rgba(74,74,207,.2);
+            border-radius: 14px;
+            padding: 20px 28px;
+            display: inline-flex;
+            flex-direction: column;
+            gap: 10px;
+            text-align: left;
+            margin-bottom: 28px;
+        }
+
+        .ee-ref-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ee-ref-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(74,74,207,.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--indigo-mid);
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .ee-ref-lbl {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--steel);
+        }
+
+        .ee-ref-val {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .btn-another {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--indigo-mid);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-size: 13.5px;
+            font-weight: 600;
+            font-family: 'DM Sans',sans-serif;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all .2s;
+        }
+
+            .btn-another:hover {
+                background: var(--indigo);
+                transform: translateY(-1px);
+            }
+
+        /* ── BOOKING FORM ── */
+        .booking-card {
+            background: #fff;
+            border: 1px solid var(--bdr);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,.06);
+        }
+
+        .bc-head {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--bdr);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bc-head-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 11px;
+            background: linear-gradient(135deg,var(--indigo-mid),var(--indigo));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .bc-head h2 {
+            font-family: 'Cormorant Garamond',serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .bc-head p {
+            font-size: 12.5px;
+            color: var(--steel);
+            margin-top: 2px;
+        }
+
+        .bc-body {
+            padding: 28px 32px;
+        }
+
+        .form-section {
+            margin-bottom: 28px;
+        }
+
+        .form-section-title {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--indigo-mid);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .form-section-title::after {
+                content: '';
+                flex: 1;
+                height: 1px;
+                background: var(--bdr);
+            }
+
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-grid-1 {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+
+        .fg {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+            .fg label {
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: .7px;
+                text-transform: uppercase;
+                color: var(--steel);
+            }
+
+            .fg .req {
+                color: var(--err);
+                margin-left: 2px;
+            }
+
+        .form-ctrl {
+            background: #f8f7f5;
             border: 1.5px solid var(--bdr);
             border-radius: 10px;
             padding: 11px 14px;
             font-size: 14px;
-            color: var(--txt);
-            transition: border-color .2s,box-shadow .2s;
+            color: var(--ink);
+            font-family: 'DM Sans',sans-serif;
+            transition: border-color .2s, box-shadow .2s, background .2s;
             width: 100%;
-            font-family: inherit;
         }
 
-            .form-inp:focus {
+            .form-ctrl:focus {
                 outline: none;
-                border-color: #2563eb;
-                box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+                border-color: var(--indigo-mid);
+                background: #fff;
+                box-shadow: 0 0 0 3px var(--indigo-glow);
             }
 
-            .form-inp::placeholder {
-                color: var(--muted);
+            .form-ctrl::placeholder {
+                color: #b0aaa0;
             }
 
+        textarea.form-ctrl {
+            resize: vertical;
+            min-height: 88px;
+        }
+
+        .form-ctrl.input-validation-error {
+            border-color: var(--err);
+        }
+
+        .field-validation-error {
+            font-size: 11px;
+            color: var(--err);
+        }
+
+        /* TIME SLOTS */
         .time-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill,minmax(110px,1fr));
+            grid-template-columns: repeat(auto-fill,minmax(90px,1fr));
             gap: 8px;
-            margin-top: 4px;
         }
 
         .time-chip {
             border: 2px solid var(--bdr);
-            border-radius: 8px;
-            padding: 9px 6px;
+            border-radius: 9px;
+            padding: 10px 4px;
             text-align: center;
             cursor: pointer;
             font-size: 13px;
             font-weight: 600;
-            color: var(--txt2);
-            transition: all .2s;
+            color: var(--steel);
+            transition: all .18s;
+            background: #f8f7f5;
+            user-select: none;
         }
 
             .time-chip:hover {
-                border-color: #2563eb;
-                color: #2563eb;
-                background: rgba(37,99,235,.04);
+                border-color: var(--indigo-mid);
+                color: var(--indigo-mid);
+                background: var(--indigo-pale);
             }
 
             .time-chip.sel {
-                border-color: #2563eb;
-                background: rgba(37,99,235,.08);
-                color: #2563eb;
+                border-color: var(--indigo-mid);
+                background: var(--indigo-pale);
+                color: var(--indigo);
             }
 
             .time-chip input {
                 display: none;
             }
 
-        .divider {
+        /* DIVIDER */
+        .bc-divider {
             height: 1px;
             background: var(--bdr);
-            margin: 20px 0;
+            margin: 0 32px 24px;
         }
 
-        .btn-submit {
+        /* FORM FOOTER */
+        .bc-footer {
+            padding: 20px 32px;
+            border-top: 1px solid var(--bdr);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: #faf9f7;
+        }
+
+        .bc-footer-note {
+            font-size: 12px;
+            color: var(--steel);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-book {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            background: linear-gradient(135deg,var(--navy),#1a2f54);
+            gap: 9px;
+            background: linear-gradient(135deg,var(--indigo-mid),var(--indigo));
             color: #fff;
             border: none;
             border-radius: 11px;
-            padding: 14px 36px;
-            font-size: 15px;
-            font-weight: 800;
+            padding: 13px 32px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'DM Sans',sans-serif;
             cursor: pointer;
-            transition: all .2s;
-            box-shadow: 0 4px 16px rgba(15,30,60,.22);
+            transition: all .22s;
+            box-shadow: 0 4px 18px var(--indigo-glow);
         }
 
-            .btn-submit:hover {
+            .btn-book:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 8px 24px rgba(15,30,60,.28);
+                box-shadow: 0 8px 26px rgba(74,74,207,.3);
             }
 
-        .success-box {
+        /* VALIDATION SUMMARY */
+        .val-summary {
+            background: rgba(192,57,43,.08);
+            border: 1px solid rgba(192,57,43,.25);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: var(--err);
+            margin-bottom: 20px;
+        }
+
+        /* ERROR BANNER */
+        .err-banner {
+            background: rgba(192,57,43,.06);
+            border: 1.5px solid rgba(192,57,43,.2);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--err);
+            margin-bottom: 16px;
             display: none;
-            text-align: center;
-            padding: 40px 24px;
-            background: rgba(5,150,105,.05);
-            border: 2px solid rgba(5,150,105,.2);
-            border-radius: 16px;
         }
 
-            .success-box .si {
-                font-size: 48px;
-                margin-bottom: 12px;
+        @@media (max-width: 700px) {
+            .ee-hero-grid {
+                grid-template-columns: 1fr;
             }
 
-            .success-box h3 {
-                font-size: 1.2rem;
-                font-weight: 800;
-                color: var(--ok);
-                margin: 0 0 6px;
+            .ee-includes-grid {
+                grid-template-columns: 1fr;
             }
 
-            .success-box p {
-                font-size: 14px;
-                color: var(--txt2);
-                margin: 0;
+            .ee-hero {
+                padding: 48px 18px 56px;
             }
 
-        @@media (max-width:560px) {
-            .form-row
+            .ee-body {
+                padding: 32px 18px 60px;
+            }
 
-        {
-            grid-template-columns: 1fr;
-        }
+            .bc-head, .bc-body, .bc-footer {
+                padding-left: 18px;
+                padding-right: 18px;
+            }
 
+            .form-grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .time-grid {
+                grid-template-columns: repeat(auto-fill,minmax(80px,1fr));
+            }
         }
     </style>
 }
 
-<div class="ee-wrap">
-    <a href="javascript:history.back()" class="back-link"><i class="bi bi-arrow-left"></i> Back</a>
+<div class="ee-page">
 
-    <div class="ee-header">
-        <span class="icon">👁</span>
-        <h1>Eye Exam &amp; Consultation</h1>
-        <p>Book a professional eye examination with one of our certified optometrists.</p>
+    <!-- HERO -->
+    <div class="ee-hero">
+        <div class="ee-hero-orb1"></div>
+        <div class="ee-hero-orb2"></div>
+        <div class="ee-hero-inner">
+            <a href="javascript:history.back()" class="ee-back"><i class="bi bi-arrow-left"></i> Back</a>
+
+            <div class="ee-hero-grid">
+                <div>
+                    <div class="ee-hero-kicker"><i class="bi bi-eye-fill"></i> Professional Eye Care</div>
+                    <h1 class="ee-hero-title">Eye Exam &amp;<br><em>Consultation</em></h1>
+                    <p class="ee-hero-sub">A thorough eye examination by our certified optometrists. Precise prescription measurement, eye health screening, and expert lens recommendation — all in one visit.</p>
+                    <div class="ee-stats">
+                        <div class="ee-stat">
+                            <div class="ee-stat-val">~30</div>
+                            <div class="ee-stat-lbl">minutes</div>
+                        </div>
+                        <div class="ee-stat">
+                            <div class="ee-stat-val">100%</div>
+                            <div class="ee-stat-lbl">certified</div>
+                        </div>
+                        <div class="ee-stat">
+                            <div class="ee-stat-val">Free</div>
+                            <div class="ee-stat-lbl">with purchase</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ee-includes-grid">
+                    @{
+                        var includes = new[]
+                        {
+                                        ("🔬", "Vision Acuity", "Full near & far vision screening"),
+                                        ("📋", "Refraction Test", "Accurate prescription measurement"),
+                                        ("💡", "Lens Recommendation", "Best lens type for your needs"),
+                                        ("🩺", "Eye Health Check", "Basic screening for eye conditions"),
+                                        ("🎯", "Pupillary Distance", "PD measurement for frame fitting"),
+                                        ("📄", "Prescription Card", "Take-home prescription document"),
+                                        };
+                    }
+                    @foreach (var (icon, name, desc) in includes)
+                    {
+                        <div class="ee-inc-card">
+                            <div class="ee-inc-icon">@icon</div>
+                            <div>
+                                <div class="ee-inc-name">@name</div>
+                                <div class="ee-inc-desc">@desc</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- What's included -->
-    <div class="included-grid">
-        <div class="inc-card">
-            <div class="ic-icon">🔬</div>
-            <div class="ic-name">Vision Acuity Test</div>
-            <div class="ic-desc">Full near &amp; far vision screening</div>
-        </div>
-        <div class="inc-card">
-            <div class="ic-icon">📋</div>
-            <div class="ic-name">Refraction Test</div>
-            <div class="ic-desc">Accurate prescription measurement</div>
-        </div>
-        <div class="inc-card">
-            <div class="ic-icon">💡</div>
-            <div class="ic-name">Lens Recommendation</div>
-            <div class="ic-desc">Best lens type for your vision needs</div>
-        </div>
-        <div class="inc-card">
-            <div class="ic-icon">🩺</div>
-            <div class="ic-name">Eye Health Check</div>
-            <div class="ic-desc">Basic eye health screening included</div>
-        </div>
+    <div class="ee-wave">
+        <svg viewBox="0 0 1440 48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d="M0,48 L0,16 Q360,48 720,16 Q1080,-16 1440,16 L1440,48 Z" fill="#f8f6f2" />
+        </svg>
     </div>
 
-    <!-- Booking Form -->
-    <div class="form-card" id="bookingForm">
-        <h2><i class="bi bi-calendar-check" style="color:#2563eb"></i> Book Your Appointment</h2>
+    <!-- BODY -->
+    <div class="ee-body">
 
-        <div class="form-row">
-            <div class="form-group">
-                <label>Full Name *</label>
-                <input type="text" class="form-inp" id="nameInput" placeholder="Your full name" />
+        @if (success)
+        {
+            <!-- SUCCESS -->
+            <div class="ee-success">
+                <span class="ee-success-icon">🎉</span>
+                <h2>Appointment Requested!</h2>
+                <p class="ee-success-sub">
+                    Thank you, <strong>@bName</strong>! Your eye exam request has been received.<br>
+                    Our team will contact you within 24 hours to confirm your appointment.
+                </p>
+                <div class="ee-booking-ref">
+                    <div class="ee-ref-row">
+                        <div class="ee-ref-icon"><i class="bi bi-calendar-check"></i></div>
+                        <div><div class="ee-ref-lbl">Date</div><div class="ee-ref-val">@bDate</div></div>
+                    </div>
+                    <div class="ee-ref-row">
+                        <div class="ee-ref-icon"><i class="bi bi-clock"></i></div>
+                        <div><div class="ee-ref-lbl">Time</div><div class="ee-ref-val">@bTime</div></div>
+                    </div>
+                    <div class="ee-ref-row">
+                        <div class="ee-ref-icon"><i class="bi bi-geo-alt"></i></div>
+                        <div><div class="ee-ref-lbl">Location</div><div class="ee-ref-val">In-store only</div></div>
+                    </div>
+                </div>
+                <a href="/Customer/Services/EyeExam" class="btn-another"><i class="bi bi-plus-lg"></i> Book Another</a>
             </div>
-            <div class="form-group">
-                <label>Phone Number *</label>
-                <input type="tel" class="form-inp" id="phoneInput" placeholder="0901 234 567" />
+        }
+        else
+        {
+            <!-- BOOKING FORM -->
+            <div class="booking-card">
+                <div class="bc-head">
+                    <div class="bc-head-icon">📅</div>
+                    <div>
+                        <h2>Book Your Appointment</h2>
+                        <p>Fill in your details and choose a convenient time</p>
+                    </div>
+                </div>
+
+                <div class="bc-body">
+                    <form method="post" id="bookingForm" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="val-summary"></div>
+                        <div class="err-banner" id="errBanner"></div>
+
+                        <!-- Personal Info -->
+                        <div class="form-section">
+                            <div class="form-section-title"><i class="bi bi-person"></i> Personal Information</div>
+                            <div class="form-grid-2" style="margin-bottom:14px">
+                                <div class="fg">
+                                    <label asp-for="Input.FullName">Full Name <span class="req">*</span></label>
+                                    <input asp-for="Input.FullName" class="form-ctrl"
+                                           placeholder="Your full name"
+                                           value="@(Model.PrefillName ?? "")" />
+                                    <span asp-validation-for="Input.FullName" class="field-validation-error"></span>
+                                </div>
+                                <div class="fg">
+                                    <label asp-for="Input.Phone">Phone Number <span class="req">*</span></label>
+                                    <input asp-for="Input.Phone" class="form-ctrl" type="tel"
+                                           placeholder="0901 234 567"
+                                           value="@(Model.PrefillPhone ?? "")" />
+                                    <span asp-validation-for="Input.Phone" class="field-validation-error"></span>
+                                </div>
+                            </div>
+                            <div class="form-grid-1">
+                                <div class="fg">
+                                    <label asp-for="Input.Email">Email Address <span style="color:var(--steel);font-weight:400">(optional)</span></label>
+                                    <input asp-for="Input.Email" class="form-ctrl" type="email"
+                                           placeholder="you@email.com"
+                                           value="@(Model.PrefillEmail ?? "")" />
+                                    <span asp-validation-for="Input.Email" class="field-validation-error"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Appointment -->
+                        <div class="form-section">
+                            <div class="form-section-title"><i class="bi bi-calendar2-week"></i> Preferred Appointment</div>
+                            <div class="form-grid-1" style="margin-bottom:18px">
+                                <div class="fg">
+                                    <label asp-for="Input.AppointmentDate">Date <span class="req">*</span></label>
+                                    <input asp-for="Input.AppointmentDate" class="form-ctrl" type="date"
+                                           min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+                                    <span asp-validation-for="Input.AppointmentDate" class="field-validation-error"></span>
+                                </div>
+                            </div>
+
+                            <div class="fg">
+                                <label>Time Slot <span class="req">*</span></label>
+                                <div class="time-grid" id="timeGrid">
+                                    @{
+                                        var morning = new[] { "08:00", "08:30", "09:00", "09:30", "10:00", "10:30" };
+                                        var afternoon = new[] { "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30" };
+                                    }
+                                    @foreach (var slot in morning.Concat(afternoon))
+                                    {
+                                        <label class="time-chip" data-time="@slot" id="chip-@slot.Replace(":", "-")">
+                                            <input type="radio" name="Input.TimeSlot" value="@slot" onchange="selTime(this,'@slot')" />
+                                            @slot
+                                        </label>
+                                    }
+                                </div>
+                                <span asp-validation-for="Input.TimeSlot" class="field-validation-error" id="timeErr"></span>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="form-section" style="margin-bottom:0">
+                            <div class="form-section-title"><i class="bi bi-chat-left-text"></i> Additional Notes</div>
+                            <div class="fg">
+                                <label asp-for="Input.Notes">Symptoms, concerns or special requests <span style="color:var(--steel);font-weight:400">(optional)</span></label>
+                                <textarea asp-for="Input.Notes" class="form-ctrl" rows="3"
+                                          placeholder="e.g. blurry vision, eye strain, need prescription update..."></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="bc-divider"></div>
+
+                <div class="bc-footer">
+                    <div class="bc-footer-note">
+                        <i class="bi bi-shield-check" style="color:var(--ok)"></i>
+                        In-store only · ~30 min · No walk-in required
+                    </div>
+                    <button class="btn-book" onclick="submitBooking()">
+                        <i class="bi bi-calendar-check"></i> Request Appointment
+                    </button>
+                </div>
             </div>
-        </div>
+        }
 
-        <div class="form-row">
-            <div class="form-group">
-                <label>Email (optional)</label>
-                <input type="email" class="form-inp" id="emailInput" placeholder="you@email.com" />
-            </div>
-            <div class="form-group">
-                <label>Preferred Date *</label>
-                <input type="date" class="form-inp" id="dateInput"
-                       min='@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")' />
-            </div>
-        </div>
-
-        <div class="form-group" style="margin-bottom:14px">
-            <label>Preferred Time *</label>
-            <div class="time-grid" id="timeGrid">
-                @{
-                    var slots = new[] { "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30" };
-                }
-                @foreach (var slot in slots)
-                {
-                    <div class="time-chip" data-time="@slot" onclick="selectTime(this)">@slot</div>
-                }
-            </div>
-        </div>
-
-        <div class="form-row one">
-            <div class="form-group">
-                <label>Notes (optional)</label>
-                <textarea class="form-inp" id="notesInput" rows="3"
-                          placeholder="Any symptoms, concerns, or special requests..."></textarea>
-            </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-            <div style="font-size:13px;color:var(--muted)">
-                <i class="bi bi-clock me-1"></i>~30 min session &nbsp;|&nbsp;
-                <i class="bi bi-geo-alt me-1"></i>In-store only
-            </div>
-            <button class="btn-submit" onclick="submitBooking()">
-                <i class="bi bi-calendar-check"></i> Request Appointment
-            </button>
-        </div>
-
-        <div id="errorMsg" style="display:none;margin-top:12px;font-size:13px;color:#dc2626;font-weight:600;"></div>
-    </div>
-
-    <!-- Success -->
-    <div class="success-box" id="successBox">
-        <div class="si">🎉</div>
-        <h3>Appointment Requested!</h3>
-        <p>
-            We'll contact you within 24 hours to confirm your slot.<br>
-            Check your phone or email for confirmation.
-        </p>
     </div>
 </div>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         let selectedTime = null;
 
-        function selectTime(chip) {
+        function selTime(radio, slot) {
             document.querySelectorAll('#timeGrid .time-chip').forEach(c => c.classList.remove('sel'));
-            chip.classList.add('sel');
-            selectedTime = chip.dataset.time;
+            radio.closest('.time-chip').classList.add('sel');
+            selectedTime = slot;
+            document.getElementById('timeErr').textContent = '';
         }
 
         function submitBooking() {
-            const name  = document.getElementById('nameInput').value.trim();
-            const phone = document.getElementById('phoneInput').value.trim();
-            const date  = document.getElementById('dateInput').value;
-            const err   = document.getElementById('errorMsg');
+            const name  = document.querySelector('[name="Input.FullName"]').value.trim();
+            const phone = document.querySelector('[name="Input.Phone"]').value.trim();
+            const date  = document.querySelector('[name="Input.AppointmentDate"]').value;
+            const err   = document.getElementById('errBanner');
 
-            if (!name)         { showErr('Please enter your full name.'); return; }
-            if (!phone)        { showErr('Please enter your phone number.'); return; }
-            if (!date)         { showErr('Please select a preferred date.'); return; }
-            if (!selectedTime) { showErr('Please select a preferred time slot.'); return; }
+            if (!name)  { showErr('Please enter your full name.'); return; }
+            if (!phone) { showErr('Please enter your phone number.'); return; }
+            if (!date)  { showErr('Please select a preferred date.'); return; }
+            if (!selectedTime) {
+                showErr('Please select a time slot.');
+                document.getElementById('timeErr').textContent = 'Please select a time slot.';
+                return;
+            }
 
             err.style.display = 'none';
-            document.getElementById('bookingForm').style.display = 'none';
-            document.getElementById('successBox').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('bookingForm').submit();
         }
 
         function showErr(msg) {
-            const el = document.getElementById('errorMsg');
-            el.textContent = '⚠️ ' + msg;
-            el.style.display = 'block';
+            const el = document.getElementById('errBanner');
+            el.innerHTML = `<i class="bi bi-exclamation-circle"></i> ${msg}`;
+            el.style.display = 'flex';
+            el.style.alignItems = 'center';
+            el.style.gap = '8px';
+            el.scrollIntoView({behavior:'smooth', block:'nearest'});
         }
     </script>
 }

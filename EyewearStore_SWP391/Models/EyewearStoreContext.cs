@@ -52,7 +52,7 @@ public partial class EyewearStoreContext : DbContext
 
     // Wishlist
     public virtual DbSet<Wishlist> Wishlists { get; set; }
-
+    public virtual DbSet<EyeExamAppointment> EyeExamAppointments { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         // Connection string is configured via appsettings.json and DI in Program.cs
@@ -725,6 +725,24 @@ public partial class EyewearStoreContext : DbContext
                 .HasForeignKey(d => d.ProductId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_wishlist_product");
+        });
+        modelBuilder.Entity<EyeExamAppointment>(entity =>
+        {
+            entity.ToTable("EyeExamAppointments");
+            entity.HasKey(e => e.AppointmentId);
+
+            entity.Property(e => e.FullName).HasMaxLength(150).IsRequired();
+            entity.Property(e => e.Phone).HasMaxLength(20).IsRequired();
+            entity.Property(e => e.Email).HasMaxLength(200);
+            entity.Property(e => e.TimeSlot).HasMaxLength(10).IsRequired();
+            entity.Property(e => e.Notes).HasMaxLength(1000);
+            entity.Property(e => e.Status).HasMaxLength(30).HasDefaultValue("Pending");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+
+            entity.HasOne(e => e.User)
+                  .WithMany()
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         OnModelCreatingPartial(modelBuilder);

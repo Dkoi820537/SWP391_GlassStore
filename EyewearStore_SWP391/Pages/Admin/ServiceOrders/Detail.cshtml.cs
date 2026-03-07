@@ -1,98 +1,128 @@
 using EyewearStore_SWP391.Models;
+using EyewearStore_SWP391.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-using static EyewearStore_SWP391.Pages.Admin.ServiceOrders.IndexModel;
 
 namespace EyewearStore_SWP391.Pages.Admin.ServiceOrders
 {
     [Authorize(Roles = "admin,manager")]
     public class DetailModel : PageModel
     {
-        private readonly EyewearStoreContext _context;
-        public DetailModel(EyewearStoreContext context) => _context = context;
+        private readonly EyewearStoreContext _db;
+        private readonly IEmailService _email;
 
-        // ── Route ─────────────────────────────────────────────────────────────
-        [BindProperty(SupportsGet = true)] public int OrderItemId { get; set; }
+        // ── FIX 3: add Statuses + OrderItemId ─────────────────────────────────
+        public static readonly string[] Statuses = { "Pending", "Processing", "Ready", "Done", "Cancelled" };
 
-        // ── Loaded data ───────────────────────────────────────────────────────
-        public Order? Order { get; set; }
-        public OrderItem? Item { get; set; }
-        public ServiceSnapshot? Snap { get; set; }
+        [BindProperty] public int OrderItemId { get; set; }
 
-        // ── Form binds ────────────────────────────────────────────────────────
-        [BindProperty] public string NewStatus { get; set; } = "Pending";
+        public DetailModel(EyewearStoreContext db, IEmailService email)
+        {
+            _db = db;
+            _email = email;
+        }
+
+        public Order Order { get; set; } = null!;
+        public OrderItem Item { get; set; } = null!;
+        public User Customer { get; set; } = null!;
+        public ServiceSnapshot Snap { get; set; } = null!;
+
+        [BindProperty] public string ServiceStatus { get; set; } = "";
         [BindProperty] public string? AssignedTo { get; set; }
         [BindProperty] public string? InternalNote { get; set; }
 
-        public static readonly string[] Statuses = { "Pending", "Processing", "Ready", "Done", "Cancelled" };
-
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(int orderId)
         {
-            Item = await _context.OrderItems
-                .Include(oi => oi.Order)
-                    .ThenInclude(o => o.User)
-                .Include(oi => oi.Order)
-                    .ThenInclude(o => o.Address)
-                .Include(oi => oi.Product)
-                    .ThenInclude(p => p.ProductImages)
-                .FirstOrDefaultAsync(oi => oi.OrderItemId == OrderItemId);
-
-            if (Item == null) return NotFound();
-            Order = Item.Order;
-
-            if (!string.IsNullOrEmpty(Item.SnapshotJson))
-            {
-                try
-                {
-                    Snap = JsonSerializer.Deserialize<ServiceSnapshot>(Item.SnapshotJson,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                }
-                catch { Snap = new ServiceSnapshot(); }
-            }
-
-            if (Snap?.IsServiceOrder != true) return NotFound(); // not a service order
-
-            NewStatus = Snap.ServiceStatus ?? "Pending";
+            var result = await LoadAsync(orderId);
+            if (result != null) return result;
+            OrderItemId = Item.OrderItemId;
+            ServiceStatus = Snap.ServiceStatus ?? "Pending";
             AssignedTo = Snap.AssignedTo;
             InternalNote = Snap.InternalNote;
-
             return Page();
         }
 
-        public async Task<IActionResult> OnPostUpdateAsync()
+        public async Task<IActionResult> OnPostUpdateAsync(int orderId)
         {
-            Item = await _context.OrderItems
-                .FirstOrDefaultAsync(oi => oi.OrderItemId == OrderItemId);
+            var result = await LoadAsync(orderId);
+            if (result != null) return result;
 
+            var raw = Item.SnapshotJson ?? "{}";
+            using var doc = JsonDocument.Parse(raw);
+
+            var mutable = new Dictionary<string, object?>();
+            foreach (var kv in doc.RootElement.EnumerateObject())
+                mutable[kv.Name] = (object)kv.Value;
+
+            mutable["serviceStatus"] = ServiceStatus;
+            mutable["assignedTo"] = AssignedTo;
+            mutable["internalNote"] = InternalNote;
+
+            Item.SnapshotJson = JsonSerializer.Serialize(mutable);
+            await _db.SaveChangesAsync();
+
+            var oldStatus = Snap.ServiceStatus ?? "Pending";
+            if (ServiceStatus != oldStatus && !string.IsNullOrEmpty(Customer.Email))
+            {
+                await _email.SendServiceOrderStatusAsync(
+                    toEmail: Customer.Email,
+                    customerName: Customer.FullName,
+                    orderId: Order.OrderId,
+                    frameName: Snap.FrameName ?? Snap.ProductName ?? "N/A",
+                    serviceName: Snap.ServiceName ?? "N/A",
+                    newStatus: ServiceStatus,
+                    assignedTo: AssignedTo,
+                    note: InternalNote);
+            }
+
+            TempData["Success"] = $"Order #{orderId} updated → {ServiceStatus}";
+            return RedirectToPage(new { orderId });
+        }
+
+        private async Task<IActionResult?> LoadAsync(int orderId)
+        {
+            Order = await _db.Orders
+                .Include(o => o.User)
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
+            if (Order == null) return NotFound();
+
+            Customer = Order.User!;
+
+            Item = Order.OrderItems.FirstOrDefault(i =>
+                i.SnapshotJson != null && (
+                    i.SnapshotJson.Contains("\"isServiceOrder\":true") ||
+                    i.SnapshotJson.Contains("\"lensProductId\":")))!;
             if (Item == null) return NotFound();
 
-            // Parse existing snapshot
-            ServiceSnapshot snap;
-            try
-            {
-                snap = string.IsNullOrEmpty(Item.SnapshotJson)
-                    ? new ServiceSnapshot()
-                    : JsonSerializer.Deserialize<ServiceSnapshot>(Item.SnapshotJson,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
-                      ?? new ServiceSnapshot();
-            }
-            catch { snap = new ServiceSnapshot(); }
+            Snap = JsonSerializer.Deserialize<ServiceSnapshot>(
+                Item.SnapshotJson!,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+                ?? new ServiceSnapshot();
 
-            // Patch only the service-management fields
-            snap.ServiceStatus = NewStatus;
-            snap.AssignedTo = AssignedTo?.Trim();
-            snap.InternalNote = InternalNote?.Trim();
-
-            Item.SnapshotJson = JsonSerializer.Serialize(snap,
-                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
-
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = $"Service order #{Item.OrderItemId} updated to {NewStatus}.";
-            return RedirectToPage(new { orderItemId = OrderItemId });
+            return null;
         }
+    }
+
+    public class ServiceSnapshot
+    {
+        public bool IsServiceOrder { get; set; }
+        public string? ProductName { get; set; }
+        public string? FrameName { get; set; }
+        public string? LensProductName { get; set; }
+        public int? LensProductId { get; set; }
+        public string? ServiceName { get; set; }
+        // ── FIX 1+2: decimal không nullable, bỏ ?? int ────────────────────────
+        public decimal FramePrice { get; set; }
+        public decimal LensPrice { get; set; }
+        public decimal ServicePrice { get; set; }
+        public int? ServiceId { get; set; }
+        public string? ImageUrl { get; set; }
+        public string? ServiceStatus { get; set; }
+        public string? AssignedTo { get; set; }
+        public string? InternalNote { get; set; }
     }
 }

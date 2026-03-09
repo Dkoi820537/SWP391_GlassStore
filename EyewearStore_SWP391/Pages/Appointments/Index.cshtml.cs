@@ -1,4 +1,4 @@
-// Pages/Admin/Appointments/Index.cshtml.cs
+
 using EyewearStore_SWP391.Models;
 using EyewearStore_SWP391.Services;
 using Microsoft.AspNetCore.Authorization;

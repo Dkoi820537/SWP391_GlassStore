@@ -43,31 +43,30 @@
             --bdr: #e2e8f0;
             --shadow: 0 2px 12px rgba(0,0,0,.07);
             --shadow-md: 0 4px 20px rgba(0,0,0,.1);
-            --r: 14px;
+            --r: 14px
         }
 
         *, *::before, *::after {
-            box-sizing: border-box;
+            box-sizing: border-box
         }
 
         body {
-            background: var(--bg);
+            background: var(--bg)
         }
 
         .so-wrap {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 32px 24px 80px;
+            padding: 32px 24px 80px
         }
 
-        /* ── HEADER ── */
         .so-hdr {
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
             gap: 16px;
             margin-bottom: 28px;
-            flex-wrap: wrap;
+            flex-wrap: wrap
         }
 
             .so-hdr h1 {
@@ -75,13 +74,13 @@
                 font-weight: 900;
                 color: var(--navy);
                 margin: 0 0 4px;
-                letter-spacing: -.5px;
+                letter-spacing: -.5px
             }
 
             .so-hdr p {
                 font-size: 13px;
                 color: var(--muted);
-                margin: 0;
+                margin: 0
             }
 
         .hdr-icon {
@@ -94,15 +93,14 @@
             justify-content: center;
             font-size: 20px;
             box-shadow: 0 4px 14px rgba(37,99,235,.28);
-            flex-shrink: 0;
+            flex-shrink: 0
         }
 
-        /* ── STATS ── */
         .stat-grid {
             display: grid;
             grid-template-columns: repeat(5,1fr);
             gap: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 20px
         }
 
         .stat-card {
@@ -114,11 +112,11 @@
             align-items: center;
             gap: 12px;
             box-shadow: var(--shadow);
-            transition: box-shadow .2s;
+            transition: box-shadow .2s
         }
 
             .stat-card:hover {
-                box-shadow: var(--shadow-md);
+                box-shadow: var(--shadow-md)
             }
 
         .stat-icon {
@@ -129,32 +127,32 @@
             align-items: center;
             justify-content: center;
             font-size: 18px;
-            flex-shrink: 0;
+            flex-shrink: 0
         }
 
         .si-all {
             background: rgba(37,99,235,.1);
-            color: #2563eb;
+            color: #2563eb
         }
 
         .si-pend {
             background: rgba(217,119,6,.1);
-            color: #d97706;
+            color: #d97706
         }
 
         .si-proc {
             background: rgba(91,91,219,.1);
-            color: #5b5bdb;
+            color: #5b5bdb
         }
 
         .si-ready {
             background: rgba(5,150,105,.1);
-            color: #059669;
+            color: #059669
         }
 
         .si-done {
             background: rgba(15,30,60,.1);
-            color: #0f1e3c;
+            color: #0f1e3c
         }
 
         .stat-lbl {
@@ -163,17 +161,16 @@
             color: var(--muted);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 2px;
+            margin-bottom: 2px
         }
 
         .stat-val {
             font-size: 24px;
             font-weight: 800;
             color: var(--txt);
-            letter-spacing: -.5px;
+            letter-spacing: -.5px
         }
 
-        /* ── FILTER ── */
         .filter-bar {
             background: var(--surf);
             border: 1px solid var(--bdr);
@@ -184,7 +181,7 @@
             gap: 10px;
             flex-wrap: wrap;
             align-items: flex-end;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow)
         }
 
         .fg {
@@ -192,7 +189,7 @@
             flex-direction: column;
             gap: 4px;
             flex: 1;
-            min-width: 140px;
+            min-width: 140px
         }
 
             .fg label {
@@ -200,7 +197,7 @@
                 font-weight: 700;
                 color: var(--muted);
                 text-transform: uppercase;
-                letter-spacing: 1px;
+                letter-spacing: 1px
             }
 
         .fi {
@@ -212,12 +209,13 @@
             color: var(--txt);
             width: 100%;
             transition: border-color .2s;
+            font-family: inherit
         }
 
             .fi:focus {
                 outline: none;
                 border-color: var(--acc);
-                box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+                box-shadow: 0 0 0 3px rgba(37,99,235,.1)
             }
 
         .btn-filter {
@@ -232,11 +230,11 @@
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
-            transition: all .2s;
+            transition: all .2s
         }
 
             .btn-filter:hover {
-                background: #1d4ed8;
+                background: #1d4ed8
             }
 
         .btn-reset {
@@ -252,31 +250,30 @@
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
-            transition: all .2s;
+            transition: all .2s
         }
 
             .btn-reset:hover {
                 color: var(--txt);
-                border-color: #94a3b8;
+                border-color: #94a3b8
             }
 
-        /* ── TABLE WRAP ── */
         .tbl-wrap {
             background: var(--surf);
             border: 1px solid var(--bdr);
             border-radius: var(--r);
             overflow: hidden;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-md)
         }
 
         .so-tbl {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: collapse
         }
 
             .so-tbl thead tr {
                 background: var(--bg2);
-                border-bottom: 1px solid var(--bdr);
+                border-bottom: 1px solid var(--bdr)
             }
 
             .so-tbl th {
@@ -287,7 +284,7 @@
                 color: var(--muted);
                 padding: 12px 16px;
                 text-align: left;
-                white-space: nowrap;
+                white-space: nowrap
             }
 
             .so-tbl td {
@@ -295,53 +292,50 @@
                 border-bottom: 1px solid var(--bdr);
                 vertical-align: middle;
                 font-size: 13px;
-                color: var(--txt2);
+                color: var(--txt2)
             }
 
             .so-tbl tbody tr:last-child td {
-                border-bottom: none;
+                border-bottom: none
             }
 
             .so-tbl tbody tr:hover {
-                background: var(--bg);
+                background: var(--bg)
             }
 
-        /* ── ORDER ID ── */
         .oid {
             font-weight: 800;
             color: var(--navy);
-            font-size: 13px;
+            font-size: 13px
         }
 
         .oid-sub {
             font-size: 10px;
             color: var(--muted);
             font-weight: 500;
-            margin-top: 1px;
+            margin-top: 1px
         }
 
-        /* ── CUSTOMER CELL ── */
         .cust-name {
             font-weight: 700;
             color: var(--txt);
-            font-size: 13px;
+            font-size: 13px
         }
 
         .cust-email {
             font-size: 11px;
-            color: var(--muted);
+            color: var(--muted)
         }
 
-        /* ── SERVICE PILL ── */
         .svc-breakdown {
             font-size: 11.5px;
-            line-height: 1.9;
+            line-height: 1.9
         }
 
         .svc-row-item {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 5px
         }
 
         .svc-tag {
@@ -352,10 +346,9 @@
             font-size: 10px;
             font-weight: 700;
             color: var(--txt2);
-            white-space: nowrap;
+            white-space: nowrap
         }
 
-        /* ── STATUS BADGES ── */
         .st-badge {
             display: inline-flex;
             align-items: center;
@@ -363,47 +356,46 @@
             padding: 4px 10px;
             border-radius: 100px;
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 700
         }
 
         .st-pending {
             background: rgba(217,119,6,.1);
             color: #d97706;
-            border: 1px solid rgba(217,119,6,.25);
+            border: 1px solid rgba(217,119,6,.25)
         }
 
         .st-processing {
             background: rgba(91,91,219,.1);
             color: #5b5bdb;
-            border: 1px solid rgba(91,91,219,.25);
+            border: 1px solid rgba(91,91,219,.25)
         }
 
         .st-ready {
             background: rgba(5,150,105,.1);
             color: #059669;
-            border: 1px solid rgba(5,150,105,.25);
+            border: 1px solid rgba(5,150,105,.25)
         }
 
         .st-done {
             background: rgba(15,30,60,.1);
             color: #0f1e3c;
-            border: 1px solid rgba(15,30,60,.2);
+            border: 1px solid rgba(15,30,60,.2)
         }
 
         .st-cancelled {
             background: rgba(220,38,38,.1);
             color: #dc2626;
-            border: 1px solid rgba(220,38,38,.25);
+            border: 1px solid rgba(220,38,38,.25)
         }
 
         .bdot {
             width: 5px;
             height: 5px;
             border-radius: 50%;
-            background: currentColor;
+            background: currentColor
         }
 
-        /* ── ASSIGN CHIP ── */
         .assign-chip {
             display: inline-flex;
             align-items: center;
@@ -413,23 +405,21 @@
             padding: 3px 10px;
             font-size: 11px;
             font-weight: 600;
-            color: #2563eb;
+            color: #2563eb
         }
 
         .no-assign {
             font-size: 11px;
-            color: var(--muted);
+            color: var(--muted)
         }
 
-        /* ── PRICE ── */
         .price-col {
             font-weight: 700;
             color: var(--gold);
             font-size: 13px;
-            white-space: nowrap;
+            white-space: nowrap
         }
 
-        /* ── ACTION BTN ── */
         .btn-detail {
             display: inline-flex;
             align-items: center;
@@ -444,41 +434,39 @@
             cursor: pointer;
             text-decoration: none;
             transition: all .2s;
-            white-space: nowrap;
+            white-space: nowrap
         }
 
             .btn-detail:hover {
                 color: #fff;
                 transform: translateY(-1px);
-                box-shadow: 0 4px 14px rgba(15,30,60,.22);
+                box-shadow: 0 4px 14px rgba(15,30,60,.22)
             }
 
-        /* ── EMPTY ── */
         .so-empty {
             text-align: center;
-            padding: 72px 24px;
+            padding: 72px 24px
         }
 
             .so-empty .ei {
                 font-size: 52px;
                 opacity: .2;
                 display: block;
-                margin-bottom: 14px;
+                margin-bottom: 14px
             }
 
             .so-empty h3 {
                 font-size: 18px;
                 font-weight: 800;
                 color: var(--txt);
-                margin: 0 0 6px;
+                margin: 0 0 6px
             }
 
             .so-empty p {
                 font-size: 13px;
-                color: var(--muted);
+                color: var(--muted)
             }
 
-        /* ── PAGINATION ── */
         .pagi {
             display: flex;
             justify-content: space-between;
@@ -487,17 +475,17 @@
             border-top: 1px solid var(--bdr);
             background: var(--bg2);
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 10px
         }
 
         .pagi-info {
             font-size: 12px;
-            color: var(--muted);
+            color: var(--muted)
         }
 
         .pagi-btns {
             display: flex;
-            gap: 4px;
+            gap: 4px
         }
 
         .pg {
@@ -514,26 +502,25 @@
             font-size: 12px;
             font-weight: 600;
             text-decoration: none;
-            transition: all .2s;
+            transition: all .2s
         }
 
             .pg:hover {
                 border-color: var(--acc);
-                color: var(--acc);
+                color: var(--acc)
             }
 
             .pg.active {
                 background: var(--acc);
                 border-color: var(--acc);
-                color: #fff;
+                color: #fff
             }
 
             .pg.disabled {
                 opacity: .3;
-                pointer-events: none;
+                pointer-events: none
             }
 
-        /* ── ALERT ── */
         .alert-bar {
             display: flex;
             align-items: center;
@@ -542,49 +529,46 @@
             border-radius: 10px;
             margin-bottom: 16px;
             font-size: 13px;
-            font-weight: 600;
-            animation: slideIn .3s ease;
+            font-weight: 600
         }
 
             .alert-bar.ok {
                 background: rgba(5,150,105,.08);
                 border: 1px solid rgba(5,150,105,.22);
-                color: #059669;
+                color: #059669
             }
 
         @@keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateY(-6px);
+                transform: translateY(-6px)
             }
 
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0)
             }
         }
 
         @@media(max-width:1100px) {
             .stat-grid {
-                grid-template-columns: repeat(3,1fr);
+                grid-template-columns: repeat(3,1fr)
             }
         }
 
         @@media(max-width:700px) {
             .stat-grid {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr 1fr
             }
 
             .so-wrap {
-                padding: 20px 12px 60px;
+                padding: 20px 12px 60px
             }
         }
     </style>
 }
 
 <div class="so-wrap">
-
-    <!-- HEADER -->
     <div class="so-hdr">
         <div style="display:flex;align-items:center;gap:14px">
             <div class="hdr-icon">🔧</div>
@@ -600,7 +584,6 @@
         <div class="alert-bar ok"><i class="bi bi-check-circle-fill"></i> @ok</div>
     }
 
-    <!-- STATS -->
     <div class="stat-grid">
         <div class="stat-card">
             <div class="stat-icon si-all"><i class="bi bi-list-ul"></i></div>
@@ -624,7 +607,6 @@
         </div>
     </div>
 
-    <!-- FILTER -->
     <form method="get" class="filter-bar">
         <div class="fg" style="flex:2">
             <label>Search</label>
@@ -637,7 +619,14 @@
                 <option value="">All Statuses</option>
                 @foreach (var s in new[] { "Pending", "Processing", "Ready", "Done", "Cancelled" })
                 {
-                    <option value="@s" selected="@(Model.StatusFilter == s)">@s</option>
+                    if (Model.StatusFilter == s)
+                    {
+                        <option value="@s" selected="selected">@s</option>
+                    }
+                    else
+                    {
+                        <option value="@s">@s</option>
+                    }
                 }
             </select>
         </div>
@@ -647,7 +636,6 @@
         </div>
     </form>
 
-    <!-- TABLE -->
     <div class="tbl-wrap">
         @if (Model.Items.Any())
         {
@@ -679,18 +667,12 @@
                                 </td>
                                 <td>
                                     <div class="svc-breakdown">
-                                        <div class="svc-row-item">
-                                            🕶 <span class="svc-tag">Frame</span> @row.FrameName
-                                        </div>
+                                        <div class="svc-row-item">🕶 <span class="svc-tag">Frame</span> @row.FrameName</div>
                                         @if (!string.IsNullOrEmpty(row.LensName) && row.LensName != "—")
                                         {
-                                            <div class="svc-row-item">
-                                                ⭕ <span class="svc-tag">Lens</span> @row.LensName
-                                            </div>
+                                            <div class="svc-row-item">⭕ <span class="svc-tag">Lens</span> @row.LensName</div>
                                         }
-                                        <div class="svc-row-item">
-                                            ⚙️ <span class="svc-tag">Service</span> @row.ServiceName
-                                        </div>
+                                        <div class="svc-row-item">⚙️ <span class="svc-tag">Service</span> @row.ServiceName</div>
                                     </div>
                                 </td>
                                 <td class="price-col">@row.Total.ToString("N0") ₫</td>
@@ -704,13 +686,11 @@
                                 <td>
                                     @if (!string.IsNullOrEmpty(row.AssignedTo))
                                     {
-                                        <span class="assign-chip">
-                                            <i class="bi bi-person-fill" style="font-size:10px"></i>
-                                            @row.AssignedTo
-                                        </span>
+                                        <span class="assign-chip"><i class="bi bi-person-fill" style="font-size:10px"></i> @row.AssignedTo</span>
                                     }
                                     else
                                     {
+
                                         <span class="no-assign">Unassigned</span>
                                     }
                                 </td>
@@ -719,9 +699,7 @@
                                     <span style="font-size:10px">@row.CreatedAt.ToString("HH:mm")</span>
                                 </td>
                                 <td style="text-align:right">
-                                    <a asp-page="Detail"
-                                       asp-route-orderItemId="@row.OrderItemId"
-                                       class="btn-detail">
+                                    <a asp-page="Detail" asp-route-orderId="@row.OrderId" class="btn-detail">
                                         <i class="bi bi-eye-fill"></i> View
                                     </a>
                                 </td>
@@ -737,11 +715,8 @@
                 int pe = Math.Min(Model.TotalPages, ps + 4);
                 int from = (Model.CurrentPage - 1) * IndexModel.PageSize + 1;
                 int to = Math.Min(Model.CurrentPage * IndexModel.PageSize, Model.TotalCount);
-
                 <div class="pagi">
-                    <div class="pagi-info">
-                        Showing <strong>@from–@to</strong> of <strong>@Model.TotalCount</strong>
-                    </div>
+                    <div class="pagi-info">Showing <strong>@from–@to</strong> of <strong>@Model.TotalCount</strong></div>
                     <div class="pagi-btns">
                         @if (Model.HasPrev)
                         {
@@ -804,5 +779,4 @@
         </div>
                 }
     </div>
-
 </div>

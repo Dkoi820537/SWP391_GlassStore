@@ -14,9 +14,7 @@ namespace EyewearStore_SWP391.Pages.Admin.ServiceOrders
         private readonly EyewearStoreContext _db;
         private readonly IEmailService _email;
 
-        // ── FIX 3: add Statuses + OrderItemId ─────────────────────────────────
         public static readonly string[] Statuses = { "Pending", "Processing", "Ready", "Done", "Cancelled" };
-
         [BindProperty] public int OrderItemId { get; set; }
 
         public DetailModel(EyewearStoreContext db, IEmailService email)
@@ -79,7 +77,8 @@ namespace EyewearStore_SWP391.Pages.Admin.ServiceOrders
             }
 
             TempData["Success"] = $"Order #{orderId} updated → {ServiceStatus}";
-            return RedirectToPage(new { orderId });
+            // FIX: thêm "Detail" vào RedirectToPage
+            return RedirectToPage("Detail", new { orderId });
         }
 
         private async Task<IActionResult?> LoadAsync(int orderId)
@@ -115,7 +114,6 @@ namespace EyewearStore_SWP391.Pages.Admin.ServiceOrders
         public string? LensProductName { get; set; }
         public int? LensProductId { get; set; }
         public string? ServiceName { get; set; }
-        // ── FIX 1+2: decimal không nullable, bỏ ?? int ────────────────────────
         public decimal FramePrice { get; set; }
         public decimal LensPrice { get; set; }
         public decimal ServicePrice { get; set; }

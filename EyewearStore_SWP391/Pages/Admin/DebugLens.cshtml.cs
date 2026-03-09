@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace EyewearStore_SWP391.Pages.Admin
 {
     // Restrict to Admin only for security
-    [Authorize(Roles = "Admin")] 
+    [Authorize(Roles = "admin")] 
     public class DebugLensModel : PageModel
     {
         private readonly EyewearStoreContext _context;

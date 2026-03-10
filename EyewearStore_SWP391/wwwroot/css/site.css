@@ -194,6 +194,12 @@ header {
     .nav-link.text-danger {
         color: var(--primary-gold) !important;
         font-weight: 600;
+        display: flex;
+        align-items: center;
+        margin-top: 0;
+        margin-bottom: 0;
+        font-size: inherit;
+        line-height: inherit;
     }
 
 /* Cart badge & dropdown styling */
@@ -484,7 +490,7 @@ main {
     }
 
 /* === VALIDATION === */
-.text-danger {
+.text-danger:not(.nav-link):not(.dropdown-toggle) {
     color: var(--error) !important;
     font-size: 0.875rem;
     margin-top: var(--spacing-xs);

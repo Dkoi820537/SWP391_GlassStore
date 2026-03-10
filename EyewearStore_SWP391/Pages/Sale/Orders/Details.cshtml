@@ -1,79 +1,546 @@
 ﻿@page "{id:int}"
 @model EyewearStore_SWP391.Pages.Sale.Orders.DetailsModel
+@using System.Text.Json
 @{
-    ViewData["Title"] = $"Order #{Model.Order?.OrderId} - Details";
+    ViewData["Title"] = $"Order #{Model.Order?.OrderId} — Details";
     Layout = "_Layout";
+
+    var order = Model.Order;
+
+    // Check if order has service items
+    bool hasServiceItem = Model.Items.Any(it =>
+        !string.IsNullOrEmpty(it.SnapshotJson) &&
+        (it.SnapshotJson.Contains("\"isServiceOrder\":true") ||
+         it.SnapshotJson.Contains("\"lensProductId\":")));
+
+    // Parse service status from snapshot
+    string serviceStatus = "Pending";
+    string serviceName = "";
+    string frameName = "";
+    if (hasServiceItem)
+    {
+        var svcItem = Model.Items.First(it =>
+            !string.IsNullOrEmpty(it.SnapshotJson) &&
+            (it.SnapshotJson.Contains("\"isServiceOrder\":true") ||
+             it.SnapshotJson.Contains("\"lensProductId\":")));
+        try
+        {
+            using var doc = JsonDocument.Parse(svcItem.SnapshotJson!);
+            var root = doc.RootElement;
+            if (root.TryGetProperty("serviceStatus", out var ss)) serviceStatus = ss.GetString() ?? "Pending";
+            if (root.TryGetProperty("serviceName", out var sn)) serviceName = sn.GetString() ?? "";
+            if (root.TryGetProperty("frameName", out var fn)) frameName = fn.GetString() ?? "";
+            else if (root.TryGetProperty("productName", out var pn)) frameName = pn.GetString() ?? "";
+        }
+        catch { }
+    }
+
+    bool serviceDone = serviceStatus == "Done";
+    bool serviceCancelled = serviceStatus == "Cancelled";
+
+    // Which statuses are blocked until service is Done
+    var blockedUntilDone = new[] { "Shipped", "Delivered", "Completed" };
+    bool statusBlocked = hasServiceItem && !serviceDone && !serviceCancelled &&
+                         blockedUntilDone.Contains(order?.Status == null ? "" : "");
+    // (actual blocking is in backend; here we compute UI lock per target option)
+
+    string StatusBg(string s) => s switch {
+        "Pending Confirmation" => "#fef9ec",
+        "Confirmed"   => "#eff6ff",
+        "Processing"  => "#eef2ff",
+        "Shipped"     => "#f0fdf4",
+        "Delivered"   => "#f0fdf4",
+        "Completed"   => "#f0fdf4",
+        "Cancelled"   => "#fef2f2",
+        _ => "#f8fafc"
+    };
+    string StatusFg(string s) => s switch {
+        "Pending Confirmation" => "#92400e",
+        "Confirmed"   => "#1d4ed8",
+        "Processing"  => "#4338ca",
+        "Shipped"     => "#065f46",
+        "Delivered"   => "#065f46",
+        "Completed"   => "#14532d",
+        "Cancelled"   => "#991b1b",
+        _ => "#374151"
+    };
+    string StatusBdr(string s) => s switch {
+        "Pending Confirmation" => "#fcd34d",
+        "Confirmed"   => "#93c5fd",
+        "Processing"  => "#a5b4fc",
+        "Shipped"     => "#6ee7b7",
+        "Delivered"   => "#6ee7b7",
+        "Completed"   => "#86efac",
+        "Cancelled"   => "#fca5a5",
+        _ => "#e2e8f0"
+    };
+    string SvcBg(string s) => s switch {
+        "Pending"    => "#fffbeb",
+        "Processing" => "#eff6ff",
+        "Ready"      => "#f0fdf4",
+        "Done"       => "#f0fdf4",
+        "Cancelled"  => "#fef2f2",
+        _ => "#f8fafc"
+    };
+    string SvcFg(string s) => s switch {
+        "Pending"    => "#d97706",
+        "Processing" => "#2563eb",
+        "Ready"      => "#059669",
+        "Done"       => "#14532d",
+        "Cancelled"  => "#991b1b",
+        _ => "#374151"
+    };
+    string SvcIcon(string s) => s switch {
+        "Pending"    => "⏳",
+        "Processing" => "⚙️",
+        "Ready"      => "✅",
+        "Done"       => "🎉",
+        "Cancelled"  => "❌",
+        _ => "🔧"
+    };
 }
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between mb-3">
-        <h3>Order #@Model.Order.OrderId</h3>
-        <div>
-            <a class="btn btn-outline-secondary" asp-page="Index">Back</a>
-            <a class="btn btn-primary" asp-page="Edit" asp-route-id="@Model.Order.OrderId">Edit</a>
-        </div>
+@section Styles {
+<style>
+:root {
+    --navy:#0d1b2a;--navy2:#1a2f54;--acc:#2563eb;--gold:#b8862a;
+    --ok:#059669;--ok-s:rgba(5,150,105,.1);
+    --warn:#d97706;--warn-s:rgba(217,119,6,.1);
+    --err:#dc2626;--err-s:rgba(220,38,38,.1);
+    --purple:#7c3aed;--purple-s:rgba(124,58,237,.1);
+    --txt:#0f172a;--txt2:#475569;--muted:#94a3b8;
+    --surf:#fff;--bg:#f1f5f9;--bg2:#e8edf4;--bdr:#e2e8f0;--bdr2:#cbd5e1;
+    --sh:0 1px 4px rgba(0,0,0,.06),0 2px 10px rgba(0,0,0,.05);
+    --sh-md:0 4px 20px rgba(0,0,0,.09);--r:14px;--r-sm:8px
+}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif}
+.pg{max-width:1100px;margin:0 auto;padding:28px 20px 80px}
+.bc{display:flex;gap:6px;align-items:center;margin-bottom:20px;font-size:12px;color:var(--muted)}
+.bc a{color:var(--muted);text-decoration:none;font-weight:600}.bc a:hover{color:var(--acc)}
+
+/* HEADER */
+.pg-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.pg-hdr h1{font-size:1.55rem;font-weight:900;color:var(--navy);margin:0 0 5px;letter-spacing:-.5px}
+.pg-hdr p{font-size:13px;color:var(--muted);margin:0}
+.status-pill{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:800}
+
+/* ══ SERVICE LOCK BANNER ══ */
+.svc-lock-banner {
+    border-radius: var(--r);
+    padding: 18px 22px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.svc-lock-banner.locked {
+    background: linear-gradient(135deg,rgba(220,38,38,.07),rgba(220,38,38,.03));
+    border: 1.5px solid rgba(220,38,38,.25);
+}
+.svc-lock-banner.done {
+    background: linear-gradient(135deg,rgba(5,150,105,.08),rgba(5,150,105,.03));
+    border: 1.5px solid rgba(5,150,105,.25);
+}
+.svc-lock-banner.cancelled {
+    background: linear-gradient(135deg,rgba(100,116,139,.07),rgba(100,116,139,.03));
+    border: 1.5px solid rgba(100,116,139,.2);
+}
+.svc-lock-icon {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+}
+.locked .svc-lock-icon{background:var(--err-s)}
+.done .svc-lock-icon{background:var(--ok-s)}
+.cancelled .svc-lock-icon{background:rgba(100,116,139,.1)}
+.svc-lock-body{flex:1;min-width:0}
+.svc-lock-title{font-size:14px;font-weight:800;margin:0 0 4px}
+.locked .svc-lock-title{color:var(--err)}
+.done .svc-lock-title{color:var(--ok)}
+.cancelled .svc-lock-title{color:#64748b}
+.svc-lock-desc{font-size:12px;color:var(--txt2);margin:0 0 10px;line-height:1.55}
+.svc-progress{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.svc-step{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:700}
+.svc-step.done-s{background:var(--ok-s);color:var(--ok);border:1px solid rgba(5,150,105,.25)}
+.svc-step.active-s{background:rgba(37,99,235,.1);color:#2563eb;border:1px solid rgba(37,99,235,.25)}
+.svc-step.idle-s{background:var(--bg2);color:var(--muted);border:1px solid var(--bdr)}
+.svc-lock-badge{display:inline-flex;align-items:center;gap:6px;background:var(--err-s);border:1px solid rgba(220,38,38,.2);color:var(--err);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;align-self:center}
+.svc-done-badge{display:inline-flex;align-items:center;gap:6px;background:var(--ok-s);border:1px solid rgba(5,150,105,.2);color:var(--ok);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;align-self:center}
+
+/* ALERTS */
+.al-ok{display:flex;align-items:center;gap:8px;background:var(--ok-s);border:1px solid rgba(5,150,105,.22);color:var(--ok);border-radius:10px;padding:12px 16px;font-size:13px;font-weight:600;margin-bottom:18px;animation:sIn .3s ease}
+.al-err{display:flex;align-items:center;gap:8px;background:var(--err-s);border:1px solid rgba(220,38,38,.22);color:var(--err);border-radius:10px;padding:12px 16px;font-size:13px;font-weight:600;margin-bottom:18px}
+@@keyframes sIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+
+/* GRID */
+.det-grid{display:grid;grid-template-columns:1fr 340px;gap:18px}
+
+/* CARD */
+.dc{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);margin-bottom:16px}
+.dc:last-child{margin-bottom:0}
+.dc-hdr{background:linear-gradient(135deg,var(--navy),var(--navy2));padding:13px 18px;display:flex;align-items:center;gap:9px}
+.dc-hdr h3{font-size:13px;font-weight:800;color:#fff;margin:0;flex:1}
+.dc-hdr i{font-size:15px;color:rgba(255,255,255,.65)}
+.dc-body{padding:18px}
+
+/* INFO GRID */
+.info-g{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ii{background:var(--bg);border-radius:9px;padding:10px 13px}
+.ii-l{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+.ii-v{font-size:13px;font-weight:700;color:var(--txt);line-height:1.4}
+.ii-s{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ITEMS TABLE */
+.item-tbl{width:100%;border-collapse:collapse}
+.item-tbl th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:9px 12px;background:var(--bg2);border-bottom:1px solid var(--bdr);text-align:left}
+.item-tbl td{padding:12px 12px;border-bottom:1px solid var(--bdr);font-size:13px;color:var(--txt2);vertical-align:middle}
+.item-tbl tbody tr:last-child td{border-bottom:none}
+.item-tbl tbody tr:hover td{background:var(--bg)}
+.svc-row td{background:rgba(124,58,237,.025) !important}
+.svc-indicator{display:inline-flex;align-items:center;gap:5px;background:var(--purple-s);border:1px solid rgba(124,58,237,.2);color:var(--purple);border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;margin-top:3px}
+
+/* STATUS FORM */
+.form-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;display:block}
+.fi{width:100%;background:var(--bg);border:1.5px solid var(--bdr);border-radius:9px;padding:9px 12px;font-size:13px;color:var(--txt);font-family:inherit;transition:border-color .2s}
+.fi:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.fi:disabled{opacity:.55;cursor:not-allowed}
+.btn-submit{width:100%;padding:11px;font-size:13px;font-weight:800;border-radius:9px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;letter-spacing:.3px;transition:all .2s}
+.btn-submit:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 5px 16px rgba(13,27,42,.25)}
+.btn-submit:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+/* LOCK OVERLAY on select */
+.select-wrap{position:relative}
+.lock-overlay{position:absolute;top:0;left:0;right:0;bottom:0;border-radius:9px;background:rgba(220,38,38,.06);border:1.5px solid rgba(220,38,38,.2);display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:700;color:var(--err);pointer-events:none;z-index:1}
+.lock-hint{font-size:11px;color:var(--err);background:var(--err-s);border:1px solid rgba(220,38,38,.18);border-radius:7px;padding:8px 12px;margin-top:8px;display:flex;align-items:flex-start;gap:7px;line-height:1.5}
+.lock-hint i{flex-shrink:0;margin-top:1px}
+
+/* BACK LINK */
+.back-l{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border:1.5px solid var(--bdr);border-radius:10px;color:var(--txt2);text-decoration:none;font-size:13px;font-weight:600;transition:all .2s;background:var(--surf);margin-top:10px}
+.back-l:hover{background:var(--bg2);color:var(--txt)}
+.edit-l{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:var(--bg);border:1.5px solid var(--bdr2);border-radius:10px;color:var(--txt2);text-decoration:none;font-size:13px;font-weight:600;transition:all .2s;margin-top:8px}
+.edit-l:hover{background:var(--bg2)}
+
+@@media(max-width:900px){.det-grid{grid-template-columns:1fr}}
+</style>
+}
+
+<div class="pg">
+    <!-- Breadcrumb -->
+    <div class="bc">
+        <a asp-page="/Index">Home</a>
+        <span style="opacity:.4">›</span>
+        <a asp-page="./Index">Orders</a>
+        <span style="opacity:.4">›</span>
+        <span>Order #@order?.OrderId</span>
     </div>
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <h5>Customer</h5>
-            <p>
-                <strong>@Model.Order.UserFullName</strong><br />
-                @Model.Order.UserEmail<br />
-                @(!string.IsNullOrWhiteSpace(Model.Order.UserPhone) ? $"Phone: {Model.Order.UserPhone}" : "")
-            </p>
+    @if (TempData["Success"] is string ok)
+    {
+        <div class="al-ok"><i class="bi bi-check-circle-fill"></i> @ok</div>
+    }
+    @if (TempData["Error"] is string err)
+    {
+        <div class="al-err"><i class="bi bi-exclamation-circle-fill"></i> @err</div>
+    }
 
-            <h5>Shipping address</h5>
-            <p>@Model.Order.AddressLine</p>
+    @if (order == null)
+    {
+        <div class="al-err"><i class="bi bi-exclamation-circle-fill"></i> Order not found.</div>
+    }
+    else
+    {
+        <!-- Header -->
+        <div class="pg-hdr">
+            <div>
+                <h1>📦 Order #@order.OrderId</h1>
+                <p>Created @order.CreatedAt.ToLocalTime().ToString("MMMM dd, yyyy 'at' HH:mm")</p>
+            </div>
+            <span class="status-pill"
+                  style="background:@StatusBg(order.Status);color:@StatusFg(order.Status);border:1.5px solid @StatusBdr(order.Status)">
+                @order.Status
+            </span>
+        </div>
 
-            <h5>Order info</h5>
-            <p>Status: <span class="badge bg-info text-dark">@Model.Order.Status</span></p>
-            <p>Total: @String.Format("{0:N0}", Model.Order.TotalAmount)</p>
-            <p>Payment: @Model.Order.PaymentMethod</p>
-            <p>Created: @Model.Order.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</p>
-
-            <div class="mt-3">
-                <form method="post" asp-page-handler="ChangeStatus" class="d-inline">
-                    <input type="hidden" name="id" value="@Model.Order.OrderId" />
-                    <select name="newStatus" class="form-select d-inline w-auto me-2">
-                        @foreach (var s in Model.AllStatuses)
-                        {
-                            <option value="@s" selected="@(s == Model.Order.Status ? "selected" : null)">@s</option>
-                        }
-                    </select>
-                    <button class="btn btn-success">Update Status</button>
-                </form>
-
-                @if (!string.IsNullOrWhiteSpace(Model.Order.TrackingNumber))
+        <!-- ══ SERVICE LOCK BANNER ══ -->
+        @if (hasServiceItem)
+        {
+            string bannerCls = serviceDone ? "done" : serviceCancelled ? "cancelled" : "locked";
+            <div class="svc-lock-banner @bannerCls">
+                <div class="svc-lock-icon">
+                    @(serviceDone ? "✅" : serviceCancelled ? "❌" : "🔒")
+                </div>
+                <div class="svc-lock-body">
+                    @if (serviceDone)
+                    {
+                        <p class="svc-lock-title">Service Completed — Order can be fulfilled</p>
+                        <p class="svc-lock-desc">
+                            The service job for <strong>@frameName</strong>
+                            (@(string.IsNullOrEmpty(serviceName) ? "eyewear service" : serviceName))
+                            has been marked <strong>Done</strong> by the technician team.
+                            You may now update the order status to Shipped / Delivered / Completed.
+                        </p>
+                    }
+                    else if (serviceCancelled)
+                    {
+                        <p class="svc-lock-title">Service Cancelled</p>
+                        <p class="svc-lock-desc">
+                            The service job for this order has been cancelled. Contact the customer or escalate to manager if needed.
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="svc-lock-title">Waiting for Service Completion</p>
+                        <p class="svc-lock-desc">
+                            This order contains a <strong>custom eyewear service</strong>
+                            (@(string.IsNullOrEmpty(serviceName) ? "fitting/customization" : serviceName)
+                            @(string.IsNullOrEmpty(frameName) ? "" : $"for \"{frameName}\"")).
+                            Status updates to <strong>Shipped, Delivered</strong> or <strong>Completed</strong>
+                            are locked until the technician team marks the job as <strong>Done</strong>.
+                        </p>
+                        <div class="svc-progress">
+                            @{
+                                string[] svcSteps = { "Pending", "Processing", "Ready", "Done" };
+                                int curIdx = Array.IndexOf(svcSteps, serviceStatus);
+                            }
+                            @for (int i = 0; i < svcSteps.Length; i++)
+                            {
+                                string cls = i < curIdx ? "done-s" : i == curIdx ? "active-s" : "idle-s";
+                                string check = i < curIdx ? "✓ " : "";
+                                <span class="svc-step @cls">@check@svcSteps[i]</span>
+                                if (i < svcSteps.Length - 1)
+                                {
+                                    <span style="color:var(--muted);font-size:10px">›</span>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+                @if (serviceDone)
                 {
-                    <span class="ms-3">Tracking: <strong>@Model.Order.TrackingNumber</strong></span>
+                    <div class="svc-done-badge">
+                        <i class="bi bi-check-circle-fill"></i> Ready to Ship
+                    </div>
+                }
+                else if (!serviceCancelled)
+                {
+                    <div class="svc-lock-badge">
+                        <i class="bi bi-lock-fill"></i> Partially Locked
+                    </div>
                 }
             </div>
-        </div>
-    </div>
+        }
 
-    <h5>Items</h5>
-    <table class="table table-sm">
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>SKU</th>
-                <th class="text-end">Qty</th>
-                <th class="text-end">Unit</th>
-                <th>Snapshot</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var it in Model.Items)
-            {
-                <tr>
-                    <td>@it.ProductName</td>
-                    <td>@it.Sku</td>
-                    <td class="text-end">@it.Quantity</td>
-                    <td class="text-end">@String.Format("{0:N0}", it.UnitPrice)</td>
-                    <td><pre style="white-space:pre-wrap">@it.SnapshotJson</pre></td>
-                </tr>
-            }
-        </tbody>
-    </table>
+        <div class="det-grid">
+            <!-- LEFT -->
+            <div>
+                <!-- Customer & Shipping -->
+                <div class="dc">
+                    <div class="dc-hdr"><i class="bi bi-person-fill"></i><h3>Customer & Shipping</h3></div>
+                    <div class="dc-body">
+                        <div class="info-g">
+                            <div class="ii">
+                                <div class="ii-l">Customer</div>
+                                <div class="ii-v">@order.UserFullName</div>
+                                <div class="ii-s">@order.UserEmail</div>
+                            </div>
+                            <div class="ii">
+                                <div class="ii-l">Phone</div>
+                                <div class="ii-v">@(string.IsNullOrWhiteSpace(order.UserPhone) ? "—" : order.UserPhone)</div>
+                                <div class="ii-s">Payment: @(order.PaymentMethod ?? "—")</div>
+                            </div>
+                            <div class="ii" style="grid-column:1/-1">
+                                <div class="ii-l">Shipping Address</div>
+                                <div class="ii-v">@(string.IsNullOrWhiteSpace(order.AddressLine) ? "—" : order.AddressLine)</div>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(order.TrackingNumber))
+                            {
+                                <div class="ii" style="grid-column:1/-1">
+                                    <div class="ii-l">Tracking Number</div>
+                                    <div class="ii-v" style="font-family:monospace;color:var(--acc)">@order.TrackingNumber</div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="dc">
+                    <div class="dc-hdr">
+                        <i class="bi bi-cart3"></i>
+                        <h3>Order Items</h3>
+                        <span style="background:rgba(255,255,255,.15);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:rgba(255,255,255,.9)">
+                            @Model.Items.Count items
+                        </span>
+                    </div>
+                    <div class="dc-body" style="padding:0">
+                        <table class="item-tbl">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>SKU</th>
+                                    <th style="text-align:center">Qty</th>
+                                    <th style="text-align:right">Unit Price</th>
+                                    <th style="text-align:right">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var it in Model.Items)
+                                {
+                                    bool isSvc = !string.IsNullOrEmpty(it.SnapshotJson) &&
+                                                 (it.SnapshotJson.Contains("\"isServiceOrder\":true") ||
+                                                  it.SnapshotJson.Contains("\"lensProductId\":"));
+                                    <tr class="@(isSvc ? "svc-row" : "")">
+                                        <td>
+                                            <div style="font-weight:700;color:var(--txt);font-size:13px">@it.ProductName</div>
+                                            @if (isSvc)
+                                            {
+                                                <div class="svc-indicator">
+                                                    🔩 Service Order
+                                                    <span style="background:@SvcBg(serviceStatus);color:@SvcFg(serviceStatus);border-radius:4px;padding:1px 6px;font-size:9px">
+                                                        @SvcIcon(serviceStatus) @serviceStatus
+                                                    </span>
+                                                </div>
+                                            }
+                                        </td>
+                                        <td style="font-family:monospace;font-size:12px">@it.Sku</td>
+                                        <td style="text-align:center">
+                                            <span style="background:var(--bg2);border-radius:6px;padding:2px 8px;font-weight:700;font-size:12px">×@it.Quantity</span>
+                                        </td>
+                                        <td style="text-align:right;font-size:13px">@it.UnitPrice.ToString("N0") ₫</td>
+                                        <td style="text-align:right;font-weight:700;color:var(--gold)">@((it.UnitPrice * it.Quantity).ToString("N0")) ₫</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr style="border-top:2px solid var(--bdr2)">
+                                    <td colspan="4" style="text-align:right;font-weight:700;font-size:13px;padding:12px;color:var(--txt2)">Total</td>
+                                    <td style="text-align:right;font-weight:900;font-size:17px;color:var(--gold);padding:12px">
+                                        @order.TotalAmount.ToString("N0") ₫
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Actions -->
+            <div>
+                <div class="dc" style="position:sticky;top:80px">
+                    <div class="dc-hdr"><i class="bi bi-pencil-square"></i><h3>Update Order</h3></div>
+                    <div class="dc-body">
+
+                        <form method="post" asp-page-handler="ChangeStatus"
+                              id="statusForm">
+                            <input type="hidden" name="id" value="@order.OrderId" />
+
+                            <span class="form-lbl">📊 New Status</span>
+
+                            @if (hasServiceItem && !serviceDone && !serviceCancelled)
+                            {
+                                <!-- Show locked select with visual indication -->
+                                <div class="select-wrap" style="margin-bottom:8px">
+                                    <select name="newStatus" class="fi" id="statusSelect"
+                                            onchange="checkStatusLock(this)">
+                                        @foreach (var s in Model.AllStatuses)
+                                        {
+                                            if (s == order.Status)
+                                            {
+                                                <option value="@s" selected="selected">@s</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@s"
+                                                        @@(blockedUntilDone.Contains(s) ? "data-locked=\"true\"" : "")>
+                                                    @(blockedUntilDone.Contains(s) ? "🔒 " : "")@s
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="lock-hint" id="lockHint" style="display:none">
+                                    <i class="bi bi-lock-fill" style="flex-shrink:0;margin-top:1px"></i>
+                                    <span>This status requires the service job to be marked <strong>Done</strong> by the technician team first.</span>
+                                </div>
+                                <button type="submit" class="btn-submit" id="submitBtn" style="margin-top:12px">
+                                    <i class="bi bi-arrow-repeat"></i> Update Status
+                                </button>
+                            }
+                            else
+                            {
+                                <select name="newStatus" class="fi" style="margin-bottom:12px">
+                                    @foreach (var s in Model.AllStatuses)
+                                    {
+                                        if (s == order.Status)
+                                        {
+                                            <option value="@s" selected="selected">@s</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@s">@s</option>
+                                        }
+                                    }
+                                </select>
+                                <button type="submit" class="btn-submit">
+                                    <i class="bi bi-arrow-repeat"></i> Update Status
+                                </button>
+                            }
+                        </form>
+
+                        @if (hasServiceItem)
+                        {
+                            <a asp-page="/Staff/ServiceOrders/Detail" asp-route-orderId="@order.OrderId"
+                               style="display:flex;align-items:center;gap:8px;padding:11px 14px;background:linear-gradient(135deg,#7c3aed,#4f46e5);border-radius:10px;color:#fff;text-decoration:none;font-size:13px;font-weight:700;margin-top:12px;transition:all .2s"
+                               onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+                                <i class="bi bi-tools"></i>
+                                View Service Job #@order.OrderId
+                                <i class="bi bi-arrow-right" style="margin-left:auto"></i>
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <a asp-page="Edit" asp-route-id="@order.OrderId" class="edit-l">
+                    <i class="bi bi-pencil"></i> Edit Order
+                </a>
+                <a asp-page="./Index" class="back-l">
+                    <i class="bi bi-arrow-left"></i> Back to Orders
+                </a>
+            </div>
+        </div>
+    }
 </div>
+
+@section Scripts {
+<script>
+    var BLOCKED = @Json.Serialize(new[] { "Shipped", "Delivered", "Completed" });
+    var SERVICE_DONE = @Json.Serialize(serviceDone);
+    var HAS_SERVICE = @Json.Serialize(hasServiceItem);
+
+    function checkStatusLock(sel) {
+        if (!HAS_SERVICE || SERVICE_DONE) return;
+        var val = sel.value;
+        var isLocked = BLOCKED.indexOf(val) !== -1;
+        var hint = document.getElementById('lockHint');
+        var btn = document.getElementById('submitBtn');
+        if (hint) hint.style.display = isLocked ? 'flex' : 'none';
+        if (btn) {
+            btn.disabled = isLocked;
+            btn.style.opacity = isLocked ? '.4' : '1';
+            btn.textContent = isLocked ? '🔒 Locked — Service Not Done' : '↻ Update Status';
+        }
+        // Highlight select red if locked option chosen
+        if (sel) {
+            sel.style.borderColor = isLocked ? '#dc2626' : '';
+            sel.style.background = isLocked ? 'rgba(220,38,38,.04)' : '';
+        }
+    }
+
+    // Run on load to check current selection
+    var sel = document.getElementById('statusSelect');
+    if (sel) checkStatusLock(sel);
+</script>
+}

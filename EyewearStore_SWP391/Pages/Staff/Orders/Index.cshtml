@@ -4,125 +4,223 @@
     ViewData["Title"] = "Operations - Order Management";
 }
 
+@section Styles {
+    <style>
+        .ops-header {
+            background: linear-gradient(135deg, #0d1b2a 0%, #1a2f54 100%);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .ops-header-left h1 {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #fff;
+            margin: 0 0 4px;
+            letter-spacing: -.5px;
+        }
+
+        .ops-header-left p {
+            font-size: 13px;
+            color: rgba(255,255,255,.45);
+            margin: 0;
+        }
+
+        .ops-header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-svc-jobs {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            color: #fff !important;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-weight: 700;
+            text-decoration: none !important;
+            box-shadow: 0 4px 16px rgba(124,58,237,.35);
+            transition: all .22s ease;
+            white-space: nowrap;
+            border: 1px solid rgba(255,255,255,.12);
+        }
+
+            .btn-svc-jobs:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(124,58,237,.5);
+                color: #fff !important;
+            }
+
+            .btn-svc-jobs .sj-icon {
+                width: 28px;
+                height: 28px;
+                background: rgba(255,255,255,.15);
+                border-radius: 7px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 14px;
+                flex-shrink: 0;
+            }
+
+            .btn-svc-jobs .sj-arrow {
+                width: 16px;
+                height: 16px;
+                opacity: .75;
+                flex-shrink: 0;
+            }
+
+        .btn-refresh {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255,255,255,.1);
+            border: 1px solid rgba(255,255,255,.18);
+            color: rgba(255,255,255,.85) !important;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .22s;
+            white-space: nowrap;
+        }
+
+            .btn-refresh:hover {
+                background: rgba(255,255,255,.18);
+                color: #fff !important;
+                border-color: rgba(255,255,255,.3);
+            }
+    </style>
+}
+
 <div class="container-fluid py-4">
-    <!-- Page Header -->
-    <div class="mb-4">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
-                <li class="breadcrumb-item active">Operations</li>
-            </ol>
-        </nav>
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
-                    🔧 Operations Dashboard
-                </h1>
-                <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin: 0;">
-                    Process orders, manage inventory, and handle shipments
-                </p>
-            </div>
-            <button class="btn btn-primary" onclick="window.location.reload()">
-                <span style="margin-right: 0.5rem;">🔄</span> Refresh
+
+    <!-- ── HEADER ──────────────────────────────────────────── -->
+    <div class="ops-header">
+        <div class="ops-header-left">
+            <h1>🔧 Operations Dashboard</h1>
+            <p>Process orders, manage inventory, and handle shipments</p>
+        </div>
+        <div class="ops-header-actions">
+            <a asp-page="/Staff/ServiceOrders/Index" class="btn-svc-jobs">
+                <span class="sj-icon">🔩</span>
+                Service Jobs
+                <svg class="sj-arrow" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+            </a>
+            <button class="btn-refresh" onclick="window.location.reload()">
+                🔄 Refresh
             </button>
         </div>
     </div>
 
-    <!-- Alert Messages -->
+    <!-- ── ALERTS ───────────────────────────────────────────── -->
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 8px; border-left: 4px solid var(--success);">
+        <div class="alert alert-success alert-dismissible fade show" role="alert"
+             style="border-radius: 10px; border-left: 4px solid #059669; font-weight: 600;">
             <strong>✓</strong> @TempData["Success"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px; border-left: 4px solid var(--error);">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert"
+             style="border-radius: 10px; border-left: 4px solid #dc2626; font-weight: 600;">
             <strong>⚠</strong> @TempData["Error"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
-    <!-- Stats Cards (kept) -->
+    <!-- ── STAT CARDS ───────────────────────────────────────── -->
     <div class="row g-3 mb-4">
         <div class="col-md-3">
-            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%); color: white;">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="card" style="border:none;border-radius:14px;background:linear-gradient(135deg,#ff9800,#ffc107);color:white;box-shadow:0 4px 16px rgba(255,152,0,.3)">
+                <div class="card-body py-3">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
                         <div>
-                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Pending</div>
-                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.PendingCount</div>
+                            <div style="font-size:.85rem;opacity:.9;margin-bottom:.2rem;font-weight:600">Pending</div>
+                            <div style="font-size:2rem;font-weight:800;line-height:1">@Model.Stats.PendingCount</div>
                         </div>
-                        <div style="font-size: 3rem; opacity: 0.3;">⏳</div>
+                        <div style="font-size:2.6rem;opacity:.25">⏳</div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #2196f3 0%, #03a9f4 100%); color: white;">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="card" style="border:none;border-radius:14px;background:linear-gradient(135deg,#2196f3,#03a9f4);color:white;box-shadow:0 4px 16px rgba(33,150,243,.3)">
+                <div class="card-body py-3">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
                         <div>
-                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Processing</div>
-                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.ProcessingCount</div>
+                            <div style="font-size:.85rem;opacity:.9;margin-bottom:.2rem;font-weight:600">Processing</div>
+                            <div style="font-size:2rem;font-weight:800;line-height:1">@Model.Stats.ProcessingCount</div>
                         </div>
-                        <div style="font-size: 3rem; opacity: 0.3;">⚙️</div>
+                        <div style="font-size:2.6rem;opacity:.25">⚙️</div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%); color: white;">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="card" style="border:none;border-radius:14px;background:linear-gradient(135deg,#9c27b0,#ba68c8);color:white;box-shadow:0 4px 16px rgba(156,39,176,.3)">
+                <div class="card-body py-3">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
                         <div>
-                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Prescription</div>
-                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.PrescriptionCount</div>
+                            <div style="font-size:.85rem;opacity:.9;margin-bottom:.2rem;font-weight:600">Prescription</div>
+                            <div style="font-size:2rem;font-weight:800;line-height:1">@Model.Stats.PrescriptionCount</div>
                         </div>
-                        <div style="font-size: 3rem; opacity: 0.3;">👓</div>
+                        <div style="font-size:2.6rem;opacity:.25">👓</div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); color: white;">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="card" style="border:none;border-radius:14px;background:linear-gradient(135deg,#4caf50,#66bb6a);color:white;box-shadow:0 4px 16px rgba(76,175,80,.3)">
+                <div class="card-body py-3">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
                         <div>
-                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Today's Shipped</div>
-                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.ShippedTodayCount</div>
+                            <div style="font-size:.85rem;opacity:.9;margin-bottom:.2rem;font-weight:600">Today's Shipped</div>
+                            <div style="font-size:2rem;font-weight:800;line-height:1">@Model.Stats.ShippedTodayCount</div>
                         </div>
-                        <div style="font-size: 3rem; opacity: 0.3;">📦</div>
+                        <div style="font-size:2.6rem;opacity:.25">📦</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Search & Filters (unchanged, but ensure page resets to 1 on search/filter submit) -->
-    <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
-        <div class="card-body">
+    <!-- ── FILTER ────────────────────────────────────────────── -->
+    <div class="card mb-4" style="border:none;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)">
+        <div class="card-body py-3">
             <form method="get" class="row g-3">
                 <div class="col-md-4">
-                    <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
+                    <label class="form-label" style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:#64748b">
                         🔍 Search Orders
                     </label>
-                    <input type="text"
-                           class="form-control"
-                           name="Search"
-                           value="@Model.Search"
+                    <input type="text" class="form-control" name="Search" value="@Model.Search"
                            placeholder="Order ID, Email, or Name..."
-                           style="border: 2px solid var(--medium-gray); border-radius: 8px; padding: 0.75rem;" />
+                           style="border:1.5px solid #e2e8f0;border-radius:9px;padding:.65rem .9rem;font-size:13px" />
                 </div>
-
                 <div class="col-md-2">
-                    <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
+                    <label class="form-label" style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:#64748b">
                         📊 Status
                     </label>
-                    <select class="form-select"
-                            name="StatusFilter"
-                            style="border: 2px solid var(--medium-gray); border-radius: 8px; padding: 0.75rem;">
+                    <select class="form-select" name="StatusFilter"
+                            style="border:1.5px solid #e2e8f0;border-radius:9px;padding:.65rem .9rem;font-size:13px">
                         <option value="">All Statuses</option>
                         @foreach (var s in Model.Statuses)
                         {
@@ -137,62 +235,61 @@
                         }
                     </select>
                 </div>
-
                 <div class="col-md-2">
-                    <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
+                    <label class="form-label" style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:#64748b">
                         🏷️ Order Type
                     </label>
-                    <select class="form-select"
-                            name="TypeFilter"
-                            style="border: 2px solid var(--medium-gray); border-radius: 8px; padding: 0.75rem;">
+                    <select class="form-select" name="TypeFilter"
+                            style="border:1.5px solid #e2e8f0;border-radius:9px;padding:.65rem .9rem;font-size:13px">
                         <option value="">All Types</option>
                         <option value="Prescription" selected="@(Model.TypeFilter == "Prescription")">Prescription Orders</option>
                         <option value="ReadyStock" selected="@(Model.TypeFilter == "ReadyStock")">Ready Stock</option>
                         <option value="PreOrder" selected="@(Model.TypeFilter == "PreOrder")">Pre-Orders</option>
                     </select>
                 </div>
-
                 <div class="col-md-2">
-                    <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
+                    <label class="form-label" style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:#64748b">
                         ⚡ Priority
                     </label>
-                    <select class="form-select"
-                            name="PriorityFilter"
-                            style="border: 2px solid var(--medium-gray); border-radius: 8px; padding: 0.75rem;">
+                    <select class="form-select" name="PriorityFilter"
+                            style="border:1.5px solid #e2e8f0;border-radius:9px;padding:.65rem .9rem;font-size:13px">
                         <option value="">All</option>
                         <option value="High" selected="@(Model.PriorityFilter == "High")">High Priority</option>
                         <option value="Normal" selected="@(Model.PriorityFilter == "Normal")">Normal</option>
                     </select>
                 </div>
-
-                <div class="col-md-2 d-flex align-items-end">
-                    @* Keep page size selection and submit button together: submit resets to page 1 *@
+                <div class="col-md-2 d-flex align-items-end gap-2">
                     <input type="hidden" name="pageNumber" value="1" />
-                    <select class="form-select me-2" name="pageSize" style="width: 120px;">
+                    <select class="form-select" name="pageSize"
+                            style="width:90px;border:1.5px solid #e2e8f0;border-radius:9px;padding:.65rem .6rem;font-size:13px;flex-shrink:0">
                         <option value="10" selected="@(Model.PageSize == 10)">10</option>
                         <option value="25" selected="@(Model.PageSize == 25)">25</option>
                         <option value="50" selected="@(Model.PageSize == 50)">50</option>
                     </select>
-                    <button type="submit" class="btn btn-primary w-100" style="padding: 0.75rem;">
-                        <span style="margin-right: 0.5rem;">🔍</span> Filter
+                    <button type="submit" class="btn btn-primary w-100"
+                            style="border-radius:9px;padding:.65rem;font-size:13px;font-weight:700">
+                        🔍 Filter
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Orders Table Card -->
-    <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-lg);">
-        <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
-                    padding: 1.5rem;
-                    border-radius: 12px 12px 0 0;">
+    <!-- ── ORDERS TABLE ──────────────────────────────────────── -->
+    <div class="card" style="border:none;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.09);overflow:hidden">
+
+        <!-- Table header bar -->
+        <div style="background:linear-gradient(135deg,#0d1b2a,#1a2f54);padding:1.25rem 1.5rem">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 style="color: white; margin: 0; font-weight: 600;">
-                    📋 Orders Queue (@Model.TotalOrders orders)
+                <h5 style="color:white;margin:0;font-weight:700;font-size:15px">
+                    📋 Orders Queue
+                    <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:2px 10px;font-size:12px;margin-left:6px">
+                        @Model.TotalOrders
+                    </span>
                 </h5>
-                <div class="text-white small">
-                    Showing <strong>@Model.FirstItemIndex</strong> - <strong>@Model.LastItemIndex</strong>
-                    of <strong>@Model.TotalOrders</strong>
+                <div style="color:rgba(255,255,255,.6);font-size:12px">
+                    Showing <strong style="color:white">@Model.FirstItemIndex</strong>–<strong style="color:white">@Model.LastItemIndex</strong>
+                    of <strong style="color:white">@Model.TotalOrders</strong>
                 </div>
             </div>
         </div>
@@ -200,28 +297,26 @@
         <div class="card-body p-0">
             @if (!Model.Orders.Any())
             {
-                <div style="text-align: center; padding: 4rem 2rem;">
-                    <div style="font-size: 4rem; opacity: 0.2; margin-bottom: 1rem;">📦</div>
-                    <h4 style="color: var(--primary-navy); margin-bottom: 0.5rem;">No Orders Found</h4>
-                    <p style="color: var(--secondary-warm-gray);">
-                        All orders are processed! Or adjust your filters.
-                    </p>
+                <div style="text-align:center;padding:4rem 2rem">
+                    <div style="font-size:3.5rem;opacity:.15;margin-bottom:1rem">📦</div>
+                    <h4 style="color:#0d1b2a;margin-bottom:.5rem;font-weight:800">No Orders Found</h4>
+                    <p style="color:#94a3b8">All orders are processed! Or adjust your filters.</p>
                 </div>
             }
             else
             {
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0" style="font-size: 0.95rem;">
-                        <thead style="background: var(--light-gray);">
-                            <tr>
-                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Order</th>
-                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Customer</th>
-                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Created</th>
-                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Status</th>
-                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Type</th>
-                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy);">Shipment</th>
-                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy); text-align: right;">Total</th>
-                                <th style="padding: 1rem; font-weight: 600; color: var(--primary-navy); text-align: center;">Actions</th>
+                    <table class="table table-hover mb-0" style="font-size:.9rem">
+                        <thead>
+                            <tr style="background:#f8fafc;border-bottom:2px solid #e2e8f0">
+                                <th style="padding:1rem 1.1rem;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b">Order</th>
+                                <th style="padding:1rem 1.1rem;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b">Customer</th>
+                                <th style="padding:1rem 1.1rem;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b">Created</th>
+                                <th style="padding:1rem 1.1rem;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b">Status</th>
+                                <th style="padding:1rem 1.1rem;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b">Type</th>
+                                <th style="padding:1rem 1.1rem;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b">Shipment</th>
+                                <th style="padding:1rem 1.1rem;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b;text-align:right">Total</th>
+                                <th style="padding:1rem 1.1rem;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b;text-align:center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -230,126 +325,112 @@
                                 var isPrescription = o.OrderItems.Any(oi => oi.PrescriptionId != null);
                                 var isPreOrder = o.OrderItems.Any(oi => (oi.Product?.InventoryQty ?? 0) < oi.Quantity);
                                 var isHighPriority = isPrescription || o.CreatedAt < DateTime.UtcNow.AddDays(-2);
+                                var hasService = o.OrderItems.Any(oi =>
+                                !string.IsNullOrEmpty(oi.SnapshotJson) &&
+                                (oi.SnapshotJson.Contains("\"isServiceOrder\":true") ||
+                                oi.SnapshotJson.Contains("\"lensProductId\":")));
 
                                 string badgeClass;
                                 string badgeIcon;
                                 switch (o.Status)
                                 {
-                                    case "Pending Confirmation":
-                                        badgeClass = "bg-warning text-dark";
-                                        badgeIcon = "⏳";
-                                        break;
-                                    case "Confirmed":
-                                        badgeClass = "bg-info text-dark";
-                                        badgeIcon = "✓";
-                                        break;
-                                    case "Processing":
-                                        badgeClass = "bg-primary";
-                                        badgeIcon = "⚙️";
-                                        break;
-                                    case "Shipped":
-                                        badgeClass = "bg-secondary text-white";
-                                        badgeIcon = "📦";
-                                        break;
-                                    case "Delivered":
-                                        badgeClass = "bg-success";
-                                        badgeIcon = "✅";
-                                        break;
-                                    case "Completed":
-                                        badgeClass = "bg-success";
-                                        badgeIcon = "🎉";
-                                        break;
-                                    case "Cancelled":
-                                        badgeClass = "bg-danger";
-                                        badgeIcon = "❌";
-                                        break;
-                                    default:
-                                        badgeClass = "bg-secondary text-white";
-                                        badgeIcon = "";
-                                        break;
+                                    case "Pending Confirmation": badgeClass = "bg-warning text-dark"; badgeIcon = "⏳"; break;
+                                    case "Confirmed": badgeClass = "bg-info text-dark"; badgeIcon = "✓"; break;
+                                    case "Processing": badgeClass = "bg-primary"; badgeIcon = "⚙️"; break;
+                                    case "Shipped": badgeClass = "bg-secondary text-white"; badgeIcon = "📦"; break;
+                                    case "Delivered": badgeClass = "bg-success"; badgeIcon = "✅"; break;
+                                    case "Completed": badgeClass = "bg-success"; badgeIcon = "🎉"; break;
+                                    case "Cancelled": badgeClass = "bg-danger"; badgeIcon = "❌"; break;
+                                    default: badgeClass = "bg-secondary text-white"; badgeIcon = ""; break;
                                 }
 
-                                <tr style="border-bottom: 1px solid var(--medium-gray);">
-                                    <td style="padding: 1rem;">
-                                        <div style="font-weight: 700; color: var(--primary-navy); font-size: 1.1rem;">
-                                            #@o.OrderId
-                                        </div>
+                                <tr style="border-bottom:1px solid #f1f5f9;@(isHighPriority ? "background:rgba(255,82,82,.025);" : "")">
+                                    <td style="padding:.9rem 1.1rem;vertical-align:middle">
+                                        <div style="font-weight:800;color:#0d1b2a;font-size:1rem">#@o.OrderId</div>
                                         @if (isHighPriority)
                                         {
-                                            <span style="background: #ff5252; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                                            <span style="background:#ff5252;color:white;padding:.2rem .5rem;border-radius:4px;font-size:.7rem;font-weight:700">
                                                 🔥 HIGH
                                             </span>
                                         }
+                                        @if (hasService)
+                                        {
+                                            <span style="background:rgba(124,58,237,.1);color:#7c3aed;border:1px solid rgba(124,58,237,.2);padding:.2rem .5rem;border-radius:4px;font-size:.7rem;font-weight:700;display:inline-block;margin-top:2px">
+                                                🔩 SERVICE
+                                            </span>
+                                        }
                                     </td>
-                                    <td style="padding: 1rem;">
-                                        <div style="font-weight: 600; color: var(--dark-gray);">
-                                            @o.User?.FullName
-                                        </div>
-                                        <div style="font-size: 0.85rem; color: var(--secondary-warm-gray);">
-                                            @o.User?.Email
-                                        </div>
+                                    <td style="padding:.9rem 1.1rem;vertical-align:middle">
+                                        <div style="font-weight:600;color:#1e293b;font-size:13px">@o.User?.FullName</div>
+                                        <div style="font-size:.8rem;color:#94a3b8">@o.User?.Email</div>
                                     </td>
-                                    <td style="padding: 1rem;">
-                                        <div style="color: var(--dark-gray);">
-                                            @o.CreatedAt.ToString("MMM dd, yyyy")
-                                        </div>
-                                        <div style="font-size: 0.85rem; color: var(--secondary-warm-gray);">
-                                            @o.CreatedAt.ToString("hh:mm tt")
-                                        </div>
+                                    <td style="padding:.9rem 1.1rem;vertical-align:middle">
+                                        <div style="color:#334155;font-size:13px">@o.CreatedAt.ToString("MMM dd, yyyy")</div>
+                                        <div style="font-size:.8rem;color:#94a3b8">@o.CreatedAt.ToString("hh:mm tt")</div>
                                     </td>
-                                    <td style="padding: 1rem;">
-                                        <span class="badge @badgeClass" style="padding: 0.35rem 0.75rem; border-radius: 6px; font-weight: 600;">
+                                    <td style="padding:.9rem 1.1rem;vertical-align:middle">
+                                        <span class="badge @badgeClass"
+                                              style="padding:.35rem .75rem;border-radius:7px;font-weight:600;font-size:12px">
                                             @badgeIcon @o.Status
                                         </span>
                                     </td>
-                                    <td style="padding: 1rem;">
+                                    <td style="padding:.9rem 1.1rem;vertical-align:middle">
                                         @if (isPrescription)
                                         {
-                                            <span style="background: #9c27b0; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-weight: 600;">
+                                            <span style="background:#9c27b0;color:white;padding:.3rem .65rem;border-radius:6px;font-weight:600;font-size:12px">
                                                 👓 Prescription
                                             </span>
                                         }
                                         else if (isPreOrder)
                                         {
-                                            <span style="background: #607d8b; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-weight: 600;">
+                                            <span style="background:#607d8b;color:white;padding:.3rem .65rem;border-radius:6px;font-weight:600;font-size:12px">
                                                 🕐 Pre-Order
                                             </span>
                                         }
                                         else
                                         {
-                                            <span style="background: #4caf50; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-weight: 600;">
+                                            <span style="background:#4caf50;color:white;padding:.3rem .65rem;border-radius:6px;font-weight:600;font-size:12px">
                                                 ✓ Ready Stock
                                             </span>
                                         }
                                     </td>
-                                    <td style="padding: 1rem;">
+                                    <td style="padding:.9rem 1.1rem;vertical-align:middle">
                                         @if (o.Shipments != null && o.Shipments.Any())
                                         {
                                             var shipment = o.Shipments.FirstOrDefault();
-                                            <div style="font-size: 0.85rem; color: var(--dark-gray);">
+                                            <div style="font-size:.85rem;color:#334155;font-weight:600">
                                                 📦 @(string.IsNullOrWhiteSpace(shipment?.TrackingNumber) ? "n/a" : shipment.TrackingNumber)
                                             </div>
-                                            <div style="font-size: 0.75rem; color: var(--secondary-warm-gray);">
+                                            <div style="font-size:.75rem;color:#94a3b8">
                                                 @(string.IsNullOrWhiteSpace(shipment?.Carrier) ? "—" : shipment.Carrier)
                                             </div>
                                         }
                                         else
                                         {
-                                            <span style="color: var(--secondary-warm-gray); font-size: 0.85rem;">—</span>
+                                            <span style="color:#cbd5e1;font-size:.85rem">—</span>
                                         }
                                     </td>
-                                    <td style="padding: 1rem; text-align: right;">
-                                        <div style="font-weight: 700; color: var(--primary-gold); font-size: 1.1rem;">
-                                            @o.TotalAmount.ToString("N0") VND
+                                    <td style="padding:.9rem 1.1rem;vertical-align:middle;text-align:right">
+                                        <div style="font-weight:800;color:#b8862a;font-size:14px">
+                                            @o.TotalAmount.ToString("N0") ₫
                                         </div>
                                     </td>
-                                    <td style="padding: 1rem; text-align: center;">
-                                        <a asp-page="./Details"
-                                           asp-route-id="@o.OrderId"
-                                           class="btn btn-sm btn-primary"
-                                           style="padding: 0.5rem 1.25rem; border-radius: 6px;">
-                                            <span style="margin-right: 0.25rem;">👁️</span> Process
-                                        </a>
+                                    <td style="padding:.9rem 1.1rem;vertical-align:middle;text-align:center">
+                                        <div style="display:flex;gap:6px;justify-content:center;align-items:center">
+                                            <a asp-page="./Details" asp-route-id="@o.OrderId"
+                                               class="btn btn-sm btn-primary"
+                                               style="padding:.45rem 1rem;border-radius:8px;font-size:12px;font-weight:700">
+                                                👁️ Process
+                                            </a>
+                                            @if (hasService)
+                                            {
+                                                <a asp-page="/Staff/ServiceOrders/Detail" asp-route-orderId="@o.OrderId"
+                                                   style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;padding:.45rem .85rem;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;transition:all .2s;white-space:nowrap"
+                                                   title="View Service Job">
+                                                    🔩
+                                                </a>
+                                            }
+                                        </div>
                                     </td>
                                 </tr>
                             }
@@ -357,14 +438,16 @@
                     </table>
                 </div>
 
-                <!-- Pagination controls -->
-                <div class="d-flex justify-content-between align-items-center p-3">
-                    <div>
-                        <small class="text-muted">Page @Model.PageNumber of @Model.TotalPages</small>
-                    </div>
+                <!-- PAGINATION -->
+                <div class="d-flex justify-content-between align-items-center p-3"
+                     style="border-top:1px solid #f1f5f9;background:#fafbfc">
+                    <small style="color:#94a3b8;font-weight:600">
+                        Page <strong style="color:#0d1b2a">@Model.PageNumber</strong>
+                        of <strong style="color:#0d1b2a">@Model.TotalPages</strong>
+                    </small>
 
-                    <nav aria-label="Orders pagination">
-                        <ul class="pagination mb-0">
+                    <nav>
+                        <ul class="pagination mb-0" style="gap:3px">
                             <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
                                 <a class="page-link" asp-page="./Index"
                                    asp-route-pageNumber="1"
@@ -372,9 +455,8 @@
                                    asp-route-Search="@Model.Search"
                                    asp-route-StatusFilter="@Model.StatusFilter"
                                    asp-route-TypeFilter="@Model.TypeFilter"
-                                   asp-route-PriorityFilter="@Model.PriorityFilter">« First</a>
+                                   asp-route-PriorityFilter="@Model.PriorityFilter">«</a>
                             </li>
-
                             <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
                                 <a class="page-link" asp-page="./Index"
                                    asp-route-pageNumber="@(Model.PageNumber - 1)"
@@ -382,7 +464,7 @@
                                    asp-route-Search="@Model.Search"
                                    asp-route-StatusFilter="@Model.StatusFilter"
                                    asp-route-TypeFilter="@Model.TypeFilter"
-                                   asp-route-PriorityFilter="@Model.PriorityFilter">‹ Prev</a>
+                                   asp-route-PriorityFilter="@Model.PriorityFilter">‹</a>
                             </li>
 
                             @foreach (var p in Model.DisplayPageNumbers)
@@ -405,9 +487,8 @@
                                    asp-route-Search="@Model.Search"
                                    asp-route-StatusFilter="@Model.StatusFilter"
                                    asp-route-TypeFilter="@Model.TypeFilter"
-                                   asp-route-PriorityFilter="@Model.PriorityFilter">Next ›</a>
+                                   asp-route-PriorityFilter="@Model.PriorityFilter">›</a>
                             </li>
-
                             <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
                                 <a class="page-link" asp-page="./Index"
                                    asp-route-pageNumber="@Model.TotalPages"
@@ -415,7 +496,7 @@
                                    asp-route-Search="@Model.Search"
                                    asp-route-StatusFilter="@Model.StatusFilter"
                                    asp-route-TypeFilter="@Model.TypeFilter"
-                                   asp-route-PriorityFilter="@Model.PriorityFilter">Last »</a>
+                                   asp-route-PriorityFilter="@Model.PriorityFilter">»</a>
                             </li>
                         </ul>
                     </nav>
@@ -426,34 +507,44 @@
 </div>
 
 <style>
-    .table tbody tr:hover {
-        background-color: rgba(212, 165, 116, 0.05);
-        transition: all 0.2s ease;
+    .table tbody tr {
+        transition: background .15s
     }
 
-    .btn:hover {
-        transform: translateY(-1px);
-        transition: all 0.2s ease;
-    }
+        .table tbody tr:hover {
+            background: rgba(13,27,42,.025) !important
+        }
 
-    /* pagination look */
-    .pagination .page-item .page-link {
-        border-radius: 10px;
-        margin: 0 3px;
-        min-width: 44px;
+    .pagination .page-link {
+        border-radius: 8px !important;
+        margin: 0 1px;
+        min-width: 36px;
         text-align: center;
-        padding: 6px 10px;
+        font-weight: 600;
+        font-size: 13px;
+        border-color: #e2e8f0;
+        color: #475569;
     }
 
     .pagination .page-item.active .page-link {
-        background: linear-gradient(90deg, #2b6cb0, #2c5282);
-        border-color: #2c5282;
+        background: linear-gradient(135deg, #0d1b2a, #1a2f54);
+        border-color: #0d1b2a;
         color: #fff;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        opacity: .35
     }
 </style>
 
 @section Scripts {
     <script>
-        // nothing needed here for paging (native anchor navigation)
+        // Auto-dismiss alerts after 4s
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(a => {
+                const bsAlert = bootstrap.Alert.getOrCreateInstance(a);
+                bsAlert.close();
+            });
+        }, 4000);
     </script>
 }

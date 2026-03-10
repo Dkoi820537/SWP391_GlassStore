@@ -1,0 +1,295 @@
+﻿@page
+@model EyewearStore_SWP391.Pages.Staff.ServiceOrders.IndexModel
+@{
+    ViewData["Title"] = "Service Jobs";
+    Layout = "_Layout";
+
+    string BadgeCls(string s) => s switch {
+        "Pending"    => "st-pending",
+        "Processing" => "st-processing",
+        "Ready"      => "st-ready",
+        "Done"       => "st-done",
+        "Cancelled"  => "st-cancelled",
+        _ => "st-pending"
+    };
+    string BadgeIcon(string s) => s switch {
+        "Pending"    => "bi-hourglass-split",
+        "Processing" => "bi-gear-wide-connected",
+        "Ready"      => "bi-check-circle-fill",
+        "Done"       => "bi-bag-check-fill",
+        "Cancelled"  => "bi-x-circle-fill",
+        _ => "bi-hourglass-split"
+    };
+}
+
+@section Styles {
+<style>
+:root{--navy:#0d1b2a;--acc:#2563eb;--gold:#b8862a;--ok:#059669;--warn:#d97706;--err:#dc2626;--txt:#0f172a;--txt2:#475569;--muted:#94a3b8;--surf:#fff;--bg:#f1f5f9;--bg2:#e8edf4;--bdr:#e2e8f0;--sh:0 2px 12px rgba(0,0,0,.07);--sh-md:0 4px 20px rgba(0,0,0,.1);--r:14px}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg)}
+.wrap{max-width:1380px;margin:0 auto;padding:28px 20px 80px}
+
+/* HERO STRIP */
+.hero-strip{background:linear-gradient(135deg,#0d1b2a 0%,#1a2f54 100%);border-radius:18px;padding:24px 28px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.hero-strip h1{font-size:1.5rem;font-weight:900;color:#fff;margin:0 0 3px;letter-spacing:-.5px}
+.hero-strip p{font-size:12px;color:rgba(255,255,255,.45);margin:0}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;color:rgba(255,255,255,.8)}
+
+/* STAT GRID */
+.stat-g{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}
+.sc{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--sh)}
+.sc-ico{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.i-all{background:rgba(37,99,235,.1);color:#2563eb}
+.i-pend{background:rgba(217,119,6,.1);color:#d97706}
+.i-proc{background:rgba(91,91,219,.1);color:#5b5bdb}
+.i-ready{background:rgba(5,150,105,.1);color:#059669}
+.i-done{background:rgba(15,30,60,.1);color:#0f1e3c}
+.sc-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.sc-val{font-size:22px;font-weight:800;color:var(--txt);letter-spacing:-.5px}
+
+/* FILTER */
+.filter-bar{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r);padding:12px 16px;margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;box-shadow:var(--sh)}
+.fg{display:flex;flex-direction:column;gap:4px;flex:1;min-width:130px}
+.fg label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.fi{background:var(--bg);border:1.5px solid var(--bdr);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--txt);width:100%;font-family:inherit;transition:border-color .2s}
+.fi:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.btn-f{display:inline-flex;align-items:center;gap:6px;background:var(--acc);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;transition:background .2s}
+.btn-f:hover{background:#1d4ed8}
+.btn-r{display:inline-flex;align-items:center;gap:5px;background:var(--bg);color:var(--muted);border:1.5px solid var(--bdr);border-radius:8px;padding:9px 13px;font-size:13px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .2s}
+.btn-r:hover{color:var(--txt);border-color:#94a3b8}
+
+/* TABLE */
+.tbl-wrap{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh-md)}
+.so-tbl{width:100%;border-collapse:collapse}
+.so-tbl thead tr{background:var(--bg2);border-bottom:1px solid var(--bdr)}
+.so-tbl th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);padding:11px 14px;text-align:left;white-space:nowrap}
+.so-tbl td{padding:13px 14px;border-bottom:1px solid var(--bdr);vertical-align:middle;font-size:13px;color:var(--txt2)}
+.so-tbl tbody tr:last-child td{border-bottom:none}
+.so-tbl tbody tr:hover{background:var(--bg)}
+
+/* CELLS */
+.oid{font-weight:800;color:var(--navy);font-size:13px}
+.oid-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.cname{font-weight:700;color:var(--txt);font-size:13px}
+.cemail{font-size:11px;color:var(--muted)}
+.svc-bk{font-size:11.5px;line-height:1.9}
+.svc-ri{display:flex;align-items:center;gap:5px}
+.svc-tag{display:inline-block;background:var(--bg2);border-radius:5px;padding:1px 7px;font-size:10px;font-weight:700;color:var(--txt2);white-space:nowrap}
+.price-c{font-weight:700;color:var(--gold);font-size:13px;white-space:nowrap}
+
+/* BADGES */
+.st-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:700}
+.st-pending{background:rgba(217,119,6,.1);color:#d97706;border:1px solid rgba(217,119,6,.25)}
+.st-processing{background:rgba(91,91,219,.1);color:#5b5bdb;border:1px solid rgba(91,91,219,.25)}
+.st-ready{background:rgba(5,150,105,.1);color:#059669;border:1px solid rgba(5,150,105,.25)}
+.st-done{background:rgba(15,30,60,.1);color:#0f1e3c;border:1px solid rgba(15,30,60,.2)}
+.st-cancelled{background:rgba(220,38,38,.1);color:#dc2626;border:1px solid rgba(220,38,38,.25)}
+.bdot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+.assign-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(37,99,235,.08);border-radius:100px;padding:3px 10px;font-size:11px;font-weight:600;color:#2563eb}
+.no-assign{font-size:11px;color:var(--muted);font-style:italic}
+
+/* URGENCY */
+.urgent-row{background:rgba(220,38,38,.03) !important}
+.urgent-tag{display:inline-flex;align-items:center;gap:3px;background:rgba(220,38,38,.1);color:#dc2626;border-radius:4px;padding:1px 6px;font-size:9px;font-weight:700;margin-top:2px}
+
+.btn-view{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,var(--navy),#1a2f54);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;text-decoration:none;transition:all .2s;white-space:nowrap}
+.btn-view:hover{color:#fff;transform:translateY(-1px);box-shadow:0 4px 12px rgba(13,27,42,.22)}
+
+/* PAGI */
+.pagi{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-top:1px solid var(--bdr);background:var(--bg2);flex-wrap:wrap;gap:10px}
+.pagi-info{font-size:12px;color:var(--muted)}
+.pg{min-width:32px;height:32px;padding:0 8px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bdr);border-radius:7px;background:var(--surf);color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;transition:all .2s}
+.pg:hover{border-color:var(--acc);color:var(--acc)}
+.pg.active{background:var(--acc);border-color:var(--acc);color:#fff}
+.pg.disabled{opacity:.3;pointer-events:none}
+
+/* ALERT */
+.al-ok{display:flex;align-items:center;gap:8px;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.22);color:#059669;border-radius:10px;padding:11px 15px;font-size:13px;font-weight:600;margin-bottom:16px;animation:sIn .3s ease}
+@@keyframes sIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+
+/* EMPTY */
+.empty{text-align:center;padding:60px 20px}
+.empty span{font-size:48px;opacity:.15;display:block;margin-bottom:12px}
+.empty h3{font-size:17px;font-weight:800;color:var(--txt);margin:0 0 6px}
+.empty p{font-size:13px;color:var(--muted)}
+
+@@media(max-width:1100px){.stat-g{grid-template-columns:repeat(3,1fr)}}
+@@media(max-width:700px){.stat-g{grid-template-columns:1fr 1fr};.wrap{padding:16px 12px 60px}}
+</style>
+}
+
+<div class="wrap">
+
+    <!-- HERO -->
+    <div class="hero-strip">
+        <div>
+            <h1>🔧 Service Jobs</h1>
+            <p>Manage and update eyewear service orders assigned to your team</p>
+        </div>
+        <div class="hero-badge">
+            <i class="bi bi-person-fill"></i>
+            Staff Portal
+        </div>
+    </div>
+
+    @if (TempData["Success"] is string ok)
+    {
+        <div class="al-ok"><i class="bi bi-check-circle-fill"></i> @ok</div>
+    }
+
+    <!-- STATS -->
+    <div class="stat-g">
+        <div class="sc"><div class="sc-ico i-all"><i class="bi bi-list-ul"></i></div><div><div class="sc-lbl">Total</div><div class="sc-val">@Model.StatTotal</div></div></div>
+        <div class="sc"><div class="sc-ico i-pend"><i class="bi bi-hourglass-split"></i></div><div><div class="sc-lbl">Pending</div><div class="sc-val">@Model.StatPending</div></div></div>
+        <div class="sc"><div class="sc-ico i-proc"><i class="bi bi-gear-wide-connected"></i></div><div><div class="sc-lbl">Processing</div><div class="sc-val">@Model.StatProcessing</div></div></div>
+        <div class="sc"><div class="sc-ico i-ready"><i class="bi bi-check-circle-fill"></i></div><div><div class="sc-lbl">Ready</div><div class="sc-val">@Model.StatReady</div></div></div>
+        <div class="sc"><div class="sc-ico i-done"><i class="bi bi-bag-check-fill"></i></div><div><div class="sc-lbl">Done</div><div class="sc-val">@Model.StatDone</div></div></div>
+    </div>
+
+    <!-- FILTER -->
+    <form method="get" class="filter-bar">
+        <div class="fg" style="flex:2">
+            <label>Search</label>
+            <input class="fi" type="text" name="SearchTerm" value="@Model.SearchTerm"
+                   placeholder="Order #, customer, frame, service…" />
+        </div>
+        <div class="fg" style="max-width:155px">
+            <label>Status</label>
+            <select class="fi" name="StatusFilter">
+                <option value="">All</option>
+                @foreach (var s in new[] { "Pending", "Processing", "Ready", "Done", "Cancelled" })
+                {
+                    <option value="@s" @@(Model.StatusFilter == s ? "selected" : "")>@s</option>
+                }
+            </select>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-end">
+            <button type="submit" class="btn-f"><i class="bi bi-search"></i> Filter</button>
+            <a asp-page="Index" class="btn-r"><i class="bi bi-x-lg"></i></a>
+        </div>
+    </form>
+
+    <!-- TABLE -->
+    <div class="tbl-wrap">
+        @if (Model.Items.Any())
+        {
+            <div style="overflow-x:auto">
+                <table class="so-tbl">
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Customer</th>
+                            <th>Service Details</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Assigned To</th>
+                            <th>Date</th>
+                            <th style="text-align:right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in Model.Items)
+                        {
+                            bool isUrgent = row.Status == "Pending" &&
+                                            (DateTime.UtcNow - row.CreatedAt).TotalDays >= 1;
+                            <tr class="@(isUrgent ? "urgent-row" : "")">
+                                <td>
+                                    <div class="oid">#@row.OrderId</div>
+                                    <div class="oid-sub">Item #@row.OrderItemId</div>
+                                    @if (isUrgent)
+                                    {
+                                        <div class="urgent-tag"><i class="bi bi-exclamation-triangle-fill"></i> URGENT</div>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="cname">@row.CustomerName</div>
+                                    <div class="cemail">@row.CustomerEmail</div>
+                                </td>
+                                <td>
+                                    <div class="svc-bk">
+                                        <div class="svc-ri">🕶 <span class="svc-tag">Frame</span> @row.FrameName</div>
+                                        @if (!string.IsNullOrEmpty(row.LensName))
+                                        {
+                                            <div class="svc-ri">⭕ <span class="svc-tag">Lens</span> @row.LensName</div>
+                                        }
+                                        <div class="svc-ri">⚙️ <span class="svc-tag">Service</span> @row.ServiceName</div>
+                                    </div>
+                                </td>
+                                <td class="price-c">@row.Total.ToString("N0") ₫</td>
+                                <td>
+                                    <span class="st-badge @BadgeCls(row.Status)">
+                                        <span class="bdot"></span>
+                                        <i class="bi @BadgeIcon(row.Status)" style="font-size:10px"></i>
+                                        @row.Status
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(row.AssignedTo))
+                                    {
+                                        <span class="assign-chip"><i class="bi bi-person-fill" style="font-size:10px"></i> @row.AssignedTo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="no-assign">Unassigned</span>
+                                    }
+                                </td>
+                                <td style="color:var(--muted);font-size:12px;white-space:nowrap">
+                                    @row.CreatedAt.ToString("dd/MM/yy")<br />
+                                    <span style="font-size:10px">@row.CreatedAt.ToString("HH:mm")</span>
+                                </td>
+                                <td style="text-align:right">
+                                    <a asp-page="Detail" asp-route-orderId="@row.OrderId" class="btn-view">
+                                        <i class="bi bi-pencil-fill"></i> Update
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                int ps = Math.Max(1, Model.CurrentPage - 2);
+                int pe = Math.Min(Model.TotalPages, ps + 4);
+                int from = (Model.CurrentPage - 1) * IndexModel.PageSize + 1;
+                int to = Math.Min(Model.CurrentPage * IndexModel.PageSize, Model.TotalCount);
+                <div class="pagi">
+                    <div class="pagi-info">Showing <strong>@from–@to</strong> of <strong>@Model.TotalCount</strong></div>
+                    <div style="display:flex;gap:4px">
+                        <a class="pg @(!Model.HasPrev ? "disabled" : "")"
+                           asp-page="Index" asp-route-SearchTerm="@Model.SearchTerm"
+                           asp-route-StatusFilter="@Model.StatusFilter"
+                           asp-route-CurrentPage="@(Model.CurrentPage - 1)">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                        @for (int i = ps; i <= pe; i++)
+                        {
+                            <a class="pg @(i == Model.CurrentPage ? "active" : "")"
+                               asp-page="Index" asp-route-SearchTerm="@Model.SearchTerm"
+                               asp-route-StatusFilter="@Model.StatusFilter"
+                               asp-route-CurrentPage="@i">@i</a>
+                        }
+                        <a class="pg @(!Model.HasNext ? "disabled" : "")"
+                           asp-page="Index" asp-route-SearchTerm="@Model.SearchTerm"
+                           asp-route-StatusFilter="@Model.StatusFilter"
+                           asp-route-CurrentPage="@(Model.CurrentPage + 1)">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty">
+                <span>🔧</span>
+                <h3>No service orders found</h3>
+                <p>@(string.IsNullOrEmpty(Model.SearchTerm) && string.IsNullOrEmpty(Model.StatusFilter)
+                    ? "No jobs assigned yet."
+                    : "No results match your filter.")</p>
+            </div>
+        }
+    </div>
+</div>

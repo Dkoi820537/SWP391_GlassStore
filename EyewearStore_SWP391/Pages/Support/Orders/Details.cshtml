@@ -1,447 +1,1271 @@
 ﻿@page "{id:int}"
 @model EyewearStore_SWP391.Pages.Support.Orders.DetailsModel
+@using System.Text.Json
 @{
     ViewData["Title"] = $"Process Order #{Model.OrderId}";
+    Layout = "_Layout";
+
+    bool serviceDone = Model.ServiceStatus == "Done";
+    bool serviceCancelled = Model.ServiceStatus == "Cancelled";
+    var blockedStatuses = new[] { "Shipped", "Delivered", "Completed" };
+
+    string SvcBg(string s) => s switch
+    {
+        "Pending" => "#fffbeb",
+        "Processing" => "#eff6ff",
+        "Ready" => "#f0fdf4",
+        "Done" => "#f0fdf4",
+        "Cancelled" => "#fef2f2",
+        _ => "#f8fafc"
+    };
+    string SvcFg(string s) => s switch
+    {
+        "Pending" => "#d97706",
+        "Processing" => "#2563eb",
+        "Ready" => "#059669",
+        "Done" => "#14532d",
+        "Cancelled" => "#991b1b",
+        _ => "#374151"
+    };
+    string SvcIcon(string s) => s switch
+    {
+        "Pending" => "⏳",
+        "Processing" => "⚙️",
+        "Ready" => "✅",
+        "Done" => "🎉",
+        "Cancelled" => "❌",
+        _ => "🔧"
+    };
 }
 
-<div class="container-fluid py-4">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
-            <li class="breadcrumb-item"><a asp-page="./Index">Support Dashboard</a></li>
-            <li class="breadcrumb-item active">Order #@Model.OrderId</li>
-        </ol>
-    </nav>
+@section Styles {
+    <style>
+        :root {
+            --navy: #0d1b2a;
+            --navy2: #1a2f54;
+            --teal: #0f766e;
+            --teal2: #0d9488;
+            --gold: #b8862a;
+            --ok: #059669;
+            --ok-s: rgba(5,150,105,.1);
+            --warn: #d97706;
+            --warn-s: rgba(217,119,6,.1);
+            --err: #dc2626;
+            --err-s: rgba(220,38,38,.1);
+            --purple: #7c3aed;
+            --purple-s: rgba(124,58,237,.1);
+            --orange: #ea580c;
+            --orange-s: rgba(234,88,12,.1);
+            --txt: #0f172a;
+            --txt2: #475569;
+            --muted: #94a3b8;
+            --surf: #fff;
+            --bg: #f1f5f9;
+            --bg2: #e8edf4;
+            --bdr: #e2e8f0;
+            --bdr2: #cbd5e1;
+            --sh: 0 1px 4px rgba(0,0,0,.06),0 2px 10px rgba(0,0,0,.05);
+            --sh-md: 0 4px 20px rgba(0,0,0,.09);
+            --r: 14px;
+            --r-sm: 8px
+        }
 
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
-                💼 Process Order #@Model.OrderId
-            </h1>
-            <div style="display: flex; gap: 0.75rem; align-items: center;">
-                @if (Model.IsHighPriority)
-                {
-                    <span style="background: linear-gradient(135deg, #f44336 0%, #e57373 100%);
-                                     color: white;
-                                     padding: 0.5rem 1rem;
-                                     border-radius: 20px;
-                                     font-weight: 600;">
-                        ⚠️ HIGH PRIORITY
-                    </span>
+        *, *::before, *::after {
+            box-sizing: border-box
+        }
+
+        body {
+            background: var(--bg);
+            font-family: 'Segoe UI', system-ui, sans-serif
+        }
+
+        .pg {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 28px 20px 80px
+        }
+
+        /* BREADCRUMB */
+        .bc {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+            .bc a {
+                color: var(--muted);
+                text-decoration: none;
+                font-weight: 600
+            }
+
+                .bc a:hover {
+                    color: var(--teal)
                 }
-                <span style="color: var(--secondary-warm-gray); font-size: 0.95rem;">
-                    Created: @Model.Order.CreatedAt.ToString("MMM dd, yyyy hh:mm tt")
-                </span>
-            </div>
-        </div>
-        <a asp-page="./Index" class="btn btn-outline-secondary">
-            <span style="margin-right: 0.5rem;">←</span> Back to Queue
-        </a>
+
+        /* HEADER */
+        .pg-hdr {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 22px
+        }
+
+            .pg-hdr h1 {
+                font-size: 1.55rem;
+                font-weight: 900;
+                color: var(--navy);
+                margin: 0 0 6px;
+                letter-spacing: -.5px
+            }
+
+        .hdr-meta {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+        .priority-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            background: linear-gradient(135deg,#dc2626,#ef4444);
+            color: #fff;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 800
+        }
+
+        .date-pill {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 18px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 800
+        }
+
+        /* ALERTS */
+        .al-ok {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--ok-s);
+            border: 1px solid rgba(5,150,105,.22);
+            color: var(--ok);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 18px;
+            animation: sIn .3s ease
+        }
+
+        .al-err {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--err-s);
+            border: 1px solid rgba(220,38,38,.22);
+            color: var(--err);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 18px
+        }
+
+        @@keyframes sIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* ══ SERVICE LOCK BANNER ══ */
+        .svc-lock-banner {
+            border-radius: var(--r);
+            padding: 18px 22px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap
+        }
+
+            .svc-lock-banner.locked {
+                background: linear-gradient(135deg,rgba(220,38,38,.07),rgba(220,38,38,.03));
+                border: 1.5px solid rgba(220,38,38,.25)
+            }
+
+            .svc-lock-banner.done {
+                background: linear-gradient(135deg,rgba(5,150,105,.08),rgba(5,150,105,.03));
+                border: 1.5px solid rgba(5,150,105,.25)
+            }
+
+            .svc-lock-banner.cancelled {
+                background: linear-gradient(135deg,rgba(100,116,139,.07),rgba(100,116,139,.03));
+                border: 1.5px solid rgba(100,116,139,.2)
+            }
+
+        .svc-lock-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0
+        }
+
+        .locked .svc-lock-icon {
+            background: var(--err-s)
+        }
+
+        .done .svc-lock-icon {
+            background: var(--ok-s)
+        }
+
+        .cancelled .svc-lock-icon {
+            background: rgba(100,116,139,.1)
+        }
+
+        .svc-lock-body {
+            flex: 1;
+            min-width: 0
+        }
+
+        .svc-lock-title {
+            font-size: 14px;
+            font-weight: 800;
+            margin: 0 0 4px
+        }
+
+        .locked .svc-lock-title {
+            color: var(--err)
+        }
+
+        .done .svc-lock-title {
+            color: var(--ok)
+        }
+
+        .cancelled .svc-lock-title {
+            color: #64748b
+        }
+
+        .svc-lock-desc {
+            font-size: 12px;
+            color: var(--txt2);
+            margin: 0 0 10px;
+            line-height: 1.55
+        }
+
+        .svc-progress {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+        .svc-step {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700
+        }
+
+            .svc-step.done-s {
+                background: var(--ok-s);
+                color: var(--ok);
+                border: 1px solid rgba(5,150,105,.25)
+            }
+
+            .svc-step.active-s {
+                background: rgba(37,99,235,.1);
+                color: #2563eb;
+                border: 1px solid rgba(37,99,235,.25)
+            }
+
+            .svc-step.idle-s {
+                background: var(--bg2);
+                color: var(--muted);
+                border: 1px solid var(--bdr)
+            }
+
+        .svc-lock-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--err-s);
+            border: 1px solid rgba(220,38,38,.2);
+            color: var(--err);
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+            align-self: center
+        }
+
+        .svc-done-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--ok-s);
+            border: 1px solid rgba(5,150,105,.2);
+            color: var(--ok);
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+            align-self: center
+        }
+
+        /* GRID */
+        .det-grid {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 18px
+        }
+
+        /* CARD */
+        .dc {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r);
+            overflow: hidden;
+            box-shadow: var(--sh);
+            margin-bottom: 16px
+        }
+
+            .dc:last-child {
+                margin-bottom: 0
+            }
+
+        .dc-hdr {
+            padding: 13px 18px;
+            display: flex;
+            align-items: center;
+            gap: 9px
+        }
+
+            .dc-hdr h3 {
+                font-size: 13px;
+                font-weight: 800;
+                color: #fff;
+                margin: 0;
+                flex: 1
+            }
+
+            .dc-hdr i {
+                font-size: 15px;
+                color: rgba(255,255,255,.65)
+            }
+
+            .dc-hdr.navy {
+                background: linear-gradient(135deg,var(--navy),var(--navy2))
+            }
+
+            .dc-hdr.teal {
+                background: linear-gradient(135deg,var(--teal),var(--teal2))
+            }
+
+            .dc-hdr.green {
+                background: linear-gradient(135deg,#15803d,#16a34a)
+            }
+
+            .dc-hdr.orange {
+                background: linear-gradient(135deg,#c2410c,var(--orange))
+            }
+
+        .dc-body {
+            padding: 18px
+        }
+
+        /* INFO GRID */
+        .info-g {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px
+        }
+
+        .ii {
+            background: var(--bg);
+            border-radius: 9px;
+            padding: 10px 13px
+        }
+
+        .ii-l {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            margin-bottom: 3px
+        }
+
+        .ii-v {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--txt);
+            line-height: 1.4
+        }
+
+        .ii-s {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        /* ITEMS TABLE */
+        .item-tbl {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+            .item-tbl th {
+                font-size: 10px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                color: var(--muted);
+                padding: 9px 12px;
+                background: var(--bg2);
+                border-bottom: 1px solid var(--bdr);
+                text-align: left
+            }
+
+            .item-tbl td {
+                padding: 12px 12px;
+                border-bottom: 1px solid var(--bdr);
+                font-size: 13px;
+                color: var(--txt2);
+                vertical-align: middle
+            }
+
+            .item-tbl tbody tr:last-child td {
+                border-bottom: none
+            }
+
+            .item-tbl tbody tr:hover td {
+                background: var(--bg)
+            }
+
+        .svc-row td {
+            background: rgba(124,58,237,.025) !important
+        }
+
+        .svc-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--purple-s);
+            border: 1px solid rgba(124,58,237,.2);
+            color: var(--purple);
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-top: 3px
+        }
+
+        /* RX SECTION */
+        .rx-section {
+            background: rgba(156,39,176,.04);
+            border-top: 1px solid rgba(156,39,176,.12)
+        }
+
+        .rx-inner {
+            margin: 0 12px 12px 28px;
+            padding: 14px;
+            background: var(--surf);
+            border-radius: 10px;
+            border: 1px solid rgba(156,39,176,.15)
+        }
+
+        .rx-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #9c27b0;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .rx-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px
+        }
+
+        .rx-eye {
+            padding: 12px;
+            background: var(--bg);
+            border-radius: 8px;
+            border-left: 3px solid #9c27b0
+        }
+
+        .rx-eye-title {
+            font-size: 10px;
+            font-weight: 800;
+            color: #9c27b0;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            margin-bottom: 7px
+        }
+
+        .rx-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 4px
+        }
+
+            .rx-row span:first-child {
+                color: var(--muted);
+                font-weight: 600
+            }
+
+            .rx-row span:last-child {
+                color: var(--txt);
+                font-weight: 700
+            }
+
+        /* STATUS FORM */
+        .form-lbl {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            margin-bottom: 7px;
+            display: block
+        }
+
+        .fi {
+            width: 100%;
+            background: var(--bg);
+            border: 1.5px solid var(--bdr);
+            border-radius: 9px;
+            padding: 9px 12px;
+            font-size: 13px;
+            color: var(--txt);
+            font-family: inherit;
+            transition: border-color .2s
+        }
+
+            .fi:focus {
+                outline: none;
+                border-color: var(--teal);
+                box-shadow: 0 0 0 3px rgba(15,118,110,.1)
+            }
+
+            .fi:disabled {
+                opacity: .55;
+                cursor: not-allowed
+            }
+
+        .btn-primary-submit {
+            width: 100%;
+            padding: 11px;
+            font-size: 13px;
+            font-weight: 800;
+            border-radius: 9px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg,var(--navy),var(--navy2));
+            color: #fff;
+            letter-spacing: .3px;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px
+        }
+
+            .btn-primary-submit:hover:not(:disabled) {
+                transform: translateY(-1px);
+                box-shadow: 0 5px 16px rgba(13,27,42,.25)
+            }
+
+            .btn-primary-submit:disabled {
+                opacity: .45;
+                cursor: not-allowed;
+                transform: none
+            }
+
+        .lock-hint {
+            font-size: 11px;
+            color: var(--err);
+            background: var(--err-s);
+            border: 1px solid rgba(220,38,38,.18);
+            border-radius: 7px;
+            padding: 8px 12px;
+            margin-top: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 7px;
+            line-height: 1.5
+        }
+
+        /* ACTION BUTTONS */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 14px
+        }
+
+        .act-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 10px 12px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none
+        }
+
+            .act-btn:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(0,0,0,.15)
+            }
+
+            .act-btn.confirm {
+                background: linear-gradient(135deg,#15803d,#16a34a);
+                color: #fff;
+                grid-column: 1/-1
+            }
+
+            .act-btn.contact {
+                background: rgba(6,182,212,.1);
+                border: 1.5px solid rgba(6,182,212,.3);
+                color: #0891b2
+            }
+
+            .act-btn.escalate {
+                background: var(--warn-s);
+                border: 1.5px solid rgba(217,119,6,.25);
+                color: var(--warn)
+            }
+
+            .act-btn.cancel {
+                background: var(--err-s);
+                border: 1.5px solid rgba(220,38,38,.2);
+                color: var(--err)
+            }
+
+            .act-btn.svc-btn {
+                background: linear-gradient(135deg,#7c3aed,#4f46e5);
+                color: #fff;
+                grid-column: 1/-1
+            }
+
+        /* BACK/EDIT LINKS */
+        .back-l {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px;
+            border: 1.5px solid var(--bdr);
+            border-radius: 10px;
+            color: var(--txt2);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all .2s;
+            background: var(--surf);
+            margin-top: 10px
+        }
+
+            .back-l:hover {
+                background: var(--bg2);
+                color: var(--txt)
+            }
+
+        /* BADGE PILLS */
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700
+        }
+
+        .badge-rx {
+            background: rgba(156,39,176,.1);
+            color: #9c27b0;
+            border: 1px solid rgba(156,39,176,.2)
+        }
+
+        .badge-urgent {
+            background: var(--err-s);
+            color: var(--err);
+            border: 1px solid rgba(220,38,38,.2)
+        }
+
+        .badge-return {
+            background: var(--orange-s);
+            color: var(--orange);
+            border: 1px solid rgba(234,88,12,.2)
+        }
+
+        .badge-ok {
+            background: var(--ok-s);
+            color: var(--ok);
+            border: 1px solid rgba(5,150,105,.2)
+        }
+
+        .badge-out {
+            background: var(--err-s);
+            color: var(--err);
+            border: 1px solid rgba(220,38,38,.15)
+        }
+
+        .badge-preorder {
+            background: rgba(100,116,139,.1);
+            color: #475569;
+            border: 1px solid rgba(100,116,139,.2)
+        }
+
+        @@media(max-width:960px) {
+            .det-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @@media(max-width:600px) {
+            .info-g {
+                grid-template-columns: 1fr
+            }
+
+            .action-grid {
+                grid-template-columns: 1fr
+            }
+        }
+    </style>
+}
+
+<div class="pg">
+    <!-- Breadcrumb -->
+    <div class="bc">
+        <a asp-page="/Index">Home</a>
+        <span style="opacity:.4">›</span>
+        <a asp-page="./Index">Support Dashboard</a>
+        <span style="opacity:.4">›</span>
+        <span>Order #@Model.OrderId</span>
     </div>
 
-    <!-- Alert Messages -->
-    @if (TempData["Success"] != null)
+    @if (TempData["Success"] is string ok)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 8px; border-left: 4px solid var(--success);">
-            <strong>✓</strong> @TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+        <div class="al-ok"><i class="bi bi-check-circle-fill"></i> @ok</div>
     }
-    @if (TempData["Error"] != null)
+    @if (TempData["Error"] is string err)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px; border-left: 4px solid var(--error);">
-            <strong>⚠</strong> @TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+        <div class="al-err"><i class="bi bi-exclamation-circle-fill"></i> @err</div>
     }
 
-    <div class="row g-4">
-        <!-- Left Column -->
-        <div class="col-lg-8">
-            <!-- Order Items Card -->
-            <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
-                <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
-                            padding: 1.5rem;
-                            border-radius: 12px 12px 0 0;">
-                    <h5 style="color: white; margin: 0; font-weight: 600;">
-                        🛒 Order Items (@Model.OrderItems.Count)
-                    </h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table mb-0">
-                            <thead style="background: var(--light-gray);">
-                                <tr>
-                                    <th style="padding: 1rem; font-weight: 600;">Product</th>
-                                    <th style="padding: 1rem; font-weight: 600;">SKU</th>
-                                    <th style="padding: 1rem; font-weight: 600; text-align: center;">Qty</th>
-                                    <th style="padding: 1rem; font-weight: 600; text-align: right;">Price</th>
-                                    <th style="padding: 1rem; font-weight: 600; text-align: right;">Subtotal</th>
-                                    <th style="padding: 1rem; font-weight: 600; text-align: center;">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model.OrderItems)
-                                {
-                                    <tr style="border-bottom: 1px solid var(--medium-gray);">
-                                        <td style="padding: 1rem;">
-                                            <div style="font-weight: 600; color: var(--dark-gray);">@item.ProductName</div>
-                                            @if (item.PrescriptionId != null)
-                                            {
-                                                <span style="background: #9c27b0; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
-                                                    👓 Prescription
-                                                </span>
-                                            }
-                                        </td>
-                                        <td style="padding: 1rem; color: var(--secondary-warm-gray);">@item.Sku</td>
-                                        <td style="padding: 1rem; text-align: center;">
-                                            <span style="background: var(--medium-gray); padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 600;">
-                                                ×@item.Quantity
-                                            </span>
-                                        </td>
-                                        <td style="padding: 1rem; text-align: right;">@item.UnitPrice.ToString("N0") VND</td>
-                                        <td style="padding: 1rem; text-align: right; font-weight: 700;">@((item.UnitPrice * item.Quantity).ToString("N0")) VND</td>
-                                        <td style="padding: 1rem; text-align: center;">
-                                            @if (item.HasReturn)
-                                            {
-                                                <span style="background: #ff9800; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.85rem;">
-                                                    🔄 Return
-                                                </span>
-                                            }
-                                            else if ((item.ProductInventory ?? 0) < item.Quantity)
-                                            {
-                                                <span style="background: #f44336; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.85rem;">
-                                                    ⚠️ Out of Stock
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <span style="background: #4caf50; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.85rem;">
-                                                    ✓ Available
-                                                </span>
-                                            }
-                                        </td>
-                                    </tr>
-
-                                    @if (item.PrescriptionDetails != null)
-                                    {
-                                        <tr style="background: rgba(156, 39, 176, 0.05);">
-                                            <td colspan="6" style="padding: 1.5rem;">
-                                                <div style="margin-left: 2rem;">
-                                                    <h6 style="color: #9c27b0; font-weight: 600; margin-bottom: 1rem;">
-                                                        👓 Prescription Details
-                                                        @if (!item.IsPrescriptionVerified)
-                                                        {
-                                                            <span style="background: #ff9800; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem;">
-                                                                Needs Verification
-                                                            </span>
-                                                        }
-                                                        else
-                                                        {
-                                                            <span style="background: #4caf50; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem;">
-                                                                ✓ Verified
-                                                            </span>
-                                                        }
-                                                    </h6>
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <div style="padding: 1rem; background: white; border-radius: 8px; border-left: 3px solid #9c27b0;">
-                                                                <strong style="color: #9c27b0;">Left Eye (OS):</strong><br />
-                                                                SPH: @item.PrescriptionDetails.LeftSph<br />
-                                                                CYL: @item.PrescriptionDetails.LeftCyl<br />
-                                                                AXIS: @item.PrescriptionDetails.LeftAxis°
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div style="padding: 1rem; background: white; border-radius: 8px; border-left: 3px solid #9c27b0;">
-                                                                <strong style="color: #9c27b0;">Right Eye (OD):</strong><br />
-                                                                SPH: @item.PrescriptionDetails.RightSph<br />
-                                                                CYL: @item.PrescriptionDetails.RightCyl<br />
-                                                                AXIS: @item.PrescriptionDetails.RightAxis°
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    @if (!item.IsPrescriptionVerified)
-                                                    {
-                                                        <div style="margin-top: 1rem;">
-                                                            <form method="post" asp-page-handler="VerifyPrescription" style="display: inline;">
-                                                                <input type="hidden" name="orderItemId" value="@item.OrderItemId" />
-                                                                <button type="submit" class="btn btn-success">
-                                                                    <span style="margin-right: 0.5rem;">✓</span> Verify Prescription
-                                                                </button>
-                                                            </form>
-                                                            <button type="button" class="btn btn-warning ms-2" onclick="contactCustomerAboutPrescription(@item.OrderItemId)">
-                                                                <span style="margin-right: 0.5rem;">📧</span> Request Correction
-                                                            </button>
-                                                        </div>
-                                                    }
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                            </tbody>
-                            <tfoot style="background: var(--light-gray);">
-                                <tr>
-                                    <td colspan="4" style="padding: 1.25rem; text-align: right; font-weight: 700; font-size: 1.1rem;">
-                                        TOTAL:
-                                    </td>
-                                    <td colspan="2" style="padding: 1.25rem; text-align: right; font-weight: 700; font-size: 1.5rem; color: var(--primary-gold);">
-                                        @Model.Order.TotalAmount.ToString("N0") VND
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Support Actions Card -->
-            <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
-                <div style="background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
-                            padding: 1.5rem;
-                            border-radius: 12px 12px 0 0;">
-                    <h5 style="color: white; margin: 0; font-weight: 600;">
-                        🛠️ Support Actions
-                    </h5>
-                </div>
-                <div class="card-body" style="padding: 2rem;">
-                    <form method="post" asp-page-handler="UpdateStatus">
-                        <input type="hidden" name="orderId" value="@Model.OrderId" />
-
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
-                                    Change Order Status
-                                </label>
-                                <select name="newStatus" class="form-select form-select-lg" style="border: 2px solid var(--medium-gray); border-radius: 8px;">
-                                    @foreach (var status in Model.AllStatuses)
-                                    {
-                                        <option value="@status" selected="@(status == Model.Order.Status)">@status</option>
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-md-6 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100" style="padding: 0.75rem; font-weight: 600;">
-                                    <span style="margin-right: 0.5rem;">🔄</span> Update Status
-                                </button>
-                            </div>
-                        </div>
-
-                        <hr style="margin: 2rem 0;">
-
-                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                            @if (Model.Order.Status == "Pending Confirmation")
-                            {
-                                <button type="button" class="btn btn-success" onclick="confirmOrder()" style="flex: 1; padding: 0.75rem;">
-                                    <span style="margin-right: 0.5rem;">✓</span> Confirm Order
-                                </button>
-                            }
-                            <button type="button" class="btn btn-info" onclick="contactCustomer()" style="flex: 1; padding: 0.75rem;">
-                                <span style="margin-right: 0.5rem;">📧</span> Contact Customer
-                            </button>
-                            <button type="button" class="btn btn-secondary" onclick="escalateToManager()" style="flex: 1; padding: 0.75rem;">
-                                <span style="margin-right: 0.5rem;">⬆️</span> Escalate to Manager
-                            </button>
-                            @if (Model.Order.Status != "Cancelled")
-                            {
-                                <button type="button" class="btn btn-danger" onclick="cancelOrder()" style="flex: 1; padding: 0.75rem;">
-                                    <span style="margin-right: 0.5rem;">❌</span> Cancel Order
-                                </button>
-                            }
-                        </div>
-                    </form>
-                </div>
+    <!-- Header -->
+    <div class="pg-hdr">
+        <div>
+            <h1>💼 Process Order #@Model.OrderId</h1>
+            <div class="hdr-meta">
+                @if (Model.IsHighPriority)
+                {
+                    <span class="priority-pill"><i class="bi bi-exclamation-triangle-fill"></i> HIGH PRIORITY</span>
+                }
+                <span class="date-pill">Created: @Model.Order.CreatedAt.ToString("MMM dd, yyyy 'at' HH:mm")</span>
             </div>
         </div>
+        @{
+            var statusColor = Model.Order.Status switch
+            {
+                "Pending Confirmation" => ("#fef9ec", "#92400e", "#fcd34d"),
+                "Confirmed" => ("#eff6ff", "#1d4ed8", "#93c5fd"),
+                "Processing" => ("#eef2ff", "#4338ca", "#a5b4fc"),
+                "Shipped" => ("#f0fdf4", "#065f46", "#6ee7b7"),
+                "Delivered" => ("#f0fdf4", "#065f46", "#6ee7b7"),
+                "Completed" => ("#f0fdf4", "#14532d", "#86efac"),
+                "Cancelled" => ("#fef2f2", "#991b1b", "#fca5a5"),
+                _ => ("#f8fafc", "#374151", "#e2e8f0")
+            };
+        }
+        <span class="status-pill"
+              style="background:@statusColor.Item1;color:@statusColor.Item2;border:1.5px solid @statusColor.Item3">
+            @Model.Order.Status
+        </span>
+    </div>
 
-        <!-- Right Column -->
-        <div class="col-lg-4">
-            <!-- Customer Info Card -->
-            <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
-                <div style="background: linear-gradient(135deg, var(--secondary-teal) 0%, #4a7c7e 100%);
-                            padding: 1.5rem;
-                            border-radius: 12px 12px 0 0;">
-                    <h5 style="color: white; margin: 0; font-weight: 600;">
-                        👤 Customer Information
-                    </h5>
-                </div>
-                <div class="card-body" style="padding: 1.5rem;">
-                    <div class="mb-3">
-                        <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.85rem;">Full Name</label>
-                        <div style="font-size: 1.1rem; color: var(--dark-gray);">@Model.CustomerName</div>
+    <!-- ══ SERVICE LOCK BANNER ══ -->
+    @if (Model.HasServiceItem)
+    {
+        string bannerCls = serviceDone ? "done" : serviceCancelled ? "cancelled" : "locked";
+        <div class="svc-lock-banner @bannerCls">
+            <div class="svc-lock-icon">
+                @(serviceDone ? "✅" : serviceCancelled ? "❌" : "🔒")
+            </div>
+            <div class="svc-lock-body">
+                @if (serviceDone)
+                {
+                    <p class="svc-lock-title">Service Completed — Order can be fulfilled</p>
+                    <p class="svc-lock-desc">
+                        The service job for <strong>@Model.FrameName</strong>
+                        (@(string.IsNullOrEmpty(Model.ServiceName) ? "eyewear service" : Model.ServiceName))
+                        has been marked <strong>Done</strong>. You may now update to Shipped / Delivered / Completed.
+                    </p>
+                }
+                else if (serviceCancelled)
+                {
+                    <p class="svc-lock-title">Service Cancelled</p>
+                    <p class="svc-lock-desc">The service job was cancelled. Contact the customer or escalate if needed.</p>
+                }
+                else
+                {
+                    <p class="svc-lock-title">Waiting for Service Completion</p>
+                    <p class="svc-lock-desc">
+                        This order contains a <strong>custom eyewear service</strong>
+                        (@(string.IsNullOrEmpty(Model.ServiceName) ? "fitting/customization" : Model.ServiceName)
+                        @(string.IsNullOrEmpty(Model.FrameName) ? "" : $"for \"{Model.FrameName}\"")).
+                        Updating to <strong>Shipped, Delivered</strong> or <strong>Completed</strong>
+                        is locked until the technician marks the job <strong>Done</strong>.
+                    </p>
+                    <div class="svc-progress">
+                        @{
+                            string[] svcSteps = { "Pending", "Processing", "Ready", "Done" };
+                            int curIdx = Array.IndexOf(svcSteps, Model.ServiceStatus);
+                        }
+                        @for (int i = 0; i < svcSteps.Length; i++)
+                        {
+                            string cls = i < curIdx ? "done-s" : i == curIdx ? "active-s" : "idle-s";
+                            string check = i < curIdx ? "✓ " : "";
+                            <span class="svc-step @cls">@check@svcSteps[i]</span>
+                            if (i < svcSteps.Length - 1)
+                            {
+
+                                <span style="color:var(--muted);font-size:10px">›</span>
+                            }
+                        }
                     </div>
-                    <div class="mb-3">
-                        <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.85rem;">Email</label>
-                        <div>
-                            <a href="mailto:@Model.CustomerEmail" style="color: var(--secondary-teal); text-decoration: none;">
-                                📧 @Model.CustomerEmail
-                            </a>
-                        </div>
-                    </div>
-                    @if (!string.IsNullOrWhiteSpace(Model.CustomerPhone))
-                    {
-                        <div class="mb-3">
-                            <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.85rem;">Phone</label>
-                            <div>
-                                <a href="tel:@Model.CustomerPhone" style="color: var(--secondary-teal); text-decoration: none;">
-                                    📱 @Model.CustomerPhone
+                }
+            </div>
+            @if (serviceDone)
+            {
+                <div class="svc-done-badge"><i class="bi bi-check-circle-fill"></i> Ready to Ship</div>
+            }
+            else if (!serviceCancelled)
+            {
+                <div class="svc-lock-badge"><i class="bi bi-lock-fill"></i> Partially Locked</div>
+            }
+        </div>
+    }
+
+    <div class="det-grid">
+        <!-- ══ LEFT ══ -->
+        <div>
+            <!-- Customer & Shipping -->
+            <div class="dc">
+                <div class="dc-hdr teal"><i class="bi bi-person-fill"></i><h3>Customer & Shipping</h3></div>
+                <div class="dc-body">
+                    <div class="info-g">
+                        <div class="ii">
+                            <div class="ii-l">Customer</div>
+                            <div class="ii-v">@Model.CustomerName</div>
+                            <div class="ii-s">
+                                <a href="mailto:@Model.CustomerEmail" style="color:var(--teal);text-decoration:none">
+                                    📧 @Model.CustomerEmail
                                 </a>
                             </div>
                         </div>
-                    }
-                    <div>
-                        <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.85rem;">Customer Since</label>
-                        <div style="color: var(--dark-gray);">@Model.CustomerSince.ToString("MMMM yyyy")</div>
+                        <div class="ii">
+                            <div class="ii-l">Phone</div>
+                            <div class="ii-v">
+                                @if (!string.IsNullOrWhiteSpace(Model.CustomerPhone))
+                                {
+                                    <a href="tel:@Model.CustomerPhone" style="color:var(--teal);text-decoration:none">📱 @Model.CustomerPhone</a>
+                                }
+                                else
+                                {
+
+                                    <span style="color:var(--muted)">—</span>
+                                }
+                            </div>
+                            <div class="ii-s">Customer since @Model.CustomerSince.ToString("MMMM yyyy")</div>
+                        </div>
+                        <div class="ii">
+                            <div class="ii-l">Payment</div>
+                            <div class="ii-v">
+                                @if (Model.Order.PaymentMethod == "COD")
+                                {
+                                    <span>💵 Cash on Delivery</span>
+                                }
+                                else
+                                {
+
+                                    <span>💳 @Model.Order.PaymentMethod</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="ii">
+                            <div class="ii-l">Order Type</div>
+                            <div class="ii-v">
+                                @if (Model.HasPrescriptionItems)
+                                {
+                                    <span class="badge-pill badge-rx">👓 Prescription</span>
+                                }
+                                else if (Model.IsPreOrder)
+                                {
+
+                                    <span class="badge-pill badge-preorder">🕐 Pre-Order</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge-pill badge-ok">✓ Ready Stock</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="ii" style="grid-column:1/-1">
+                            <div class="ii-l">Shipping Address</div>
+                            <div class="ii-v">@Model.ShippingAddress</div>
+                        </div>
                     </div>
                 </div>
-                <div class="card-footer" style="background: var(--light-gray); padding: 1rem; border-radius: 0 0 12px 12px;">
-                    <a asp-page="/Support/Customers/OrderHistory" asp-route-userId="@Model.Order.UserId" class="btn btn-outline-primary w-100">
-                        <span style="margin-right: 0.5rem;">🕐</span> View Order History
+            </div>
+
+            <!-- Order Items -->
+            <div class="dc">
+                <div class="dc-hdr navy">
+                    <i class="bi bi-cart3"></i>
+                    <h3>Order Items</h3>
+                    <span style="background:rgba(255,255,255,.15);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:rgba(255,255,255,.9)">
+                        @Model.OrderItems.Count items
+                    </span>
+                </div>
+                <div class="dc-body" style="padding:0">
+                    <table class="item-tbl">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>SKU</th>
+                                <th style="text-align:center">Qty</th>
+                                <th style="text-align:right">Unit Price</th>
+                                <th style="text-align:right">Subtotal</th>
+                                <th style="text-align:center">Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OrderItems)
+                            {
+                                bool isSvc = !string.IsNullOrEmpty(item.SnapshotJson) &&
+                                (item.SnapshotJson.Contains("\"isServiceOrder\":true") ||
+                                item.SnapshotJson.Contains("\"lensProductId\":"));
+
+                                // Parse per-item service status
+                                string itemSvcStatus = Model.ServiceStatus;
+
+                                <tr class="@(isSvc ? "svc-row" : "")">
+                                    <td>
+                                        <div style="font-weight:700;color:var(--txt);font-size:13px">@item.ProductName</div>
+                                        @if (item.PrescriptionId != null)
+                                        {
+                                            <span class="badge-pill badge-rx" style="margin-top:3px">👓 Rx</span>
+                                        }
+                                        @if (isSvc)
+                                        {
+                                            <div class="svc-indicator">
+                                                🔩 Service Order
+                                                <span style="background:@SvcBg(itemSvcStatus);color:@SvcFg(itemSvcStatus);border-radius:4px;padding:1px 6px;font-size:9px">
+                                                    @SvcIcon(itemSvcStatus) @itemSvcStatus
+                                                </span>
+                                            </div>
+                                        }
+                                        @if (item.HasReturn)
+                                        {
+                                            <span class="badge-pill badge-return" style="margin-top:3px">🔄 Return</span>
+                                        }
+                                    </td>
+                                    <td style="font-family:monospace;font-size:12px">@item.Sku</td>
+                                    <td style="text-align:center">
+                                        <span style="background:var(--bg2);border-radius:6px;padding:2px 8px;font-weight:700;font-size:12px">×@item.Quantity</span>
+                                    </td>
+                                    <td style="text-align:right;font-size:13px">@item.UnitPrice.ToString("N0") ₫</td>
+                                    <td style="text-align:right;font-weight:700;color:var(--gold)">@((item.UnitPrice * item.Quantity).ToString("N0")) ₫</td>
+                                    <td style="text-align:center">
+                                        @if ((item.ProductInventory ?? 0) < item.Quantity && !isSvc)
+                                        {
+                                            <span class="badge-pill badge-out">⚠️ Low</span>
+                                        }
+                                        else if (!isSvc)
+                                        {
+                                            <span class="badge-pill badge-ok">✓ OK</span>
+                                        }
+                                        else
+                                        {
+                                            <span style="color:var(--muted);font-size:11px">—</span>
+                                        }
+                                    </td>
+                                </tr>
+
+                                <!-- Prescription Details Row -->
+                                @if (item.PrescriptionDetails != null)
+                                {
+                                    <tr class="rx-section">
+                                        <td colspan="6" style="padding:0 12px 14px">
+                                            <div class="rx-inner">
+                                                <div class="rx-title">
+                                                    👓 Prescription
+                                                    @if (!item.IsPrescriptionVerified)
+                                                    {
+                                                        <span style="background:#ff9800;color:#fff;padding:2px 8px;border-radius:5px;font-size:10px">Needs Verification</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span style="background:var(--ok);color:#fff;padding:2px 8px;border-radius:5px;font-size:10px">✓ Verified</span>
+                                                    }
+                                                </div>
+                                                <div class="rx-grid">
+                                                    <div class="rx-eye">
+                                                        <div class="rx-eye-title">Left Eye (OS)</div>
+                                                        <div class="rx-row"><span>SPH</span><span>@item.PrescriptionDetails.LeftSph</span></div>
+                                                        <div class="rx-row"><span>CYL</span><span>@item.PrescriptionDetails.LeftCyl</span></div>
+                                                        <div class="rx-row"><span>AXIS</span><span>@item.PrescriptionDetails.LeftAxis°</span></div>
+                                                    </div>
+                                                    <div class="rx-eye">
+                                                        <div class="rx-eye-title">Right Eye (OD)</div>
+                                                        <div class="rx-row"><span>SPH</span><span>@item.PrescriptionDetails.RightSph</span></div>
+                                                        <div class="rx-row"><span>CYL</span><span>@item.PrescriptionDetails.RightCyl</span></div>
+                                                        <div class="rx-row"><span>AXIS</span><span>@item.PrescriptionDetails.RightAxis°</span></div>
+                                                    </div>
+                                                </div>
+                                                @if (!item.IsPrescriptionVerified)
+                                                {
+                                                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                                                        <form method="post" asp-page-handler="VerifyPrescription" style="display:inline">
+                                                            <input type="hidden" name="orderItemId" value="@item.OrderItemId" />
+                                                            <button type="submit" class="act-btn" style="background:linear-gradient(135deg,#15803d,#16a34a);color:#fff;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;border:none;cursor:pointer">
+                                                                ✓ Verify Prescription
+                                                            </button>
+                                                        </form>
+                                                        <button type="button" class="act-btn contact"
+                                                                onclick="contactCustomerAboutPrescription(@item.OrderItemId)"
+                                                                style="padding:8px 16px;border-radius:8px;font-size:12px">
+                                                            📧 Request Correction
+                                                        </button>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr style="border-top:2px solid var(--bdr2)">
+                                <td colspan="4" style="text-align:right;font-weight:700;font-size:13px;padding:12px;color:var(--txt2)">Total</td>
+                                <td colspan="2" style="text-align:right;font-weight:900;font-size:17px;color:var(--gold);padding:12px">
+                                    @Model.Order.TotalAmount.ToString("N0") ₫
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ RIGHT ══ -->
+        <div>
+            <div class="dc" style="position:sticky;top:80px">
+                <div class="dc-hdr orange"><i class="bi bi-tools"></i><h3>Support Actions</h3></div>
+                <div class="dc-body">
+
+                    <!-- Status Update Form -->
+                    <form method="post" asp-page-handler="UpdateStatus" id="statusForm">
+                        <input type="hidden" name="orderId" value="@Model.OrderId" />
+
+                        <span class="form-lbl">📊 Update Status</span>
+
+                        @if (Model.HasServiceItem && !serviceDone && !serviceCancelled)
+                        {
+                            <select name="newStatus" class="fi" id="statusSelect"
+                                    onchange="checkStatusLock(this)" style="margin-bottom:8px">
+                                @foreach (var s in Model.AllStatuses)
+                                {
+                                    <option value="@s" selected="@(s == Model.Order.Status)"
+                                            data-locked="@(blockedStatuses.Contains(s) ? "true" : "false")">
+                                        @(blockedStatuses.Contains(s) ? "🔒 " : "")@s
+                                    </option>
+                                }
+                            </select>
+                            <div class="lock-hint" id="lockHint" style="display:none">
+                                <i class="bi bi-lock-fill" style="flex-shrink:0;margin-top:1px"></i>
+                                <span>This status requires the service job to be <strong>Done</strong> first.</span>
+                            </div>
+                            <button type="submit" class="btn-primary-submit" id="submitBtn" style="margin-top:12px">
+                                <i class="bi bi-arrow-repeat"></i> Update Status
+                            </button>
+                        }
+                        else
+                        {
+                            <select name="newStatus" class="fi" style="margin-bottom:12px">
+                                @foreach (var s in Model.AllStatuses)
+                                {
+                                    <option value="@s" selected="@(s == Model.Order.Status)">@s</option>
+                                }
+                            </select>
+                            <button type="submit" class="btn-primary-submit">
+                                <i class="bi bi-arrow-repeat"></i> Update Status
+                            </button>
+                        }
+                    </form>
+
+                    <div style="height:1px;background:var(--bdr);margin:16px 0"></div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-grid">
+                        @if (Model.Order.Status == "Pending Confirmation")
+                        {
+                            <button type="button" class="act-btn confirm" onclick="confirmOrder()">
+                                <i class="bi bi-check-circle-fill"></i> Confirm Order
+                            </button>
+                        }
+
+                        @if (Model.HasServiceItem)
+                        {
+                            <a asp-page="/Staff/ServiceOrders/Detail" asp-route-orderId="@Model.OrderId"
+                               class="act-btn svc-btn">
+                                <i class="bi bi-tools"></i> View Service Job #@Model.OrderId
+                                <i class="bi bi-arrow-right" style="margin-left:auto"></i>
+                            </a>
+                        }
+
+                        <button type="button" class="act-btn contact" onclick="contactCustomer()">
+                            <i class="bi bi-envelope-fill"></i> Contact Customer
+                        </button>
+                        <button type="button" class="act-btn escalate" onclick="escalateToManager()">
+                            <i class="bi bi-arrow-up-circle-fill"></i> Escalate
+                        </button>
+
+                        @if (Model.Order.Status != "Cancelled")
+                        {
+                            <button type="button" class="act-btn cancel" onclick="cancelOrder()" style="grid-column:1/-1">
+                                <i class="bi bi-x-circle-fill"></i> Cancel Order
+                            </button>
+                        }
+                    </div>
+
+                    <!-- Order History Link -->
+                    <a asp-page="/Support/Customers/OrderHistory" asp-route-userId="@Model.Order.UserId"
+                       style="display:flex;align-items:center;gap:7px;padding:10px 14px;background:var(--bg);border:1.5px solid var(--bdr2);border-radius:10px;color:var(--txt2);text-decoration:none;font-size:12px;font-weight:700;margin-top:10px;transition:all .2s"
+                       onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='var(--bg)'">
+                        <i class="bi bi-clock-history"></i> View Customer Order History
+                        <i class="bi bi-arrow-right" style="margin-left:auto"></i>
                     </a>
                 </div>
             </div>
 
-            <!-- Shipping Address Card -->
-            <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
-                <div style="background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
-                            padding: 1.5rem;
-                            border-radius: 12px 12px 0 0;">
-                    <h5 style="color: white; margin: 0; font-weight: 600;">
-                        📍 Shipping Address
-                    </h5>
-                </div>
-                <div class="card-body" style="padding: 1.5rem;">
-                    <p style="margin: 0; line-height: 1.6; color: var(--dark-gray);">@Model.ShippingAddress</p>
-                </div>
-            </div>
-
-            <!-- Order Summary Card -->
-            <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
-                <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
-                            padding: 1.5rem;
-                            border-radius: 12px 12px 0 0;">
-                    <h5 style="color: white; margin: 0; font-weight: 600;">
-                        📄 Order Summary
-                    </h5>
-                </div>
-                <div class="card-body" style="padding: 1.5rem;">
-                    <div class="mb-3">
-                        <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.85rem;">Status</label>
-                        <div>
-                            @{
-                                var statusColor = Model.Order.Status switch
-                                {
-                                    "Pending Confirmation" => "#ff9800",
-                                    "Confirmed" => "#4caf50",
-                                    "Processing" => "#2196f3",
-                                    "Shipped" => "#607d8b",
-                                    "Delivered" => "#4caf50",
-                                    "Completed" => "#4caf50",
-                                    "Cancelled" => "#f44336",
-                                    _ => "#9e9e9e"
-                                };
-                            }
-                            <span style="background: @statusColor;
-                                         color: white;
-                                         padding: 0.5rem 1rem;
-                                         border-radius: 8px;
-                                         font-size: 1rem;
-                                         font-weight: 600;
-                                         display: inline-block;">
-                                @Model.Order.Status
-                            </span>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.85rem;">Payment Method</label>
-                        <div style="color: var(--dark-gray);">
-                            @if (Model.Order.PaymentMethod == "COD")
-                            {
-                                <span>💵 Cash on Delivery</span>
-                            }
-                            else
-                            {
-                                <span>💳 @Model.Order.PaymentMethod</span>
-                            }
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label style="font-weight: 600; color: var(--primary-navy); font-size: 0.85rem;">Order Type</label>
-                        <div>
-                            @if (Model.HasPrescriptionItems)
-                            {
-                                <span style="background: #9c27b0; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
-                                    👓 Prescription Order
-                                </span>
-                            }
-                            else if (Model.IsPreOrder)
-                            {
-                                <span style="background: #607d8b; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
-                                    🕐 Pre-Order
-                                </span>
-                            }
-                            else
-                            {
-                                <span style="background: #4caf50; color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
-                                    ✓ Ready Stock
-                                </span>
-                            }
-                        </div>
-                    </div>
-                    <hr>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <strong style="color: var(--primary-navy);">Total Amount:</strong>
-                        <span style="font-size: 1.5rem; font-weight: 700; color: var(--primary-gold);">
-                            @Model.Order.TotalAmount.ToString("N0") VND
-                        </span>
-                    </div>
-                </div>
-            </div>
+            <a asp-page="./Index" class="back-l">
+                <i class="bi bi-arrow-left"></i> Back to Support Queue
+            </a>
         </div>
     </div>
 </div>
 
 <!-- Hidden Forms -->
-<form id="confirmForm" method="post" asp-page-handler="Confirm" style="display:none;">
+<form id="confirmForm" method="post" asp-page-handler="Confirm" style="display:none">
+    @Html.AntiForgeryToken()
     <input type="hidden" name="orderId" value="@Model.OrderId" />
 </form>
-
-<form id="escalateForm" method="post" asp-page-handler="Escalate" style="display:none;">
+<form id="escalateForm" method="post" asp-page-handler="Escalate" style="display:none">
+    @Html.AntiForgeryToken()
     <input type="hidden" name="orderId" value="@Model.OrderId" />
 </form>
 
 @section Scripts {
     <script>
-        function confirmOrder() {
-            if (confirm('✓ Confirm this order?\n\nThis will notify the customer and send to Operations team.')) {
-                document.getElementById('confirmForm').submit();
+        var BLOCKED      = @Json.Serialize(new[] { "Shipped", "Delivered", "Completed" });
+        var SERVICE_DONE = @Json.Serialize(serviceDone);
+        var HAS_SERVICE  = @Json.Serialize(Model.HasServiceItem);
+
+        function checkStatusLock(sel) {
+            if (!HAS_SERVICE || SERVICE_DONE) return;
+            var isLocked = BLOCKED.indexOf(sel.value) !== -1;
+            var hint = document.getElementById('lockHint');
+            var btn  = document.getElementById('submitBtn');
+            if (hint) hint.style.display = isLocked ? 'flex' : 'none';
+            if (btn) {
+                btn.disabled = isLocked;
+                btn.innerHTML = isLocked
+                    ? '<i class="bi bi-lock-fill"></i> Locked — Service Not Done'
+                    : '<i class="bi bi-arrow-repeat"></i> Update Status';
+            }
+            if (sel) {
+                sel.style.borderColor = isLocked ? '#dc2626' : '';
+                sel.style.background  = isLocked ? 'rgba(220,38,38,.04)' : '';
             }
         }
 
+        // Run on load
+        var sel = document.getElementById('statusSelect');
+        if (sel) checkStatusLock(sel);
+
+        function confirmOrder() {
+            if (confirm('✓ Confirm this order?\n\nThis will notify the customer and send to Operations team.'))
+                document.getElementById('confirmForm').submit();
+        }
         function contactCustomer() {
             window.location.href = 'mailto:@Model.CustomerEmail?subject=Regarding Order #@Model.OrderId';
         }
-
         function contactCustomerAboutPrescription(itemId) {
-            const subject = encodeURIComponent('Prescription Correction Needed - Order #@Model.OrderId');
-            const body = encodeURIComponent('Dear Customer,\n\nWe need clarification on your prescription values for Order #@Model.OrderId.\n\nPlease reply with the correct prescription.\n\nThank you!');
-            window.location.href = 'mailto:@Model.CustomerEmail?subject=' + subject + '&body=' + body;
+            var sub  = encodeURIComponent('Prescription Correction Needed — Order #@Model.OrderId');
+            var body = encodeURIComponent('Dear Customer,\n\nWe need clarification on your prescription values for Order #@Model.OrderId.\n\nPlease reply with the correct prescription.\n\nThank you!');
+            window.location.href = 'mailto:@Model.CustomerEmail?subject=' + sub + '&body=' + body;
         }
-
         function escalateToManager() {
-            if (confirm('⬆️ Escalate to Manager?\n\nThis order will be flagged for manager review.')) {
+            if (confirm('⬆️ Escalate to Manager?\n\nThis order will be flagged for manager review.'))
                 document.getElementById('escalateForm').submit();
-            }
         }
-
         function cancelOrder() {
             if (confirm('❌ Cancel Order #@Model.OrderId?\n\nThis action cannot be undone!')) {
-                // TODO: Implement cancel handler
-                alert('Cancel order feature - To be implemented');
+                alert('Cancel order feature — To be implemented');
             }
         }
+
+        // Auto-dismiss success alert
+        var alOk = document.querySelector('.al-ok');
+        if (alOk) setTimeout(() => alOk.style.opacity = '0', 4000);
     </script>
 }

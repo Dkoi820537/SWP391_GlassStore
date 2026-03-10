@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using System.Text.Json;
 
 namespace EyewearStore_SWP391.Pages.Sale.Orders
 {
@@ -44,8 +45,18 @@ namespace EyewearStore_SWP391.Pages.Sale.Orders
         public OrderDto Order { get; set; } = new();
 
         public List<ItemDto> Items { get; set; } = new();
-        public List<string> AllStatuses { get; } = new() { "Pending Confirmation", "Confirmed", "Processing", "Shipped", "Delivered", "Completed", "Cancelled" };
 
+        public List<string> AllStatuses { get; } = new()
+        {
+            "Pending Confirmation", "Confirmed", "Processing",
+            "Shipped", "Delivered", "Completed", "Cancelled"
+        };
+
+        // Statuses that are blocked while service job is not Done
+        private static readonly string[] LockedStatuses =
+            { "Shipped", "Delivered", "Completed" };
+
+        // ── GET ────────────────────────────────────────────────────
         public async Task<IActionResult> OnGetAsync(int id)
         {
             var o = await _context.Orders
@@ -53,6 +64,7 @@ namespace EyewearStore_SWP391.Pages.Sale.Orders
                     .ThenInclude(oi => oi.Product)
                 .Include(x => x.User)
                 .Include(x => x.Address)
+                .Include(x => x.Shipments)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.OrderId == id);
 
@@ -68,15 +80,15 @@ namespace EyewearStore_SWP391.Pages.Sale.Orders
                 Status = o.Status,
                 TotalAmount = o.TotalAmount,
                 PaymentMethod = o.PaymentMethod ?? "",
-                TrackingNumber = o.Shipments.FirstOrDefault()?.TrackingNumber ?? "",
+                TrackingNumber = o.Shipments?.FirstOrDefault()?.TrackingNumber ?? "",
                 CreatedAt = o.CreatedAt
             };
 
             Items = o.OrderItems.Select(oi => new ItemDto
             {
                 OrderItemId = oi.OrderItemId,
-                ProductName = oi.Product != null ? oi.Product.Name : "(Deleted product)",
-                Sku = oi.Product != null ? oi.Product.Sku : "",
+                ProductName = oi.Product?.Name ?? "(Deleted product)",
+                Sku = oi.Product?.Sku ?? "",
                 Quantity = oi.Quantity,
                 UnitPrice = oi.UnitPrice,
                 SnapshotJson = oi.SnapshotJson ?? ""
@@ -85,26 +97,62 @@ namespace EyewearStore_SWP391.Pages.Sale.Orders
             return Page();
         }
 
+        // ── POST: Change Status ────────────────────────────────────
         public async Task<IActionResult> OnPostChangeStatusAsync(int id, string newStatus)
         {
-            var o = await _context.Orders.FirstOrDefaultAsync(x => x.OrderId == id);
+            var o = await _context.Orders
+                .Include(x => x.OrderItems)
+                .FirstOrDefaultAsync(x => x.OrderId == id);
+
             if (o == null) return NotFound();
 
-            var valid = new[] { "Pending Confirmation", "Confirmed", "Processing", "Shipped", "Delivered", "Completed", "Cancelled" };
-            if (!valid.Contains(newStatus))
+            // Validate
+            if (!AllStatuses.Contains(newStatus))
             {
-                ModelState.AddModelError("", "Invalid status value");
-                return await OnGetAsync(id);
+                TempData["Error"] = "Invalid status value.";
+                return RedirectToPage(new { id });
             }
+
+            // ── SERVICE LOCK CHECK ─────────────────────────────────
+            // If trying to move to a "fulfillment" status, check that
+            // every service job in this order is Done (or Cancelled).
+            if (LockedStatuses.Contains(newStatus))
+            {
+                var serviceItems = o.OrderItems
+                    .Where(oi => !string.IsNullOrEmpty(oi.SnapshotJson) &&
+                                 (oi.SnapshotJson.Contains("\"isServiceOrder\":true") ||
+                                  oi.SnapshotJson.Contains("\"lensProductId\":")))
+                    .ToList();
+
+                foreach (var item in serviceItems)
+                {
+                    string svcStatus = "Pending";
+                    try
+                    {
+                        using var doc = JsonDocument.Parse(item.SnapshotJson!);
+                        if (doc.RootElement.TryGetProperty("serviceStatus", out var ss))
+                            svcStatus = ss.GetString() ?? "Pending";
+                    }
+                    catch { /* malformed JSON — treat as Pending */ }
+
+                    if (svcStatus != "Done" && svcStatus != "Cancelled")
+                    {
+                        TempData["Error"] =
+                            $"⚠️ Cannot set status to \"{newStatus}\" — " +
+                            $"the service job is currently \"{svcStatus}\". " +
+                            $"Please wait for the technician team to mark it as Done first.";
+                        return RedirectToPage(new { id });
+                    }
+                }
+            }
+            // ── END SERVICE LOCK ───────────────────────────────────
 
             o.Status = newStatus;
             _context.Orders.Update(o);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Order status updated.";
-            // TODO: send notification/email as BR requires (call mail service)
-
-            return RedirectToPage(new { id = id });
+            TempData["Success"] = $"✓ Order #{id} status updated to: {newStatus}";
+            return RedirectToPage(new { id });
         }
     }
 }

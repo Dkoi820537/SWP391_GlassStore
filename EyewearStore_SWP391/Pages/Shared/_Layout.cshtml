@@ -58,8 +58,6 @@
                 line-height: 1;
             }
 
-
-
         /* ── Shop dropdown ── */
         .shop-dropdown-menu {
             min-width: 250px;
@@ -99,9 +97,12 @@
             flex-shrink: 0;
         }
 
-            .shop-drop-icon.frames  { background: rgba(255,255,255,0.13); color: #fff; }
-            .shop-drop-icon.lenses  { background: rgba(255,255,255,0.13); color: #fff; }
-            .shop-drop-icon.rx      { background: rgba(255,255,255,0.13); color: #fff; }
+            .shop-drop-icon.frames,
+            .shop-drop-icon.lenses,
+            .shop-drop-icon.rx {
+                background: rgba(255,255,255,0.13);
+                color: #fff;
+            }
 
         .shop-drop-text {
             line-height: 1.2;
@@ -135,7 +136,52 @@
             transform: rotate(180deg);
         }
 
-        /* ── Dropdown wishlist item ── */
+        /* ── User dropdown ── */
+        .user-menu .dropdown-item {
+            border-radius: 8px;
+            margin: 2px 0;
+            padding: .7rem 1rem !important;
+            transition: background .15s;
+        }
+
+        /* ── My Service Orders item — special gradient ── */
+        .dropdown-item-service {
+            background: linear-gradient(135deg, rgba(124,58,237,.06) 0%, rgba(79,70,229,.06) 100%);
+            border: 1px solid rgba(124,58,237,.12);
+            border-radius: 10px !important;
+            margin: 4px 0 !important;
+        }
+
+            .dropdown-item-service:hover {
+                background: linear-gradient(135deg, rgba(124,58,237,.14) 0%, rgba(79,70,229,.14) 100%) !important;
+                border-color: rgba(124,58,237,.25);
+            }
+
+            .dropdown-item-service .svc-icon-wrap {
+                width: 28px;
+                height: 28px;
+                background: linear-gradient(135deg, #7c3aed, #4f46e5);
+                border-radius: 7px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 13px;
+                flex-shrink: 0;
+            }
+
+            .dropdown-item-service .svc-label {
+                font-weight: 700;
+                color: #5b21b6;
+            }
+
+            .dropdown-item-service .svc-sub {
+                font-size: 10px;
+                color: #8b5cf6;
+                display: block;
+                margin-top: 1px;
+            }
+
+        /* ── Wishlist item ── */
         .dropdown-item-wishlist {
             padding: 0.75rem 1rem;
             background: linear-gradient(135deg, rgba(201,169,110,0.06) 0%, rgba(232,208,176,0.06) 100%);
@@ -193,10 +239,7 @@
                                 <i class="bi bi-shop me-1"></i>Shop
                                 <i class="bi bi-chevron-down shop-chevron"></i>
                             </a>
-                            <ul class="dropdown-menu shop-dropdown-menu p-2"
-                                aria-labelledby="shopDropdown">
-
-                                <!-- Frames -->
+                            <ul class="dropdown-menu shop-dropdown-menu p-2" aria-labelledby="shopDropdown">
                                 <li>
                                     <a class="shop-drop-item" href="/Products?ProductTypeFilter=Frame">
                                         <div class="shop-drop-icon frames"><i class="bi bi-eyeglasses"></i></div>
@@ -206,10 +249,7 @@
                                         </div>
                                     </a>
                                 </li>
-
                                 <li><div class="shop-drop-divider"></div></li>
-
-                                <!-- Lenses -->
                                 <li>
                                     <a class="shop-drop-item" href="/Products?ProductTypeFilter=Lens">
                                         <div class="shop-drop-icon lenses"><i class="bi bi-circle"></i></div>
@@ -219,12 +259,9 @@
                                         </div>
                                     </a>
                                 </li>
-
                                 @if (User.Identity.IsAuthenticated)
                                 {
                                     <li><div class="shop-drop-divider"></div></li>
-
-                                    <!-- Prescription Profile -->
                                     <li>
                                         <a class="shop-drop-item" asp-page="/Customer/Prescriptions/Index">
                                             <div class="shop-drop-icon rx"><i class="bi bi-clipboard2-pulse"></i></div>
@@ -235,10 +272,8 @@
                                         </a>
                                     </li>
                                 }
-
                             </ul>
                         </li>
-                        <!-- ══ END SHOP DROPDOWN ══ -->
 
                         <!-- ══ SERVICES DROPDOWN ══ -->
                         <li class="nav-item dropdown">
@@ -248,10 +283,7 @@
                                 <i class="bi bi-gear me-1"></i>Services
                                 <i class="bi bi-chevron-down shop-chevron"></i>
                             </a>
-                            <ul class="dropdown-menu shop-dropdown-menu p-2"
-                                aria-labelledby="servicesDropdown">
-
-                                <!-- Custom Glasses -->
+                            <ul class="dropdown-menu shop-dropdown-menu p-2" aria-labelledby="servicesDropdown">
                                 <li>
                                     <a class="shop-drop-item" asp-page="/Customer/Services/CustomGlasses">
                                         <div class="shop-drop-icon frames"><i class="bi bi-eyeglasses"></i></div>
@@ -261,10 +293,7 @@
                                         </div>
                                     </a>
                                 </li>
-
                                 <li><div class="shop-drop-divider"></div></li>
-
-                                <!-- Frame Repair -->
                                 <li>
                                     <a class="shop-drop-item" asp-page="/Customer/Services/FrameRepair">
                                         <div class="shop-drop-icon lenses"><i class="bi bi-tools"></i></div>
@@ -274,10 +303,7 @@
                                         </div>
                                     </a>
                                 </li>
-
                                 <li><div class="shop-drop-divider"></div></li>
-
-                                <!-- Lens Replacement -->
                                 <li>
                                     <a class="shop-drop-item" asp-page="/Customer/Services/LensReplacement">
                                         <div class="shop-drop-icon rx"><i class="bi bi-arrow-repeat"></i></div>
@@ -287,10 +313,7 @@
                                         </div>
                                     </a>
                                 </li>
-
                                 <li><div class="shop-drop-divider"></div></li>
-
-                                <!-- Eye Exam -->
                                 <li>
                                     <a class="shop-drop-item" asp-page="/Customer/Services/EyeExam">
                                         <div class="shop-drop-icon frames"><i class="bi bi-eye"></i></div>
@@ -300,10 +323,8 @@
                                         </div>
                                     </a>
                                 </li>
-
                             </ul>
                         </li>
-                        <!-- ══ END SERVICES DROPDOWN ══ -->
 
                         <li class="nav-item">
                             <a class="nav-link" href="#footer">
@@ -363,7 +384,9 @@
                                     </span>
                                     <span class="user-name">@User.Identity.Name</span>
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end user-menu shadow" aria-labelledby="userDropdown" style="min-width:280px">
+                                <ul class="dropdown-menu dropdown-menu-end user-menu shadow" aria-labelledby="userDropdown" style="min-width:300px;padding:8px">
+
+                                    <!-- User info header -->
                                     <li class="px-3 py-2">
                                         <div class="d-flex align-items-center">
                                             <div class="avatar rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3"
@@ -379,8 +402,37 @@
                                         </div>
                                     </li>
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li><a class="dropdown-item d-flex align-items-center" asp-page="/Profile/Index" style="padding:.75rem 1rem"><i class="bi bi-person-lines-fill me-2 text-primary"></i><span>My Profile</span></a></li>
-                                    <li><a class="dropdown-item d-flex align-items-center" asp-page="/Customer/MyOrders" style="padding:.75rem 1rem"><i class="bi bi-box-seam me-2 text-success"></i><span>My Orders</span></a></li>
+
+                                    <!-- Profile -->
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" asp-page="/Profile/Index">
+                                            <i class="bi bi-person-lines-fill me-2 text-primary"></i>
+                                            <span>My Profile</span>
+                                        </a>
+                                    </li>
+
+                                    <!-- My Orders -->
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" asp-page="/Customer/MyOrders">
+                                            <i class="bi bi-box-seam me-2 text-success"></i>
+                                            <span>My Orders</span>
+                                        </a>
+                                    </li>
+
+                                    <!-- ── MY SERVICE ORDERS ── -->
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center dropdown-item-service"
+                                           asp-page="/Customer/ServiceTracking">
+                                            <span class="svc-icon-wrap me-2">🔩</span>
+                                            <span>
+                                                <span class="svc-label">My Service Orders</span>
+                                                <span class="svc-sub">Track eyewear fitting &amp; repairs</span>
+                                            </span>
+                                            <i class="bi bi-chevron-right ms-auto" style="font-size:10px;color:#8b5cf6;opacity:.7"></i>
+                                        </a>
+                                    </li>
+
+                                    <!-- Wishlist -->
                                     <li>
                                         <a class="dropdown-item d-flex align-items-center dropdown-item-wishlist" asp-page="/Customer/Wishlist">
                                             <i class="bi bi-heart-fill me-2" style="color:#c9a96e"></i>
@@ -388,20 +440,26 @@
                                             <span class="wl-badge" id="dropdownWlCount"></span>
                                         </a>
                                     </li>
+
+                                    <!-- Prescriptions -->
                                     <li>
                                         <a class="dropdown-item d-flex align-items-center" asp-page="/Customer/Prescriptions/Index"
-                                           style="padding:.75rem 1rem;background:linear-gradient(135deg,rgba(156,39,176,0.05),rgba(186,104,200,0.05))">
+                                           style="background:linear-gradient(135deg,rgba(156,39,176,0.05),rgba(186,104,200,0.05));border-radius:8px">
                                             <i class="bi bi-eyeglasses me-2" style="color:#9c27b0"></i>
                                             <span style="font-weight:600;color:#9c27b0">My Prescriptions</span>
                                             <span class="badge ms-auto" style="background:linear-gradient(135deg,#9c27b0,#ba68c8)">New</span>
                                         </a>
                                     </li>
+
                                     <li><hr class="dropdown-divider" /></li>
+
+                                    <!-- Logout -->
                                     <li>
                                         <form method="post" asp-page="/Account/Logout" class="m-0">
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-link dropdown-item text-danger p-0 d-flex align-items-center"
-                                                    style="width:100%;text-decoration:none;padding:.75rem 1rem!important">
+                                            <button type="submit"
+                                                    class="btn btn-link dropdown-item text-danger p-0 d-flex align-items-center"
+                                                    style="width:100%;text-decoration:none;padding:.7rem 1rem!important;border-radius:8px">
                                                 <i class="bi bi-box-arrow-right me-2"></i><span>Logout</span>
                                             </button>
                                         </form>

@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Text.Json;
 
 namespace EyewearStore_SWP391.Pages.Support.Orders
 {
-    [Authorize(Roles = "support,sales,admin,Administrator")]
+    [Authorize(Roles = "support,sales,sale,admin,Administrator")]
     public class DetailsModel : PageModel
     {
         private readonly EyewearStoreContext _context;
@@ -36,6 +37,12 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
         public bool IsPreOrder { get; set; }
         public bool IsHighPriority { get; set; }
 
+        // Service info for UI banner
+        public bool HasServiceItem { get; set; }
+        public string ServiceStatus { get; set; } = "Pending";
+        public string ServiceName { get; set; } = "";
+        public string FrameName { get; set; } = "";
+
         public List<string> AllStatuses { get; } = new()
         {
             "Pending Confirmation",
@@ -46,6 +53,9 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             "Completed",
             "Cancelled"
         };
+
+        private static readonly string[] LockedStatuses =
+            { "Shipped", "Delivered", "Completed" };
 
         public class OrderItemDto
         {
@@ -59,6 +69,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             public bool IsPrescriptionVerified { get; set; }
             public int? ProductInventory { get; set; }
             public bool HasReturn { get; set; }
+            public string SnapshotJson { get; set; } = "";
         }
 
         public class PrescriptionDto
@@ -71,6 +82,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             public int? RightAxis { get; set; }
         }
 
+        // ── GET ──────────────────────────────────────────────────────
         public async Task<IActionResult> OnGetAsync(int id)
         {
             OrderId = id;
@@ -116,21 +128,41 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
                 } : null,
                 IsPrescriptionVerified = oi.Prescription?.IsActive ?? false,
                 ProductInventory = oi.Product?.InventoryQty,
-                HasReturn = oi.Returns.Any()
+                HasReturn = oi.Returns.Any(),
+                SnapshotJson = oi.SnapshotJson ?? ""
             }).ToList();
 
             HasPrescriptionItems = OrderItems.Any(oi => oi.PrescriptionId != null);
             IsPreOrder = OrderItems.Any(oi => (oi.ProductInventory ?? 0) < oi.Quantity);
             IsHighPriority = HasPrescriptionItems ||
-                            order.CreatedAt < DateTime.UtcNow.AddDays(-2) ||
-                            OrderItems.Any(oi => oi.HasReturn);
+                                   order.CreatedAt < DateTime.UtcNow.AddDays(-2) ||
+                                   OrderItems.Any(oi => oi.HasReturn);
+
+            // Parse service info for banner
+            var svcItem = OrderItems.FirstOrDefault(oi =>
+                !string.IsNullOrEmpty(oi.SnapshotJson) &&
+                (oi.SnapshotJson.Contains("\"isServiceOrder\":true") ||
+                 oi.SnapshotJson.Contains("\"lensProductId\":")));
+
+            if (svcItem != null)
+            {
+                HasServiceItem = true;
+                try
+                {
+                    using var doc = JsonDocument.Parse(svcItem.SnapshotJson);
+                    var root = doc.RootElement;
+                    if (root.TryGetProperty("serviceStatus", out var ss)) ServiceStatus = ss.GetString() ?? "Pending";
+                    if (root.TryGetProperty("serviceName", out var sn)) ServiceName = sn.GetString() ?? "";
+                    if (root.TryGetProperty("frameName", out var fn)) FrameName = fn.GetString() ?? "";
+                    else if (root.TryGetProperty("productName", out var pn)) FrameName = pn.GetString() ?? "";
+                }
+                catch { /* malformed JSON */ }
+            }
 
             return Page();
         }
 
-        /// <summary>
-        /// Update order status
-        /// </summary>
+        // ── POST: Update Status (with SERVICE LOCK) ───────────────────
         public async Task<IActionResult> OnPostUpdateStatusAsync(int orderId, string newStatus)
         {
             var order = await _context.Orders
@@ -163,11 +195,43 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
                 }
             }
 
+            // ── SERVICE LOCK CHECK ─────────────────────────────────────
+            if (LockedStatuses.Contains(newStatus))
+            {
+                var serviceItems = order.OrderItems
+                    .Where(oi => !string.IsNullOrEmpty(oi.SnapshotJson) &&
+                                 (oi.SnapshotJson.Contains("\"isServiceOrder\":true") ||
+                                  oi.SnapshotJson.Contains("\"lensProductId\":")))
+                    .ToList();
+
+                foreach (var item in serviceItems)
+                {
+                    string svcStatus = "Pending";
+                    try
+                    {
+                        using var doc = JsonDocument.Parse(item.SnapshotJson!);
+                        if (doc.RootElement.TryGetProperty("serviceStatus", out var ss))
+                            svcStatus = ss.GetString() ?? "Pending";
+                    }
+                    catch { }
+
+                    if (svcStatus != "Done" && svcStatus != "Cancelled")
+                    {
+                        TempData["Error"] =
+                            $"⚠️ Cannot set status to \"{newStatus}\" — " +
+                            $"the service job is currently \"{svcStatus}\". " +
+                            $"Please wait for the technician team to mark it Done first.";
+                        return RedirectToPage(new { id = orderId });
+                    }
+                }
+            }
+            // ── END SERVICE LOCK ───────────────────────────────────────
+
             var oldStatus = order.Status;
             order.Status = newStatus;
             _context.Orders.Update(order);
 
-            // Handle inventory restoration for cancelled orders
+            // Restore inventory on cancel
             if (newStatus == "Cancelled" && oldStatus != "Cancelled")
             {
                 var orderItems = await _context.OrderItems
@@ -187,16 +251,11 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
 
             await _context.SaveChangesAsync();
 
-            // TODO: Send notification email
-            // await SendStatusUpdateEmail(order, oldStatus, newStatus);
-
-            TempData["Success"] = $"Order status updated to: {newStatus}";
+            TempData["Success"] = $"✓ Order #{orderId} status updated to: {newStatus}";
             return RedirectToPage(new { id = orderId });
         }
 
-        /// <summary>
-        /// Verify prescription values
-        /// </summary>
+        // ── POST: Verify Prescription ─────────────────────────────────
         public async Task<IActionResult> OnPostVerifyPrescriptionAsync(int orderItemId)
         {
             var orderItem = await _context.OrderItems
@@ -213,7 +272,6 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             var p = orderItem.Prescription;
             var errors = new List<string>();
 
-            // BR-S003: Validate prescription ranges
             if (p.LeftSph < -20 || p.LeftSph > 20) errors.Add("Left SPH out of range (-20 to +20)");
             if (p.RightSph < -20 || p.RightSph > 20) errors.Add("Right SPH out of range (-20 to +20)");
             if (p.LeftCyl < -6 || p.LeftCyl > 6) errors.Add("Left CYL out of range (-6 to +6)");
@@ -227,7 +285,6 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
                 return RedirectToPage(new { id = orderItem.OrderId });
             }
 
-            // Mark as verified
             p.IsActive = true;
             _context.PrescriptionProfiles.Update(p);
             await _context.SaveChangesAsync();
@@ -236,9 +293,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             return RedirectToPage(new { id = orderItem.OrderId });
         }
 
-        /// <summary>
-        /// Quick confirm order
-        /// </summary>
+        // ── POST: Quick Confirm ───────────────────────────────────────
         public async Task<IActionResult> OnPostConfirmAsync(int orderId)
         {
             var order = await _context.Orders
@@ -247,7 +302,6 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
 
             if (order == null) return NotFound();
 
-            // Check if all prescriptions are verified
             if (order.OrderItems.Any(oi => oi.PrescriptionId != null))
             {
                 var unverified = order.OrderItems
@@ -265,16 +319,11 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
 
-            // TODO: Send confirmation email
-            // await _emailService.SendOrderConfirmedEmail(order);
-
             TempData["Success"] = "✓ Order confirmed and sent to Operations team!";
             return RedirectToPage(new { id = orderId });
         }
 
-        /// <summary>
-        /// Escalate to Manager - Creates a new Order entry or uses separate Escalation table
-        /// </summary>
+        // ── POST: Escalate ────────────────────────────────────────────
         public async Task<IActionResult> OnPostEscalateAsync(int orderId)
         {
             var order = await _context.Orders
@@ -287,11 +336,6 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
                 return RedirectToPage("./Index");
             }
 
-            // TODO: Create escalation record in a separate table
-            // Or send notification to manager
-            // await _notificationService.EscalateToManager(order, User.Identity.Name);
-
-            // For now, just show success message
             TempData["Success"] = $"⬆️ Order #{orderId} escalated to Manager for review!";
             return RedirectToPage(new { id = orderId });
         }

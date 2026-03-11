@@ -453,10 +453,14 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif}
                                             }
                                             else
                                             {
-                                                <option value="@s"
-                                                        @@(blockedUntilDone.Contains(s) ? "data-locked=\"true\"" : "")>
-                                                    @(blockedUntilDone.Contains(s) ? "🔒 " : "")@s
-                                                </option>
+                                            @if (blockedUntilDone.Contains(s))
+                                            {
+                                                <option value="@s" data-locked="true">🔒 @s</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@s">@s</option>
+                                            }
                                             }
                                         }
                                     </select>

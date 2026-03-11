@@ -160,7 +160,14 @@ body{background:var(--bg)}
                 <option value="">All</option>
                 @foreach (var s in new[] { "Pending", "Processing", "Ready", "Done", "Cancelled" })
                 {
-                    <option value="@s" @@(Model.StatusFilter == s ? "selected" : "")>@s</option>
+                    @if (Model.StatusFilter == s)
+                    {
+                        <option value="@s" selected>@s</option>
+                    }
+                    else
+                    {
+                        <option value="@s">@s</option>
+                    }
                 }
             </select>
         </div>

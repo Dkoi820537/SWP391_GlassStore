@@ -56,6 +56,17 @@ namespace EyewearStore_SWP391.Pages.Frames
         public EditFrameViewModel Input { get; set; } = new();
 
         /// <summary>
+        /// Lens types selected as compatible with this frame (form-bound)
+        /// </summary>
+        [BindProperty]
+        public List<string> SelectedLensTypes { get; set; } = new();
+
+        /// <summary>
+        /// All available lens type categories (for the checkbox list)
+        /// </summary>
+        public string[] AllLensTypes => Models.LensTypes.All;
+
+        /// <summary>
         /// List of existing images for this product
         /// </summary>
         public List<ProductImage> ExistingImages { get; set; } = new();
@@ -83,6 +94,12 @@ namespace EyewearStore_SWP391.Pages.Frames
                 .Where(pi => pi.ProductId == id && pi.IsActive)
                 .OrderByDescending(pi => pi.IsPrimary)
                 .ThenBy(pi => pi.SortOrder)
+                .ToListAsync();
+
+            // Load current compatible lens types
+            SelectedLensTypes = await _context.FrameCompatibleLensTypes
+                .Where(c => c.FrameProductId == id)
+                .Select(c => c.LensType)
                 .ToListAsync();
 
             Input = new EditFrameViewModel
@@ -200,6 +217,21 @@ namespace EyewearStore_SWP391.Pages.Frames
                 {
                     await SaveProductImageAsync(frame.ProductId, Input.ImageFile, Input.ImageAltText);
                 }
+
+                // ── Save compatible lens types ───────────────────────────────
+                var existing = await _context.FrameCompatibleLensTypes
+                    .Where(c => c.FrameProductId == frame.ProductId)
+                    .ToListAsync();
+
+                var toRemove = existing.Where(e => !SelectedLensTypes.Contains(e.LensType)).ToList();
+                var toAdd = SelectedLensTypes
+                    .Where(lt => !existing.Any(e => e.LensType == lt))
+                    .Select(lt => new FrameCompatibleLensType { FrameProductId = frame.ProductId, LensType = lt })
+                    .ToList();
+
+                if (toRemove.Any()) _context.FrameCompatibleLensTypes.RemoveRange(toRemove);
+                if (toAdd.Any()) _context.FrameCompatibleLensTypes.AddRange(toAdd);
+                if (toRemove.Any() || toAdd.Any()) await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {

@@ -220,8 +220,11 @@ namespace EyewearStore_SWP391.Services
             => await _context.Orders
                 .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
                     .ThenInclude(p => p.ProductImages)
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Returns)
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Prescription)
                 .Include(o => o.Address)
                 .Include(o => o.User)
+                .Include(o => o.Shipments)
                 .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
         public async Task<Order?> GetOrderByStripeSessionIdAsync(string sessionId)
@@ -233,6 +236,8 @@ namespace EyewearStore_SWP391.Services
             => await _context.Orders
                 .Where(o => o.UserId == userId)
                 .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Returns)
+                .Include(o => o.Shipments)
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
 

@@ -14,6 +14,12 @@ namespace EyewearStore_SWP391.Pages.Customer.Services
         public List<Lens> Lenses { get; set; } = new();
         public List<Service> Services { get; set; } = new();
 
+        /// <summary>
+        /// Maps each frameId to its list of compatible lens type strings.
+        /// Empty list / missing key = open compatibility (show all lenses).
+        /// </summary>
+        public Dictionary<int, List<string>> CompatibilityMap { get; set; } = new();
+
         public async Task<IActionResult> OnGetAsync()
         {
             Frames = await _context.Set<Frame>()
@@ -32,6 +38,14 @@ namespace EyewearStore_SWP391.Pages.Customer.Services
                 .Where(s => s.IsActive)
                 .OrderBy(s => s.Name)
                 .ToListAsync();
+
+            // Load frame → compatible lens types mapping
+            var frameIds = Frames.Select(f => f.ProductId).ToList();
+            CompatibilityMap = (await _context.FrameCompatibleLensTypes
+                .Where(c => frameIds.Contains(c.FrameProductId))
+                .ToListAsync())
+                .GroupBy(c => c.FrameProductId)
+                .ToDictionary(g => g.Key, g => g.Select(c => c.LensType).ToList());
 
             return Page();
         }

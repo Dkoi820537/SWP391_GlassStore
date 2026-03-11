@@ -38,4 +38,74 @@ public class DetailModel : PageModel
 
         return Page();
     }
+
+    // ── Helper: parse SnapshotJson for service orders ────────────────────────
+
+    public static (bool isServiceOrder, string? lensName, decimal? lensPrice,
+                    string? serviceName, decimal? servicePrice, decimal? framePrice)
+        ParseSnapshot(string? snapshotJson)
+    {
+        if (string.IsNullOrEmpty(snapshotJson))
+            return (false, null, null, null, null, null);
+
+        try
+        {
+            var doc = System.Text.Json.JsonDocument.Parse(snapshotJson);
+            var root = doc.RootElement;
+
+            if (!root.TryGetProperty("isServiceOrder", out var isSvcEl)
+                || isSvcEl.ValueKind != System.Text.Json.JsonValueKind.True)
+                return (false, null, null, null, null, null);
+
+            string? lensName = root.TryGetProperty("lensProductName", out var ln) ? ln.GetString() : null;
+            decimal? lensPrice = root.TryGetProperty("lensPrice", out var lp) && lp.TryGetDecimal(out var lpv) ? lpv : null;
+            string? serviceName = root.TryGetProperty("serviceName", out var sn) ? sn.GetString() : null;
+            decimal? svcPrice = root.TryGetProperty("servicePrice", out var sp) && sp.TryGetDecimal(out var spv) ? spv : null;
+            decimal? framePrice = root.TryGetProperty("framePrice", out var fp) && fp.TryGetDecimal(out var fpv) ? fpv : null;
+
+            return (true, lensName, lensPrice, serviceName, svcPrice, framePrice);
+        }
+        catch { return (false, null, null, null, null, null); }
+    }
+
+    // ── Helper methods ───────────────────────────────────────────────────
+
+    public string GetStatusBadgeClass(string status) => status switch
+    {
+        "Pending" => "bg-warning text-dark",
+        "Confirmed" => "bg-info text-dark",
+        "Processing" => "bg-primary text-white",
+        "Shipped" => "bg-secondary text-white",
+        "Delivered" => "bg-success text-white",
+        "Completed" => "bg-success text-white",
+        "Cancelled" => "bg-danger text-white",
+        "Pending Confirmation" => "bg-warning text-dark",
+        _ => "bg-secondary text-white"
+    };
+
+    public string GetStatusIcon(string status) => status switch
+    {
+        "Pending" => "bi-hourglass-split",
+        "Pending Confirmation" => "bi-hourglass-split",
+        "Confirmed" => "bi-check-circle",
+        "Processing" => "bi-gear",
+        "Shipped" => "bi-truck",
+        "Delivered" => "bi-box-seam",
+        "Completed" => "bi-check-all",
+        "Cancelled" => "bi-x-circle",
+        _ => "bi-question-circle"
+    };
+
+    public int GetStatusProgress(string status) => status switch
+    {
+        "Pending" => 10,
+        "Pending Confirmation" => 14,
+        "Confirmed" => 28,
+        "Processing" => 42,
+        "Shipped" => 71,
+        "Delivered" => 85,
+        "Completed" => 100,
+        "Cancelled" => 0,
+        _ => 0
+    };
 }

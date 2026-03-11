@@ -26,6 +26,9 @@ public partial class EyewearStoreContext : DbContext
     public virtual DbSet<Bundle> Bundles { get; set; }
     public virtual DbSet<BundleItem> BundleItems { get; set; }
 
+    // Frame–lens-type compatibility
+    public virtual DbSet<FrameCompatibleLensType> FrameCompatibleLensTypes { get; set; }
+
     // Services
     public virtual DbSet<Service> Services { get; set; }
 
@@ -245,6 +248,26 @@ public partial class EyewearStoreContext : DbContext
             entity.Property(e => e.PrescriptionFee)
                 .HasColumnType("decimal(18,2)")
                 .HasColumnName("prescription_fee");
+        });
+
+        // =========================
+        // FRAME–LENS-TYPE COMPATIBILITY
+        // =========================
+        modelBuilder.Entity<FrameCompatibleLensType>(entity =>
+        {
+            entity.ToTable("frame_compatible_lens_types");
+            entity.HasKey(e => new { e.FrameProductId, e.LensType });
+
+            entity.Property(e => e.FrameProductId).HasColumnName("frame_product_id");
+            entity.Property(e => e.LensType)
+                .HasMaxLength(50)
+                .HasColumnName("lens_type");
+
+            entity.HasOne(e => e.Frame)
+                .WithMany(f => f.CompatibleLensTypes)
+                .HasForeignKey(e => e.FrameProductId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_frame_compat_lens_types_frame");
         });
 
         // =========================

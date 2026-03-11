@@ -68,7 +68,7 @@ namespace EyewearStore_SWP391.Pages.Customer
             if (Order == null)
             {
                 TempData["ErrorMessage"] = "Order not found!";
-                return RedirectToPage("/Customer/MyOrders");
+                return RedirectToPage("/Orders/Index");
             }
 
             // Check eligibility: must be Completed and within 7 days
@@ -128,20 +128,20 @@ namespace EyewearStore_SWP391.Pages.Customer
             if (order == null)
             {
                 TempData["ErrorMessage"] = "Order not found!";
-                return RedirectToPage("/Customer/MyOrders");
+                return RedirectToPage("/Orders/Index");
             }
 
             // Validate order status and 7-day window
             if (order.Status != "Completed")
             {
                 TempData["ErrorMessage"] = "Refund can only be requested for completed orders.";
-                return RedirectToPage("/Customer/MyOrders");
+                return RedirectToPage("/Orders/Index");
             }
 
             if ((DateTime.UtcNow - order.CreatedAt).TotalDays > 7)
             {
                 TempData["ErrorMessage"] = "The 7-day refund window has expired for this order.";
-                return RedirectToPage("/Customer/MyOrders");
+                return RedirectToPage("/Orders/Index");
             }
 
             // Validate the specific order item
@@ -217,7 +217,7 @@ namespace EyewearStore_SWP391.Pages.Customer
                 }
 
                 TempData["SuccessMessage"] = "Refund request submitted successfully! Our team will review it within 24–48 hours.";
-                return RedirectToPage("/Customer/MyOrders");
+                return RedirectToPage("/Orders/Index");
             }
             catch (Exception ex)
             {

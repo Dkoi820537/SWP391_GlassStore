@@ -13,22 +13,36 @@
         </ol>
     </nav>
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert" style="border-radius: 8px; border-left: 4px solid #4CAF50;">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert" style="border-radius: 8px; border-left: 4px solid #f44336;">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     @if (Model.Order == null)
     {
         <div class="alert alert-danger">Order not found.</div>
     }
     else
     {
-        var statusColor = Model.Order.Status switch
-        {
-            "Paid" => "#10b981",
-            "Pending" => "#f59e0b",
-            "Processing" => "#3b82f6",
-            "Shipped" => "#8b5cf6",
-            "Completed" => "#059669",
-            "Cancelled" => "#ef4444",
-            _ => "#6b7280"
-        };
+        var canReturn = (Model.Order.Status == "Delivered" || Model.Order.Status == "Completed")
+            && (DateTime.UtcNow - Model.Order.CreatedAt).TotalDays <= 30;
+        var daysLeft = 30 - (int)(DateTime.UtcNow - Model.Order.CreatedAt).TotalDays;
+
+        var canRefund = Model.Order.Status == "Completed"
+            && (DateTime.UtcNow - Model.Order.CreatedAt).TotalDays <= 7;
+        
+        var hasPrescription = Model.Order.OrderItems.Any(oi => oi.PrescriptionId.HasValue);
 
         <div class="row g-4">
             <!-- Left: Order Info -->
@@ -45,15 +59,62 @@
                                     Placed on @Model.Order.CreatedAt.ToString("MMMM dd, yyyy 'at' HH:mm")
                                 </small>
                             </div>
-                            <span class="badge" style="background: @statusColor; color: white; padding: 0.5rem 1rem; font-size: 1rem; border-radius: 8px;">
-                                @Model.Order.Status
-                            </span>
+                            <div class="text-md-end">
+                                <span class="badge @(Model.GetStatusBadgeClass(Model.Order.Status))" style="padding: 0.5rem 1rem; font-size: 1rem; border-radius: 8px;">
+                                    <i class="@(Model.GetStatusIcon(Model.Order.Status)) me-1"></i>
+                                    @Model.Order.Status
+                                </span>
+                                @if (canReturn && daysLeft > 0)
+                                {
+                                    <div class="mt-2">
+                                        <small style="color: rgba(255,255,255,0.8); font-size: 0.85rem;">
+                                            <i class="bi bi-clock-history me-1"></i>
+                                            @daysLeft days left to return
+                                        </small>
+                                    </div>
+                                }
+                            </div>
                         </div>
+                    </div>
+                    <div style="padding: 1.5rem; background: var(--white);">
+                        <!-- Progress Bar -->
+                        @if (Model.Order.Status != "Cancelled")
+                        {
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <small style="font-weight: 600; color: var(--primary-navy);">Order Progress</small>
+                                    <small style="font-weight: 600; color: var(--primary-gold);">
+                                        @(Model.GetStatusProgress(Model.Order.Status))%
+                                    </small>
+                                </div>
+                                <div class="progress" style="height: 10px; border-radius: 10px; background: var(--light-gray);">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                         style="width: @(Model.GetStatusProgress(Model.Order.Status))%; background: linear-gradient(90deg, var(--primary-gold) 0%, var(--primary-gold-light) 100%); border-radius: 10px;">
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Prescription alert -->
+                        @if (hasPrescription)
+                        {
+                            <div class="alert" style="background: linear-gradient(135deg, rgba(156,39,176,0.08) 0%, rgba(186,104,200,0.05) 100%); border: none; border-left: 4px solid #9c27b0; border-radius: 10px; padding: 1rem 1.25rem;">
+                                <div class="d-flex align-items-center">
+                                    <div style="font-size: 2rem; margin-right: 1rem; color: #9c27b0;">👓</div>
+                                    <div>
+                                        <strong style="color: #9c27b0; font-size: 1.05rem;">Prescription Order</strong>
+                                        <p class="mb-0" style="color: #7b1fa2; font-size: 0.9rem; margin-top: 0.25rem;">
+                                            This order includes custom prescription lenses.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
 
                 <!-- Order Items -->
-                <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden;">
+                <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden;">
                     <div style="padding: 1.25rem 1.5rem; background: var(--light-gray); border-bottom: 1px solid var(--medium-gray);">
                         <h5 style="color: var(--primary-navy); margin: 0; font-weight: 600;">
                             <i class="bi bi-box-seam me-1"></i> Items (@Model.Order.OrderItems.Count)
@@ -61,29 +122,75 @@
                     </div>
                     @foreach (var oi in Model.Order.OrderItems)
                     {
+                        var (isServiceOrder, lensName, lensPrice, serviceName, servicePrice, framePrice) = DetailModel.ParseSnapshot(oi.SnapshotJson);
+                        var latestReturn = oi.Returns?.OrderByDescending(r => r.CreatedAt).FirstOrDefault();
+
                         <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--medium-gray);">
                             <div class="row align-items-center g-3">
                                 <div class="col-auto">
                                     <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--light-gray), var(--secondary-cream)); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--medium-gray);">
                                         <span style="font-size: 1.25rem;">
-                                            @(oi.Product?.ProductType switch { "frame" => "F", "lens" => "L", _ => "P" })
+                                            @(isServiceOrder ? "⚙" : (oi.Product?.ProductType switch { "frame" => "F", "lens" => "L", _ => "P" }))
                                         </span>
                                     </div>
                                 </div>
                                 <div class="col">
                                     <h6 style="color: var(--primary-navy); margin-bottom: 0.25rem; font-weight: 600;">
+                                        @if (isServiceOrder)
+                                        {
+                                            <span style="font-size: 12px; background: #f0f0ff; color: #5b5bdb; border-radius: 6px; padding: 2px 8px; font-weight: 600; margin-right: 6px;">
+                                                🔧 Gia công
+                                            </span>
+                                        }
                                         @(oi.Product?.Name ?? "Product")
+                                        @if (isServiceOrder && lensName != null) { <text> + @lensName</text> }
+                                        @if (isServiceOrder && serviceName != null) { <text> + @serviceName</text> }
                                     </h6>
-                                    @if (oi.Product != null)
+                                    
+                                    @if (isServiceOrder)
                                     {
-                                        <span class="badge" style="background: var(--primary-gold); color: white; padding: 0.2rem 0.5rem; font-size: 0.7rem; border-radius: 4px;">
-                                            @oi.Product.ProductType
+                                        <div style="background: #f8f9fc; border-radius: 8px; padding: 6px 10px; font-size: 0.8rem; line-height: 1.8; color: var(--secondary-warm-gray); margin: 6px 0;">
+                                            <div>🕶 Frame: <strong style="color: var(--primary-navy);">@framePrice?.ToString("N0") VND</strong></div>
+                                            <div>⭕ Lens (@lensName): <strong style="color: var(--primary-navy);">@lensPrice?.ToString("N0") VND</strong></div>
+                                            <div>⚙️ Dịch vụ (@serviceName): <strong style="color: var(--primary-navy);">@servicePrice?.ToString("N0") VND</strong></div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div style="font-size: 0.85rem; color: var(--secondary-warm-gray); margin-bottom: 0.25rem;">
+                                            <span class="badge me-1" style="background: var(--primary-gold); color: white;">@oi.Product?.ProductType</span>
+                                            <code style="background: var(--light-gray); padding: 2px 6px; border-radius: 4px; color: var(--dark-gray);">SKU: @(oi.Product?.Sku ?? "N/A")</code>
+                                        </div>
+                                    }
+
+                                    @if (oi.PrescriptionId.HasValue && oi.Prescription != null)
+                                    {
+                                        <span class="badge bg-secondary mt-1" style="font-size: 0.75rem;">
+                                            👓 Rx: @oi.Prescription.ProfileName
                                         </span>
+                                    }
+
+                                    @if (latestReturn != null)
+                                    {
+                                        <div class="mt-2">
+                                            @if (latestReturn.Status == "Pending")
+                                            {
+                                                <span class="badge" style="background: linear-gradient(135deg, #ff9800, #ffb74d); color: white; font-size: 0.75rem;"><i class="bi bi-hourglass-split me-1"></i>Refund Pending</span>
+                                            }
+                                            else if (latestReturn.Status == "Approved")
+                                            {
+                                                <span class="badge" style="background: linear-gradient(135deg, #4caf50, #66bb6a); color: white; font-size: 0.75rem;"><i class="bi bi-check-circle me-1"></i>Refund Approved</span>
+                                            }
+                                            else if (latestReturn.Status == "Rejected")
+                                            {
+                                                <span class="badge" style="background: linear-gradient(135deg, #f44336, #ef5350); color: white; font-size: 0.75rem;"><i class="bi bi-x-circle me-1"></i>Refund Rejected</span>
+                                            }
+                                        </div>
                                     }
                                 </div>
                                 <div class="col-auto text-end">
                                     <div style="font-size: 0.85rem; color: var(--secondary-warm-gray);">
-                                        @oi.UnitPrice.ToString("N0") VND × @oi.Quantity
+                                        @oi.UnitPrice.ToString("N0") VND <span style="font-weight: 600; color: var(--primary-navy);">× @oi.Quantity</span>
                                     </div>
                                     <div style="font-weight: 700; color: var(--primary-navy); font-size: 1.1rem;">
                                         @((oi.UnitPrice * oi.Quantity).ToString("N0")) VND
@@ -92,6 +199,50 @@
                             </div>
                         </div>
                     }
+                </div>
+
+                <!-- Action Bar -->
+                <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); padding: 1.5rem;">
+                    <div class="d-flex flex-wrap gap-2 justify-content-end align-items-center">
+                        @if (canReturn && daysLeft <= 7)
+                        {
+                            <div class="text-warning me-auto" style="font-size: 0.9rem; font-weight: 600;">
+                                <i class="bi bi-exclamation-triangle me-1"></i> Hurry! Only @daysLeft days left to return.
+                            </div>
+                        }
+                        else if ((DateTime.UtcNow - Model.Order.CreatedAt).TotalDays > 30 && (Model.Order.Status == "Delivered" || Model.Order.Status == "Completed"))
+                        {
+                            <div class="text-secondary me-auto" style="font-size: 0.9rem;">
+                                <i class="bi bi-info-circle me-1"></i> 30-day return window expired.
+                            </div>
+                        }
+
+                        @if (canRefund)
+                        {
+                            <a asp-page="/Customer/RequestReturn"
+                               asp-route-orderId="@Model.Order.OrderId"
+                               class="btn"
+                               style="padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 600; background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%); color: white; box-shadow: 0 2px 6px rgba(33,150,243,0.3);">
+                                <i class="bi bi-arrow-return-left me-1"></i>Request Refund
+                            </a>
+                        }
+                        @if (canReturn)
+                        {
+                            <a asp-page="/Customer/RequestReturn"
+                               asp-route-orderId="@Model.Order.OrderId"
+                               class="btn"
+                               style="padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 600; background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%); color: white; box-shadow: 0 2px 6px rgba(255,152,0,0.3);">
+                                <i class="bi bi-arrow-repeat me-1"></i>Request Return
+                            </a>
+                        }
+
+                        @if (Model.Order.Status == "Pending")
+                        {
+                            <button class="btn btn-outline-danger" style="padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 600;">
+                                <i class="bi bi-x-circle me-1"></i>Cancel Order
+                            </button>
+                        }
+                    </div>
                 </div>
             </div>
 

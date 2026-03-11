@@ -1,4 +1,4 @@
-﻿@page "{orderId:int}"
+@page "{orderId:int}"
 @model EyewearStore_SWP391.Pages.Customer.RequestReturnModel
 @{
     ViewData["Title"] = "Request Refund";
@@ -9,7 +9,7 @@
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
-            <li class="breadcrumb-item"><a asp-page="/Customer/MyOrders">My Orders</a></li>
+            <li class="breadcrumb-item"><a asp-page="/Orders/Index">My Orders</a></li>
             <li class="breadcrumb-item active">Request Refund</li>
         </ol>
     </nav>
@@ -171,7 +171,7 @@
 
             <!-- Back Button -->
             <div class="mt-4">
-                <a asp-page="/Customer/MyOrders"
+                <a asp-page="/Orders/Index"
                    class="btn btn-outline-secondary btn-lg"
                    style="padding: 0.875rem 2rem; border-radius: 10px;">
                     <i class="bi bi-arrow-left me-2"></i>Back to My Orders

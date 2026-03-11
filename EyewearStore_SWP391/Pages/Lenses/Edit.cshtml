@@ -508,9 +508,13 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label asp-for="Input.LensType">Lens Type</label>
-                        <input asp-for="Input.LensType" 
-                               class="form-control" 
-                               placeholder="e.g., Single Vision, Bifocal, Progressive" />
+                        <select asp-for="Input.LensType" class="form-control">
+                            <option value="">— Select Lens Type —</option>
+                            @foreach (var lt in EyewearStore_SWP391.Models.LensTypes.All)
+                            {
+                                <option value="@lt">@lt</option>
+                            }
+                        </select>
                         <span asp-validation-for="Input.LensType" class="field-validation-error"></span>
                     </div>
 

@@ -90,6 +90,26 @@ public class FrameViewModel
     /// </summary>
     public decimal? TempleLength { get; set; }
 
+    // New additions
+
+    /// <summary>Brand / manufacturer (e.g. Ray-Ban, Bolon, Molsion)</summary>
+    public string? Brand { get; set; }
+
+    /// <summary>Frame colour(s), comma-separated (e.g. "Black, Gold, Red")</summary>
+    public string? Color { get; set; }
+
+    /// <summary>Target gender: Unisex | Male | Female</summary>
+    public string? Gender { get; set; }
+
+    /// <summary>Lens/frame shape: Round | Square | Rectangle | Aviator | Cat-eye | Oval</summary>
+    public string? FrameShape { get; set; }
+
+    /// <summary>Lens width in mm (e.g. 53)</summary>
+    public decimal? LensWidth { get; set; }
+
+    /// <summary>Country of origin (e.g. P.R.C, Japan, Italy)</summary>
+    public string? Origin { get; set; }
+
     /// <summary>
     /// Primary image URL for the product
     /// </summary>

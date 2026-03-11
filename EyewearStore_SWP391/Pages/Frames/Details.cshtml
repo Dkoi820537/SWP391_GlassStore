@@ -373,6 +373,27 @@
                         }
                     </dd>
 
+                    <dt>Brand</dt>
+                    <dd>
+                        @if (!string.IsNullOrEmpty(Model.Frame.Brand))
+                        {
+                            <strong>@Model.Frame.Brand</strong>
+                        }
+                        else
+                        {
+                            <span class="na-text">N/A</span>
+                        }
+                    </dd>
+
+                    <dt>Color</dt>
+                    <dd>@(!string.IsNullOrEmpty(Model.Frame.Color) ? Model.Frame.Color : Html.Raw("<span class='na-text'>N/A</span>"))</dd>
+
+                    <dt>Gender</dt>
+                    <dd>@(!string.IsNullOrEmpty(Model.Frame.Gender) ? Model.Frame.Gender : Html.Raw("<span class='na-text'>N/A</span>"))</dd>
+
+                    <dt>Origin</dt>
+                    <dd>@(!string.IsNullOrEmpty(Model.Frame.Origin) ? Model.Frame.Origin : Html.Raw("<span class='na-text'>N/A</span>"))</dd>
+
                     <dt>Price</dt>
                     <dd>
                         <span class="price-value">@Model.Frame.Price.ToString("N0")</span>
@@ -414,6 +435,18 @@
                         }
                     </dd>
 
+                    <dt>Frame Shape</dt>
+                    <dd>
+                        @if (!string.IsNullOrEmpty(Model.Frame.FrameShape))
+                        {
+                            <span class="type-badge" style="background: #e2e3e5; color: #383d41;">@Model.Frame.FrameShape</span>
+                        }
+                        else
+                        {
+                            <span class="na-text">N/A</span>
+                        }
+                    </dd>
+
                     <dt>Frame Type</dt>
                     <dd>
                         @if (!string.IsNullOrEmpty(Model.Frame.FrameType))
@@ -431,6 +464,19 @@
                         @if (Model.Frame.BridgeWidth.HasValue)
                         {
                             <span class="dimension-value">@Model.Frame.BridgeWidth.Value.ToString("0.##")</span>
+                            <span class="dimension-unit">mm</span>
+                        }
+                        else
+                        {
+                            <span class="na-text">N/A</span>
+                        }
+                    </dd>
+
+                    <dt>Lens Width</dt>
+                    <dd>
+                        @if (Model.Frame.LensWidth.HasValue)
+                        {
+                            <span class="dimension-value">@Model.Frame.LensWidth.Value.ToString("0.##")</span>
                             <span class="dimension-unit">mm</span>
                         }
                         else
@@ -467,6 +513,18 @@
                         else
                         {
                             <span class="status-badge status-inactive">Inactive</span>
+                        }
+                    </dd>
+
+                    <dt>Attributes</dt>
+                    <dd>
+                        @if (!string.IsNullOrEmpty(Model.Frame.Attributes))
+                        {
+                            <code>@Model.Frame.Attributes</code>
+                        }
+                        else
+                        {
+                            <span class="na-text">None</span>
                         }
                     </dd>
 

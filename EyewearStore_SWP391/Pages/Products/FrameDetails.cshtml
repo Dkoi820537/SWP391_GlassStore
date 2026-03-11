@@ -1,7 +1,7 @@
 @page "{id:int}"
 @model EyewearStore_SWP391.Pages.Products.FrameDetailsModel
 @{
-    ViewData["Title"] = Model.Frame?.Name ?? "Chi tiết sản phẩm";
+    ViewData["Title"] = Model.Frame?.Name ?? "Product Details";
     Layout = "_Layout";
 }
 
@@ -24,7 +24,6 @@
             font-family: 'Be Vietnam Pro', sans-serif;
         }
 
-        /* ── Breadcrumb ─────────────────────────────────────── */
         .bc {
             background: #fff;
             border-bottom: 1px solid var(--border);
@@ -62,7 +61,6 @@
                 font-weight: 600;
             }
 
-        /* ── Wrap ───────────────────────────────────────────── */
         .fd {
             max-width: 1280px;
             margin: 0 auto;
@@ -76,7 +74,6 @@
             align-items: start;
         }
 
-        /* ═══ LEFT ══════════════════════════════════════════════ */
         .gal {
             position: sticky;
             top: 78px;
@@ -107,7 +104,6 @@
             color: #ddd;
         }
 
-        /* Brand badge TOP-RIGHT */
         .brand-badge {
             position: absolute;
             top: 14px;
@@ -133,7 +129,6 @@
                 color: var(--teal);
             }
 
-        /* Thumbs */
         .thumbs {
             display: flex;
             gap: 10px;
@@ -162,7 +157,6 @@
                 object-fit: cover;
             }
 
-        /* Size diagram */
         .sz-strip {
             display: flex;
             gap: 10px;
@@ -196,12 +190,10 @@
             margin-top: 3px;
         }
 
-        /* ═══ RIGHT ═════════════════════════════════════════════ */
         .info {
             padding-top: 2px;
         }
 
-        /* Brand link */
         .brand-link {
             display: inline-block;
             font-size: 13px;
@@ -227,7 +219,6 @@
             line-height: 1.3;
         }
 
-        /* Status row */
         .status-row {
             display: flex;
             align-items: center;
@@ -246,7 +237,6 @@
             color: #ccc;
         }
 
-        /* Badges */
         .badges {
             display: flex;
             gap: 8px;
@@ -266,7 +256,6 @@
             color: var(--teal);
         }
 
-        /* Price */
         .price-row {
             display: flex;
             align-items: baseline;
@@ -302,7 +291,6 @@
                 color: var(--text);
             }
 
-        /* Stock */
         .stock-row {
             display: flex;
             align-items: center;
@@ -336,7 +324,6 @@
                 color: #c62828;
             }
 
-        /* ── Color picker ─────────────────────── */
         .section-lbl {
             font-size: 14px;
             font-weight: 700;
@@ -392,7 +379,6 @@
             box-shadow: 0 1px 4px rgba(0,0,0,.2);
         }
 
-        /* ── Size selector ─────────────────────── */
         .size-opts {
             display: flex;
             gap: 10px;
@@ -418,7 +404,6 @@
                 color: var(--teal);
             }
 
-        /* ── Quick specs ───────────────────────── */
         .specs {
             margin-bottom: 20px;
         }
@@ -446,7 +431,6 @@
             color: var(--sub);
         }
 
-        /* ── Promo ─────────────────────────────── */
         .promo {
             background: #fff9f0;
             border: 1px dashed #f59e0b;
@@ -477,7 +461,6 @@
                 color: var(--text);
             }
 
-        /* ── Qty ───────────────────────────────── */
         .qty-row {
             display: flex;
             align-items: center;
@@ -536,7 +519,6 @@
             font-family: inherit;
         }
 
-        /* ── CTA buttons ───────────────────────── */
         .cta-row {
             display: flex;
             gap: 12px;
@@ -596,7 +578,8 @@
                 transform: none;
             }
 
-        .btn-wish {
+        /* Notify/Wishlist button — only shown when out of stock */
+        .btn-notify {
             width: 100%;
             padding: 13px;
             margin-top: 10px;
@@ -612,15 +595,20 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: border-color .2s, color .2s;
+            transition: border-color .2s, color .2s, background .2s;
         }
 
-            .btn-wish:hover {
+            .btn-notify:hover {
                 border-color: var(--gold);
                 color: var(--gold);
             }
 
-        /* ── Alerts ────────────────────────────── */
+            .btn-notify.active {
+                border-color: var(--gold);
+                color: var(--gold);
+                background: #fffbf5;
+            }
+
         .alert {
             display: flex;
             align-items: center;
@@ -643,7 +631,6 @@
                 color: var(--red);
             }
 
-        /* ── Tabs ──────────────────────────────── */
         .tabs-wrap {
             max-width: 1280px;
             margin: 0 auto 64px;
@@ -740,7 +727,6 @@
                     color: var(--teal);
                 }
 
-        /* ── Related ───────────────────────────── */
         .related {
             max-width: 1280px;
             margin: 0 auto 64px;
@@ -826,7 +812,6 @@
                 margin: 0;
             }
 
-        /* ── Mobile sticky ─────────────────────── */
         .sticky-bar {
             display: none;
             position: fixed;
@@ -867,7 +852,6 @@
             font-family: inherit;
         }
 
-        /* ── Responsive ────────────────────────── */
         @@media(max-width:991px) {
             .fd-grid {
                 grid-template-columns: 1fr;
@@ -924,11 +908,11 @@
 <!-- Breadcrumb -->
 <div class="bc">
     <ol>
-        <li><a asp-page="/Index">Trang chủ</a></li>
+        <li><a asp-page="/Index">Home</a></li>
         <li><span class="sep"><i class="bi bi-chevron-right"></i></span></li>
         <li><a asp-page="/Products/Index">Shop</a></li>
         <li><span class="sep"><i class="bi bi-chevron-right"></i></span></li>
-        <li><a asp-page="/Products/Index" asp-route-productType="Frame">Gọng kính</a></li>
+        <li><a asp-page="/Products/Index" asp-route-productType="Frame">Eyeglass Frames</a></li>
         @if (!string.IsNullOrEmpty(Model.Frame?.Brand))
         {
             <li><span class="sep"><i class="bi bi-chevron-right"></i></span></li>
@@ -957,16 +941,15 @@
     <div class="fd">
         <div class="fd-grid">
 
-            <!-- ══════ LEFT — Gallery ══════ -->
+            <!-- LEFT: Gallery -->
             <div class="gal">
                 <div class="gal-main">
-                    @* Brand badge TOP-RIGHT *@
                     @if (!string.IsNullOrEmpty(Model.Frame.Brand))
                     {
                         <a class="brand-badge"
                            asp-page="/Products/Index"
                            asp-route-BrandFilter="@Model.Frame.Brand"
-                           title="Xem tất cả @Model.Frame.Brand">
+                           title="View all @Model.Frame.Brand">
                             @Model.Frame.Brand.ToUpper()
                         </a>
                     }
@@ -993,45 +976,45 @@
                     </div>
                 }
 
-                @* Size diagram — shows when at least one measurement exists *@
                 @if (Model.Frame.LensWidth.HasValue || Model.Frame.BridgeWidth.HasValue || Model.Frame.TempleLength.HasValue)
                 {
+                    var lensColor = Model.Frame.LensWidth.HasValue ? "#00756A" : "#ccc";
+                    var bridgeColor = Model.Frame.BridgeWidth.HasValue ? "#00756A" : "#ccc";
+                    var templeColor = Model.Frame.TempleLength.HasValue ? "#00756A" : "#ccc";
+
                     <div class="sz-strip">
-                        @* Lens Width *@
                         <div class="sz-card">
-                            <svg viewBox="0 0 70 46" fill="none">
-                                <rect x="4" y="8" width="26" height="28" rx="6" stroke="@(Model.Frame.LensWidth.HasValue ? "#00756A" : "#ccc")" stroke-width="2.5" />
-                                <rect x="40" y="8" width="26" height="28" rx="6" stroke="@(Model.Frame.LensWidth.HasValue ? "#00756A" : "#ccc")" stroke-width="2.5" />
+                            <svg viewBox="0 0 70 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="8" width="27" height="28" rx="6" stroke="@lensColor" stroke-width="2.5" />
+                                <rect x="40" y="8" width="27" height="28" rx="6" stroke="@lensColor" stroke-width="2.5" />
                                 <line x1="30" y1="22" x2="40" y2="22" stroke="#ccc" stroke-width="2" />
-                                <line x1="4" y1="42" x2="30" y2="42" stroke="#aaa" stroke-width="1.5" />
-                                <polygon points="3,42 7,40 7,44" fill="#aaa" />
-                                <polygon points="31,42 27,40 27,44" fill="#aaa" />
+                                <line x1="3" y1="42" x2="30" y2="42" stroke="#aaa" stroke-width="1.5" />
+                                <polygon points="2,42 6,40 6,44" fill="@lensColor" />
+                                <polygon points="31,42 27,40 27,44" fill="@lensColor" />
                             </svg>
                             <div class="sz-num">@(Model.Frame.LensWidth.HasValue? Model.Frame.LensWidth.Value.ToString("0") : "—")</div>
                             <div class="sz-lbl">Lens Width</div>
                         </div>
-                        @* Bridge *@
                         <div class="sz-card">
-                            <svg viewBox="0 0 70 46" fill="none">
-                                <rect x="4" y="8" width="26" height="28" rx="6" stroke="#ccc" stroke-width="2" />
-                                <rect x="40" y="8" width="26" height="28" rx="6" stroke="#ccc" stroke-width="2" />
-                                <line x1="30" y1="22" x2="40" y2="22" stroke="@(Model.Frame.BridgeWidth.HasValue ? "#00756A" : "#ccc")" stroke-width="2.5" />
+                            <svg viewBox="0 0 70 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="8" width="27" height="28" rx="6" stroke="#ccc" stroke-width="2" />
+                                <rect x="40" y="8" width="27" height="28" rx="6" stroke="#ccc" stroke-width="2" />
+                                <line x1="30" y1="22" x2="40" y2="22" stroke="@bridgeColor" stroke-width="2.5" />
                                 <line x1="30" y1="42" x2="40" y2="42" stroke="#aaa" stroke-width="1.5" />
-                                <polygon points="29,42 33,40 33,44" fill="#aaa" />
-                                <polygon points="41,42 37,40 37,44" fill="#aaa" />
+                                <polygon points="29,42 33,40 33,44" fill="@bridgeColor" />
+                                <polygon points="41,42 37,40 37,44" fill="@bridgeColor" />
                             </svg>
                             <div class="sz-num">@(Model.Frame.BridgeWidth.HasValue? Model.Frame.BridgeWidth.Value.ToString("0") : "—")</div>
                             <div class="sz-lbl">Bridge (mm)</div>
                         </div>
-                        @* Temple *@
                         <div class="sz-card">
-                            <svg viewBox="0 0 70 46" fill="none">
-                                <rect x="4" y="12" width="22" height="20" rx="4" stroke="#ccc" stroke-width="2" />
+                            <svg viewBox="0 0 70 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="12" width="22" height="20" rx="4" stroke="#ccc" stroke-width="2" />
                                 <rect x="30" y="12" width="22" height="20" rx="4" stroke="#ccc" stroke-width="2" />
-                                <line x1="52" y1="22" x2="68" y2="22" stroke="@(Model.Frame.TempleLength.HasValue ? "#00756A" : "#ccc")" stroke-width="2.5" />
+                                <line x1="52" y1="22" x2="68" y2="22" stroke="@templeColor" stroke-width="2.5" />
                                 <line x1="52" y1="42" x2="68" y2="42" stroke="#aaa" stroke-width="1.5" />
-                                <polygon points="51,42 55,40 55,44" fill="#aaa" />
-                                <polygon points="69,42 65,40 65,44" fill="#aaa" />
+                                <polygon points="51,42 55,40 55,44" fill="@templeColor" />
+                                <polygon points="69,42 65,40 65,44" fill="@templeColor" />
                             </svg>
                             <div class="sz-num">@(Model.Frame.TempleLength.HasValue? Model.Frame.TempleLength.Value.ToString("0") : "—")</div>
                             <div class="sz-lbl">Temple (mm)</div>
@@ -1040,10 +1023,9 @@
                 }
             </div>
 
-            <!-- ══════ RIGHT — Info ══════ -->
+            <!-- RIGHT: Info -->
             <div class="info">
 
-                @* Brand link *@
                 @if (!string.IsNullOrEmpty(Model.Frame.Brand))
                 {
                     <a class="brand-link"
@@ -1053,19 +1035,17 @@
 
                 <h1 class="prod-name">@Model.Frame.Name</h1>
 
-                @* Status / SKU / Origin row *@
                 <div class="status-row">
-                    <span>Tình trạng: <strong>@(Model.Frame.IsInStock ? "Còn hàng" : "Hết hàng")</strong></span>
+                    <span>Status: <strong>@(Model.Frame.IsInStock ? "In Stock" : "Out of Stock")</strong></span>
                     <span class="sep-dot">·</span>
                     <span>SKU: <strong>@Model.Frame.Sku</strong></span>
                     @if (!string.IsNullOrEmpty(Model.Frame.Origin))
                     {
                         <span class="sep-dot">·</span>
-                        <span>Xuất xứ: <strong>@Model.Frame.Origin</strong></span>
+                        <span>Origin: <strong>@Model.Frame.Origin</strong></span>
                     }
                 </div>
 
-                @* Meta badges *@
                 @if (!string.IsNullOrEmpty(Model.Frame.Gender) || !string.IsNullOrEmpty(Model.Frame.FrameShape) || !string.IsNullOrEmpty(Model.Frame.FrameType))
                 {
                     <div class="badges">
@@ -1084,20 +1064,25 @@
                     </div>
                 }
 
-                @* Price + sold count *@
                 <div class="price-row">
-                    <span class="price-lbl">Giá:</span>
+                    <span class="price-lbl">Price:</span>
                     <span class="price-cur">@Model.Frame.Currency</span>
                     <span class="price-val">@Model.Frame.Price.ToString("N0")</span>
                     @if (Model.Frame.SoldCount > 0)
                     {
-                        <span class="sold-txt"><strong>@Model.Frame.SoldCount</strong> đã bán</span>
+                        <span class="sold-txt"><strong>@Model.Frame.SoldCount</strong> sold</span>
                     }
                 </div>
 
-                @* Stock badge *@
                 @{
-                    var sc = Model.Frame.StockStatus == "OutOfStock" ? "out" : Model.Frame.StockStatus == "LowStock" ? "low" : "in";
+                    var sc = Model.Frame.StockStatus == "OutOfStock" ? "out"
+                    : Model.Frame.StockStatus == "LowStock" ? "low"
+                    : "in";
+                    var stockMsg = Model.Frame.StockStatus == "OutOfStock"
+                    ? "Out of Stock"
+                    : Model.Frame.StockStatus == "LowStock"
+                    ? "Low Stock (" + Model.Frame.InventoryQty + " left)"
+                    : "In Stock (" + Model.Frame.InventoryQty + " available)";
                 }
                 <div class="stock-row">
                     <div class="stock-badge @sc">
@@ -1107,23 +1092,22 @@
                         }
                         else if (sc == "low")
                         {
-
                             <i class="bi bi-exclamation-circle-fill"></i>
                         }
                         else
                         {
-
                             <i class="bi bi-x-circle-fill"></i>
                         }
-                        <span>@Model.Frame.StockMessage</span>
+                        <span>@stockMsg</span>
                     </div>
                 </div>
 
-                @* ── Color picker ── *@
                 @if (!string.IsNullOrEmpty(Model.Frame.Color))
                 {
-                    var cols = Model.Frame.Color.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
-                    <div class="section-lbl">Màu sắc <span class="cur" id="colorLbl">@cols[0]</span></div>
+                    var cols = Model.Frame.Color
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .ToList();
+                    <div class="section-lbl">Color <span class="cur" id="colorLbl">@cols[0]</span></div>
                     <div class="color-opts">
                         @foreach (var c in cols)
                         {
@@ -1136,146 +1120,167 @@
                     </div>
                 }
 
-                @* ── Size selector ── *@
                 @if (!string.IsNullOrEmpty(Model.Frame.SizeLabel))
                 {
-                    <div class="section-lbl">Kích thước</div>
+                    <div class="section-lbl">Size</div>
                     <div class="size-opts">
                         <button class="size-opt active">@Model.Frame.SizeLabel</button>
                     </div>
                 }
 
-                @* ── Quick specs ── *@
                 <div class="specs">
                     @if (!string.IsNullOrEmpty(Model.Frame.FrameMaterial))
                     {
-                        <div class="spec-row"><span class="spec-k">Chất liệu</span><span class="spec-v">@Model.Frame.FrameMaterial</span></div>
+                        <div class="spec-row"><span class="spec-k">Material</span><span class="spec-v">@Model.Frame.FrameMaterial</span></div>
                     }
                     @if (!string.IsNullOrEmpty(Model.Frame.FrameType))
                     {
-                        <div class="spec-row"><span class="spec-k">Kiểu gọng</span><span class="spec-v">@Model.Frame.FrameType</span></div>
+                        <div class="spec-row"><span class="spec-k">Frame Type</span><span class="spec-v">@Model.Frame.FrameType</span></div>
+                    }
+                    @if (Model.Frame.LensWidth.HasValue)
+                    {
+                        <div class="spec-row"><span class="spec-k">Lens Width</span><span class="spec-v">@Model.Frame.LensWidth.Value.ToString("0.#") mm</span></div>
                     }
                     @if (Model.Frame.BridgeWidth.HasValue)
                     {
-                        <div class="spec-row"><span class="spec-k">Bridge (mm)</span><span class="spec-v">@Model.Frame.BridgeWidth.Value.ToString("0.#")</span></div>
+                        <div class="spec-row"><span class="spec-k">Bridge</span><span class="spec-v">@Model.Frame.BridgeWidth.Value.ToString("0.#") mm</span></div>
                     }
                     @if (Model.Frame.TempleLength.HasValue)
                     {
-                        <div class="spec-row"><span class="spec-k">Temple (mm)</span><span class="spec-v">@Model.Frame.TempleLength.Value.ToString("0.#")</span></div>
+                        <div class="spec-row"><span class="spec-k">Temple Length</span><span class="spec-v">@Model.Frame.TempleLength.Value.ToString("0.#") mm</span></div>
                     }
-            </div>
+                </div>
 
-            @* ── Promo box ── *@
-            <div class="promo">
-                <div class="promo-ttl"><i class="bi bi-gift-fill"></i> KHUYẾN MÃI</div>
-                <ul>
-                    <li>Hoàn tiền <strong>100%</strong> nếu hàng không chính hãng</li>
-                    <li>Miễn phí giao hàng cho đơn từ <strong>500,000đ</strong></li>
-                    <li>Bảo hành chính hãng <strong>12 tháng</strong></li>
-                </ul>
-            </div>
+                <div class="promo">
+                    <div class="promo-ttl"><i class="bi bi-gift-fill"></i> PROMOTIONS</div>
+                    <ul>
+                        <li><strong>100% refund</strong> if product is not authentic</li>
+                        <li>Free shipping on orders over <strong>500,000 VND</strong></li>
+                        <li>Official manufacturer warranty <strong>12 months</strong></li>
+                    </ul>
+                </div>
 
-            @* ── Form ── *@
-            <form method="post" asp-page-handler="AddToCart" id="cartForm">
-                <input type="hidden" asp-for="AddToCartInput.ProductId" />
-                <div class="qty-row">
-                    <span class="qty-lbl">Số lượng:</span>
-                    <div class="qty-ctrl">
-                        <button type="button" class="qty-btn" id="qMinus" onclick="chQty(-1)">−</button>
-                        <input type="number" asp-for="AddToCartInput.Quantity" class="qty-inp" id="qInput"
-                               min="1" max="@(Model.Frame.InventoryQty ?? 99)" value="1" />
-                        <button type="button" class="qty-btn" id="qPlus" onclick="chQty(1)">+</button>
+                @if (Model.Frame.IsInStock)
+                {
+                    // In stock: show qty + buy/cart buttons
+                    <form method="post" asp-page-handler="AddToCart" id="cartForm">
+                        <input type="hidden" asp-for="AddToCartInput.ProductId" />
+                        <div class="qty-row">
+                            <span class="qty-lbl">Quantity:</span>
+                            <div class="qty-ctrl">
+                                <button type="button" class="qty-btn" id="qMinus" onclick="chQty(-1)">&#8722;</button>
+                                <input type="number" asp-for="AddToCartInput.Quantity" class="qty-inp" id="qInput"
+                                       min="1" max="@(Model.Frame.InventoryQty ?? 99)" value="1" />
+                                <button type="button" class="qty-btn" id="qPlus" onclick="chQty(1)">+</button>
+                            </div>
+                        </div>
+                        <div class="cta-row">
+                            <button type="submit" name="handler" value="BuyNow" class="btn-buy">
+                                <i class="bi bi-lightning-fill"></i> BUY NOW
+                            </button>
+                            <button type="submit" class="btn-cart">
+                                <i class="bi bi-cart-plus"></i> ADD TO CART
+                            </button>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    // Out of stock: disabled buttons + Notify When Available (wishlist)
+                    <div class="qty-row">
+                        <span class="qty-lbl">Quantity:</span>
+                        <div class="qty-ctrl">
+                            <button type="button" class="qty-btn" disabled>&#8722;</button>
+                            <input type="number" class="qty-inp" value="1" disabled />
+                            <button type="button" class="qty-btn" disabled>+</button>
+                        </div>
                     </div>
-                </div>
-                <div class="cta-row">
-                    <button type="submit" name="handler" value="BuyNow" class="btn-buy"
-                            @(Model.Frame.IsInStock ? "" : "disabled")>
-                        <i class="bi bi-lightning-fill"></i> MUA NGAY
-                    </button>
-                    <button type="submit" class="btn-cart" @(Model.Frame.IsInStock ? "" : "disabled")>
-                        <i class="bi bi-cart-plus"></i> THÊM VÀO GIỎ
-                    </button>
-                </div>
-            </form>
+                    <div class="cta-row">
+                        <button class="btn-buy" disabled><i class="bi bi-lightning-fill"></i> BUY NOW</button>
+                        <button class="btn-cart" disabled><i class="bi bi-cart-plus"></i> ADD TO CART</button>
+                    </div>
 
-            <button type="button" class="btn-wish" id="wishBtn"
-                    data-product-id="@Model.Frame.ProductId" data-in="false">
-                <i class="bi bi-heart"></i>
-                <span>@(Model.Frame.IsInStock ? "Thêm vào yêu thích" : "Thông báo khi có hàng")</span>
-            </button>
+                    // Wishlist / notify button — only for out-of-stock items
+                    <button type="button" class="btn-notify" id="notifyBtn"
+                            data-product-id="@Model.Frame.ProductId"
+                            data-in="false">
+                        <i class="bi bi-bell" id="notifyIcon"></i>
+                        <span id="notifyLabel">Notify When Available</span>
+                    </button>
+                }
 
         </div>
     </div>
 </div>
 
-<!-- ═══ Tabs ═══ -->
+<!-- Tabs -->
 <div class="tabs-wrap">
     <div class="tabs-hdr">
-        <button class="tab-btn on" onclick="switchTab('desc',this)">Mô tả sản phẩm</button>
-        <button class="tab-btn" onclick="switchTab('specs',this)">Thông số kỹ thuật</button>
-        <button class="tab-btn" onclick="switchTab('care',this)">Bảo quản</button>
+        <button class="tab-btn on" onclick="switchTab('desc',this)">Description</button>
+        <button class="tab-btn" onclick="switchTab('specs',this)">Specifications</button>
+        <button class="tab-btn" onclick="switchTab('care',this)">Care Instructions</button>
     </div>
 
     <div id="tab-desc" class="tab-panel on">
-        <h3>Giới thiệu sản phẩm</h3>
+        <h3>Product Description</h3>
         <p style="color:var(--sub);line-height:1.8;font-size:15px;">
             @(string.IsNullOrEmpty(Model.Frame.Description)
-                        ? "Gọng kính được thiết kế tỉ mỉ, kết hợp phong cách hiện đại với sự thoải mái trong từng chi tiết."
+                        ? "Meticulously designed eyeglass frames that blend modern style with all-day comfort."
                         : Model.Frame.Description)
         </p>
     </div>
 
         <div id="tab-specs" class="tab-panel">
-            <h3>Thông số kỹ thuật</h3>
+            <h3>Technical Specifications</h3>
             <div class="spec-grid">
                 <div class="spec-row"><span class="spec-k">SKU</span><span class="spec-v">@Model.Frame.Sku</span></div>
             @if (!string.IsNullOrEmpty(Model.Frame.Brand))
                 {
-                    <div class="spec-row"><span class="spec-k">Thương hiệu</span><span class="spec-v">@Model.Frame.Brand</span></div>
+                    <div class="spec-row"><span class="spec-k">Brand</span><span class="spec-v">@Model.Frame.Brand</span></div>
                 }
                 @if (!string.IsNullOrEmpty(Model.Frame.Origin))
                 {
-                    <div class="spec-row"><span class="spec-k">Xuất xứ</span><span class="spec-v">@Model.Frame.Origin</span></div>
+                    <div class="spec-row"><span class="spec-k">Origin</span><span class="spec-v">@Model.Frame.Origin</span></div>
                 }
                 @if (!string.IsNullOrEmpty(Model.Frame.Gender))
                 {
-                    <div class="spec-row"><span class="spec-k">Giới tính</span><span class="spec-v">@Model.Frame.Gender</span></div>
+                    <div class="spec-row"><span class="spec-k">Gender</span><span class="spec-v">@Model.Frame.Gender</span></div>
                 }
                 @if (!string.IsNullOrEmpty(Model.Frame.FrameShape))
                 {
-                    <div class="spec-row"><span class="spec-k">Kiểu dáng</span><span class="spec-v">@Model.Frame.FrameShape</span></div>
+                    <div class="spec-row"><span class="spec-k">Frame Shape</span><span class="spec-v">@Model.Frame.FrameShape</span></div>
                 }
                 @if (!string.IsNullOrEmpty(Model.Frame.FrameMaterial))
                 {
-                    <div class="spec-row"><span class="spec-k">Chất liệu</span><span class="spec-v">@Model.Frame.FrameMaterial</span></div>
+                    <div class="spec-row"><span class="spec-k">Material</span><span class="spec-v">@Model.Frame.FrameMaterial</span></div>
                 }
                 @if (!string.IsNullOrEmpty(Model.Frame.FrameType))
                 {
-                    <div class="spec-row"><span class="spec-k">Kiểu gọng</span><span class="spec-v">@Model.Frame.FrameType</span></div>
+                    <div class="spec-row"><span class="spec-k">Frame Type</span><span class="spec-v">@Model.Frame.FrameType</span></div>
                 }
                 @if (Model.Frame.LensWidth.HasValue)
                 {
-                    <div class="spec-row"><span class="spec-k">Lens Width (mm)</span><span class="spec-v">@Model.Frame.LensWidth.Value.ToString("0.#")</span></div>
+                    <div class="spec-row"><span class="spec-k">Lens Width</span><span class="spec-v">@Model.Frame.LensWidth.Value.ToString("0.#") mm</span></div>
                 }
                 @if (Model.Frame.BridgeWidth.HasValue)
                 {
-                    <div class="spec-row"><span class="spec-k">Bridge (mm)</span><span class="spec-v">@Model.Frame.BridgeWidth.Value.ToString("0.#")</span></div>
+                    <div class="spec-row"><span class="spec-k">Bridge</span><span class="spec-v">@Model.Frame.BridgeWidth.Value.ToString("0.#") mm</span></div>
                 }
                 @if (Model.Frame.TempleLength.HasValue)
                 {
-                    <div class="spec-row"><span class="spec-k">Temple (mm)</span><span class="spec-v">@Model.Frame.TempleLength.Value.ToString("0.#")</span></div>
+                    <div class="spec-row"><span class="spec-k">Temple Length</span><span class="spec-v">@Model.Frame.TempleLength.Value.ToString("0.#") mm</span></div>
                 }
                 @if (!string.IsNullOrEmpty(Model.Frame.Color))
                 {
-                    <div class="spec-row"><span class="spec-k">Màu sắc</span><span class="spec-v">@Model.Frame.Color</span></div>
+                    <div class="spec-row"><span class="spec-k">Colors</span><span class="spec-v">@Model.Frame.Color</span></div>
                 }
             </div>
         </div>
 
         <div id="tab-care" class="tab-panel">
-            <h3>Bảo quản &amp; vệ sinh</h3>
+            <h3>Care &amp; Cleaning</h3>
             <ul class="care-list">
-                @foreach (var line in (Model.Frame.CareInstructions ?? "Lau nhẹ bằng khăn mềm. Tránh hóa chất. Bảo quản trong hộp đựng kính.").Split('.').Where(s => !string.IsNullOrWhiteSpace(s)))
+                @foreach (var line in (Model.Frame.CareInstructions ?? "Clean gently with a microfiber cloth. Avoid harsh chemicals. Store in the provided case when not in use.").Split('.').Where(s => !string.IsNullOrWhiteSpace(s)))
                 {
                     <li>@line.Trim().</li>
                 }
@@ -1283,11 +1288,10 @@
         </div>
     </div>
 
-    <!-- ═══ Related ═══ -->
     @if (Model.Frame.RelatedProducts.Any())
     {
         <div class="related">
-            <h2>Sản phẩm tương tự</h2>
+            <h2>Similar Products</h2>
             <div class="rel-grid">
                 @foreach (var r in Model.Frame.RelatedProducts)
                 {
@@ -1299,7 +1303,6 @@
                             }
                             else
                             {
-
                                 <div class="rel-ph"><i class="bi bi-eyeglasses"></i></div>
                             }
                         </div>
@@ -1317,100 +1320,182 @@
     <div class="sticky-bar" id="stickyBar">
         <div class="sticky-inner">
             <div class="sticky-price">@Model.Frame.Currency @Model.Frame.Price.ToString("N0")</div>
-            <button class="sticky-btn" onclick="document.getElementById('cartForm').submit()"
-                    @(Model.Frame.IsInStock ? "" : "disabled")>
-                @(Model.Frame.IsInStock ? "Thêm vào giỏ hàng" : "Hết hàng")
-            </button>
+            @if (Model.Frame.IsInStock)
+            {
+                <button class="sticky-btn" onclick="document.getElementById('cartForm').submit()">Add to Cart</button>
+            }
+            else
+            {
+                <button class="sticky-btn" style="background:#6b7280;" onclick="document.getElementById('notifyBtn')?.click()">
+                    <i class="bi bi-bell"></i> Notify Me
+                </button>
+            }
         </div>
     </div>
 }
 else
 {
     <div style="text-align:center;padding:80px 24px;">
-        <i class="bi bi-exclamation-circle" style="font-size:60px;color:var(--red,#e53935);"></i>
-        <h2 style="margin-top:16px;">Không tìm thấy sản phẩm</h2>
-        <a asp-page="/Products/Index" style="color:#00756A;">← Quay về Shop</a>
+        <i class="bi bi-exclamation-circle" style="font-size:60px;color:#e53935;"></i>
+        <h2 style="margin-top:16px;">Product Not Found</h2>
+        <a asp-page="/Products/Index" style="color:#00756A;">&#8592; Back to Shop</a>
     </div>
 }
 
 @section Scripts {
     <script>
         function changeImg(url, el) {
-            const img = document.getElementById('mainImg');
-            if (img) { img.style.opacity='0'; setTimeout(()=>{ img.src=url; img.style.opacity='1'; }, 200); }
-            document.querySelectorAll('.thumb').forEach(t=>t.classList.remove('active'));
+            var img = document.getElementById('mainImg');
+            if (img) {
+                img.style.opacity = '0';
+                setTimeout(function () { img.src = url; img.style.opacity = '1'; }, 200);
+            }
+            document.querySelectorAll('.thumb').forEach(function (t) { t.classList.remove('active'); });
             if (el) el.classList.add('active');
         }
-        function chQty(d) {
-            const inp=document.getElementById('qInput');
-            const max=parseInt(inp.max)||99;
-            let v=Math.max(1,Math.min(max,(parseInt(inp.value)||1)+d));
-            inp.value=v;
-            document.getElementById('qMinus').disabled=v<=1;
-            document.getElementById('qPlus').disabled=v>=max;
-        }
-        document.addEventListener('DOMContentLoaded',()=>{ chQty(0); });
 
-        function selColor(btn,name) {
-            document.querySelectorAll('.color-opt').forEach(b=>b.classList.remove('active'));
-            btn.classList.add('active');
-            const lbl=document.getElementById('colorLbl');
-            if(lbl) lbl.textContent=name;
+        function chQty(d) {
+            var inp = document.getElementById('qInput');
+            if (!inp) return;
+            var max = parseInt(inp.max) || 99;
+            var v = Math.max(1, Math.min(max, (parseInt(inp.value) || 1) + d));
+            inp.value = v;
+            document.getElementById('qMinus').disabled = v <= 1;
+            document.getElementById('qPlus').disabled = v >= max;
         }
-        function switchTab(name,btn) {
-            document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('on'));
-            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
-            document.getElementById('tab-'+name)?.classList.add('on');
+        document.addEventListener('DOMContentLoaded', function () {
+            if (document.getElementById('qInput')) chQty(0);
+            initNotifyBtn();
+        });
+
+        function selColor(btn, name) {
+            document.querySelectorAll('.color-opt').forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            var lbl = document.getElementById('colorLbl');
+            if (lbl) lbl.textContent = name;
+        }
+
+        function switchTab(name, btn) {
+            document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('on'); });
+            document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('on'); });
+            var panel = document.getElementById('tab-' + name);
+            if (panel) panel.classList.add('on');
             btn.classList.add('on');
         }
 
         // Mobile sticky
-        const sb=document.getElementById('stickyBar'), cf=document.getElementById('cartForm');
-        if(sb&&cf) window.addEventListener('scroll',()=>{
-            if(window.innerWidth<=991) sb.style.display=cf.getBoundingClientRect().bottom<0?'block':'none';
-        });
-
-        // Wishlist
-        (async()=>{
-            const btn=document.getElementById('wishBtn'); if(!btn) return;
-            const pid=parseInt(btn.dataset.productId);
-            @if (User.Identity?.IsAuthenticated == true)
-            {
-                <text>
-                try{const r=await fetch('/api/wishlist/my');if(r.ok){const d=await r.json();if(d.some(i=>i.productId===pid))setWish(btn,true);}}catch{}
-                </text>
-            }
-            btn.addEventListener('click',async()=>{
-                @if (User.Identity?.IsAuthenticated != true)
-                {
-                    <text>
-                    window.location.href='/Account/Login?returnUrl='+encodeURIComponent(window.location.pathname);return;
-                    </text>
-                }
-                const isIn=btn.dataset.in==='true'; btn.disabled=true;
-                try{
-                    const r=await fetch(isIn?'/api/wishlist/remove':'/api/wishlist/add',
-                        {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productId:pid})});
-                    const d=await r.json().catch(()=>({}));
-                    if(r.ok){setWish(btn,!isIn);toast(isIn?'Đã xóa khỏi yêu thích':'Đã thêm vào yêu thích!');}
-                    else toast(d.message||'Có lỗi xảy ra');
-                }catch{toast('Lỗi kết nối.');}finally{btn.disabled=false;}
+        var sb = document.getElementById('stickyBar');
+        var cf = document.getElementById('cartForm');
+        if (sb && cf) {
+            window.addEventListener('scroll', function () {
+                if (window.innerWidth <= 991)
+                    sb.style.display = cf.getBoundingClientRect().bottom < 0 ? 'block' : 'none';
             });
-        })();
-        function setWish(btn,on){
-            btn.dataset.in=on?'true':'false';
-            btn.querySelector('i').className=on?'bi bi-heart-fill':'bi bi-heart';
-            btn.querySelector('span').textContent=on?'Đã thêm vào yêu thích':'Thêm vào yêu thích';
-            btn.style.borderColor=on?'#c9a96e':''; btn.style.color=on?'#c9a96e':'';
         }
-        let _tt;
-        function toast(msg){
-            let t=document.getElementById('_toast');
-            if(!t){t=document.createElement('div');t.id='_toast';
-            t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;border-radius:10px;padding:12px 22px;font-size:13px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.25);z-index:9999;white-space:nowrap;transition:transform .3s cubic-bezier(.34,1.56,.64,1)';
-            document.body.appendChild(t);}
-            t.textContent=msg; t.style.transform='translateX(-50%) translateY(0)';
-            clearTimeout(_tt); _tt=setTimeout(()=>{t.style.transform='translateX(-50%) translateY(80px)';},3000);
+
+        // ── Notify / Wishlist (only rendered when out of stock) ──────────────────
+        function initNotifyBtn() {
+            var btn = document.getElementById('notifyBtn');
+            if (!btn) return; // not out of stock, button not rendered
+
+            var pid = parseInt(btn.dataset.productId);
+
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                    <text>
+                    // Check if already wishlisted
+                    fetch('/api/wishlist/my').then(function (r) {
+                        if (r.ok) return r.json();
+                    }).then(function (d) {
+                        if (d && d.some(function (i) { return i.productId === pid; })) {
+                            setNotifyState(true);
+                        }
+                    }).catch(function () {});
+                    </text>
+            }
+
+            btn.addEventListener('click', function () {
+                @if (User.Identity == null || !User.Identity.IsAuthenticated)
+                {
+                        <text>
+                        window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                        return;
+                        </text>
+                }
+
+                var isIn = btn.dataset.in === 'true';
+                btn.disabled = true;
+
+                if (isIn) {
+                    fetch('/api/wishlist/remove', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ productId: pid })
+                    }).then(function (r) {
+                        if (r.ok) {
+                            setNotifyState(false);
+                            showToast('Removed from wishlist.');
+                        } else {
+                            showToast('Could not remove. Try again.');
+                        }
+                    }).catch(function () {
+                        showToast('Network error.');
+                    }).finally(function () {
+                        btn.disabled = false;
+                    });
+                } else {
+                    fetch('/api/wishlist/add', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ productId: pid })
+                    }).then(function (r) {
+                        return r.json().then(function (d) { return { ok: r.ok, data: d }; });
+                    }).then(function (res) {
+                        if (res.ok) {
+                            setNotifyState(true);
+                            showToast('Added to wishlist! Go to your wishlist to enable email notifications.');
+                        } else {
+                            showToast(res.data.message || 'Could not add to wishlist.');
+                        }
+                    }).catch(function () {
+                        showToast('Network error.');
+                    }).finally(function () {
+                        btn.disabled = false;
+                    });
+                }
+            });
+        }
+
+        function setNotifyState(isIn) {
+            var btn = document.getElementById('notifyBtn');
+            var lbl = document.getElementById('notifyLabel');
+            var ico = document.getElementById('notifyIcon');
+            if (!btn || !lbl || !ico) return;
+            btn.dataset.in = isIn ? 'true' : 'false';
+            if (isIn) {
+                btn.classList.add('active');
+                ico.className = 'bi bi-bell-fill';
+                lbl.textContent = 'Added to Wishlist';
+            } else {
+                btn.classList.remove('active');
+                ico.className = 'bi bi-bell';
+                lbl.textContent = 'Notify When Available';
+            }
+        }
+
+        var _toastTimer;
+        function showToast(msg) {
+            var t = document.getElementById('_toast');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = '_toast';
+                t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;border-radius:10px;padding:12px 22px;font-size:13px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.25);z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);max-width:90vw;white-space:normal;text-align:center;';
+                document.body.appendChild(t);
+            }
+            t.textContent = msg;
+            t.style.transform = 'translateX(-50%) translateY(0)';
+            clearTimeout(_toastTimer);
+            _toastTimer = setTimeout(function () { t.style.transform = 'translateX(-50%) translateY(80px)'; }, 4000);
         }
     </script>
 }
@@ -1418,15 +1503,23 @@ else
 @functions {
     string ColorStyle(string color)
     {
-        var m = new System.Collections.Generic.Dictionary<string, string>(StringComparer.OrdinalIgnoreCase){
-            {"Black","background:#1a1a1a"},{"Red","background:#cc2200"},{"Gold","background:#c9a96e"},
-            {"Tortoise","background:linear-gradient(135deg,#7b4f1e,#c8892a,#1a0e00)"},
-            {"Silver","background:linear-gradient(135deg,#d0d0d0,#f5f5f5,#b0b0b0)"},
-            {"Blue","background:#1a4fa0"},{"Pink","background:#e879a0"},{"Green","background:#2d7a3a"},
-            {"Transparent","background:linear-gradient(135deg,rgba(180,220,255,.5),rgba(255,255,255,.9));border:1px solid #ddd"},
-            {"White","background:#f0f0f0;border:1px solid #ddd"},{"Brown","background:#8B4513"},
-            {"Olive","background:#808000"},{"Grey","background:#808080"},{"Gray","background:#808080"},
-            {"Purple","background:#6b21a8"},{"Transparent Grey","background:linear-gradient(135deg,rgba(180,180,180,.5),rgba(240,240,240,.9));border:1px solid #ccc"}
+        var m = new System.Collections.Generic.Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
+            { "Black",            "background:#1a1a1a" },
+            { "Red",              "background:#cc2200" },
+            { "Gold",             "background:#c9a96e" },
+            { "Tortoise",         "background:linear-gradient(135deg,#7b4f1e,#c8892a,#1a0e00)" },
+            { "Silver",           "background:linear-gradient(135deg,#d0d0d0,#f5f5f5,#b0b0b0)" },
+            { "Blue",             "background:#1a4fa0" },
+            { "Pink",             "background:#e879a0" },
+            { "Green",            "background:#2d7a3a" },
+            { "Transparent",      "background:linear-gradient(135deg,rgba(180,220,255,.5),rgba(255,255,255,.9));border:1px solid #ddd" },
+            { "White",            "background:#f0f0f0;border:1px solid #ddd" },
+            { "Brown",            "background:#8B4513" },
+            { "Olive",            "background:#808000" },
+            { "Grey",             "background:#808080" },
+            { "Gray",             "background:#808080" },
+            { "Purple",           "background:#6b21a8" },
+            { "Transparent Grey", "background:linear-gradient(135deg,rgba(180,180,180,.5),rgba(240,240,240,.9));border:1px solid #ccc" }
         };
         return m.TryGetValue(color.Trim(), out var s) ? s : "background:#ccc";
     }

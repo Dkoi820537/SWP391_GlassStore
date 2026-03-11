@@ -1013,6 +1013,18 @@
         </div>
     }
 
+    <!-- Recently Viewed Section -->
+    <section class="favorites-section" id="recently-viewed" style="display:none;">
+        <div class="favorites-container">
+            <div class="favorites-header">
+                <p class="favorites-eyebrow">Your History</p>
+                <h2>Recently Viewed Products</h2>
+            </div>
+            <div class="favorites-grid" id="recently-viewed-container">
+            </div>
+        </div>
+    </section>
+
     <!-- Mobile Sticky Bar -->
     <div class="mobile-sticky-bar" id="mobileStickyBar">
         <div class="mobile-sticky-content">
@@ -1045,6 +1057,17 @@ else
 }
 
 @section Scripts {
+    <script>
+        window.recentlyViewedProduct = {
+            id: @Model.Lens.ProductId,
+            name: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Lens.Name)),
+            imageUrl: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Lens.PrimaryImageUrl ?? "")),
+            categoryLink: "/Products?ProductTypeFilter=Lenses",
+            price: '@Model.Lens.Price.ToString("N0")',
+            currency: '@Model.Lens.Currency',
+            productUrl: '/Products/LensDetails/@Model.Lens.ProductId'
+        };
+    </script>
     <script>
         // ── Image Gallery ────────────────────────────────────────────────────────
         function changeMainImage(imageUrl, thumbnailElement) {

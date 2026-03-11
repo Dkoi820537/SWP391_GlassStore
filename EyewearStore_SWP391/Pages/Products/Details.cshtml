@@ -389,7 +389,30 @@
     }
 </div>
 
+<!-- Recently Viewed Section -->
+<section class="favorites-section" id="recently-viewed" style="display:none;">
+    <div class="favorites-container">
+        <div class="favorites-header">
+            <p class="favorites-eyebrow">Your History</p>
+            <h2>Recently Viewed Products</h2>
+        </div>
+        <div class="favorites-grid" id="recently-viewed-container">
+        </div>
+    </div>
+</section>
+
 @section Scripts {
+    <script>
+        window.recentlyViewedProduct = {
+            id: @Model.Product.ProductId,
+            name: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Product.Name)),
+            imageUrl: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Product.PrimaryImageUrl ?? "")),
+            categoryLink: "/Products",
+            price: '@Model.Product.Price.ToString("N0")',
+            currency: '@Model.Product.Currency',
+            productUrl: '/Products/Details/@Model.Product.ProductId'
+        };
+    </script>
     <script>
         function changeImage(imageUrl, thumbnailElement) {
             // Update main image

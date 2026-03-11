@@ -532,6 +532,7 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @Html.AntiForgeryToken()
     <script src="~/js/shop-cart.js" asp-append-version="true"></script>
+    <script src="~/js/recently-viewed.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
     @if (User.Identity.IsAuthenticated)

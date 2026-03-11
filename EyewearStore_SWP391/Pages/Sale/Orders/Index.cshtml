@@ -1,309 +1,236 @@
-﻿@page
+@page
 @model EyewearStore_SWP391.Pages.Sale.Orders.IndexModel
 @{
     ViewData["Title"] = "Orders Management";
     Layout = "_Layout";
 }
 
-<div class="container-fluid py-4">
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="mb-1"><i class="bi bi-box-seam me-2"></i>Orders Management</h2>
-            <p class="text-muted mb-0">
-                <i class="bi bi-info-circle me-1"></i>Manage and track all customer orders
-            </p>
-        </div>
-        <a asp-page="Create" class="btn btn-primary btn-lg">
-            <i class="bi bi-plus-circle me-2"></i>Create New Order
-        </a>
-    </div>
+<style>
+    .lenses-container { padding: 1.5rem 2rem; background: #f4f6f9; min-height: calc(100vh - 60px); font-family: 'Inter', sans-serif; }
+    .controls-bar { background: white; border-radius: 12px; padding: 1rem 1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .page-title { font-size: 1.5rem; font-weight: 700; color: #1a1a2e; margin: 0; display: flex; align-items: center; gap: 0.5rem; }
+    .page-subtitle { font-size: 0.85rem; color: #8f9bb3; margin-top: 0.25rem; font-weight: normal; }
+    .controls-right { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; width: 100%; justify-content: space-between; }
+    .filter-inline-form { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; flex: 1; justify-content: flex-end; }
+    .search-input-group { position: relative; min-width: 250px; flex-grow: 1; max-width: 400px; }
+    .search-input-group .bi-search { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #8f9bb3; }
+    .search-input-group .form-control { padding-left: 2.5rem; border-radius: 8px; border: 1px solid #e4e9f2; background: #f7f9fc; box-shadow: none; width: 100%; height: 38px; }
+    .search-input-group .form-control:focus { border-color: #008080; background: white; }
+    .filter-select { border-radius: 8px; border: 1px solid #e4e9f2; padding: 0.375rem 2rem 0.375rem 1rem; background-color: white; color: #1a1a2e; cursor: pointer; font-size: 0.9rem; height: 38px; }
+    .btn-create { background: #008080; color: white; border: none; border-radius: 8px; padding: 0.5rem 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; text-decoration: none; height: 38px;}
+    .btn-create:hover { background: #006666; color: white; transform: translateY(-1px); }
+    .btn-filter-action { background: #1a1a2e; color: white; border-radius: 8px; border: none; padding: 0.375rem 1rem; font-weight: 500; transition: background 0.2s; height: 38px; }
+    .btn-filter-action:hover { background: #2a2a4a; }
+    .btn-reset { background: transparent; color: #8f9bb3; border: 1px solid #e4e9f2; border-radius: 8px; padding: 0.375rem 1rem; height: 38px; text-decoration: none; display: inline-flex; align-items: center; }
+    .btn-reset:hover { background: #f7f9fc; color: #1a1a2e; }
+    .table-card { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); overflow: hidden; }
+    .modern-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .modern-table th { background: #1a1a2e; color: white; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1.2rem 1.5rem; border: none; white-space: nowrap; }
+    .modern-table td { padding: 1.2rem 1.5rem; vertical-align: middle; border-bottom: 1px solid #edf1f7; color: #222b45; font-size: 0.9rem; }
+    .modern-table tbody tr { transition: background-color 0.2s; }
+    .modern-table tbody tr:hover { background-color: #f7f9fc; }
+    
+    .avatar-circle { width: 36px; height: 36px; border-radius: 50%; background: rgba(0,128,128,0.1); display: flex; align-items: center; justify-content: center; color: #008080; font-weight: 600; flex-shrink: 0; }
+    .customer-cell { display: flex; align-items: center; gap: 0.75rem; }
+    .customer-name { font-weight: 600; color: #1a1a2e; }
 
-    <!-- Alert Messages -->
+    .badge-modern { padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+    .badge-teal { background: rgba(0, 128, 128, 0.1); color: #008080; }
+    .badge-navy { background: rgba(26, 26, 46, 0.1); color: #1a1a2e; }
+    .badge-success { background: rgba(0, 200, 83, 0.1); color: #00c853; }
+    .badge-warning { background: rgba(255, 170, 0, 0.1); color: #ffaa00; }
+    .badge-danger { background: rgba(255, 61, 113, 0.1); color: #ff3d71; }
+    .badge-neutral { background: #f7f9fc; color: #8f9bb3; border: 1px solid #e4e9f2; }
+    
+    .actions-cell { display: flex; gap: 0.5rem; justify-content: flex-end;}
+    .btn-action { padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none; border: 1px solid transparent; transition: all 0.2s; }
+    .btn-action-edit { background: #f7f9fc; color: #008080; border-color: #e4e9f2; }
+    .btn-action-edit:hover { background: #008080; color: white; border-color: #008080; }
+    .btn-action-details { background: #f7f9fc; color: #1a1a2e; border-color: #e4e9f2; }
+    .btn-action-details:hover { background: #1a1a2e; color: white; border-color: #1a1a2e; }
+    .btn-action-delete { background: #f7f9fc; color: #ff3d71; border-color: #e4e9f2; }
+    .btn-action-delete:hover { background: #ff3d71; color: white; border-color: #ff3d71; }
+
+    .pagination-footer { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-top: 1px solid #edf1f7; }
+    .pagination-info { color: #8f9bb3; font-size: 0.85rem; }
+    .modern-pagination { display: flex; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
+    .modern-pagination .page-link { min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid #e4e9f2; background: white; color: #1a1a2e; font-size: 0.85rem; font-weight: 500; text-decoration: none; transition: all 0.2s; padding: 0 0.5rem; }
+    .modern-pagination .page-link:hover:not(.disabled) { border-color: #008080; color: #008080; }
+    .modern-pagination .page-link.active { background: #008080; border-color: #008080; color: white; }
+    .modern-pagination .page-link.disabled { opacity: 0.5; cursor: not-allowed; background: #f7f9fc; color: #8f9bb3; }
+    .empty-state { text-align: center; padding: 4rem 2rem; color: #8f9bb3; }
+</style>
+
+<div class="lenses-container">
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert" style="border-radius: 8px; background: rgba(0, 200, 83, 0.1); color: #00c853; border: none;">
             <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
-    <!-- Search and Filter Card -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3 align-items-end">
-                <div class="col-md-6">
-                    <label for="searchQuery" class="form-label fw-semibold">
-                        <i class="bi bi-search me-1"></i>Search Orders
-                    </label>
-                    <input type="text"
-                           class="form-control"
-                           id="searchQuery"
-                           name="SearchQuery"
-                           value="@Model.SearchQuery"
-                           placeholder="Search by Order ID, Customer Name, or Email..." />
+    <div class="controls-bar">
+        <div class="controls-right" style="flex-wrap: nowrap; align-items: flex-start; flex-direction: column;">
+            <div class="d-flex w-100 justify-content-between align-items-center">
+                <h1 class="page-title">
+                    <i class="bi bi-box-seam"></i> Orders Management
+                </h1>
+                <a asp-page="Create" class="btn-create">
+                    <i class="bi bi-plus-lg"></i> Create New
+                </a>
+            </div>
+            
+            <form method="get" class="filter-inline-form w-100 mt-2">
+                <div class="search-input-group">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="form-control" name="SearchQuery" value="@Model.SearchQuery" placeholder="Search by Order ID, Customer, Email..." />
                 </div>
-                <div class="col-md-3">
-                    <label for="statusFilter" class="form-label fw-semibold">
-                        <i class="bi bi-funnel me-1"></i>Filter by Status
-                    </label>
-                    <select class="form-select" id="statusFilter" name="StatusFilter">
-                        <option value="">All Statuses</option>
-                        @foreach (var status in Model.AvailableStatuses)
-                        {
-                            <option value="@status" selected="@(status == Model.StatusFilter)">
-                                @status
-                            </option>
-                        }
-                    </select>
-                </div>
+                
+                <select class="filter-select" name="StatusFilter">
+                    <option value="">All Statuses</option>
+                    @foreach (var status in Model.AvailableStatuses)
+                    {
+                        <option value="@status" selected="@(status == Model.StatusFilter)">@status</option>
+                    }
+                </select>
+                
+                <select class="filter-select" name="PageSize" style="width: 80px;">
+                    <option value="10" selected="@(Model.PageSize == 10)">10</option>
+                    <option value="25" selected="@(Model.PageSize == 25)">25</option>
+                    <option value="50" selected="@(Model.PageSize == 50)">50</option>
+                </select>
 
-                <div class="col-md-1">
-                    <label class="form-label fw-semibold">Size</label>
-                    <select class="form-select" name="PageSize">
-                        <option value="10" selected="@(Model.PageSize == 10)">10</option>
-                        <option value="25" selected="@(Model.PageSize == 25)">25</option>
-                        <option value="50" selected="@(Model.PageSize == 50)">50</option>
-                    </select>
-                </div>
-
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-funnel-fill me-1"></i>Apply Filter
-                    </button>
-                </div>
+                <button type="submit" class="btn-filter-action">
+                    Filter
+                </button>
             </form>
         </div>
     </div>
 
-    <!-- Orders Table Card -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">
-                <i class="bi bi-list-ul me-2"></i>Orders List
-            </h5>
-            <div>
-                <span class="badge bg-light text-dark">@Model.TotalOrders orders</span>
+    <div class="table-card">
+        @if (!Model.Orders.Any())
+        {
+            <div class="empty-state">
+                <i class="bi bi-inbox fs-1 mb-3 d-block"></i>
+                <h4>No Orders Found</h4>
+                <p>Adjust your search/filters or create a new order.</p>
             </div>
-        </div>
-        <div class="card-body p-0">
-            @if (!Model.Orders.Any())
-            {
-                <div class="text-center py-5">
-                    <i class="bi bi-inbox display-1 text-muted"></i>
-                    <h4 class="mt-3 text-muted">No Orders Found</h4>
-                    <p class="text-muted">
-                        @if (!string.IsNullOrWhiteSpace(Model.SearchQuery) || !string.IsNullOrWhiteSpace(Model.StatusFilter))
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Email</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th class="text-end">Amount</th>
+                            <th class="text-end" style="padding-right: 2rem;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model.Orders)
                         {
-                            <span>Try adjusting your search or filter criteria.</span>
+                            <tr>
+                                <td>
+                                    <span class="fw-bold" style="color: #008080;">#@order.OrderId</span>
+                                </td>
+                                <td>
+                                    <div class="customer-cell">
+                                        <div class="avatar-circle">
+                                            @(!string.IsNullOrEmpty(order.UserName) ? order.UserName.Substring(0, 1).ToUpper() : "?")
+                                        </div>
+                                        <span class="customer-name">@order.UserName</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="mailto:@order.UserEmail" style="color: #8f9bb3; text-decoration: none;">@order.UserEmail</a>
+                                </td>
+                                <td>
+                                    <div>@order.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")</div>
+                                    <div style="font-size: 0.75rem; color: #8f9bb3;">@order.CreatedAt.ToLocalTime().ToString("hh:mm tt")</div>
+                                </td>
+                                <td>
+                                    @{
+                                        var badgeClass = order.Status switch
+                                        {
+                                            "Pending Confirmation" => "badge-warning",
+                                            "Confirmed" => "badge-teal",
+                                            "Processing" => "badge-navy",
+                                            "Shipped" => "badge-neutral",
+                                            "Delivered" => "badge-success",
+                                            "Completed" => "badge-success",
+                                            "Cancelled" => "badge-danger",
+                                            _ => "badge-neutral"
+                                        };
+                                    }
+                                    <span class="badge-modern @badgeClass">@order.Status</span>
+                                </td>
+                                <td class="text-end fw-bold text-success">
+                                    @String.Format("{0:N0} ₫", order.TotalAmount)
+                                </td>
+                                <td>
+                                    <div class="actions-cell">
+                                        <a asp-page="Details" asp-route-id="@order.OrderId" class="btn-action btn-action-details" title="Details">
+                                            <i class="bi bi-eye"></i> Details
+                                        </a>
+                                        <a asp-page="Edit" asp-route-id="@order.OrderId" class="btn-action btn-action-edit" title="Edit">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </a>
+                                        <a asp-page="Delete" asp-route-id="@order.OrderId" class="btn-action btn-action-delete" title="Delete">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-footer">
+                <div class="pagination-info">
+                    Showing <strong>@(((Model.PageNumber - 1) * Model.PageSize) + 1)</strong> to 
+                    <strong>@(Math.Min(Model.PageNumber * Model.PageSize, Model.TotalOrders))</strong> of 
+                    <strong>@Model.TotalOrders</strong> orders
+                </div>
+
+                <ul class="modern-pagination">
+                    @if (Model.PageNumber > 1)
+                    {
+                        <li><a asp-page="./Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize" asp-route-SearchQuery="@Model.SearchQuery" asp-route-StatusFilter="@Model.StatusFilter" class="page-link nav-text"><i class="bi bi-chevron-left me-1"></i> Prev</a></li>
+                    }
+                    else
+                    {
+                        <li><span class="page-link nav-text disabled"><i class="bi bi-chevron-left me-1"></i> Prev</span></li>
+                    }
+
+                    @foreach (var p in Model.DisplayPageNumbers)
+                    {
+                        if (p == Model.PageNumber)
+                        {
+                            <li><span class="page-link active">@p</span></li>
                         }
                         else
                         {
-                            <span>Get started by creating your first order.</span>
+                            <li><a asp-page="./Index" asp-route-pageNumber="@p" asp-route-pageSize="@Model.PageSize" asp-route-SearchQuery="@Model.SearchQuery" asp-route-StatusFilter="@Model.StatusFilter" class="page-link">@p</a></li>
                         }
-                    </p>
-                    <a asp-page="Create" class="btn btn-primary mt-3">
-                        <i class="bi bi-plus-circle me-1"></i>Create First Order
-                    </a>
-                </div>
-            }
-            else
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="py-3">Order ID</th>
-                                <th class="py-3">Customer</th>
-                                <th class="py-3">Email</th>
-                                <th class="py-3">Created Date</th>
-                                <th class="py-3">Status</th>
-                                <th class="py-3 text-end">Total Amount</th>
-                                <th class="py-3 text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var order in Model.Orders)
-                            {
-                                <tr>
-                                    <td class="align-middle">
-                                        <span class="fw-bold text-primary">#@order.OrderId</span>
-                                    </td>
-                                    <td class="align-middle">
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar-circle bg-primary text-white me-2">
-                                                @(!string.IsNullOrEmpty(order.UserName) ? order.UserName.Substring(0, 1).ToUpper() : "?")
-                                            </div>
-                                            <span class="fw-semibold">@order.UserName</span>
-                                        </div>
-                                    </td>
-                                    <td class="align-middle">
-                                        <a href="mailto:@order.UserEmail" class="text-decoration-none">
-                                            @order.UserEmail
-                                        </a>
-                                    </td>
-                                    <td class="align-middle">
-                                        <div>
-                                            <i class="bi bi-calendar-event me-1"></i>
-                                            @order.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")
-                                        </div>
-                                        <small class="text-muted">
-                                            <i class="bi bi-clock me-1"></i>
-                                            @order.CreatedAt.ToLocalTime().ToString("hh:mm tt")
-                                        </small>
-                                    </td>
-                                    <td class="align-middle">
-                                        @{
-                                            var badgeClass = order.Status switch
-                                            {
-                                                "Pending Confirmation" => "bg-warning text-dark",
-                                                "Confirmed" => "bg-info",
-                                                "Processing" => "bg-primary",
-                                                "Shipped" => "bg-secondary",
-                                                "Delivered" => "bg-success",
-                                                "Completed" => "bg-success",
-                                                "Cancelled" => "bg-danger",
-                                                _ => "bg-secondary"
-                                            };
-                                        }
-                                        <span class="badge @badgeClass">@order.Status</span>
-                                    </td>
-                                    <td class="align-middle text-end">
-                                        <span class="fw-bold text-success">
-                                            @String.Format("{0:N0} ₫", order.TotalAmount)
-                                        </span>
-                                    </td>
-                                    <td class="align-middle text-center">
-                                        <div class="btn-group" role="group">
-                                            <a asp-page="Details"
-                                               asp-route-id="@order.OrderId"
-                                               asp-route-pageNumber="@Model.PageNumber"
-                                               asp-route-pageSize="@Model.PageSize"
-                                               asp-route-SearchQuery="@Model.SearchQuery"
-                                               asp-route-StatusFilter="@Model.StatusFilter"
-                                               class="btn btn-sm btn-outline-primary"
-                                               title="View Details">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            <a asp-page="Edit"
-                                               asp-route-id="@order.OrderId"
-                                               class="btn btn-sm btn-outline-secondary"
-                                               title="Edit Order">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                            <a asp-page="Delete"
-                                               asp-route-id="@order.OrderId"
-                                               class="btn btn-sm btn-outline-danger"
-                                               title="Delete Order">
-                                                <i class="bi bi-trash"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                    }
 
-                <!-- Pagination -->
-                <div class="d-flex justify-content-between align-items-center p-3">
-                    <div>
-                        <small class="text-muted">
-                            Showing
-                            <strong>@(((Model.PageNumber - 1) * Model.PageSize) + 1)</strong>
-                            -
-                            <strong>@(Math.Min(Model.PageNumber * Model.PageSize, Model.TotalOrders))</strong>
-                            of <strong>@Model.TotalOrders</strong>
-                        </small>
-                    </div>
-
-                    <nav aria-label="Orders pagination">
-                        <ul class="pagination mb-0">
-                            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
-                                <a class="page-link" asp-page="./Index"
-                                   asp-route-pageNumber="1"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-SearchQuery="@Model.SearchQuery"
-                                   asp-route-StatusFilter="@Model.StatusFilter">« First</a>
-                            </li>
-
-                            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
-                                <a class="page-link" asp-page="./Index"
-                                   asp-route-pageNumber="@(Model.PageNumber - 1)"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-SearchQuery="@Model.SearchQuery"
-                                   asp-route-StatusFilter="@Model.StatusFilter">‹ Prev</a>
-                            </li>
-
-                            @foreach (var p in Model.DisplayPageNumbers)
-                            {
-                                <li class="page-item @(p == Model.PageNumber ? "active" : "")">
-                                    <a class="page-link" asp-page="./Index"
-                                       asp-route-pageNumber="@p"
-                                       asp-route-pageSize="@Model.PageSize"
-                                       asp-route-SearchQuery="@Model.SearchQuery"
-                                       asp-route-StatusFilter="@Model.StatusFilter">@p</a>
-                                </li>
-                            }
-
-                            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
-                                <a class="page-link" asp-page="./Index"
-                                   asp-route-pageNumber="@(Model.PageNumber + 1)"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-SearchQuery="@Model.SearchQuery"
-                                   asp-route-StatusFilter="@Model.StatusFilter">Next ›</a>
-                            </li>
-
-                            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
-                                <a class="page-link" asp-page="./Index"
-                                   asp-route-pageNumber="@Model.TotalPages"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-SearchQuery="@Model.SearchQuery"
-                                   asp-route-StatusFilter="@Model.StatusFilter">Last »</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            }
-        </div>
+                    @if (Model.PageNumber < Model.TotalPages)
+                    {
+                        <li><a asp-page="./Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize" asp-route-SearchQuery="@Model.SearchQuery" asp-route-StatusFilter="@Model.StatusFilter" class="page-link nav-text">Next <i class="bi bi-chevron-right ms-1"></i></a></li>
+                    }
+                    else
+                    {
+                        <li><span class="page-link nav-text disabled">Next <i class="bi bi-chevron-right ms-1"></i></span></li>
+                    }
+                </ul>
+            </div>
+        }
     </div>
 </div>
-
-@section Styles {
-    <style>
-        .avatar-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1rem;
-        }
-
-        .table tbody tr {
-            transition: all 0.2s ease;
-        }
-
-            .table tbody tr:hover {
-                background-color: rgba(0, 123, 255, 0.05);
-                transform: translateY(-2px);
-                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            }
-
-        .pagination .page-item .page-link {
-            border-radius: 8px;
-            margin: 0 3px;
-            min-width: 40px;
-            text-align: center;
-            padding: 6px 10px;
-        }
-
-        .pagination .page-item.active .page-link {
-            background: linear-gradient(90deg, #2b6cb0, #2c5282);
-            border-color: #2c5282;
-            color: #fff;
-        }
-    </style>
-}

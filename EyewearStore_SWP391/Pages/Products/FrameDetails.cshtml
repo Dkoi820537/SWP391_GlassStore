@@ -1,471 +1,717 @@
 @page "{id:int}"
 @model EyewearStore_SWP391.Pages.Products.FrameDetailsModel
 @{
-    ViewData["Title"] = Model.Frame?.Name ?? "Frame Details";
+    ViewData["Title"] = Model.Frame?.Name ?? "Chi tiết sản phẩm";
     Layout = "_Layout";
 }
 
 @section Styles {
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* ==========================================
-                   FRAME DETAILS PAGE STYLES
-                   ========================================== */
-
-        /* Breadcrumb Section */
-        .frame-breadcrumb-section {
-            background: #F8F9FA;
-            padding: 16px 0;
+        :root {
+            --teal: #00756A;
+            --teal-dk: #005a51;
+            --teal-lt: #e8f5f4;
+            --red: #e53935;
+            --gold: #c9a96e;
+            --text: #1a1a1a;
+            --sub: #6b7280;
+            --border: #e5e7eb;
+            --bg: #f9fafb;
         }
 
-        .frame-breadcrumb {
-            display: flex;
-            align-items: center;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            font-size: 14px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
         }
 
-            .frame-breadcrumb li {
+        /* ── Breadcrumb ─────────────────────────────────────── */
+        .bc {
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
+            font-size: 13px;
+        }
+
+            .bc ol {
                 display: flex;
                 align-items: center;
+                list-style: none;
+                margin: 0 auto;
+                padding: 0 24px;
+                max-width: 1280px;
+                gap: 5px;
+                flex-wrap: wrap;
             }
 
-            .frame-breadcrumb a {
-                color: #666666;
+            .bc a {
+                color: var(--sub);
                 text-decoration: none;
-                transition: color 0.3s ease;
             }
 
-                .frame-breadcrumb a:hover {
-                    color: var(--shop-primary-teal);
+                .bc a:hover {
+                    color: var(--teal);
                 }
 
-            .frame-breadcrumb .separator {
-                margin: 0 8px;
-                color: #999999;
-                font-size: 12px;
+            .bc .sep {
+                color: #ccc;
+                font-size: 10px;
             }
 
-            .frame-breadcrumb .current {
-                color: var(--shop-primary-teal);
-                font-weight: 500;
+            .bc .cur {
+                color: var(--text);
+                font-weight: 600;
             }
 
-        /* Main Container */
-        .frame-details-container {
-            max-width: 1200px;
+        /* ── Wrap ───────────────────────────────────────────── */
+        .fd {
+            max-width: 1280px;
             margin: 0 auto;
-            padding: 40px 24px;
-            background: var(--shop-white);
+            padding: 32px 24px 80px;
         }
 
-        /* Two Column Layout */
-        .frame-details-grid {
+        .fd-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 48px;
+            grid-template-columns: 55% 1fr;
+            gap: 56px;
+            align-items: start;
         }
 
-        /* Left Column - Images */
-        .frame-gallery {
+        /* ═══ LEFT ══════════════════════════════════════════════ */
+        .gal {
+            position: sticky;
+            top: 78px;
+        }
+
+        .gal-main {
             position: relative;
-        }
-
-        .main-image-container {
-            aspect-ratio: 1;
-            background: var(--shop-white);
-            border-radius: 12px;
-            border: 1px solid #E0E0E0;
+            border-radius: 16px;
             overflow: hidden;
+            background: #fff;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 24px rgba(0,0,0,.06);
+            aspect-ratio: 1;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-            .main-image-container img {
+            .gal-main img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                transition: opacity 0.3s ease;
+                transition: opacity .22s;
             }
 
-        .main-image-placeholder {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
+        .gal-ph {
+            font-size: 90px;
+            color: #ddd;
         }
 
-            .main-image-placeholder i {
-                font-size: 120px;
-                color: var(--shop-primary-teal);
-                opacity: 0.3;
+        /* Brand badge TOP-RIGHT */
+        .brand-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: rgba(255,255,255,.95);
+            border: 1px solid rgba(0,0,0,.08);
+            border-radius: 8px;
+            padding: 6px 18px;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--teal);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            backdrop-filter: blur(6px);
+            text-decoration: none;
+            box-shadow: 0 2px 12px rgba(0,0,0,.12);
+            transition: box-shadow .2s, background .2s;
+        }
+
+            .brand-badge:hover {
+                background: #fff;
+                box-shadow: 0 4px 20px rgba(0,0,0,.2);
+                color: var(--teal);
             }
 
-        .thumbnail-gallery {
+        /* Thumbs */
+        .thumbs {
             display: flex;
-            gap: 12px;
-            margin-top: 16px;
+            gap: 10px;
+            margin-top: 12px;
             flex-wrap: wrap;
         }
 
-        .thumbnail-item {
+        .thumb {
             width: 80px;
             height: 80px;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
             cursor: pointer;
             border: 2px solid transparent;
-            transition: all 0.3s ease;
+            transition: border-color .18s;
+            flex-shrink: 0;
         }
 
-            .thumbnail-item:hover,
-            .thumbnail-item.active {
-                border-color: var(--shop-primary-teal);
+            .thumb:hover, .thumb.active {
+                border-color: var(--teal);
             }
 
-            .thumbnail-item img {
+            .thumb img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
             }
 
-        /* Right Column - Product Info */
-        .frame-info {
-            padding-top: 16px;
+        /* Size diagram */
+        .sz-strip {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
         }
 
-        .frame-name {
-            font-size: 32px;
-            font-weight: 700;
-            color: #333333;
-            margin: 0 0 12px;
+        .sz-card {
+            flex: 1;
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 12px 8px 10px;
+            text-align: center;
+        }
+
+            .sz-card svg {
+                width: 100%;
+                height: 46px;
+            }
+
+        .sz-num {
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--text);
+            margin-top: 4px;
+            line-height: 1;
+        }
+
+        .sz-lbl {
+            font-size: 11px;
+            color: var(--sub);
+            margin-top: 3px;
+        }
+
+        /* ═══ RIGHT ═════════════════════════════════════════════ */
+        .info {
+            padding-top: 2px;
+        }
+
+        /* Brand link */
+        .brand-link {
+            display: inline-block;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--teal);
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--teal);
+            padding-bottom: 1px;
+        }
+
+            .brand-link:hover {
+                color: var(--teal-dk);
+            }
+
+        .prod-name {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text);
+            margin: 0 0 10px;
             line-height: 1.3;
         }
 
-        .frame-sku {
-            font-size: 14px;
-            color: #666666;
-            margin-bottom: 16px;
+        /* Status row */
+        .status-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--sub);
+            margin-bottom: 14px;
+            flex-wrap: wrap;
         }
 
-        .frame-price {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--shop-primary-teal);
-            margin-bottom: 24px;
+            .status-row strong {
+                color: var(--text);
+            }
+
+        .sep-dot {
+            color: #ccc;
+        }
+
+        /* Badges */
+        .badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--teal-lt);
+            color: var(--teal);
+        }
+
+        /* Price */
+        .price-row {
             display: flex;
             align-items: baseline;
             gap: 8px;
+            margin-bottom: 16px;
         }
 
-            .frame-price .currency {
-                font-size: 24px;
+        .price-lbl {
+            font-size: 14px;
+            color: var(--sub);
+        }
+
+        .price-val {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--red);
+            line-height: 1;
+        }
+
+        .price-cur {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--red);
+        }
+
+        .sold-txt {
+            font-size: 13px;
+            color: var(--sub);
+            margin-left: auto;
+        }
+
+            .sold-txt strong {
+                color: var(--text);
             }
 
-        /* Stock Status Badge */
+        /* Stock */
+        .stock-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+
         .stock-badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 16px;
-            border-radius: 16px;
+            gap: 7px;
+            padding: 7px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+            .stock-badge.in {
+                background: #e8f5e9;
+                color: #2e7d32;
+            }
+
+            .stock-badge.low {
+                background: #fff8e1;
+                color: #f57f17;
+            }
+
+            .stock-badge.out {
+                background: #ffebee;
+                color: #c62828;
+            }
+
+        /* ── Color picker ─────────────────────── */
+        .section-lbl {
             font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 24px;
-        }
-
-            .stock-badge.in-stock {
-                background: #28A745;
-                color: white;
-            }
-
-            .stock-badge.low-stock {
-                background: #FFA500;
-                color: white;
-            }
-
-            .stock-badge.out-of-stock {
-                background: #DC3545;
-                color: white;
-            }
-
-        /* Description Box */
-        .frame-description-box {
-            margin: 24px 0;
-            padding: 24px;
-            background: #F5E6D3;
-            border-radius: 12px;
-        }
-
-            .frame-description-box p {
-                font-size: 16px;
-                line-height: 1.6;
-                color: #333333;
-                margin: 0;
-            }
-
-        /* Specifications Section */
-        .specs-section {
-            margin: 24px 0;
-        }
-
-        .specs-heading {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--shop-primary-teal);
-            margin: 0 0 16px;
-        }
-
-        .specs-table {
-            width: 100%;
-        }
-
-        .specs-row {
-            display: flex;
-            padding: 12px 0;
-            border-bottom: 1px solid #E0E0E0;
-        }
-
-            .specs-row:last-child {
-                border-bottom: none;
-            }
-
-        .specs-label {
-            width: 140px;
-            font-weight: 600;
-            color: #333333;
-            flex-shrink: 0;
-        }
-
-        .specs-value {
-            color: #666666;
-            flex: 1;
-        }
-
-        /* Quantity Selector */
-        .quantity-section {
-            margin-top: 32px;
-        }
-
-        .quantity-label {
-            font-weight: 600;
-            color: #333333;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .quantity-input-wrapper {
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .quantity-btn {
-            width: 40px;
-            height: 48px;
-            border: 2px solid #E0E0E0;
-            background: var(--shop-white);
+            .section-lbl .cur {
+                font-weight: 500;
+                color: var(--sub);
+            }
+
+        .color-opts {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .color-opt {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid var(--border);
             border-radius: 8px;
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--shop-primary-teal);
+            padding: 7px 14px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            background: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            transition: border-color .18s, box-shadow .18s;
+            white-space: nowrap;
+        }
+
+            .color-opt:hover {
+                border-color: var(--teal);
+            }
+
+            .color-opt.active {
+                border-color: var(--teal);
+                box-shadow: 0 0 0 3px rgba(0,117,106,.12);
+            }
+
+        .c-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 1px 4px rgba(0,0,0,.2);
+        }
+
+        /* ── Size selector ─────────────────────── */
+        .size-opts {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .size-opt {
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 18px;
+            background: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            transition: border-color .18s;
+        }
+
+            .size-opt.active {
+                border-color: var(--teal);
+                background: var(--teal-lt);
+                color: var(--teal);
+            }
+
+        /* ── Quick specs ───────────────────────── */
+        .specs {
+            margin-bottom: 20px;
+        }
+
+        .spec-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+            .spec-row:last-child {
+                border-bottom: none;
+            }
+
+        .spec-k {
+            width: 160px;
+            flex-shrink: 0;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .spec-v {
+            color: var(--sub);
+        }
+
+        /* ── Promo ─────────────────────────────── */
+        .promo {
+            background: #fff9f0;
+            border: 1px dashed #f59e0b;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+
+        .promo-ttl {
+            font-size: 14px;
+            font-weight: 700;
+            color: #d97706;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .promo ul {
+            margin: 0;
+            padding: 0 0 0 16px;
+            font-size: 13px;
+            color: var(--sub);
+            line-height: 1.9;
+        }
+
+            .promo ul li strong {
+                color: var(--text);
+            }
+
+        /* ── Qty ───────────────────────────────── */
+        .qty-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .qty-lbl {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .qty-ctrl {
+            display: flex;
+            align-items: center;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .qty-btn {
+            width: 44px;
+            height: 46px;
+            background: #fff;
+            border: none;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--teal);
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background .15s;
         }
 
-            .quantity-btn:hover:not(:disabled) {
-                border-color: var(--shop-primary-teal);
-                background: var(--shop-warm-peach-light);
+            .qty-btn:hover:not(:disabled) {
+                background: var(--teal-lt);
             }
 
-            .quantity-btn:disabled {
-                opacity: 0.5;
+            .qty-btn:disabled {
+                opacity: .35;
                 cursor: not-allowed;
             }
 
-        .quantity-input {
-            width: 80px;
-            height: 48px;
-            border: 2px solid #E0E0E0;
-            border-radius: 8px;
-            font-size: 16px;
+        .qty-inp {
+            width: 56px;
             text-align: center;
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-left: 2px solid var(--border);
+            border-right: 2px solid var(--border);
+            height: 46px;
+            outline: none;
+            font-family: inherit;
         }
 
-            .quantity-input:focus {
-                outline: none;
-                border-color: var(--shop-primary-teal);
-            }
+        /* ── CTA buttons ───────────────────────── */
+        .cta-row {
+            display: flex;
+            gap: 12px;
+        }
 
-        /* Add to Cart Button */
-        .btn-add-to-cart {
-            margin-top: 24px;
-            width: 100%;
-            background: #0066CC;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            padding: 16px 32px;
-            border-radius: 8px;
+        .btn-buy {
+            flex: 1;
+            padding: 16px;
+            background: var(--red);
+            color: #fff;
             border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
             cursor: pointer;
-            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
+            transition: background .2s, transform .15s;
         }
 
-            .btn-add-to-cart:hover:not(:disabled) {
-                background: #0052A3;
+            .btn-buy:hover:not(:disabled) {
+                background: #c62828;
                 transform: translateY(-2px);
             }
 
-            .btn-add-to-cart:active:not(:disabled) {
-                transform: translateY(0);
-                background: #003d7a;
+        .btn-cart {
+            flex: 1;
+            padding: 16px;
+            background: #fff;
+            color: var(--teal);
+            border: 2px solid var(--teal);
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background .2s, transform .15s;
+        }
+
+            .btn-cart:hover:not(:disabled) {
+                background: var(--teal-lt);
+                transform: translateY(-2px);
             }
 
-            .btn-add-to-cart:disabled {
-                background: #CCCCCC;
+            .btn-buy:disabled, .btn-cart:disabled {
+                background: #e5e7eb;
+                color: #9ca3af;
+                border-color: #e5e7eb;
                 cursor: not-allowed;
                 transform: none;
             }
 
-        /* Add to Wishlist Button */
-        .btn-add-wishlist {
-            margin-top: 12px;
+        .btn-wish {
             width: 100%;
-            background: white;
-            color: var(--shop-primary-teal);
-            font-size: 16px;
+            padding: 13px;
+            margin-top: 10px;
+            background: #fff;
+            color: var(--sub);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
             font-weight: 600;
-            padding: 14px 32px;
-            border-radius: 8px;
-            border: 2px solid var(--shop-primary-teal);
+            font-family: inherit;
             cursor: pointer;
-            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
+            transition: border-color .2s, color .2s;
         }
 
-            .btn-add-wishlist:hover:not(:disabled) {
-                background: #F5E6D3;
+            .btn-wish:hover {
+                border-color: var(--gold);
+                color: var(--gold);
             }
 
-            .btn-add-wishlist:disabled {
-                opacity: 0.7;
-                cursor: not-allowed;
-            }
-
-        /* Error Message */
-        .error-alert {
-            background: #FFF5F5;
-            border: 1px solid #DC3545;
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 16px;
-            color: #DC3545;
+        /* ── Alerts ────────────────────────────── */
+        .alert {
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        /* Success Message */
-        .success-alert {
-            background: #F0FFF4;
-            border: 1px solid #28A745;
             border-radius: 8px;
             padding: 12px 16px;
-            margin-bottom: 16px;
-            color: #28A745;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 14px;
+            font-size: 14px;
         }
 
-        /* Tabs Section */
-        .details-tabs-section {
-            margin-top: 48px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
+            .alert.ok {
+                background: #f0fff4;
+                border: 1px solid #28a745;
+                color: #28a745;
+            }
+
+            .alert.err {
+                background: #fff5f5;
+                border: 1px solid var(--red);
+                color: var(--red);
+            }
+
+        /* ── Tabs ──────────────────────────────── */
+        .tabs-wrap {
+            max-width: 1280px;
+            margin: 0 auto 64px;
             padding: 0 24px;
         }
 
-        .tabs-header {
+        .tabs-hdr {
             display: flex;
-            border-bottom: 1px solid #E0E0E0;
-            gap: 4px;
+            border-bottom: 2px solid var(--border);
         }
 
-        .tab-button {
-            padding: 16px 24px;
+        .tab-btn {
+            padding: 14px 24px;
             background: transparent;
             border: none;
-            font-size: 16px;
-            font-weight: 500;
-            color: var(--shop-primary-teal);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--sub);
             cursor: pointer;
             position: relative;
-            transition: all 0.3s ease;
+            transition: color .18s;
         }
 
-            .tab-button:hover {
-                background: var(--shop-warm-peach-light);
+            .tab-btn:hover {
+                color: var(--teal);
             }
 
-            .tab-button.active {
-                font-weight: 600;
+            .tab-btn.on {
+                color: var(--teal);
             }
 
-                .tab-button.active::after {
+                .tab-btn.on::after {
                     content: '';
                     position: absolute;
-                    bottom: 0;
+                    bottom: -2px;
                     left: 0;
                     right: 0;
-                    height: 3px;
-                    background: var(--shop-primary-teal);
+                    height: 2px;
+                    background: var(--teal);
                 }
 
-        .tab-content {
+        .tab-panel {
             display: none;
-            background: var(--shop-white);
-            padding: 32px;
-            border-radius: 0 0 12px 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            background: #fff;
+            padding: 28px 32px;
+            border-radius: 0 0 14px 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.05);
         }
 
-            .tab-content.active {
+            .tab-panel.on {
                 display: block;
             }
 
-            .tab-content h3 {
-                font-size: 18px;
-                font-weight: 600;
-                color: var(--shop-primary-teal);
+            .tab-panel h3 {
+                font-size: 17px;
+                font-weight: 700;
+                color: var(--teal);
                 margin: 0 0 16px;
             }
 
-            .tab-content p {
-                color: #666666;
-                line-height: 1.8;
-                margin: 0;
+        .spec-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+            .spec-grid .spec-row:nth-child(odd) {
+                padding-right: 24px;
             }
 
         .care-list {
@@ -475,11 +721,11 @@
         }
 
             .care-list li {
-                padding: 12px 0;
-                padding-left: 32px;
+                padding: 11px 0 11px 28px;
                 position: relative;
-                color: #666666;
-                border-bottom: 1px solid #E0E0E0;
+                color: var(--sub);
+                border-bottom: 1px solid var(--border);
+                font-size: 14px;
             }
 
                 .care-list li:last-child {
@@ -491,475 +737,575 @@
                     font-family: 'bootstrap-icons';
                     position: absolute;
                     left: 0;
-                    color: var(--shop-primary-teal);
+                    color: var(--teal);
                 }
 
-        /* Related Products Section */
-        .related-products-section {
-            margin-top: 64px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 0 24px 48px;
+        /* ── Related ───────────────────────────── */
+        .related {
+            max-width: 1280px;
+            margin: 0 auto 64px;
+            padding: 0 24px;
         }
 
-        .related-heading {
-            text-align: center;
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--shop-primary-teal);
-            margin: 0 0 32px;
-        }
-
-        .related-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
-        }
-
-        .related-card {
-            background: var(--shop-white);
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-            .related-card:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            .related h2 {
+                text-align: center;
+                font-size: 24px;
+                font-weight: 800;
+                color: var(--text);
+                margin: 0 0 28px;
             }
 
-        .related-card-image {
-            aspect-ratio: 1;
-            background: var(--shop-light-gray);
-            overflow: hidden;
+        .rel-grid {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 20px;
         }
 
-            .related-card-image img {
+        .rel-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.07);
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+            .rel-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 24px rgba(0,0,0,.13);
+            }
+
+        .rel-img {
+            aspect-ratio: 1;
+            overflow: hidden;
+            background: #f5f5f5;
+        }
+
+            .rel-img img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                transition: transform 0.3s ease;
+                transition: transform .35s;
             }
 
-        .related-card:hover .related-card-image img {
-            transform: scale(1.05);
+        .rel-card:hover .rel-img img {
+            transform: scale(1.06);
         }
 
-        .related-card-image-placeholder {
+        .rel-ph {
             width: 100%;
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 38px;
+            color: #ccc;
         }
 
-            .related-card-image-placeholder i {
-                font-size: 40px;
-                color: var(--shop-text-muted);
-                opacity: 0.5;
+        .rel-info {
+            padding: 14px 16px 16px;
+        }
+
+            .rel-info h4 {
+                font-size: 13px;
+                font-weight: 600;
+                margin: 0 0 6px;
+                color: var(--text);
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
             }
 
-        .related-card-info {
-            padding: 16px;
-        }
+            .rel-info p {
+                font-size: 15px;
+                font-weight: 800;
+                color: var(--red);
+                margin: 0;
+            }
 
-        .related-card-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333333;
-            margin: 0 0 8px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .related-card-price {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--shop-primary-teal);
-        }
-
-        .related-card-link {
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-
-        /* Mobile Sticky Bar */
-        .mobile-sticky-bar {
+        /* ── Mobile sticky ─────────────────────── */
+        .sticky-bar {
             display: none;
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: white;
-            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            box-shadow: 0 -4px 20px rgba(0,0,0,.1);
             padding: 12px 16px;
-            z-index: 1000;
+            z-index: 999;
         }
 
-        .mobile-sticky-content {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            max-width: 1200px;
+        .sticky-inner {
+            max-width: 1280px;
             margin: 0 auto;
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
 
-        .mobile-price {
+        .sticky-price {
             font-size: 18px;
-            font-weight: 700;
-            color: var(--shop-primary-teal);
+            font-weight: 800;
+            color: var(--red);
+            white-space: nowrap;
         }
 
-        .mobile-add-btn {
+        .sticky-btn {
             flex: 1;
-            background: #0066CC;
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 12px 20px;
+            background: var(--red);
+            color: #fff;
             border: none;
             border-radius: 8px;
+            padding: 13px;
+            font-size: 14px;
+            font-weight: 700;
             cursor: pointer;
+            font-family: inherit;
         }
 
-        /* Responsive Design */
-        @@media (max-width: 991px) {
-            .frame-details-grid {
+        /* ── Responsive ────────────────────────── */
+        @@media(max-width:991px) {
+            .fd-grid {
                 grid-template-columns: 1fr;
                 gap: 32px;
             }
 
-            .related-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .gal {
+                position: static;
             }
 
-            .mobile-sticky-bar {
+            .rel-grid {
+                grid-template-columns: repeat(2,1fr);
+            }
+
+            .sticky-bar {
                 display: block;
             }
 
-            .frame-details-container {
-                padding-bottom: 100px;
+            .fd {
+                padding-bottom: 90px;
+            }
+
+            .spec-grid {
+                grid-template-columns: 1fr;
             }
         }
 
-        @@media (max-width: 576px) {
-            .frame-name {
-                font-size: 24px;
+        @@media(max-width:576px) {
+            .prod-name {
+                font-size: 20px;
             }
 
-            .frame-price {
+            .price-val {
                 font-size: 28px;
             }
 
-                .frame-price .currency {
-                    font-size: 18px;
-                }
-
-            .related-grid {
-                grid-template-columns: 1fr;
+            .rel-grid {
+                grid-template-columns: repeat(2,1fr);
+                gap: 12px;
             }
 
-            .tabs-header {
-                flex-wrap: wrap;
+            .cta-row {
+                flex-direction: column;
             }
 
-            .tab-button {
-                flex: 1;
-                min-width: 100px;
-                text-align: center;
-                padding: 12px 16px;
-                font-size: 14px;
+            .tab-btn {
+                font-size: 13px;
+                padding: 12px 14px;
             }
         }
     </style>
 }
 
 <!-- Breadcrumb -->
-<div class="frame-breadcrumb-section">
-    <ol class="frame-breadcrumb">
-        <li><a asp-page="/Index">Home</a></li>
-        <li><span class="separator"><i class="bi bi-chevron-right"></i></span></li>
+<div class="bc">
+    <ol>
+        <li><a asp-page="/Index">Trang chủ</a></li>
+        <li><span class="sep"><i class="bi bi-chevron-right"></i></span></li>
         <li><a asp-page="/Products/Index">Shop</a></li>
-        <li><span class="separator"><i class="bi bi-chevron-right"></i></span></li>
-        <li><a asp-page="/Products/Index" asp-route-productType="Frames">Frames</a></li>
-        <li><span class="separator"><i class="bi bi-chevron-right"></i></span></li>
-        <li><span class="current">@Model.Frame?.Name</span></li>
+        <li><span class="sep"><i class="bi bi-chevron-right"></i></span></li>
+        <li><a asp-page="/Products/Index" asp-route-productType="Frame">Gọng kính</a></li>
+        @if (!string.IsNullOrEmpty(Model.Frame?.Brand))
+        {
+            <li><span class="sep"><i class="bi bi-chevron-right"></i></span></li>
+            <li><a asp-page="/Products/Index" asp-route-BrandFilter="@Model.Frame.Brand">@Model.Frame.Brand</a></li>
+        }
+        <li><span class="sep"><i class="bi bi-chevron-right"></i></span></li>
+        <li><span class="cur">@Model.Frame?.Name</span></li>
     </ol>
 </div>
 
 @if (Model.Frame != null)
 {
-    <div class="frame-details-container">
-        <!-- Success/Error Messages -->
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="success-alert">
-                <i class="bi bi-check-circle"></i>
-                <span>@TempData["SuccessMessage"]</span>
-            </div>
-        }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="fd" style="padding-bottom:0;padding-top:16px;">
+            <div class="alert ok"><i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]</div>
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="fd" style="padding-bottom:0;padding-top:16px;">
+            <div class="alert err"><i class="bi bi-exclamation-circle-fill"></i> @Model.ErrorMessage</div>
+        </div>
+    }
 
-        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-        {
-            <div class="error-alert">
-                <i class="bi bi-exclamation-circle"></i>
-                <span>@Model.ErrorMessage</span>
-            </div>
-        }
+    <div class="fd">
+        <div class="fd-grid">
 
-        @if (TempData["ErrorMessage"] != null)
-        {
-            <div class="error-alert">
-                <i class="bi bi-exclamation-circle"></i>
-                <span>@TempData["ErrorMessage"]</span>
-            </div>
-        }
-
-        <div class="frame-details-grid">
-            <!-- Left Column - Product Images -->
-            <div class="frame-gallery">
-                <div class="main-image-container">
+            <!-- ══════ LEFT — Gallery ══════ -->
+            <div class="gal">
+                <div class="gal-main">
+                    @* Brand badge TOP-RIGHT *@
+                    @if (!string.IsNullOrEmpty(Model.Frame.Brand))
+                    {
+                        <a class="brand-badge"
+                           asp-page="/Products/Index"
+                           asp-route-BrandFilter="@Model.Frame.Brand"
+                           title="Xem tất cả @Model.Frame.Brand">
+                            @Model.Frame.Brand.ToUpper()
+                        </a>
+                    }
                     @if (!string.IsNullOrEmpty(Model.Frame.PrimaryImageUrl))
                     {
-                        <img id="mainProductImage" src="@Model.Frame.PrimaryImageUrl" alt="@Model.Frame.Name" />
+                        <img id="mainImg" src="@Model.Frame.PrimaryImageUrl" alt="@Model.Frame.Name" />
                     }
                     else
                     {
-                        <div class="main-image-placeholder">
-                            <i class="bi bi-eyeglasses"></i>
-                        </div>
+                        <div class="gal-ph"><i class="bi bi-eyeglasses"></i></div>
                     }
                 </div>
 
                 @if (Model.Frame.Images.Count > 1)
                 {
-                    <div class="thumbnail-gallery">
-                        @foreach (var image in Model.Frame.Images)
+                    <div class="thumbs">
+                        @foreach (var img in Model.Frame.Images)
                         {
-                            <div class="thumbnail-item @(image.IsPrimary ? "active" : "")"
-                                 onclick="changeMainImage('@image.ImageUrl', this)">
-                                <img src="@image.ImageUrl" alt="@(image.AltText ?? Model.Frame.Name)" />
+                            <div class="thumb @(img.IsPrimary ? "active" : "")"
+                                 onclick="changeImg('@img.ImageUrl',this)">
+                                <img src="@img.ImageUrl" alt="@img.AltText" />
                             </div>
                         }
                     </div>
                 }
+
+                @* Size diagram — shows when at least one measurement exists *@
+                @if (Model.Frame.LensWidth.HasValue || Model.Frame.BridgeWidth.HasValue || Model.Frame.TempleLength.HasValue)
+                {
+                    <div class="sz-strip">
+                        @* Lens Width *@
+                        <div class="sz-card">
+                            <svg viewBox="0 0 70 46" fill="none">
+                                <rect x="4" y="8" width="26" height="28" rx="6" stroke="@(Model.Frame.LensWidth.HasValue ? "#00756A" : "#ccc")" stroke-width="2.5" />
+                                <rect x="40" y="8" width="26" height="28" rx="6" stroke="@(Model.Frame.LensWidth.HasValue ? "#00756A" : "#ccc")" stroke-width="2.5" />
+                                <line x1="30" y1="22" x2="40" y2="22" stroke="#ccc" stroke-width="2" />
+                                <line x1="4" y1="42" x2="30" y2="42" stroke="#aaa" stroke-width="1.5" />
+                                <polygon points="3,42 7,40 7,44" fill="#aaa" />
+                                <polygon points="31,42 27,40 27,44" fill="#aaa" />
+                            </svg>
+                            <div class="sz-num">@(Model.Frame.LensWidth.HasValue? Model.Frame.LensWidth.Value.ToString("0") : "—")</div>
+                            <div class="sz-lbl">Lens Width</div>
+                        </div>
+                        @* Bridge *@
+                        <div class="sz-card">
+                            <svg viewBox="0 0 70 46" fill="none">
+                                <rect x="4" y="8" width="26" height="28" rx="6" stroke="#ccc" stroke-width="2" />
+                                <rect x="40" y="8" width="26" height="28" rx="6" stroke="#ccc" stroke-width="2" />
+                                <line x1="30" y1="22" x2="40" y2="22" stroke="@(Model.Frame.BridgeWidth.HasValue ? "#00756A" : "#ccc")" stroke-width="2.5" />
+                                <line x1="30" y1="42" x2="40" y2="42" stroke="#aaa" stroke-width="1.5" />
+                                <polygon points="29,42 33,40 33,44" fill="#aaa" />
+                                <polygon points="41,42 37,40 37,44" fill="#aaa" />
+                            </svg>
+                            <div class="sz-num">@(Model.Frame.BridgeWidth.HasValue? Model.Frame.BridgeWidth.Value.ToString("0") : "—")</div>
+                            <div class="sz-lbl">Bridge (mm)</div>
+                        </div>
+                        @* Temple *@
+                        <div class="sz-card">
+                            <svg viewBox="0 0 70 46" fill="none">
+                                <rect x="4" y="12" width="22" height="20" rx="4" stroke="#ccc" stroke-width="2" />
+                                <rect x="30" y="12" width="22" height="20" rx="4" stroke="#ccc" stroke-width="2" />
+                                <line x1="52" y1="22" x2="68" y2="22" stroke="@(Model.Frame.TempleLength.HasValue ? "#00756A" : "#ccc")" stroke-width="2.5" />
+                                <line x1="52" y1="42" x2="68" y2="42" stroke="#aaa" stroke-width="1.5" />
+                                <polygon points="51,42 55,40 55,44" fill="#aaa" />
+                                <polygon points="69,42 65,40 65,44" fill="#aaa" />
+                            </svg>
+                            <div class="sz-num">@(Model.Frame.TempleLength.HasValue? Model.Frame.TempleLength.Value.ToString("0") : "—")</div>
+                            <div class="sz-lbl">Temple (mm)</div>
+                        </div>
+                    </div>
+                }
             </div>
 
-            <!-- Right Column - Product Information -->
-            <div class="frame-info">
-                <h1 class="frame-name">@Model.Frame.Name</h1>
+            <!-- ══════ RIGHT — Info ══════ -->
+            <div class="info">
 
-                <p class="frame-sku">SKU: @Model.Frame.Sku</p>
+                @* Brand link *@
+                @if (!string.IsNullOrEmpty(Model.Frame.Brand))
+                {
+                    <a class="brand-link"
+                       asp-page="/Products/Index"
+                       asp-route-BrandFilter="@Model.Frame.Brand">@Model.Frame.Brand.ToUpper()</a>
+                }
 
-                <div class="frame-price">
-                    <span class="currency">@Model.Frame.Currency</span>
-                    <span>@Model.Frame.Price.ToString("N0")</span>
-                </div>
+                <h1 class="prod-name">@Model.Frame.Name</h1>
 
-                <!-- Stock Status Badge -->
-                <div class="stock-badge @Model.Frame.StockStatus.ToLower().Replace("stock", "-stock")">
-                    @switch (Model.Frame.StockStatus)
+                @* Status / SKU / Origin row *@
+                <div class="status-row">
+                    <span>Tình trạng: <strong>@(Model.Frame.IsInStock ? "Còn hàng" : "Hết hàng")</strong></span>
+                    <span class="sep-dot">·</span>
+                    <span>SKU: <strong>@Model.Frame.Sku</strong></span>
+                    @if (!string.IsNullOrEmpty(Model.Frame.Origin))
                     {
-                        case "InStock":
-                            <i class="bi bi-check-circle-fill"></i>
-                            <span>In Stock</span>
-                            break;
-                        case "LowStock":
-                            <i class="bi bi-exclamation-circle-fill"></i>
-                            <span>@Model.Frame.StockMessage</span>
-                            break;
-                        case "OutOfStock":
-                            <i class="bi bi-x-circle-fill"></i>
-                            <span>Out of Stock</span>
-                            break;
+                        <span class="sep-dot">·</span>
+                        <span>Xuất xứ: <strong>@Model.Frame.Origin</strong></span>
                     }
                 </div>
 
-                <!-- Description Box -->
-                @if (!string.IsNullOrEmpty(Model.Frame.Description))
+                @* Meta badges *@
+                @if (!string.IsNullOrEmpty(Model.Frame.Gender) || !string.IsNullOrEmpty(Model.Frame.FrameShape) || !string.IsNullOrEmpty(Model.Frame.FrameType))
                 {
-                    <div class="frame-description-box">
-                        <p>@Model.Frame.Description</p>
+                    <div class="badges">
+                        @if (!string.IsNullOrEmpty(Model.Frame.Gender))
+                        {
+                            <span class="badge"><i class="bi bi-person"></i> @Model.Frame.Gender</span>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Frame.FrameShape))
+                        {
+                            <span class="badge"><i class="bi bi-circle"></i> @Model.Frame.FrameShape</span>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Frame.FrameType))
+                        {
+                            <span class="badge"><i class="bi bi-eyeglasses"></i> @Model.Frame.FrameType</span>
+                        }
                     </div>
                 }
 
-                <!-- Specifications -->
-                <div class="specs-section">
-                    <h3 class="specs-heading">Specifications</h3>
-                    <div class="specs-table">
-                        <div class="specs-row">
-                            <span class="specs-label">Material:</span>
-                            <span class="specs-value">@(Model.Frame.FrameMaterial ?? "—")</span>
-                        </div>
-                        <div class="specs-row">
-                            <span class="specs-label">Frame Type:</span>
-                            <span class="specs-value">@(Model.Frame.FrameType ?? "—")</span>
-                        </div>
-                        <div class="specs-row">
-                            <span class="specs-label">Bridge Width:</span>
-                            <span class="specs-value">@(Model.Frame.BridgeWidth.HasValue ? $"{Model.Frame.BridgeWidth.Value:N1} mm" : "—")</span>
-                        </div>
-                        <div class="specs-row">
-                            <span class="specs-label">Temple Length:</span>
-                            <span class="specs-value">@(Model.Frame.TempleLength.HasValue ? $"{Model.Frame.TempleLength.Value:N1} mm" : "—")</span>
-                        </div>
-                    </div>
+                @* Price + sold count *@
+                <div class="price-row">
+                    <span class="price-lbl">Giá:</span>
+                    <span class="price-cur">@Model.Frame.Currency</span>
+                    <span class="price-val">@Model.Frame.Price.ToString("N0")</span>
+                    @if (Model.Frame.SoldCount > 0)
+                    {
+                        <span class="sold-txt"><strong>@Model.Frame.SoldCount</strong> đã bán</span>
+                    }
                 </div>
 
-                <!-- Add to Cart Form -->
-                <form method="post" asp-page-handler="AddToCart" id="addToCartForm">
-                    <input type="hidden" asp-for="AddToCartInput.ProductId" />
-
-                    <!-- Quantity Selector -->
-                    <div class="quantity-section">
-                        <label class="quantity-label">Quantity</label>
-                        <div class="quantity-input-wrapper">
-                            <button type="button" class="quantity-btn" id="decreaseQty" onclick="decreaseQuantity()">
-                                <i class="bi bi-dash"></i>
-                            </button>
-                            <input type="number" asp-for="AddToCartInput.Quantity"
-                                   class="quantity-input" id="quantityInput"
-                                   min="1" max="@(Model.Frame.InventoryQty ?? 10)"
-                                   value="1" />
-                            <button type="button" class="quantity-btn" id="increaseQty" onclick="increaseQuantity()">
-                                <i class="bi bi-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Add to Cart Button -->
-                    <button type="submit" class="btn-add-to-cart" @(Model.Frame.IsInStock ? "" : "disabled")>
-                        @if (Model.Frame.IsInStock)
+                @* Stock badge *@
+                @{
+                    var sc = Model.Frame.StockStatus == "OutOfStock" ? "out" : Model.Frame.StockStatus == "LowStock" ? "low" : "in";
+                }
+                <div class="stock-row">
+                    <div class="stock-badge @sc">
+                        @if (sc == "in")
                         {
-                            <i class="bi bi-cart-plus"></i>
-                            <span>Add to Cart</span>
+                            <i class="bi bi-check-circle-fill"></i>
+                        }
+                        else if (sc == "low")
+                        {
+
+                            <i class="bi bi-exclamation-circle-fill"></i>
                         }
                         else
                         {
-                            <i class="bi bi-cart-x"></i>
-                            <span>Out of Stock</span>
-                        }
-                    </button>
-                </form>
 
-                @* ── Add to Wishlist: CHỈ hiện khi hết hàng ── *@
-                @if (!Model.Frame.IsInStock)
+                            <i class="bi bi-x-circle-fill"></i>
+                        }
+                        <span>@Model.Frame.StockMessage</span>
+                    </div>
+                </div>
+
+                @* ── Color picker ── *@
+                @if (!string.IsNullOrEmpty(Model.Frame.Color))
                 {
-                    <button type="button"
-                            class="btn-add-wishlist"
-                            id="wishlistBtn"
-                            data-product-id="@Model.Frame.ProductId"
-                            data-in-wishlist="false">
-                        <i class="bi bi-heart"></i>
-                        <span>Save to Wishlist — Notify me when back</span>
-                    </button>
+                    var cols = Model.Frame.Color.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+                    <div class="section-lbl">Màu sắc <span class="cur" id="colorLbl">@cols[0]</span></div>
+                    <div class="color-opts">
+                        @foreach (var c in cols)
+                        {
+                            <button class="color-opt @(c == cols[0] ? "active" : "")"
+                                    data-color="@c" onclick="selColor(this,'@c')">
+                                <span class="c-dot" style="@ColorStyle(c)"></span>
+                                @c.ToUpper()
+                            </button>
+                        }
+                    </div>
                 }
+
+                @* ── Size selector ── *@
+                @if (!string.IsNullOrEmpty(Model.Frame.SizeLabel))
+                {
+                    <div class="section-lbl">Kích thước</div>
+                    <div class="size-opts">
+                        <button class="size-opt active">@Model.Frame.SizeLabel</button>
+                    </div>
+                }
+
+                @* ── Quick specs ── *@
+                <div class="specs">
+                    @if (!string.IsNullOrEmpty(Model.Frame.FrameMaterial))
+                    {
+                        <div class="spec-row"><span class="spec-k">Chất liệu</span><span class="spec-v">@Model.Frame.FrameMaterial</span></div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Frame.FrameType))
+                    {
+                        <div class="spec-row"><span class="spec-k">Kiểu gọng</span><span class="spec-v">@Model.Frame.FrameType</span></div>
+                    }
+                    @if (Model.Frame.BridgeWidth.HasValue)
+                    {
+                        <div class="spec-row"><span class="spec-k">Bridge (mm)</span><span class="spec-v">@Model.Frame.BridgeWidth.Value.ToString("0.#")</span></div>
+                    }
+                    @if (Model.Frame.TempleLength.HasValue)
+                    {
+                        <div class="spec-row"><span class="spec-k">Temple (mm)</span><span class="spec-v">@Model.Frame.TempleLength.Value.ToString("0.#")</span></div>
+                    }
             </div>
+
+            @* ── Promo box ── *@
+            <div class="promo">
+                <div class="promo-ttl"><i class="bi bi-gift-fill"></i> KHUYẾN MÃI</div>
+                <ul>
+                    <li>Hoàn tiền <strong>100%</strong> nếu hàng không chính hãng</li>
+                    <li>Miễn phí giao hàng cho đơn từ <strong>500,000đ</strong></li>
+                    <li>Bảo hành chính hãng <strong>12 tháng</strong></li>
+                </ul>
+            </div>
+
+            @* ── Form ── *@
+            <form method="post" asp-page-handler="AddToCart" id="cartForm">
+                <input type="hidden" asp-for="AddToCartInput.ProductId" />
+                <div class="qty-row">
+                    <span class="qty-lbl">Số lượng:</span>
+                    <div class="qty-ctrl">
+                        <button type="button" class="qty-btn" id="qMinus" onclick="chQty(-1)">−</button>
+                        <input type="number" asp-for="AddToCartInput.Quantity" class="qty-inp" id="qInput"
+                               min="1" max="@(Model.Frame.InventoryQty ?? 99)" value="1" />
+                        <button type="button" class="qty-btn" id="qPlus" onclick="chQty(1)">+</button>
+                    </div>
+                </div>
+                <div class="cta-row">
+                    <button type="submit" name="handler" value="BuyNow" class="btn-buy"
+                            @(Model.Frame.IsInStock ? "" : "disabled")>
+                        <i class="bi bi-lightning-fill"></i> MUA NGAY
+                    </button>
+                    <button type="submit" class="btn-cart" @(Model.Frame.IsInStock ? "" : "disabled")>
+                        <i class="bi bi-cart-plus"></i> THÊM VÀO GIỎ
+                    </button>
+                </div>
+            </form>
+
+            <button type="button" class="btn-wish" id="wishBtn"
+                    data-product-id="@Model.Frame.ProductId" data-in="false">
+                <i class="bi bi-heart"></i>
+                <span>@(Model.Frame.IsInStock ? "Thêm vào yêu thích" : "Thông báo khi có hàng")</span>
+            </button>
+
         </div>
     </div>
+</div>
 
-    <!-- Tabs Section -->
-    <div class="details-tabs-section">
-        <div class="tabs-header">
-            <button class="tab-button active" onclick="showTab('description')">Full Description</button>
-            <button class="tab-button" onclick="showTab('specifications')">Specifications</button>
-            <button class="tab-button" onclick="showTab('care')">Care Instructions</button>
-        </div>
+<!-- ═══ Tabs ═══ -->
+<div class="tabs-wrap">
+    <div class="tabs-hdr">
+        <button class="tab-btn on" onclick="switchTab('desc',this)">Mô tả sản phẩm</button>
+        <button class="tab-btn" onclick="switchTab('specs',this)">Thông số kỹ thuật</button>
+        <button class="tab-btn" onclick="switchTab('care',this)">Bảo quản</button>
+    </div>
 
-        <div id="tab-description" class="tab-content active">
-            <h3>About This Frame</h3>
-            <p>
-                @if (!string.IsNullOrEmpty(Model.Frame.Description))
+    <div id="tab-desc" class="tab-panel on">
+        <h3>Giới thiệu sản phẩm</h3>
+        <p style="color:var(--sub);line-height:1.8;font-size:15px;">
+            @(string.IsNullOrEmpty(Model.Frame.Description)
+                        ? "Gọng kính được thiết kế tỉ mỉ, kết hợp phong cách hiện đại với sự thoải mái trong từng chi tiết."
+                        : Model.Frame.Description)
+        </p>
+    </div>
+
+        <div id="tab-specs" class="tab-panel">
+            <h3>Thông số kỹ thuật</h3>
+            <div class="spec-grid">
+                <div class="spec-row"><span class="spec-k">SKU</span><span class="spec-v">@Model.Frame.Sku</span></div>
+            @if (!string.IsNullOrEmpty(Model.Frame.Brand))
                 {
-                    @Model.Frame.Description
+                    <div class="spec-row"><span class="spec-k">Thương hiệu</span><span class="spec-v">@Model.Frame.Brand</span></div>
                 }
-                else
+                @if (!string.IsNullOrEmpty(Model.Frame.Origin))
                 {
-                    <text>Discover exceptional quality and timeless design with this premium eyewear frame. Crafted with precision and attention to detail, this frame offers both style and comfort for everyday wear.</text>
+                    <div class="spec-row"><span class="spec-k">Xuất xứ</span><span class="spec-v">@Model.Frame.Origin</span></div>
                 }
-            </p>
-        </div>
-
-        <div id="tab-specifications" class="tab-content">
-            <h3>Technical Specifications</h3>
-            <div class="specs-table">
-                <div class="specs-row">
-                    <span class="specs-label">SKU:</span>
-                    <span class="specs-value">@Model.Frame.Sku</span>
-                </div>
-                <div class="specs-row">
-                    <span class="specs-label">Material:</span>
-                    <span class="specs-value">@(Model.Frame.FrameMaterial ?? "—")</span>
-                </div>
-                <div class="specs-row">
-                    <span class="specs-label">Frame Type:</span>
-                    <span class="specs-value">@(Model.Frame.FrameType ?? "—")</span>
-                </div>
-                <div class="specs-row">
-                    <span class="specs-label">Bridge Width:</span>
-                    <span class="specs-value">@(Model.Frame.BridgeWidth.HasValue ? $"{Model.Frame.BridgeWidth.Value:N1} mm" : "—")</span>
-                </div>
-                <div class="specs-row">
-                    <span class="specs-label">Temple Length:</span>
-                    <span class="specs-value">@(Model.Frame.TempleLength.HasValue ? $"{Model.Frame.TempleLength.Value:N1} mm" : "—")</span>
-                </div>
+                @if (!string.IsNullOrEmpty(Model.Frame.Gender))
+                {
+                    <div class="spec-row"><span class="spec-k">Giới tính</span><span class="spec-v">@Model.Frame.Gender</span></div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Frame.FrameShape))
+                {
+                    <div class="spec-row"><span class="spec-k">Kiểu dáng</span><span class="spec-v">@Model.Frame.FrameShape</span></div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Frame.FrameMaterial))
+                {
+                    <div class="spec-row"><span class="spec-k">Chất liệu</span><span class="spec-v">@Model.Frame.FrameMaterial</span></div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Frame.FrameType))
+                {
+                    <div class="spec-row"><span class="spec-k">Kiểu gọng</span><span class="spec-v">@Model.Frame.FrameType</span></div>
+                }
+                @if (Model.Frame.LensWidth.HasValue)
+                {
+                    <div class="spec-row"><span class="spec-k">Lens Width (mm)</span><span class="spec-v">@Model.Frame.LensWidth.Value.ToString("0.#")</span></div>
+                }
+                @if (Model.Frame.BridgeWidth.HasValue)
+                {
+                    <div class="spec-row"><span class="spec-k">Bridge (mm)</span><span class="spec-v">@Model.Frame.BridgeWidth.Value.ToString("0.#")</span></div>
+                }
+                @if (Model.Frame.TempleLength.HasValue)
+                {
+                    <div class="spec-row"><span class="spec-k">Temple (mm)</span><span class="spec-v">@Model.Frame.TempleLength.Value.ToString("0.#")</span></div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Frame.Color))
+                {
+                    <div class="spec-row"><span class="spec-k">Màu sắc</span><span class="spec-v">@Model.Frame.Color</span></div>
+                }
             </div>
         </div>
 
-        <div id="tab-care" class="tab-content">
-            <h3>Care & Maintenance</h3>
+        <div id="tab-care" class="tab-panel">
+            <h3>Bảo quản &amp; vệ sinh</h3>
             <ul class="care-list">
-                @if (!string.IsNullOrEmpty(Model.Frame.CareInstructions))
+                @foreach (var line in (Model.Frame.CareInstructions ?? "Lau nhẹ bằng khăn mềm. Tránh hóa chất. Bảo quản trong hộp đựng kính.").Split('.').Where(s => !string.IsNullOrWhiteSpace(s)))
                 {
-                    @foreach (var instruction in Model.Frame.CareInstructions.Split('.').Where(s => !string.IsNullOrWhiteSpace(s)))
-                    {
-                        <li>@instruction.Trim().</li>
-                    }
-                }
-                else
-                {
-                    <li>Clean gently with a microfiber cloth.</li>
-                    <li>Store in the provided case when not in use.</li>
-                    <li>Avoid dropping or sitting on your eyewear.</li>
-                    <li>Keep away from extreme temperatures.</li>
+                    <li>@line.Trim().</li>
                 }
             </ul>
         </div>
     </div>
 
-    <!-- Related Products Section -->
+    <!-- ═══ Related ═══ -->
     @if (Model.Frame.RelatedProducts.Any())
     {
-        <div class="related-products-section">
-            <h2 class="related-heading">You May Also Like</h2>
-            <div class="related-grid">
-                @foreach (var related in Model.Frame.RelatedProducts)
+        <div class="related">
+            <h2>Sản phẩm tương tự</h2>
+            <div class="rel-grid">
+                @foreach (var r in Model.Frame.RelatedProducts)
                 {
-                    <a asp-page="/Products/FrameDetails" asp-route-id="@related.ProductId" class="related-card-link">
-                        <div class="related-card">
-                            <div class="related-card-image">
-                                @if (!string.IsNullOrEmpty(related.PrimaryImageUrl))
-                                {
-                                    <img src="@related.PrimaryImageUrl" alt="@related.Name" />
-                                }
-                                else
-                                {
-                                    <div class="related-card-image-placeholder">
-                                        <i class="bi bi-eyeglasses"></i>
-                                    </div>
-                                }
-                            </div>
-                            <div class="related-card-info">
-                                <h4 class="related-card-name">@related.Name</h4>
-                                <p class="related-card-price">
-                                    @related.Currency @related.Price.ToString("N0")
-                                </p>
-                            </div>
+                    <a asp-page="/Products/FrameDetails" asp-route-id="@r.ProductId" class="rel-card">
+                        <div class="rel-img">
+                            @if (!string.IsNullOrEmpty(r.PrimaryImageUrl))
+                            {
+                                <img src="@r.PrimaryImageUrl" alt="@r.Name" />
+                            }
+                            else
+                            {
+
+                                <div class="rel-ph"><i class="bi bi-eyeglasses"></i></div>
+                            }
+                        </div>
+                        <div class="rel-info">
+                            <h4>@r.Name</h4>
+                            <p>@r.Currency @r.Price.ToString("N0")</p>
                         </div>
                     </a>
                 }
@@ -967,252 +1313,121 @@
         </div>
     }
 
-    <!-- Recently Viewed Section -->
-    <section class="favorites-section" id="recently-viewed" style="display:none;">
-        <div class="favorites-container">
-            <div class="favorites-header">
-                <p class="favorites-eyebrow">Your History</p>
-                <h2>Recently Viewed Products</h2>
-            </div>
-            <div class="favorites-grid" id="recently-viewed-container">
-            </div>
-        </div>
-    </section>
-
-    <!-- Mobile Sticky Bar -->
-    <div class="mobile-sticky-bar" id="mobileStickyBar">
-        <div class="mobile-sticky-content">
-            <div class="mobile-price">
-                @Model.Frame.Currency @Model.Frame.Price.ToString("N0")
-            </div>
-            <button type="button" class="mobile-add-btn" onclick="submitAddToCart()" @(Model.Frame.IsInStock ? "" : "disabled")>
-                @if (Model.Frame.IsInStock)
-                {
-                    <text><i class="bi bi-cart-plus"></i> Add to Cart</text>
-                }
-                else
-                {
-                    <text>Out of Stock</text>
-                }
+    <!-- Mobile sticky -->
+    <div class="sticky-bar" id="stickyBar">
+        <div class="sticky-inner">
+            <div class="sticky-price">@Model.Frame.Currency @Model.Frame.Price.ToString("N0")</div>
+            <button class="sticky-btn" onclick="document.getElementById('cartForm').submit()"
+                    @(Model.Frame.IsInStock ? "" : "disabled")>
+                @(Model.Frame.IsInStock ? "Thêm vào giỏ hàng" : "Hết hàng")
             </button>
         </div>
     </div>
 }
 else
 {
-    <div class="frame-details-container">
-        <div class="empty-state" style="margin-top: 48px;">
-            <div class="empty-state-icon">
-                <i class="bi bi-exclamation-circle"></i>
-            </div>
-            <h2>Product Not Found</h2>
-            <p>The frame you're looking for doesn't exist or has been removed.</p>
-            <a asp-page="/Products/Index" class="btn-clear-filters">
-                <i class="bi bi-arrow-left"></i> Back to Shop
-            </a>
-        </div>
+    <div style="text-align:center;padding:80px 24px;">
+        <i class="bi bi-exclamation-circle" style="font-size:60px;color:var(--red,#e53935);"></i>
+        <h2 style="margin-top:16px;">Không tìm thấy sản phẩm</h2>
+        <a asp-page="/Products/Index" style="color:#00756A;">← Quay về Shop</a>
     </div>
 }
 
 @section Scripts {
     <script>
-        window.recentlyViewedProduct = {
-            id: @Model.Frame.ProductId,
-            name: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Frame.Name)),
-            imageUrl: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Frame.PrimaryImageUrl ?? "")),
-            categoryLink: "/Products?ProductTypeFilter=Frame",
-            price: '@Model.Frame.Price.ToString("N0")',
-            currency: '@Model.Frame.Currency',
-            productUrl: '/Products/FrameDetails/@Model.Frame.ProductId'
-        };
-    </script>
-    <script>
-        // ── Image Gallery ────────────────────────────────────────────────────────
-        function changeMainImage(imageUrl, thumbnailElement) {
-            const mainImage = document.getElementById('mainProductImage');
-            if (mainImage) {
-                mainImage.style.opacity = '0';
-                setTimeout(() => {
-                    mainImage.src = imageUrl;
-                    mainImage.style.opacity = '1';
-                }, 150);
-            }
-            document.querySelectorAll('.thumbnail-item').forEach(thumb => thumb.classList.remove('active'));
-            thumbnailElement.classList.add('active');
+        function changeImg(url, el) {
+            const img = document.getElementById('mainImg');
+            if (img) { img.style.opacity='0'; setTimeout(()=>{ img.src=url; img.style.opacity='1'; }, 200); }
+            document.querySelectorAll('.thumb').forEach(t=>t.classList.remove('active'));
+            if (el) el.classList.add('active');
+        }
+        function chQty(d) {
+            const inp=document.getElementById('qInput');
+            const max=parseInt(inp.max)||99;
+            let v=Math.max(1,Math.min(max,(parseInt(inp.value)||1)+d));
+            inp.value=v;
+            document.getElementById('qMinus').disabled=v<=1;
+            document.getElementById('qPlus').disabled=v>=max;
+        }
+        document.addEventListener('DOMContentLoaded',()=>{ chQty(0); });
+
+        function selColor(btn,name) {
+            document.querySelectorAll('.color-opt').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+            const lbl=document.getElementById('colorLbl');
+            if(lbl) lbl.textContent=name;
+        }
+        function switchTab(name,btn) {
+            document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('on'));
+            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+            document.getElementById('tab-'+name)?.classList.add('on');
+            btn.classList.add('on');
         }
 
-        // ── Quantity Selector ────────────────────────────────────────────────────
-        function decreaseQuantity() {
-            const input = document.getElementById('quantityInput');
-            const currentValue = parseInt(input.value) || 1;
-            if (currentValue > 1) { input.value = currentValue - 1; updateQuantityButtons(); }
-        }
-
-        function increaseQuantity() {
-            const input = document.getElementById('quantityInput');
-            const maxValue = parseInt(input.max) || 10;
-            const currentValue = parseInt(input.value) || 1;
-            if (currentValue < maxValue) { input.value = currentValue + 1; updateQuantityButtons(); }
-        }
-
-        function updateQuantityButtons() {
-            const input = document.getElementById('quantityInput');
-            const currentValue = parseInt(input.value) || 1;
-            const maxValue = parseInt(input.max) || 10;
-            const decreaseBtn = document.getElementById('decreaseQty');
-            const increaseBtn = document.getElementById('increaseQty');
-            if (decreaseBtn) decreaseBtn.disabled = currentValue <= 1;
-            if (increaseBtn) increaseBtn.disabled = currentValue >= maxValue;
-        }
-
-        document.getElementById('quantityInput')?.addEventListener('change', function () {
-            const maxValue = parseInt(this.max) || 10;
-            let value = parseInt(this.value) || 1;
-            if (value < 1) value = 1;
-            if (value > maxValue) value = maxValue;
-            this.value = value;
-            updateQuantityButtons();
+        // Mobile sticky
+        const sb=document.getElementById('stickyBar'), cf=document.getElementById('cartForm');
+        if(sb&&cf) window.addEventListener('scroll',()=>{
+            if(window.innerWidth<=991) sb.style.display=cf.getBoundingClientRect().bottom<0?'block':'none';
         });
 
-        // ── Tab Navigation ───────────────────────────────────────────────────────
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-' + tabName)?.classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        // ── Mobile Sticky Bar ────────────────────────────────────────────────────
-        const stickyBar = document.getElementById('mobileStickyBar');
-        window.addEventListener('scroll', function () {
-            const formBottom = document.getElementById('addToCartForm')?.getBoundingClientRect().bottom || 0;
-            if (window.innerWidth <= 991) {
-                stickyBar.style.display = formBottom < 0 ? 'block' : 'none';
-            }
-        });
-
-        function submitAddToCart() {
-            document.getElementById('addToCartForm').submit();
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            updateQuantityButtons();
-        });
-
-        // ── Wishlist Logic ───────────────────────────────────────────────────────
-        (async function initWishlist() {
-            const btn = document.getElementById('wishlistBtn');
-            if (!btn) return; // sản phẩm còn hàng → không render nút → thoát
-
-            const productId = parseInt(btn.dataset.productId);
-
-            // Nếu đã đăng nhập, check xem đã wishlist chưa để highlight đúng trạng thái
+        // Wishlist
+        (async()=>{
+            const btn=document.getElementById('wishBtn'); if(!btn) return;
+            const pid=parseInt(btn.dataset.productId);
             @if (User.Identity?.IsAuthenticated == true)
             {
-                    <text>
-                    try {
-                        const res = await fetch('/api/wishlist/my');
-                        if (res.ok) {
-                            const items = await res.json();
-                            if (items.some(i => i.productId === productId)) {
-                                setWishlistActive(btn, true);
-                            }
-                        }
-                    } catch {}
-                    </text>
+                <text>
+                try{const r=await fetch('/api/wishlist/my');if(r.ok){const d=await r.json();if(d.some(i=>i.productId===pid))setWish(btn,true);}}catch{}
+                </text>
             }
-
-            btn.addEventListener('click', async function () {
-                // Chưa đăng nhập → redirect login
+            btn.addEventListener('click',async()=>{
                 @if (User.Identity?.IsAuthenticated != true)
                 {
-                        <text>
-                        window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
-                        return;
-                        </text>
+                    <text>
+                    window.location.href='/Account/Login?returnUrl='+encodeURIComponent(window.location.pathname);return;
+                    </text>
                 }
-
-                const isIn = btn.dataset.inWishlist === 'true';
-                btn.disabled = true;
-
-                try {
-                    if (isIn) {
-                        // Đang trong wishlist → xoá
-                        const res = await fetch('/api/wishlist/remove', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ productId })
-                        });
-                        if (res.ok) {
-                            setWishlistActive(btn, false);
-                            showWishlistToast('Removed from wishlist', '');
-                        }
-                    } else {
-                        // Chưa trong wishlist → thêm
-                        const res = await fetch('/api/wishlist/add', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ productId })
-                        });
-                        const data = await res.json();
-                        if (res.ok) {
-                            setWishlistActive(btn, true);
-                            showWishlistToast("Saved! We'll email you when it's back", '');
-                        } else {
-                            showWishlistToast(data.message || 'Something went wrong', '');
-                        }
-                    }
-                } catch {
-                    showWishlistToast('Network error. Please try again.', '');
-                } finally {
-                    btn.disabled = false;
-                }
+                const isIn=btn.dataset.in==='true'; btn.disabled=true;
+                try{
+                    const r=await fetch(isIn?'/api/wishlist/remove':'/api/wishlist/add',
+                        {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productId:pid})});
+                    const d=await r.json().catch(()=>({}));
+                    if(r.ok){setWish(btn,!isIn);toast(isIn?'Đã xóa khỏi yêu thích':'Đã thêm vào yêu thích!');}
+                    else toast(d.message||'Có lỗi xảy ra');
+                }catch{toast('Lỗi kết nối.');}finally{btn.disabled=false;}
             });
         })();
-
-        function setWishlistActive(btn, active) {
-            btn.dataset.inWishlist = active ? 'true' : 'false';
-            const icon = btn.querySelector('i');
-            const text = btn.querySelector('span');
-            if (active) {
-                icon.className = 'bi bi-heart-fill';
-                text.textContent = 'Saved to Wishlist';
-                btn.style.background = '#fffbf5';
-                btn.style.borderColor = '#c9a96e';
-                btn.style.color = '#a07840';
-            } else {
-                icon.className = 'bi bi-heart';
-                text.textContent = 'Save to Wishlist — Notify me when back';
-                btn.style.background = '';
-                btn.style.borderColor = '';
-                btn.style.color = '';
-            }
+        function setWish(btn,on){
+            btn.dataset.in=on?'true':'false';
+            btn.querySelector('i').className=on?'bi bi-heart-fill':'bi bi-heart';
+            btn.querySelector('span').textContent=on?'Đã thêm vào yêu thích':'Thêm vào yêu thích';
+            btn.style.borderColor=on?'#c9a96e':''; btn.style.color=on?'#c9a96e':'';
         }
-
-        let _wlToastTimer;
-        function showWishlistToast(msg, icon = '<i class="bi bi-heart"></i>') {
-            let toast = document.getElementById('wl-toast-detail');
-            if (!toast) {
-                toast = document.createElement('div');
-                toast.id = 'wl-toast-detail';
-                toast.style.cssText = [
-                    'position:fixed', 'bottom:28px', 'left:50%',
-                    'transform:translateX(-50%) translateY(100px)',
-                    'background:#0f0f0f', 'color:#fff', 'border-radius:12px',
-                    'padding:12px 22px', 'font-size:13px', 'font-weight:500',
-                    'display:flex', 'align-items:center', 'gap:8px',
-                    'box-shadow:0 8px 28px rgba(0,0,0,0.22)', 'z-index:9999',
-                    'white-space:nowrap',
-                    'transition:transform .35s cubic-bezier(0.34,1.56,0.64,1)'
-                ].join(';');
-                document.body.appendChild(toast);
-            }
-            toast.innerHTML = `<span style="font-size:16px">${icon}</span>${msg}`;
-            toast.style.transform = 'translateX(-50%) translateY(0)';
-            clearTimeout(_wlToastTimer);
-            _wlToastTimer = setTimeout(() => {
-                toast.style.transform = 'translateX(-50%) translateY(100px)';
-            }, 3000);
+        let _tt;
+        function toast(msg){
+            let t=document.getElementById('_toast');
+            if(!t){t=document.createElement('div');t.id='_toast';
+            t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;border-radius:10px;padding:12px 22px;font-size:13px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.25);z-index:9999;white-space:nowrap;transition:transform .3s cubic-bezier(.34,1.56,.64,1)';
+            document.body.appendChild(t);}
+            t.textContent=msg; t.style.transform='translateX(-50%) translateY(0)';
+            clearTimeout(_tt); _tt=setTimeout(()=>{t.style.transform='translateX(-50%) translateY(80px)';},3000);
         }
     </script>
+}
+
+@functions {
+    string ColorStyle(string color)
+    {
+        var m = new System.Collections.Generic.Dictionary<string, string>(StringComparer.OrdinalIgnoreCase){
+            {"Black","background:#1a1a1a"},{"Red","background:#cc2200"},{"Gold","background:#c9a96e"},
+            {"Tortoise","background:linear-gradient(135deg,#7b4f1e,#c8892a,#1a0e00)"},
+            {"Silver","background:linear-gradient(135deg,#d0d0d0,#f5f5f5,#b0b0b0)"},
+            {"Blue","background:#1a4fa0"},{"Pink","background:#e879a0"},{"Green","background:#2d7a3a"},
+            {"Transparent","background:linear-gradient(135deg,rgba(180,220,255,.5),rgba(255,255,255,.9));border:1px solid #ddd"},
+            {"White","background:#f0f0f0;border:1px solid #ddd"},{"Brown","background:#8B4513"},
+            {"Olive","background:#808000"},{"Grey","background:#808080"},{"Gray","background:#808080"},
+            {"Purple","background:#6b21a8"},{"Transparent Grey","background:linear-gradient(135deg,rgba(180,180,180,.5),rgba(240,240,240,.9));border:1px solid #ccc"}
+        };
+        return m.TryGetValue(color.Trim(), out var s) ? s : "background:#ccc";
+    }
 }

@@ -202,6 +202,28 @@ public partial class EyewearStoreContext : DbContext
             entity.Property(e => e.TempleLength)
                 .HasColumnType("decimal(5,2)")
                 .HasColumnName("temple_length");
+
+            // ── v2 ──────────────────────────────────────────────────────────
+            entity.Property(e => e.Brand)
+                .HasMaxLength(100)
+                .HasColumnName("brand");
+            entity.Property(e => e.Color)
+                .HasMaxLength(200)
+                .HasColumnName("color");
+            entity.Property(e => e.Gender)
+                .HasMaxLength(20)
+                .HasColumnName("gender");
+            entity.Property(e => e.FrameShape)
+                .HasMaxLength(50)
+                .HasColumnName("frame_shape");
+
+            // ── v3 ──────────────────────────────────────────────────────────
+            entity.Property(e => e.LensWidth)
+                .HasColumnType("decimal(5,2)")
+                .HasColumnName("lens_width");
+            entity.Property(e => e.Origin)
+                .HasMaxLength(100)
+                .HasColumnName("origin");
         });
 
         // =========================

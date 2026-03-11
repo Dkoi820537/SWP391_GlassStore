@@ -189,7 +189,7 @@ namespace EyewearStore_SWP391.Pages.Profile
             return RedirectToPage();
         }
 
-        // ✅✅✅ FIXED METHOD - CHỖ QUAN TRỌNG NHẤT! ✅✅✅
+        // FIXED METHOD - KEY SECTION
         public async Task<IActionResult> OnPostDeleteAddressAsync(int addressId)
         {
             var uid = CurrentUserId();
@@ -202,7 +202,7 @@ namespace EyewearStore_SWP391.Pages.Profile
                 return RedirectToPage();
             }
 
-            // ✅ KEY FIX: Set AddressId = null for all orders using this address
+            // KEY FIX: Set AddressId = null for all orders using this address
             // Orders will keep ReceiverName, Phone, AddressLine (snapshot)
             var ordersWithThisAddress = await _context.Orders
                 .Where(o => o.AddressId == addressId)

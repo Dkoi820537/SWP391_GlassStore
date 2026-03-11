@@ -138,7 +138,7 @@ namespace EyewearStore_SWP391.Pages.Sale.Orders
                     if (svcStatus != "Done" && svcStatus != "Cancelled")
                     {
                         TempData["Error"] =
-                            $"⚠️ Cannot set status to \"{newStatus}\" — " +
+                            $"Warning: Cannot set status to \"{newStatus}\" — " +
                             $"the service job is currently \"{svcStatus}\". " +
                             $"Please wait for the technician team to mark it as Done first.";
                         return RedirectToPage(new { id });
@@ -151,7 +151,7 @@ namespace EyewearStore_SWP391.Pages.Sale.Orders
             _context.Orders.Update(o);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"✓ Order #{id} status updated to: {newStatus}";
+            TempData["Success"] = $"Order #{id} status updated to: {newStatus}";
             return RedirectToPage(new { id });
         }
     }

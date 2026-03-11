@@ -312,10 +312,10 @@
 <div class="details-container">
     <!-- Page Header -->
     <div class="page-header">
-        <h1>👓 @Model.Lens.Name</h1>
+        <h1><i class="bi bi-circle"></i> @Model.Lens.Name</h1>
         <div style="display: flex; gap: 0.5rem;">
             <a asp-page="/Lenses/Edit" asp-route-id="@Model.Lens.ProductId" class="btn btn-warning">
-                ✏️ Edit
+                <i class="bi bi-pencil"></i> Edit
             </a>
             <a asp-page="/Lenses/Index" class="btn btn-secondary">
                 ← Back to List
@@ -334,7 +334,7 @@
                 }
                 else
                 {
-                    <span class="no-image">👓</span>
+                    <span class="no-image"><i class="bi bi-circle"></i></span>
                 }
             </div>
 
@@ -355,7 +355,7 @@
         <!-- Details Section -->
         <div class="details-section">
             <!-- Product Information -->
-            <h3 class="section-title">📦 Product Information</h3>
+            <h3 class="section-title"><i class="bi bi-box-seam"></i> Product Information</h3>
             <div class="details-list">
                 <dl>
                     <dt>SKU</dt>
@@ -402,7 +402,7 @@
             </div>
 
             <!-- Lens-Specific Properties -->
-            <h3 class="section-title" style="margin-top: 2rem;">🔬 Lens Specifications</h3>
+            <h3 class="section-title" style="margin-top: 2rem;"><i class="bi bi-sliders"></i> Lens Specifications</h3>
             <div class="details-list">
                 <dl>
                     <dt>Lens Type</dt>
@@ -444,7 +444,7 @@
             </div>
 
             <!-- Status and Metadata -->
-            <h3 class="section-title" style="margin-top: 2rem;">📋 Status & Metadata</h3>
+            <h3 class="section-title" style="margin-top: 2rem;"><i class="bi bi-card-checklist"></i> Status & Metadata</h3>
             <div class="details-list">
                 <dl>
                     <dt>Status</dt>
@@ -474,7 +474,7 @@
             <!-- Action Buttons -->
             <div class="actions-section">
                 <a asp-page="/Lenses/Edit" asp-route-id="@Model.Lens.ProductId" class="btn btn-warning">
-                    ✏️ Edit Lens
+                    <i class="bi bi-pencil"></i> Edit Lens
                 </a>
                 <a asp-page="/Lenses/Index" class="btn btn-secondary">
                     ← Back to List

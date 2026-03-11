@@ -78,7 +78,7 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             // TODO: Send notification email (BR-OP006)
             // await _emailService.SendPrescriptionWorkflowUpdateEmail(order, WorkflowStep);
 
-            TempData["Success"] = $"✓ Workflow updated to: {WorkflowStep}";
+            TempData["Success"] = $"Workflow updated to: {WorkflowStep}";
             return RedirectToPage(new { id });
         }
 
@@ -118,7 +118,7 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             // TODO: Send notification email (BR-OP006)
             // await _emailService.SendStatusUpdateEmail(order, NewStatus);
 
-            TempData["Success"] = $"✓ Order status updated to: {NewStatus}";
+            TempData["Success"] = $"Order status updated to: {NewStatus}";
             return RedirectToPage(new { id });
         }
 
@@ -164,7 +164,7 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                     CreatedAt = DateTime.UtcNow
                 });
 
-                TempData["Success"] = "✓ Shipment created successfully!";
+                TempData["Success"] = "Shipment created successfully!";
             }
             else
             {
@@ -184,7 +184,7 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                     CreatedAt = DateTime.UtcNow
                 });
 
-                TempData["Success"] = "✓ Shipment updated successfully!";
+                TempData["Success"] = "Shipment updated successfully!";
             }
 
             // Update order status to Shipped

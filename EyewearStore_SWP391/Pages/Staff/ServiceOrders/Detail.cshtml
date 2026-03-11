@@ -49,10 +49,10 @@
     string StatusEmoji(string s) => s switch
     {
         "Pending" => "⏳",
-        "Processing" => "⚙️",
-        "Ready" => "✅",
-        "Done" => "🎉",
-        "Cancelled" => "❌",
+        "Processing" => "⊛",
+        "Ready" => "●",
+        "Done" => "★",
+        "Cancelled" => "✕",
         _ => "•"
     };
 
@@ -671,7 +671,7 @@
     {
         <div class="pg-hdr">
             <div>
-                <h1>🔧 Job #@order.OrderId</h1>
+                <h1><i class="bi bi-wrench me-2"></i>Job #@order.OrderId</h1>
                 <p>@order.CreatedAt.ToString("MMMM dd, yyyy 'at' HH:mm")</p>
             </div>
             <span class="spill"
@@ -688,7 +688,7 @@
                     <div class="dc-hdr"><i class="bi bi-tools"></i><h3>Service Breakdown</h3></div>
                     <div class="dc-body">
                         <div class="bd-row">
-                            <div class="bd-left"><div class="bd-ico">🕶</div><div><div class="bd-lbl">Frame</div><div class="bd-val">@(snap.FrameName ?? snap.ProductName ?? "N/A")</div></div></div>
+                            <div class="bd-left"><div class="bd-ico"><i class="bi bi-eyeglasses"></i></div><div><div class="bd-lbl">Frame</div><div class="bd-val">@(snap.FrameName ?? snap.ProductName ?? "N/A")</div></div></div>
                             <div class="bd-prc">@snap.FramePrice.ToString("N0") ₫</div>
                         </div>
                         @if (!string.IsNullOrEmpty(snap.LensProductName))
@@ -699,7 +699,7 @@
                             </div>
                         }
                         <div class="bd-row">
-                            <div class="bd-left"><div class="bd-ico">⚙️</div><div><div class="bd-lbl">Service</div><div class="bd-val">@(snap.ServiceName ?? "N/A")</div></div></div>
+                            <div class="bd-left"><div class="bd-ico"><i class="bi bi-gear"></i></div><div><div class="bd-lbl">Service</div><div class="bd-val">@(snap.ServiceName ?? "N/A")</div></div></div>
                             <div class="bd-prc">@snap.ServicePrice.ToString("N0") ₫</div>
                         </div>
                         <div class="bd-tot">
@@ -716,7 +716,7 @@
                         @if (isCancelled)
                         {
                             <div style="display:flex;align-items:center;gap:10px;color:#dc2626">
-                                <span style="font-size:1.4rem">❌</span>
+                                <i class="bi bi-x-circle" style="font-size:1.4rem"></i>
                                 <strong>This service order has been cancelled.</strong>
                             </div>
                         }
@@ -760,7 +760,7 @@
                             <input type="hidden" name="OrderItemId" value="@item.OrderItemId" />
 
                             <div style="margin-bottom:18px">
-                                <span class="form-lbl">📊 Status</span>
+                                <span class="form-lbl"><i class="bi bi-bar-chart me-1"></i> Status</span>
                                 <div class="st-g">
                                     @foreach (var s in DetailModel.Statuses)
                                     {
@@ -780,7 +780,7 @@
                             </div>
 
                             <div style="margin-bottom:13px">
-                                <label class="form-lbl" for="at">👤 Assign Technician</label>
+                                <label class="form-lbl" for="at"><i class="bi bi-person me-1"></i> Assign Technician</label>
                                 <input type="text" id="at" name="AssignedTo"
                                        value="@snap.AssignedTo" class="fi-inp"
                                        placeholder="Technician name or staff code…" />
@@ -788,14 +788,14 @@
 
                             <div style="margin-bottom:18px">
                                 <label class="form-lbl" for="note">
-                                    📝 Note to Customer
+                                    <i class="bi bi-pencil me-1"></i> Note to Customer
                                 </label>
                                 <textarea id="note" name="InternalNote" rows="4"
                                       class="fi-inp" style="resize:vertical"
                                       placeholder="e.g. Lens is being cut, estimated 2 hours…">@snap.InternalNote</textarea>
                             </div>
 
-                            <button type="submit" class="btn-save">💾 Save Changes</button>
+                            <button type="submit" class="btn-save"><i class="bi bi-save me-1"></i> Save Changes</button>
                         </form>
 
                         <a asp-page="/Staff/ServiceOrders/Index" class="back-l">

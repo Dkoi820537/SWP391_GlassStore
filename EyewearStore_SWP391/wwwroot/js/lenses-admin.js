@@ -289,8 +289,8 @@ const LensAdmin = (function () {
                 <span class="status-badge ${statusClass}">${lens.isActive ? 'Active' : 'Inactive'}</span>
                 <div class="lens-card-image">
                     ${lens.primaryImageUrl
-                ? `<img src="${lens.primaryImageUrl}" alt="${escapeHtml(lens.name)}" onerror="this.parentElement.innerHTML='<span class=\\'placeholder-icon\\'>🔍</span>'">`
-                : '<span class="placeholder-icon">🔍</span>'
+                ? `<img src="${lens.primaryImageUrl}" alt="${escapeHtml(lens.name)}" onerror="this.parentElement.innerHTML='<span class=\\'placeholder-icon\\'><i class=\\'bi bi-search\\'></i></span>'">`
+                : '<span class="placeholder-icon"><i class="bi bi-search"></i></span>'
             }
                 </div>
                 <div class="lens-card-body">
@@ -317,7 +317,7 @@ const LensAdmin = (function () {
     function renderEmptyState(title, description) {
         return `
             <div class="empty-state">
-                <div class="empty-state-icon">📦</div>
+                <div class="empty-state-icon"><i class="bi bi-box-seam"></i></div>
                 <h3 class="empty-state-title">${title}</h3>
                 <p class="empty-state-description">${description}</p>
                 <a href="/Admin/Lenses/Create" class="btn btn-primary">Add New Lens</a>
@@ -771,7 +771,7 @@ const LensAdmin = (function () {
         if (!gallery || !mainImage) return;
 
         if (!images || images.length === 0) {
-            mainImage.innerHTML = '<span class="placeholder-icon" style="font-size: 5rem;">🔍</span>';
+            mainImage.innerHTML = '<span class="placeholder-icon" style="font-size: 5rem;"><i class="bi bi-search"></i></span>';
             if (thumbnails) thumbnails.style.display = 'none';
             return;
         }

@@ -159,7 +159,7 @@ header {
     }
 
     .navbar-brand::before {
-        content: "👓 ";
+        content: "";
         margin-right: var(--spacing-sm);
     }
 

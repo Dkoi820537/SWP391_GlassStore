@@ -29,12 +29,12 @@
     };
     string SvcIcon(string s) => s switch
     {
-        "Pending" => "⏳",
-        "Processing" => "⚙️",
-        "Ready" => "✅",
-        "Done" => "🎉",
-        "Cancelled" => "❌",
-        _ => "🔧"
+        "Pending" => "◷",
+        "Processing" => "⊛",
+        "Ready" => "●",
+        "Done" => "★",
+        "Cancelled" => "✕",
+        _ => "⊘"
     };
 }
 
@@ -802,7 +802,7 @@
     <!-- Header -->
     <div class="pg-hdr">
         <div>
-            <h1>💼 Process Order #@Model.OrderId</h1>
+            <h1><i class="bi bi-briefcase me-2"></i>Process Order #@Model.OrderId</h1>
             <div class="hdr-meta">
                 @if (Model.IsHighPriority)
                 {
@@ -836,7 +836,7 @@
         string bannerCls = serviceDone ? "done" : serviceCancelled ? "cancelled" : "locked";
         <div class="svc-lock-banner @bannerCls">
             <div class="svc-lock-icon">
-                @(serviceDone ? "✅" : serviceCancelled ? "❌" : "🔒")
+                <i class="bi @(serviceDone ? "bi-check-circle-fill" : serviceCancelled ? "bi-x-circle-fill" : "bi-lock-fill")"></i>
             </div>
             <div class="svc-lock-body">
                 @if (serviceDone)
@@ -871,7 +871,7 @@
                         @for (int i = 0; i < svcSteps.Length; i++)
                         {
                             string cls = i < curIdx ? "done-s" : i == curIdx ? "active-s" : "idle-s";
-                            string check = i < curIdx ? "✓ " : "";
+                            string check = i < curIdx ? "" : "";
                             <span class="svc-step @cls">@check@svcSteps[i]</span>
                             if (i < svcSteps.Length - 1)
                             {
@@ -906,7 +906,7 @@
                             <div class="ii-v">@Model.CustomerName</div>
                             <div class="ii-s">
                                 <a href="mailto:@Model.CustomerEmail" style="color:var(--teal);text-decoration:none">
-                                    📧 @Model.CustomerEmail
+                                    <i class="bi bi-envelope me-1"></i> @Model.CustomerEmail
                                 </a>
                             </div>
                         </div>
@@ -915,7 +915,7 @@
                             <div class="ii-v">
                                 @if (!string.IsNullOrWhiteSpace(Model.CustomerPhone))
                                 {
-                                    <a href="tel:@Model.CustomerPhone" style="color:var(--teal);text-decoration:none">📱 @Model.CustomerPhone</a>
+                                    <a href="tel:@Model.CustomerPhone" style="color:var(--teal);text-decoration:none"><i class="bi bi-phone me-1"></i> @Model.CustomerPhone</a>
                                 }
                                 else
                                 {
@@ -930,12 +930,12 @@
                             <div class="ii-v">
                                 @if (Model.Order.PaymentMethod == "COD")
                                 {
-                                    <span>💵 Cash on Delivery</span>
+                                    <span><i class="bi bi-cash me-1"></i> Cash on Delivery</span>
                                 }
                                 else
                                 {
 
-                                    <span>💳 @Model.Order.PaymentMethod</span>
+                                    <span><i class="bi bi-credit-card me-1"></i> @Model.Order.PaymentMethod</span>
                                 }
                             </div>
                         </div>
@@ -944,12 +944,12 @@
                             <div class="ii-v">
                                 @if (Model.HasPrescriptionItems)
                                 {
-                                    <span class="badge-pill badge-rx">👓 Prescription</span>
+                                    <span class="badge-pill badge-rx"><i class="bi bi-eyeglasses me-1"></i> Prescription</span>
                                 }
                                 else if (Model.IsPreOrder)
                                 {
 
-                                    <span class="badge-pill badge-preorder">🕐 Pre-Order</span>
+                                    <span class="badge-pill badge-preorder"><i class="bi bi-clock me-1"></i> Pre-Order</span>
                                 }
                                 else
                                 {
@@ -1002,12 +1002,12 @@
                                         <div style="font-weight:700;color:var(--txt);font-size:13px">@item.ProductName</div>
                                         @if (item.PrescriptionId != null)
                                         {
-                                            <span class="badge-pill badge-rx" style="margin-top:3px">👓 Rx</span>
+                                            <span class="badge-pill badge-rx" style="margin-top:3px"><i class="bi bi-eyeglasses me-1"></i> Rx</span>
                                         }
                                         @if (isSvc)
                                         {
                                             <div class="svc-indicator">
-                                                🔩 Service Order
+                                                <i class="bi bi-nut me-1"></i> Service Order
                                                 <span style="background:@SvcBg(itemSvcStatus);color:@SvcFg(itemSvcStatus);border-radius:4px;padding:1px 6px;font-size:9px">
                                                     @SvcIcon(itemSvcStatus) @itemSvcStatus
                                                 </span>
@@ -1015,7 +1015,7 @@
                                         }
                                         @if (item.HasReturn)
                                         {
-                                            <span class="badge-pill badge-return" style="margin-top:3px">🔄 Return</span>
+                                            <span class="badge-pill badge-return" style="margin-top:3px"><i class="bi bi-arrow-repeat me-1"></i> Return</span>
                                         }
                                     </td>
                                     <td style="font-family:monospace;font-size:12px">@item.Sku</td>
@@ -1027,7 +1027,7 @@
                                     <td style="text-align:center">
                                         @if ((item.ProductInventory ?? 0) < item.Quantity && !isSvc)
                                         {
-                                            <span class="badge-pill badge-out">⚠️ Low</span>
+                                            <span class="badge-pill badge-out"><i class="bi bi-exclamation-triangle me-1"></i> Low</span>
                                         }
                                         else if (!isSvc)
                                         {
@@ -1047,7 +1047,7 @@
                                         <td colspan="6" style="padding:0 12px 14px">
                                             <div class="rx-inner">
                                                 <div class="rx-title">
-                                                    👓 Prescription
+                                                    <i class="bi bi-eyeglasses me-1"></i> Prescription
                                                     @if (!item.IsPrescriptionVerified)
                                                     {
                                                         <span style="background:#ff9800;color:#fff;padding:2px 8px;border-radius:5px;font-size:10px">Needs Verification</span>
@@ -1083,7 +1083,7 @@
                                                         <button type="button" class="act-btn contact"
                                                                 onclick="contactCustomerAboutPrescription(@item.OrderItemId)"
                                                                 style="padding:8px 16px;border-radius:8px;font-size:12px">
-                                                            📧 Request Correction
+                                                            <i class="bi bi-envelope me-1"></i> Request Correction
                                                         </button>
                                                     </div>
                                                 }
@@ -1116,7 +1116,7 @@
                     <form method="post" asp-page-handler="UpdateStatus" id="statusForm">
                         <input type="hidden" name="orderId" value="@Model.OrderId" />
 
-                        <span class="form-lbl">📊 Update Status</span>
+                        <span class="form-lbl"><i class="bi bi-bar-chart me-1"></i> Update Status</span>
 
                         @if (Model.HasServiceItem && !serviceDone && !serviceCancelled)
                         {
@@ -1126,7 +1126,7 @@
                                 {
                                     <option value="@s" selected="@(s == Model.Order.Status)"
                                             data-locked="@(blockedStatuses.Contains(s) ? "true" : "false")">
-                                        @(blockedStatuses.Contains(s) ? "🔒 " : "")@s
+                                        @(blockedStatuses.Contains(s) ? "[Locked] " : "")@s
                                     </option>
                                 }
                             </select>
@@ -1243,7 +1243,7 @@
         if (sel) checkStatusLock(sel);
 
         function confirmOrder() {
-            if (confirm('✓ Confirm this order?\n\nThis will notify the customer and send to Operations team.'))
+            if (confirm('Confirm this order?\n\nThis will notify the customer and send to Operations team.'))
                 document.getElementById('confirmForm').submit();
         }
         function contactCustomer() {
@@ -1255,11 +1255,11 @@
             window.location.href = 'mailto:@Model.CustomerEmail?subject=' + sub + '&body=' + body;
         }
         function escalateToManager() {
-            if (confirm('⬆️ Escalate to Manager?\n\nThis order will be flagged for manager review.'))
+            if (confirm('Escalate to Manager?\n\nThis order will be flagged for manager review.'))
                 document.getElementById('escalateForm').submit();
         }
         function cancelOrder() {
-            if (confirm('❌ Cancel Order #@Model.OrderId?\n\nThis action cannot be undone!')) {
+            if (confirm('Cancel Order #@Model.OrderId?\n\nThis action cannot be undone!')) {
                 alert('Cancel order feature — To be implemented');
             }
         }

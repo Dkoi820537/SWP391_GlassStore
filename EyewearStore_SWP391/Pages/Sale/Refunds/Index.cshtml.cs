@@ -179,7 +179,7 @@ namespace EyewearStore_SWP391.Pages.Sale.Refunds
                 {
                     await _emailService.SendEmailAsync(
                         customerEmail,
-                        $"✅ Your Refund Has Been Approved — Order #{orderId}",
+                        $"Your Refund Has Been Approved — Order #{orderId}",
                         BuildApprovalEmail(customerName, productName, orderId, returnRequest.RefundAmount ?? 0)
                     );
                 }
@@ -241,7 +241,7 @@ namespace EyewearStore_SWP391.Pages.Sale.Refunds
                 {
                     await _emailService.SendEmailAsync(
                         customerEmail,
-                        $"❌ Refund Request Update — Order #{orderId}",
+                        $"Refund Request Update — Order #{orderId}",
                         BuildRejectionEmail(customerName, productName, orderId, rejectionReason)
                     );
                 }
@@ -276,7 +276,7 @@ namespace EyewearStore_SWP391.Pages.Sale.Refunds
 <body>
     <div class='container'>
         <div class='header'>
-            <h1>✅ Refund Approved</h1>
+            <h1>Refund Approved</h1>
         </div>
         <div class='content'>
             <h2 style='color: #333; margin-bottom: 10px;'>Great news, {customerName}!</h2>

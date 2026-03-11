@@ -62,7 +62,7 @@ namespace EyewearStore_SWP391.Pages.Account
                 return Page();
             }
 
-            // ✅ Xử lý cả 2 trường hợp: hash đúng chuẩn Identity hoặc plain text
+            // Handle both cases: correct Identity hash or plain text
             bool isPasswordValid = false;
             try
             {

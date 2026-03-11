@@ -17,7 +17,7 @@
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
-                    👔 Manager Dashboard
+                    <i class="bi bi-person-badge me-2"></i> Manager Dashboard
                 </h1>
                 <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin: 0;">
                     Business overview, analytics, and system management
@@ -46,7 +46,7 @@
                             <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.TotalRevenue.ToString("N0")</div>
                             <small style="opacity: 0.8;">VND this month</small>
                         </div>
-                        <div style="font-size: 3rem; opacity: 0.3;">💰</div>
+                        <div style="font-size: 3rem; opacity: 0.3;"><i class="bi bi-cash-stack"></i></div>
                     </div>
                 </div>
             </div>
@@ -63,15 +63,15 @@
                             <small style="opacity: 0.8;">
                                 @if (Model.Stats.OrderGrowth >= 0)
                                 {
-                                    <span>📈 +@Model.Stats.OrderGrowth% growth</span>
+                                    <span><i class="bi bi-graph-up-arrow text-success"></i> +@Model.Stats.OrderGrowth% growth</span>
                                 }
                                 else
                                 {
-                                    <span>📉 @Model.Stats.OrderGrowth% change</span>
+                                    <span><i class="bi bi-graph-down-arrow text-danger"></i> @Model.Stats.OrderGrowth% change</span>
                                 }
                             </small>
                         </div>
-                        <div style="font-size: 3rem; opacity: 0.3;">📦</div>
+                        <div style="font-size: 3rem; opacity: 0.3;"><i class="bi bi-box-seam"></i></div>
                     </div>
                 </div>
             </div>
@@ -88,15 +88,15 @@
                             <small style="opacity: 0.8;">
                                 @if (Model.Stats.LowStockCount > 0)
                                 {
-                                    <span>⚠️ @Model.Stats.LowStockCount low stock</span>
+                                    <span><i class="bi bi-exclamation-triangle-fill text-warning"></i> @Model.Stats.LowStockCount low stock</span>
                                 }
                                 else
                                 {
-                                    <span>✅ All stocked well</span>
+                                    <span><i class="bi bi-check-circle-fill text-success"></i> All stocked well</span>
                                 }
                             </small>
                         </div>
-                        <div style="font-size: 3rem; opacity: 0.3;">📊</div>
+                        <div style="font-size: 3rem; opacity: 0.3;"><i class="bi bi-bar-chart-line"></i></div>
                     </div>
                 </div>
             </div>
@@ -112,7 +112,7 @@
                             <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.TotalStaff</div>
                             <small style="opacity: 0.8;">@Model.Stats.ActiveStaff active today</small>
                         </div>
-                        <div style="font-size: 3rem; opacity: 0.3;">👥</div>
+                        <div style="font-size: 3rem; opacity: 0.3;"><i class="bi bi-people"></i></div>
                     </div>
                 </div>
             </div>
@@ -129,15 +129,15 @@
                             <small style="opacity: 0.8;">
                                 @if (Model.Stats.PendingReturns > 0)
                                 {
-                                    <span>⚠️ Awaiting review</span>
+                                    <span><i class="bi bi-exclamation-triangle-fill text-warning"></i> Awaiting review</span>
                                 }
                                 else
                                 {
-                                    <span>✅ All processed</span>
+                                    <span><i class="bi bi-check-circle-fill text-success"></i> All processed</span>
                                 }
                             </small>
                         </div>
-                        <div style="font-size: 3rem; opacity: 0.3;">🔄</div>
+                        <div style="font-size: 3rem; opacity: 0.3;"><i class="bi bi-arrow-repeat"></i></div>
                     </div>
                 </div>
             </div>
@@ -148,7 +148,7 @@
     <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); background: linear-gradient(135deg, rgba(26, 35, 50, 0.02) 0%, rgba(212, 165, 116, 0.05) 100%);">
         <div class="card-body" style="padding: 1.5rem;">
             <h5 style="color: var(--primary-navy); margin-bottom: 1rem; font-weight: 600;">
-                ⚡ Quick Actions
+                <i class="bi bi-lightning-charge-fill text-warning me-2"></i> Quick Actions
             </h5>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
                 <a asp-page="/Frames/Index" class="btn btn-outline-primary" style="padding: 0.75rem;">
@@ -210,7 +210,7 @@
                     @if (!Model.RecentOrders.Any())
                     {
                         <div style="text-align: center; padding: 3rem;">
-                            <div style="font-size: 3rem; opacity: 0.2;">📦</div>
+                            <div style="font-size: 3rem; opacity: 0.2;"><i class="bi bi-box-seam"></i></div>
                             <p style="color: var(--secondary-warm-gray); margin: 0;">No recent orders</p>
                         </div>
                     }
@@ -275,7 +275,7 @@
                     @if (Model.Stats.LowStockCount > 0)
                     {
                         <div class="alert alert-warning" style="border-radius: 8px;">
-                            <strong>⚠️ Low Stock Alert</strong><br />
+                            <strong><i class="bi bi-exclamation-triangle-fill"></i> Low Stock Alert</strong><br />
                             @Model.Stats.LowStockCount products need restocking
                             <a asp-page="/Manager/Inventory" class="alert-link d-block mt-2">View Details →</a>
                         </div>
@@ -283,7 +283,7 @@
                     @if (Model.Stats.PendingReturns > 0)
                     {
                         <div class="alert alert-info" style="border-radius: 8px;">
-                            <strong>🔄 Pending Returns</strong><br />
+                            <strong><i class="bi bi-arrow-repeat"></i> Pending Returns</strong><br />
                             @Model.Stats.PendingReturns returns awaiting approval
                             <a asp-page="/Manager/Returns" class="alert-link d-block mt-2">Review Returns →</a>
                         </div>
@@ -291,7 +291,7 @@
                     @if (Model.Stats.LowStockCount == 0 && Model.Stats.PendingReturns == 0)
                     {
                         <div style="text-align: center; padding: 2rem;">
-                            <div style="font-size: 3rem; opacity: 0.2;">✅</div>
+                            <div style="font-size: 3rem; opacity: 0.2;"><i class="bi bi-check-circle-fill"></i></div>
                             <p style="color: var(--secondary-warm-gray); margin: 0;">All systems operational</p>
                         </div>
                     }
@@ -309,7 +309,7 @@
                     @if (!Model.TopProducts.Any())
                     {
                         <div style="text-align: center; padding: 2rem;">
-                            <div style="font-size: 3rem; opacity: 0.2;">📦</div>
+                            <div style="font-size: 3rem; opacity: 0.2;"><i class="bi bi-box-seam"></i></div>
                             <p style="color: var(--secondary-warm-gray); margin: 0;">No sales data available</p>
                         </div>
                     }

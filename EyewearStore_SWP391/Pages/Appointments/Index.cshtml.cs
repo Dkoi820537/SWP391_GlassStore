@@ -84,7 +84,7 @@ namespace EyewearStore_SWP391.Pages.Admin.Appointments
                     appt.AppointmentDate.ToString("dd/MM/yyyy"),
                     appt.TimeSlot);
 
-            TempData["Success"] = $"✅ Confirmed appointment for {appt.FullName}. Email sent.";
+            TempData["Success"] = $"Confirmed appointment for {appt.FullName}. Email sent.";
             // FIX: phải truyền tên page "Index" rõ ràng
             return RedirectToPage("Index", new { Search, StatusFilter, DateFilter, Page });
         }
@@ -97,7 +97,7 @@ namespace EyewearStore_SWP391.Pages.Admin.Appointments
             appt.Status = "Completed";
             await _db.SaveChangesAsync();
 
-            TempData["Success"] = $"✅ Appointment #{id} marked as completed.";
+            TempData["Success"] = $"Appointment #{id} marked as completed.";
             return RedirectToPage("Index", new { Search, StatusFilter, DateFilter, Page });
         }
 

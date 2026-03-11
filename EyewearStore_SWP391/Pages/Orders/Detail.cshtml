@@ -56,7 +56,7 @@
                 <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden;">
                     <div style="padding: 1.25rem 1.5rem; background: var(--light-gray); border-bottom: 1px solid var(--medium-gray);">
                         <h5 style="color: var(--primary-navy); margin: 0; font-weight: 600;">
-                            📦 Items (@Model.Order.OrderItems.Count)
+                            <i class="bi bi-box-seam me-1"></i> Items (@Model.Order.OrderItems.Count)
                         </h5>
                     </div>
                     @foreach (var oi in Model.Order.OrderItems)
@@ -66,7 +66,7 @@
                                 <div class="col-auto">
                                     <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--light-gray), var(--secondary-cream)); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--medium-gray);">
                                         <span style="font-size: 1.25rem;">
-                                            @(oi.Product?.ProductType switch { "frame" => "👓", "lens" => "🔍", _ => "📦" })
+                                            @(oi.Product?.ProductType switch { "frame" => "F", "lens" => "L", _ => "P" })
                                         </span>
                                     </div>
                                 </div>
@@ -127,11 +127,11 @@
                 {
                     <div class="card mb-3" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
                         <div style="padding: 1.5rem;">
-                            <h5 style="color: var(--primary-navy); font-weight: 600; margin-bottom: 1rem;">📍 Shipping Address</h5>
+                            <h5 style="color: var(--primary-navy); font-weight: 600; margin-bottom: 1rem;"><i class="bi bi-geo-alt me-1"></i> Shipping Address</h5>
                             <div style="color: var(--dark-gray); line-height: 1.7;">
                                 <strong>@Model.Order.Address.ReceiverName</strong><br />
-                                📞 @Model.Order.Address.Phone<br />
-                                📍 @Model.Order.Address.AddressLine
+                                <i class="bi bi-telephone me-1"></i> @Model.Order.Address.Phone<br />
+                                <i class="bi bi-geo-alt me-1"></i> @Model.Order.Address.AddressLine
                             </div>
                         </div>
                     </div>

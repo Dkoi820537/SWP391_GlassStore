@@ -13,7 +13,7 @@
     </nav>
 
     <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
-        📋 My Orders
+        <i class="bi bi-card-list me-2"></i>My Orders
     </h1>
     <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin-bottom: 2rem;">
         View and track your order history
@@ -22,7 +22,7 @@
     @if (!Model.Orders.Any())
     {
         <div class="card" style="border: none; border-radius: 16px; box-shadow: var(--shadow-lg); text-align: center; padding: 4rem 2rem; background: linear-gradient(135deg, var(--white), var(--secondary-cream));">
-            <div style="font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.3;">📦</div>
+            <div style="font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.3;"><i class="bi bi-box-seam"></i></div>
             <h3 style="color: var(--primary-navy); margin-bottom: 1rem;">No Orders Yet</h3>
             <p style="color: var(--secondary-warm-gray); max-width: 400px; margin: 0 auto 2rem;">
                 You haven't placed any orders yet. Start shopping to see your order history here.

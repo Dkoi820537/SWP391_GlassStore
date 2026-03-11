@@ -189,7 +189,7 @@ namespace EyewearStore_SWP391.Pages.Account
 <body>
   <div class='wrap'>
     <div class='header'>
-      <h1>👓 OptiPlus</h1>
+      <h1>OptiPlus</h1>
       <p>Email Verification</p>
     </div>
     <div class='body'>
@@ -198,9 +198,9 @@ namespace EyewearStore_SWP391.Pages.Account
       <div class='otp-box'>
         <div class='otp-code'>{code}</div>
       </div>
-      <p class='expire'>⏱ This code expires in <strong>10 minutes</strong></p>
+      <p class='expire'>This code expires in <strong>10 minutes</strong></p>
       <div class='warning'>
-        🔒 <strong>Security notice:</strong> Never share this code with anyone. OptiPlus staff will never ask for your OTP.
+        <strong>Security notice:</strong> Never share this code with anyone. OptiPlus staff will never ask for your OTP.
       </div>
     </div>
     <div class='footer'>© {DateTime.Now.Year} OptiPlus. All rights reserved.</div>

@@ -607,7 +607,7 @@
     <script>
         // Toast helper
         let _wlToast = null;
-        function showWlToast(msg, icon = '♡') {
+        function showWlToast(msg, icon = '<i class="bi bi-heart"></i>') {
             if (!_wlToast) {
                 _wlToast = document.createElement('div');
                 _wlToast.id = 'wl-toast';
@@ -623,7 +623,7 @@
             @if (!User.Identity.IsAuthenticated)
             {
                     <text>
-                    showWlToast('Please login to save items', '🔒');
+                    showWlToast('Please login to save items', '');
                     setTimeout(() => window.location.href = '/Account/Login', 1200);
                     return;
                     </text>
@@ -644,7 +644,7 @@
                         btn.dataset.inWishlist = 'false';
                         btn.querySelector('i').className = 'bi bi-heart';
                         btn.classList.remove('active');
-                        showWlToast('Removed from wishlist', '🤍');
+                        showWlToast('Removed from wishlist', '');
                     }
                 } else {
                     const res  = await fetch('/api/wishlist/add', {
@@ -660,13 +660,13 @@
                         // Pop animation
                         btn.classList.add('pop');
                         btn.addEventListener('animationend', () => btn.classList.remove('pop'), { once: true });
-                        showWlToast("Saved! We'll notify you when it's back ❤️", '♡');
+                        showWlToast("Saved! We'll notify you when it's back", '');
                     } else {
-                        showWlToast(data.message || 'Something went wrong', '⚠️');
+                        showWlToast(data.message || 'Something went wrong', '');
                     }
                 }
             } catch {
-                showWlToast('Network error. Try again.', '⚠️');
+                showWlToast('Network error. Try again.', '');
             } finally {
                 btn.disabled = false;
             }

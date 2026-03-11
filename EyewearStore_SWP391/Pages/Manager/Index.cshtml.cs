@@ -40,7 +40,7 @@ namespace EyewearStore_SWP391.Pages.Manager
             public int LowStockCount { get; set; }
             public int TotalStaff { get; set; }
             public int ActiveStaff { get; set; }
-            public int PendingReturns { get; set; } // ✅ ADDED
+            public int PendingReturns { get; set; } // ADDED
             public decimal OrderGrowth { get; set; }
         }
 
@@ -103,7 +103,7 @@ namespace EyewearStore_SWP391.Pages.Manager
             Stats.TotalStaff = await _context.Users.Where(u => u.Role != "customer" && u.IsActive).CountAsync();
             Stats.ActiveStaff = Stats.TotalStaff;
 
-            // ✅ ADDED: Get pending returns count
+            // ADDED: Get pending returns count
             Stats.PendingReturns = await _context.Returns
                 .Where(r => r.Status == "Pending")
                 .CountAsync();

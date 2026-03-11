@@ -744,7 +744,7 @@
         <!-- PAGE HEADER -->
         <div class="pg-hdr">
             <div class="pg-hdr-left">
-                <h1>📦 Order #@order.OrderId</h1>
+                <h1><i class="bi bi-box-seam"></i> Order #@order.OrderId</h1>
                 <p>Placed @order.CreatedAt.ToString("MMMM dd, yyyy 'at' HH:mm")</p>
             </div>
             <span class="status-pill"
@@ -758,7 +758,7 @@
         {
             <div class="svc-banner">
                 <div class="svc-banner-left">
-                    <div class="svc-banner-icon">🔧</div>
+                    <div class="svc-banner-icon"><i class="bi bi-wrench"></i></div>
                     <div class="svc-banner-txt">
                         <h4>This order contains Service Jobs</h4>
                         <p>Frame + Lens fitting or customization requires technician processing</p>
@@ -823,7 +823,7 @@
                                         }
                                         else
                                         {
-                                            <div class="oi-no-img">@(isService ? "🔧" : "🕶")</div>
+                                            <div class="oi-no-img">@(isService ? Html.Raw("<i class='bi bi-wrench'></i>") : Html.Raw("<i class='bi bi-eyeglasses'></i>"))</div>
                                         }
                                         <div class="oi-info">
                                             <div class="oi-name">@(oi.Product?.Name ?? "Unknown Product")</div>
@@ -905,7 +905,7 @@
                             @foreach (var ship in order.Shipments)
                             {
                                 <div class="ship-row">
-                                    <div class="ship-ico">📦</div>
+                                    <div class="ship-ico"><i class="bi bi-box-seam"></i></div>
                                     <div>
                                         <div class="ship-lbl">Tracking</div>
                                         <div class="ship-val">@(string.IsNullOrEmpty(ship.TrackingNumber) ? "N/A" : ship.TrackingNumber)</div>
@@ -941,7 +941,7 @@
                         <div class="tab-content active" id="tab-status">
                             <form method="post" asp-page-handler="UpdateStatus" asp-route-id="@order.OrderId">
                                 <div style="margin-bottom: 14px">
-                                    <span class="form-lbl">📊 New Order Status</span>
+                                    <span class="form-lbl"><i class="bi bi-bar-chart"></i> New Order Status</span>
                                     <select name="NewStatus" class="fi">
                                         @foreach (var s in new[] { "Confirmed", "Processing", "Shipped", "Delivered", "Completed", "Cancelled" })
                                         {
@@ -967,7 +967,7 @@
                         {
                             <div class="tab-content" id="tab-rx">
                                 <form method="post" asp-page-handler="UpdatePrescriptionWorkflow" asp-route-id="@order.OrderId">
-                                    <span class="form-lbl">👓 Prescription Workflow Step</span>
+                                    <span class="form-lbl"><i class="bi bi-eyeglasses"></i> Prescription Workflow Step</span>
                                     <div class="wf-steps" style="margin-bottom: 14px">
                                         @{
                                             var rxSteps = new[] {
@@ -1001,13 +1001,13 @@
                         <div class="tab-content" id="tab-ship">
                             <form method="post" asp-page-handler="CreateShipment" asp-route-id="@order.OrderId">
                                 <div style="margin-bottom:12px">
-                                    <label class="form-lbl" for="trackNo">📦 Tracking Number</label>
+                                    <label class="form-lbl" for="trackNo"><i class="bi bi-box-seam"></i> Tracking Number</label>
                                     <input type="text" id="trackNo" name="TrackingNumber"
                                            class="fi" placeholder="e.g. VN123456789"
                                            value="@(order.Shipments?.FirstOrDefault()?.TrackingNumber ?? "")" />
                                 </div>
                                 <div style="margin-bottom:14px">
-                                    <label class="form-lbl" for="carrier">🚚 Carrier</label>
+                                    <label class="form-lbl" for="carrier"><i class="bi bi-truck"></i> Carrier</label>
                                     <input type="text" id="carrier" name="Carrier"
                                            class="fi" placeholder="e.g. GHN, GHTK, ViettelPost"
                                            value="@(order.Shipments?.FirstOrDefault()?.Carrier ?? "")" />

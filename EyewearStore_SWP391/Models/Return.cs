@@ -74,6 +74,6 @@ public partial class Return
     public virtual OrderItem OrderItem { get; set; } = null!;
     public virtual User? User { get; set; }
 
-    // ❌ REMOVE Reviewer navigation - causes FK conflict
+    // REMOVE Reviewer navigation - causes FK conflict
     // We'll use ReviewedBy (int) directly and query when needed
 }

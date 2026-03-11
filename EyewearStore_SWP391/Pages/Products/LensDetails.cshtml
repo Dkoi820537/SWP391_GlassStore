@@ -1188,7 +1188,7 @@ else
                         });
                         if (res.ok) {
                             setWishlistActive(btn, false);
-                            showWishlistToast('Removed from wishlist', '🤍');
+                            showWishlistToast('Removed from wishlist', '');
                         }
                     } else {
                         const res = await fetch('/api/wishlist/add', {
@@ -1199,13 +1199,13 @@ else
                         const data = await res.json();
                         if (res.ok) {
                             setWishlistActive(btn, true);
-                            showWishlistToast("Saved! We'll email you when it's back ❤️", '♡');
+                            showWishlistToast("Saved! We'll email you when it's back", '');
                         } else {
-                            showWishlistToast(data.message || 'Something went wrong', '⚠️');
+                            showWishlistToast(data.message || 'Something went wrong', '');
                         }
                     }
                 } catch {
-                    showWishlistToast('Network error. Please try again.', '⚠️');
+                    showWishlistToast('Network error. Please try again.', '');
                 } finally {
                     btn.disabled = false;
                 }
@@ -1218,7 +1218,7 @@ else
             const text = btn.querySelector('span');
             if (active) {
                 icon.className = 'bi bi-heart-fill';
-                text.textContent = 'Saved to Wishlist ✓';
+                text.textContent = 'Saved to Wishlist';
                 btn.style.background = '#fffbf5';
                 btn.style.borderColor = '#c9a96e';
                 btn.style.color = '#a07840';
@@ -1232,7 +1232,7 @@ else
         }
 
         let _wlToastTimer;
-        function showWishlistToast(msg, icon = '♡') {
+        function showWishlistToast(msg, icon = '<i class="bi bi-heart"></i>') {
             let toast = document.getElementById('wl-toast-detail');
             if (!toast) {
                 toast = document.createElement('div');

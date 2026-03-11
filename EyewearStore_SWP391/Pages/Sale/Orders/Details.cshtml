@@ -91,12 +91,12 @@
         _ => "#374151"
     };
     string SvcIcon(string s) => s switch {
-        "Pending"    => "⏳",
-        "Processing" => "⚙️",
-        "Ready"      => "✅",
-        "Done"       => "🎉",
-        "Cancelled"  => "❌",
-        _ => "🔧"
+        "Pending"    => "◷",
+        "Processing" => "⊛",
+        "Ready"      => "●",
+        "Done"       => "★",
+        "Cancelled"  => "✕",
+        _ => "⊘"
     };
 }
 
@@ -255,7 +255,7 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif}
         <!-- Header -->
         <div class="pg-hdr">
             <div>
-                <h1>📦 Order #@order.OrderId</h1>
+                <h1><i class="bi bi-box-seam me-2"></i>Order #@order.OrderId</h1>
                 <p>Created @order.CreatedAt.ToLocalTime().ToString("MMMM dd, yyyy 'at' HH:mm")</p>
             </div>
             <span class="status-pill"
@@ -270,7 +270,7 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif}
             string bannerCls = serviceDone ? "done" : serviceCancelled ? "cancelled" : "locked";
             <div class="svc-lock-banner @bannerCls">
                 <div class="svc-lock-icon">
-                    @(serviceDone ? "✅" : serviceCancelled ? "❌" : "🔒")
+                    <i class="bi @(serviceDone ? "bi-check-circle-fill" : serviceCancelled ? "bi-x-circle-fill" : "bi-lock-fill")"></i>
                 </div>
                 <div class="svc-lock-body">
                     @if (serviceDone)
@@ -308,7 +308,7 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif}
                             @for (int i = 0; i < svcSteps.Length; i++)
                             {
                                 string cls = i < curIdx ? "done-s" : i == curIdx ? "active-s" : "idle-s";
-                                string check = i < curIdx ? "✓ " : "";
+                                string check = i < curIdx ? "" : "";
                                 <span class="svc-step @cls">@check@svcSteps[i]</span>
                                 if (i < svcSteps.Length - 1)
                                 {
@@ -398,7 +398,7 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif}
                                             @if (isSvc)
                                             {
                                                 <div class="svc-indicator">
-                                                    🔩 Service Order
+                                                    <i class="bi bi-nut me-1"></i> Service Order
                                                     <span style="background:@SvcBg(serviceStatus);color:@SvcFg(serviceStatus);border-radius:4px;padding:1px 6px;font-size:9px">
                                                         @SvcIcon(serviceStatus) @serviceStatus
                                                     </span>
@@ -437,7 +437,7 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif}
                               id="statusForm">
                             <input type="hidden" name="id" value="@order.OrderId" />
 
-                            <span class="form-lbl">📊 New Status</span>
+                            <span class="form-lbl"><i class="bi bi-bar-chart me-1"></i> New Status</span>
 
                             @if (hasServiceItem && !serviceDone && !serviceCancelled)
                             {
@@ -455,7 +455,7 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif}
                                             {
                                             @if (blockedUntilDone.Contains(s))
                                             {
-                                                <option value="@s" data-locked="true">🔒 @s</option>
+                                                <option value="@s" data-locked="true">[Locked] @s</option>
                                             }
                                             else
                                             {
@@ -534,7 +534,7 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif}
         if (btn) {
             btn.disabled = isLocked;
             btn.style.opacity = isLocked ? '.4' : '1';
-            btn.textContent = isLocked ? '🔒 Locked — Service Not Done' : '↻ Update Status';
+            btn.textContent = isLocked ? 'Locked — Service Not Done' : 'Update Status';
         }
         // Highlight select red if locked option chosen
         if (sel) {

@@ -124,7 +124,7 @@ body{background:var(--bg)}
     <!-- HERO -->
     <div class="hero-strip">
         <div>
-            <h1>🔧 Service Jobs</h1>
+            <h1><i class="bi bi-wrench me-2"></i>Service Jobs</h1>
             <p>Manage and update eyewear service orders assigned to your team</p>
         </div>
         <div class="hero-badge">
@@ -215,12 +215,12 @@ body{background:var(--bg)}
                                 </td>
                                 <td>
                                     <div class="svc-bk">
-                                        <div class="svc-ri">🕶 <span class="svc-tag">Frame</span> @row.FrameName</div>
+                                        <div class="svc-ri"><i class="bi bi-eyeglasses me-1"></i> <span class="svc-tag">Frame</span> @row.FrameName</div>
                                         @if (!string.IsNullOrEmpty(row.LensName))
                                         {
                                             <div class="svc-ri">⭕ <span class="svc-tag">Lens</span> @row.LensName</div>
                                         }
-                                        <div class="svc-ri">⚙️ <span class="svc-tag">Service</span> @row.ServiceName</div>
+                                        <div class="svc-ri"><i class="bi bi-gear me-1"></i> <span class="svc-tag">Service</span> @row.ServiceName</div>
                                     </div>
                                 </td>
                                 <td class="price-c">@row.Total.ToString("N0") ₫</td>
@@ -291,7 +291,7 @@ body{background:var(--bg)}
         else
         {
             <div class="empty">
-                <span>🔧</span>
+                <i class="bi bi-wrench"></i>
                 <h3>No service orders found</h3>
                 <p>@(string.IsNullOrEmpty(Model.SearchTerm) && string.IsNullOrEmpty(Model.StatusFilter)
                     ? "No jobs assigned yet."

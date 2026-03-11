@@ -205,7 +205,7 @@ namespace EyewearStore_SWP391.Pages.Customer
                     {
                         await _emailService.SendEmailAsync(
                             staffEmail,
-                            $"🔔 New Refund Request — Order #{order.OrderId}",
+                            $"New Refund Request — Order #{order.OrderId}",
                             BuildStaffNotificationEmail(customerName, productName, order.OrderId, RefundReason)
                         );
                     }
@@ -247,7 +247,7 @@ namespace EyewearStore_SWP391.Pages.Customer
 <body>
     <div class='container'>
         <div class='header'>
-            <h1>🔔 New Refund Request</h1>
+            <h1>New Refund Request</h1>
         </div>
         <div class='content'>
             <p style='font-size: 16px; color: #333;'>A new refund request has been submitted and requires your review.</p>

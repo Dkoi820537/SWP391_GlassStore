@@ -78,7 +78,7 @@ namespace EyewearStore_SWP391.Pages.Staff.ServiceOrders
                 catch { /* non-fatal */ }
             }
 
-            TempData["Success"] = $"✓ Order #{orderId} updated → {ServiceStatus}";
+            TempData["Success"] = $"Order #{orderId} updated to: {ServiceStatus}";
             return RedirectToPage("Detail", new { orderId });
         }
 

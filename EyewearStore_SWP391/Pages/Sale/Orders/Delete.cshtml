@@ -86,7 +86,7 @@
         document.getElementById('deleteButton').addEventListener('click', function(e) {
             e.preventDefault();
 
-            if (confirm('⚠️ FINAL CONFIRMATION: Are you absolutely sure you want to delete Order #@Model.OrderId?\n\nThis action CANNOT be undone!')) {
+            if (confirm('WARNING: FINAL CONFIRMATION: Are you absolutely sure you want to delete Order #@Model.OrderId?\n\nThis action CANNOT be undone!')) {
                 this.closest('form').submit();
             }
         });

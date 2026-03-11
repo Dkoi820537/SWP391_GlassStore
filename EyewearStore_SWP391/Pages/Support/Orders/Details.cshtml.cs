@@ -218,7 +218,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
                     if (svcStatus != "Done" && svcStatus != "Cancelled")
                     {
                         TempData["Error"] =
-                            $"⚠️ Cannot set status to \"{newStatus}\" — " +
+                            $"Warning: Cannot set status to \"{newStatus}\" — " +
                             $"the service job is currently \"{svcStatus}\". " +
                             $"Please wait for the technician team to mark it Done first.";
                         return RedirectToPage(new { id = orderId });
@@ -251,7 +251,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
 
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"✓ Order #{orderId} status updated to: {newStatus}";
+            TempData["Success"] = $"Order #{orderId} status updated to: {newStatus}";
             return RedirectToPage(new { id = orderId });
         }
 
@@ -289,7 +289,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             _context.PrescriptionProfiles.Update(p);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "✓ Prescription verified successfully!";
+            TempData["Success"] = "Prescription verified successfully!";
             return RedirectToPage(new { id = orderItem.OrderId });
         }
 
@@ -310,7 +310,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
 
                 if (unverified.Any())
                 {
-                    TempData["Error"] = "⚠️ Please verify all prescriptions before confirming!";
+                    TempData["Error"] = "Please verify all prescriptions before confirming!";
                     return RedirectToPage(new { id = orderId });
                 }
             }
@@ -319,7 +319,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "✓ Order confirmed and sent to Operations team!";
+            TempData["Success"] = "Order confirmed and sent to Operations team!";
             return RedirectToPage(new { id = orderId });
         }
 
@@ -336,7 +336,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
                 return RedirectToPage("./Index");
             }
 
-            TempData["Success"] = $"⬆️ Order #{orderId} escalated to Manager for review!";
+            TempData["Success"] = $"Order #{orderId} escalated to Manager for review!";
             return RedirectToPage(new { id = orderId });
         }
     }

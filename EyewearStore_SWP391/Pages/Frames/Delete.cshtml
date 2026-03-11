@@ -287,7 +287,7 @@
 <div class="delete-container">
     <!-- Page Header -->
     <div class="page-header">
-        <h1>🗑️ Delete Frame</h1>
+        <h1><i class="bi bi-trash3"></i> Delete Frame</h1>
         <a asp-page="./Index" class="btn btn-secondary">
             ← Back to List
         </a>
@@ -297,7 +297,7 @@
     <div class="delete-card">
         <div class="delete-header">
             <h2>
-                <span>⚠️</span>
+                <span><i class="bi bi-exclamation-triangle-fill text-warning"></i></span>
                 Delete Confirmation
             </h2>
         </div>
@@ -307,20 +307,20 @@
             @if (!string.IsNullOrEmpty(Model.ErrorMessage))
             {
                 <div class="error-alert">
-                    <span>❌</span>
+                    <span><i class="bi bi-x-circle-fill text-danger"></i></span>
                     <span>@Model.ErrorMessage</span>
                 </div>
             }
 
             <!-- Warning Icon -->
-            <div class="warning-icon">🗑️</div>
+            <div class="warning-icon"><i class="bi bi-trash3"></i></div>
 
             <!-- Warning Message -->
             <p class="warning-message">Are you sure you want to delete this frame?</p>
 
             <!-- Frame Details -->
             <div class="frame-details">
-                <h3>📦 Frame Details</h3>
+                <h3><i class="bi bi-box-seam"></i> Frame Details</h3>
                 <dl>
                     <dt>SKU</dt>
                     <dd><span class="sku-badge">@Model.Frame.Sku</span></dd>
@@ -374,7 +374,7 @@
 
             <!-- Warning Box -->
             <div class="warning-box">
-                <strong>⚠️ Warning</strong>
+                <strong><i class="bi bi-exclamation-triangle-fill text-warning"></i> Warning</strong>
                 This action will deactivate the frame. The data will be preserved but the frame will no longer be visible in active listings.
             </div>
 
@@ -384,7 +384,7 @@
                 
                 <div class="action-buttons">
                     <button type="submit" class="btn btn-danger" id="deleteButton">
-                        🗑️ Delete Frame
+                        <i class="bi bi-trash3"></i> Delete Frame
                     </button>
                     <a asp-page="./Index" class="btn btn-secondary">
                         ← Cancel
@@ -394,7 +394,7 @@
         </div>
 
         <div class="delete-footer">
-            🛡️ This is a soft delete operation. The frame can be reactivated if needed.
+            <i class="bi bi-shield-check text-info"></i> This is a soft delete operation. The frame can be reactivated if needed.
         </div>
     </div>
 </div>
@@ -405,7 +405,7 @@
         document.getElementById('deleteButton').addEventListener('click', function(e) {
             e.preventDefault();
 
-            if (confirm('⚠️ FINAL CONFIRMATION: Are you sure you want to delete "' + '@Model.Frame.Name.Replace("'", "\\'")' + '"?\n\nThis will deactivate the frame from active listings.')) {
+            if (confirm('FINAL CONFIRMATION: Are you sure you want to delete "' + '@Model.Frame.Name.Replace("'", "\\'")' + '"?\n\nThis will deactivate the frame from active listings.')) {
                 this.closest('form').submit();
             }
         });

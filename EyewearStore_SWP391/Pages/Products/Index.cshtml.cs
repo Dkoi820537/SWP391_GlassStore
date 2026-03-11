@@ -7,10 +7,6 @@ using System.Security.Claims;
 
 namespace EyewearStore_SWP391.Pages.Products;
 
-/// <summary>
-/// Page model for the customer-facing product catalog.
-/// Allows browsing all available frames and lenses with filtering, sorting, and pagination.
-/// </summary>
 public class IndexModel : PageModel
 {
     private readonly EyewearStoreContext _context;
@@ -23,9 +19,6 @@ public class IndexModel : PageModel
         _cartService = cartService;
     }
 
-    /// <summary>
-    /// The view model containing product catalog data
-    /// </summary>
     public ProductCatalogViewModel Catalog { get; set; } = new();
 
     [BindProperty(SupportsGet = true)]
@@ -49,6 +42,10 @@ public class IndexModel : PageModel
     [BindProperty(SupportsGet = true)]
     public string? LensTypeFilter { get; set; }
 
+    // ── NEW: Brand filter (used by brand links on FrameDetails page) ──────────
+    [BindProperty(SupportsGet = true)]
+    public string? BrandFilter { get; set; }
+
     [BindProperty(SupportsGet = true)]
     public string SortBy { get; set; } = "name";
 
@@ -58,26 +55,31 @@ public class IndexModel : PageModel
     [BindProperty(SupportsGet = true)]
     public int PageSize { get; set; } = DefaultPageSize;
 
-    /// <summary>
-    /// Handles GET request - loads products with filtering, sorting, and pagination
-    /// </summary>
     public async Task<IActionResult> OnGetAsync()
     {
         if (CurrentPage < 1) CurrentPage = 1;
         if (PageSize < 1 || PageSize > 48) PageSize = DefaultPageSize;
+
+        // When BrandFilter is set, force to Frames only (brands only exist on frames)
+        if (!string.IsNullOrWhiteSpace(BrandFilter))
+            ProductTypeFilter = "Frame";
 
         var productList = new List<ProductCatalogItemViewModel>();
 
         bool includeFrames = ProductTypeFilter == "All" || ProductTypeFilter == "Frame";
         bool includeLenses = ProductTypeFilter == "All" || ProductTypeFilter == "Lens";
 
-        // ── Query Frames ─────────────────────────────────────────────────────
+        // ── Query Frames ──────────────────────────────────────────────────────
         if (includeFrames)
         {
             var framesQuery = _context.Frames
                 .Include(f => f.ProductImages)
                 .AsNoTracking()
                 .Where(f => f.IsActive);
+
+            // Brand filter — exact match, case-insensitive
+            if (!string.IsNullOrWhiteSpace(BrandFilter))
+                framesQuery = framesQuery.Where(f => f.Brand != null && f.Brand.ToLower() == BrandFilter.ToLower());
 
             if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
@@ -106,16 +108,16 @@ public class IndexModel : PageModel
                 Description = f.Description,
                 Price = f.Price,
                 Currency = f.Currency,
-                InventoryQty = f.InventoryQty,   // ← THÊM
+                InventoryQty = f.InventoryQty,
                 PrimaryImageUrl = f.ProductImages?.FirstOrDefault(i => i.IsPrimary && i.IsActive)?.ImageUrl
-                                  ?? f.ProductImages?.FirstOrDefault(i => i.IsActive)?.ImageUrl,
+                               ?? f.ProductImages?.FirstOrDefault(i => i.IsActive)?.ImageUrl,
                 FrameMaterial = f.FrameMaterial,
                 FrameType = f.FrameType,
                 CreatedAt = f.CreatedAt
             }));
         }
 
-        // ── Query Lenses ─────────────────────────────────────────────────────
+        // ── Query Lenses ──────────────────────────────────────────────────────
         if (includeLenses)
         {
             var lensesQuery = _context.Lenses
@@ -148,9 +150,9 @@ public class IndexModel : PageModel
                 Description = l.Description,
                 Price = l.Price,
                 Currency = l.Currency,
-                InventoryQty = l.InventoryQty,   // ← THÊM
+                InventoryQty = l.InventoryQty,
                 PrimaryImageUrl = l.ProductImages?.FirstOrDefault(i => i.IsPrimary && i.IsActive)?.ImageUrl
-                                  ?? l.ProductImages?.FirstOrDefault(i => i.IsActive)?.ImageUrl,
+                               ?? l.ProductImages?.FirstOrDefault(i => i.IsActive)?.ImageUrl,
                 LensType = l.LensType,
                 LensIndex = l.LensIndex,
                 IsPrescription = l.IsPrescription,
@@ -158,7 +160,7 @@ public class IndexModel : PageModel
             }));
         }
 
-        // ── Sort ─────────────────────────────────────────────────────────────
+        // ── Sort ──────────────────────────────────────────────────────────────
         productList = SortBy switch
         {
             "price-low" => productList.OrderBy(p => p.Price).ToList(),
@@ -167,7 +169,7 @@ public class IndexModel : PageModel
             _ => productList.OrderBy(p => p.Name).ToList()
         };
 
-        // ── Pagination ───────────────────────────────────────────────────────
+        // ── Pagination ────────────────────────────────────────────────────────
         var totalCount = productList.Count;
         var totalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
         if (CurrentPage > totalPages && totalPages > 0) CurrentPage = totalPages;
@@ -177,7 +179,7 @@ public class IndexModel : PageModel
             .Take(PageSize)
             .ToList();
 
-        // ── Filter options ───────────────────────────────────────────────────
+        // ── Filter options ────────────────────────────────────────────────────
         var availableFrameMaterials = await _context.Frames
             .Where(f => f.IsActive && f.FrameMaterial != null)
             .Select(f => f.FrameMaterial!)
@@ -216,9 +218,8 @@ public class IndexModel : PageModel
         return Page();
     }
 
-    /// <summary>
-    /// Handles AJAX Add to Cart request
-    /// </summary>
+    // ── Cart handlers (unchanged) ─────────────────────────────────────────────
+
     public async Task<IActionResult> OnPostAddToCartAsync([FromBody] AddToCartRequest request)
     {
         if (request == null || request.ProductId <= 0 || request.Quantity <= 0)
@@ -270,10 +271,8 @@ public class IndexModel : PageModel
             {
                 foreach (var ci in cart.CartItems)
                 {
-                    decimal unitPrice = ci.Product != null ? ci.Product.Price :
-                                        ci.Service != null ? ci.Service.Price : 0m;
-                    string name = ci.Product != null ? ci.Product.Name :
-                                        ci.Service != null ? ci.Service.Name : "Product";
+                    decimal unitPrice = ci.Product != null ? ci.Product.Price : ci.Service != null ? ci.Service.Price : 0m;
+                    string name = ci.Product != null ? ci.Product.Name : ci.Service != null ? ci.Service.Name : "Product";
                     decimal lineTotal = unitPrice * ci.Quantity;
                     subtotal += lineTotal;
                     string? imageUrl = ci.Product?.ProductImages?.OrderByDescending(x => x.IsPrimary).FirstOrDefault()?.ImageUrl;
@@ -283,14 +282,7 @@ public class IndexModel : PageModel
                 }
             }
 
-            return new JsonResult(new
-            {
-                success = true,
-                message = "Added to cart successfully!",
-                cartCount = newCount,
-                cartItems = cartItemsList,
-                subtotal
-            });
+            return new JsonResult(new { success = true, message = "Added to cart successfully!", cartCount = newCount, cartItems = cartItemsList, subtotal });
         }
         catch (Exception ex)
         {
@@ -298,39 +290,24 @@ public class IndexModel : PageModel
         }
     }
 
-    /// <summary>
-    /// Returns the _CartSummary partial view HTML for AJAX cart dropdown refresh
-    /// </summary>
-    public IActionResult OnGetCartSummaryPartial()
-    {
-        return Partial("_CartSummary");
-    }
+    public IActionResult OnGetCartSummaryPartial() => Partial("_CartSummary");
 
-    /// <summary>
-    /// AJAX: Remove a single item from the cart by cartItemId.
-    /// Returns updated cart data so the dropdown can be rebuilt client-side.
-    /// </summary>
     public async Task<IActionResult> OnPostRemoveCartItemAsync([FromBody] RemoveCartItemRequest request)
     {
         if (request == null || request.CartItemId <= 0)
             return new JsonResult(new { success = false, message = "Invalid request." });
-
         if (!User.Identity?.IsAuthenticated ?? true)
             return new JsonResult(new { success = false, message = "Please login." }) { StatusCode = 401 };
-
-        var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (!int.TryParse(userIdStr, out var userId))
             return new JsonResult(new { success = false, message = "User identity not found." }) { StatusCode = 401 };
-
         try
         {
             await _cartService.RemoveItemAsync(request.CartItemId);
-
             var cart = await _cartService.GetCartByUserIdAsync(userId);
             var newCount = cart?.CartItems.Sum(i => i.Quantity) ?? 0;
             decimal subtotal = 0m;
             var cartItemsList = new List<object>();
-
             if (cart?.CartItems != null)
             {
                 foreach (var ci in cart.CartItems)
@@ -345,7 +322,6 @@ public class IndexModel : PageModel
                     cartItemsList.Add(new { cartItemId = ci.CartItemId, name, unitPrice, quantity = ci.Quantity, lineTotal, imageUrl, prescriptionName, productType });
                 }
             }
-
             return new JsonResult(new { success = true, message = "Item removed.", cartCount = newCount, cartItems = cartItemsList, subtotal });
         }
         catch (Exception ex)
@@ -354,19 +330,13 @@ public class IndexModel : PageModel
         }
     }
 
-    /// <summary>
-    /// AJAX: Clear all items from the cart.
-    /// Returns an empty cart response so the dropdown shows the empty state.
-    /// </summary>
     public async Task<IActionResult> OnPostClearCartAsync()
     {
         if (!User.Identity?.IsAuthenticated ?? true)
             return new JsonResult(new { success = false, message = "Please login." }) { StatusCode = 401 };
-
-        var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (!int.TryParse(userIdStr, out var userId))
             return new JsonResult(new { success = false, message = "User identity not found." }) { StatusCode = 401 };
-
         try
         {
             await _cartService.ClearCartAsync(userId);
@@ -378,53 +348,25 @@ public class IndexModel : PageModel
         }
     }
 
-    public class AddToCartRequest
-    {
-        public int ProductId { get; set; }
-        public int Quantity { get; set; }
-        public int? PrescriptionId { get; set; }
-    }
-
-    public class RemoveCartItemRequest
-    {
-        public int CartItemId { get; set; }
-    }
-
-    public class UpdateCartItemQtyRequest
-    {
-        public int CartItemId { get; set; }
-        public int NewQuantity { get; set; }
-    }
-
-    /// <summary>
-    /// AJAX: Update the quantity of a single cart item.
-    /// If newQuantity is 0, the item is removed instead.
-    /// Returns updated cart data so the dropdown can be rebuilt client-side.
-    /// </summary>
     public async Task<IActionResult> OnPostUpdateCartItemQtyAsync([FromBody] UpdateCartItemQtyRequest request)
     {
         if (request == null || request.CartItemId <= 0)
             return new JsonResult(new { success = false, message = "Invalid request." });
-
         if (!User.Identity?.IsAuthenticated ?? true)
             return new JsonResult(new { success = false, message = "Please login." }) { StatusCode = 401 };
-
-        var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (!int.TryParse(userIdStr, out var userId))
             return new JsonResult(new { success = false, message = "User identity not found." }) { StatusCode = 401 };
-
         try
         {
             if (request.NewQuantity <= 0)
                 await _cartService.RemoveItemAsync(request.CartItemId);
             else
                 await _cartService.UpdateQuantityAsync(request.CartItemId, request.NewQuantity);
-
             var cart = await _cartService.GetCartByUserIdAsync(userId);
             var newCount = cart?.CartItems.Sum(i => i.Quantity) ?? 0;
             decimal subtotal = 0m;
             var cartItemsList = new List<object>();
-
             if (cart?.CartItems != null)
             {
                 foreach (var ci in cart.CartItems)
@@ -439,7 +381,6 @@ public class IndexModel : PageModel
                     cartItemsList.Add(new { cartItemId = ci.CartItemId, name, unitPrice, quantity = ci.Quantity, lineTotal, imageUrl, prescriptionName, productType });
                 }
             }
-
             return new JsonResult(new { success = true, message = "Quantity updated.", cartCount = newCount, cartItems = cartItemsList, subtotal });
         }
         catch (Exception ex)
@@ -448,33 +389,22 @@ public class IndexModel : PageModel
         }
     }
 
-    /// <summary>
-    /// AJAX GET: Returns the authenticated user's active prescription profiles as JSON.
-    /// Used by the prescription selection popup.
-    /// </summary>
     public async Task<IActionResult> OnGetPrescriptionsAsync()
     {
         if (!User.Identity?.IsAuthenticated ?? true)
             return new JsonResult(new { prescriptions = Array.Empty<object>() }) { StatusCode = 401 };
-
         var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (!int.TryParse(userIdStr, out var userId))
             return new JsonResult(new { prescriptions = Array.Empty<object>() }) { StatusCode = 401 };
-
         var prescriptions = await _context.PrescriptionProfiles
             .Where(p => p.UserId == userId && p.IsActive)
             .OrderByDescending(p => p.CreatedAt)
-            .Select(p => new
-            {
-                p.PrescriptionId,
-                name = p.ProfileName ?? "Prescription",
-                leftSph = p.LeftSph,
-                leftCyl = p.LeftCyl,
-                rightSph = p.RightSph,
-                rightCyl = p.RightCyl
-            })
+            .Select(p => new { p.PrescriptionId, name = p.ProfileName ?? "Prescription", leftSph = p.LeftSph, leftCyl = p.LeftCyl, rightSph = p.RightSph, rightCyl = p.RightCyl })
             .ToListAsync();
-
         return new JsonResult(new { prescriptions });
     }
+
+    public class AddToCartRequest { public int ProductId { get; set; } public int Quantity { get; set; } public int? PrescriptionId { get; set; } }
+    public class RemoveCartItemRequest { public int CartItemId { get; set; } }
+    public class UpdateCartItemQtyRequest { public int CartItemId { get; set; } public int NewQuantity { get; set; } }
 }

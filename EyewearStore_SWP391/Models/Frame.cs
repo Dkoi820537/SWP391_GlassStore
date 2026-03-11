@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace EyewearStore_SWP391.Models;
@@ -29,4 +29,8 @@ public class Frame : Product
     public decimal? LensWidth { get; set; }
     /// <summary>Country of origin (e.g. P.R.C, Japan, Italy)</summary>
     public string? Origin { get; set; }
+
+    // ── Compatibility ────────────────────────────────────────────────────
+    /// <summary>Lens types this frame supports (category-based compatibility)</summary>
+    public virtual ICollection<FrameCompatibleLensType> CompatibleLensTypes { get; set; } = new List<FrameCompatibleLensType>();
 }

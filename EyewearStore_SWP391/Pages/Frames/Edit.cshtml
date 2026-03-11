@@ -258,6 +258,35 @@
                 </div>
             </div>
 
+            <!-- ── Compatible Lens Types ────────────────────────────────── -->
+            <div class="form-section">
+                <h2 class="section-title">Compatible Lens Types</h2>
+                <p class="helper-text" style="margin-bottom:1rem;">
+                    Select which lens types are physically compatible with this frame.
+                    If none are selected, <strong>all lens types</strong> will be shown to customers.
+                </p>
+                <div style="margin-bottom:.75rem;">
+                    <button type="button" class="btn-sm btn-set-primary" onclick="toggleAllLensTypes()" id="toggleAllBtn">
+                        Select All
+                    </button>
+                </div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:.75rem;">
+                    @foreach (var lt in Model.AllLensTypes)
+                    {
+                        var isChecked = Model.SelectedLensTypes.Contains(lt);
+                        <label style="display:flex; align-items:center; gap:.5rem; cursor:pointer; padding:.5rem .75rem; border:1px solid #e0e0e8; border-radius:8px; transition:all .2s;">
+                            <input type="checkbox"
+                                   name="SelectedLensTypes"
+                                   value="@lt"
+                                   class="lens-type-cb"
+                                   @(isChecked ? "checked" : "")
+                                   style="width:18px; height:18px; cursor:pointer;" />
+                            <span style="font-size:.9rem; color:#4a4a68;">@lt</span>
+                        </label>
+                    }
+                </div>
+            </div>
+
             <!-- ── Product Images ──────────────────────────────────────── -->
             <div class="form-section">
                 <h2 class="section-title">Product Images</h2>
@@ -390,6 +419,14 @@
             updateColorPreview();
         }
     }
+    // Lens-type compatibility: Select All / Deselect All
+    function toggleAllLensTypes() {
+        const cbs = document.querySelectorAll('.lens-type-cb');
+        const allChecked = [...cbs].every(cb => cb.checked);
+        cbs.forEach(cb => cb.checked = !allChecked);
+        document.getElementById('toggleAllBtn').textContent = allChecked ? 'Select All' : 'Deselect All';
+    }
+    // init preview on load
     document.addEventListener('DOMContentLoaded', updateColorPreview);
     </script>
 }

@@ -193,6 +193,23 @@ public class CartService : ICartService
             if (lens.InventoryQty.HasValue && lens.InventoryQty < quantity)
                 throw new InvalidOperationException("Lens quantity exceeds available stock");
 
+            // Validate Frame-Lens Compatibility (Category-based)
+            var allowedLensTypes = await _context.FrameCompatibleLensTypes
+                .Where(c => c.FrameProductId == frameProductId)
+                .Select(c => c.LensType)
+                .ToListAsync();
+
+            if (allowedLensTypes.Any())
+            {
+                // If the frame has restricted compatibility, the lens must match one of the allowed types.
+                // We need to fetch the LensType from the Lens table specifically (since we only have the Product base entity above).
+                var lensDetails = await _context.Lenses.FindAsync(lensProductId);
+                if (lensDetails == null || string.IsNullOrEmpty(lensDetails.LensType) || !allowedLensTypes.Contains(lensDetails.LensType))
+                {
+                    throw new InvalidOperationException("The selected lens is not compatible with this frame.");
+                }
+            }
+
             // Validate Service
             var svc = await _context.Services.FindAsync(serviceId);
             if (svc == null || !svc.IsActive)

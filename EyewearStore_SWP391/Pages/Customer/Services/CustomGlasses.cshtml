@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model EyewearStore_SWP391.Pages.Customer.Services.CustomGlassesModel
 @{
     ViewData["Title"] = "Custom Glasses";
@@ -710,6 +710,7 @@
                          data-name="@l.Name"
                          data-price="@l.Price"
                          data-img="@(img ?? "")"
+                         data-lens-type="@(l.LensType ?? "")"
                          onclick="selectLens(this)">
                         @if (!string.IsNullOrEmpty(img))
                         {
@@ -872,12 +873,30 @@
                 sel[k].price.toLocaleString('vi-VN') + ' &#x20AB;</strong></div>'
             ).join('');
         }
+        // Frame → compatible lens types map (from server)
+        const compatMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CompatibilityMap));
+
         function selectFrame(card) {
             document.querySelectorAll('#frameGrid .prod-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
             sel.frame = { id: card.dataset.id, name: card.dataset.name,
                           price: parseFloat(card.dataset.price), img: card.dataset.img };
             document.getElementById('btnN1').disabled = false;
+
+            // Filter lenses by compatible types (empty = show all)
+            const frameId = parseInt(card.dataset.id);
+            const allowed = compatMap[frameId] || null;
+            document.querySelectorAll('#lensGrid .prod-card').forEach(c => {
+                const lt = c.dataset.lensType || '';
+                c.style.display = (!allowed || allowed.includes(lt)) ? '' : 'none';
+            });
+            // Reset lens selection if current lens is now hidden
+            if (sel.lens && allowed && !allowed.includes(
+                document.querySelector('#lensGrid .prod-card.selected')?.dataset.lensType || '')) {
+                sel.lens = null;
+                document.querySelectorAll('#lensGrid .prod-card').forEach(c => c.classList.remove('selected'));
+                document.getElementById('btnN2').disabled = true;
+            }
         }
         function selectLens(card) {
             document.querySelectorAll('#lensGrid .prod-card').forEach(c => c.classList.remove('selected'));

@@ -19,6 +19,16 @@ namespace EyewearStore_SWP391.Pages.Customer.Services
         public List<Product> Lenses { get; set; } = new();
         public List<Service> Services { get; set; } = new();
 
+        /// <summary>
+        /// Maps each frameId to its list of compatible lens type strings.
+        /// </summary>
+        public Dictionary<int, List<string>> CompatibilityMap { get; set; } = new();
+
+        /// <summary>
+        /// Maps lens ProductId → LensType string (needed because Lenses list uses Product base type).
+        /// </summary>
+        public Dictionary<int, string> LensTypeMap { get; set; } = new();
+
         public async Task<IActionResult> OnGetAsync()
         {
             // Load Frames
@@ -44,6 +54,20 @@ namespace EyewearStore_SWP391.Pages.Customer.Services
                 .Where(s => s.IsActive)
                 .OrderBy(s => s.Name)
                 .ToListAsync();
+
+            // Load frame → compatible lens types mapping
+            var frameIds = Frames.Select(f => f.ProductId).ToList();
+            CompatibilityMap = (await _context.FrameCompatibleLensTypes
+                .Where(c => frameIds.Contains(c.FrameProductId))
+                .ToListAsync())
+                .GroupBy(c => c.FrameProductId)
+                .ToDictionary(g => g.Key, g => g.Select(c => c.LensType).ToList());
+
+            // Build lens ProductId → LensType lookup
+            var lensIds = Lenses.Select(l => l.ProductId).ToList();
+            LensTypeMap = await _context.Lenses
+                .Where(l => lensIds.Contains(l.ProductId))
+                .ToDictionaryAsync(l => l.ProductId, l => l.LensType ?? "");
 
             return Page();
         }

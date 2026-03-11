@@ -69,6 +69,12 @@ public class DetailsModel : PageModel
             FrameType = frame.FrameType,
             BridgeWidth = frame.BridgeWidth,
             TempleLength = frame.TempleLength,
+            Brand = frame.Brand,
+            Color = frame.Color,
+            Gender = frame.Gender,
+            FrameShape = frame.FrameShape,
+            LensWidth = frame.LensWidth,
+            Origin = frame.Origin,
             // Image properties (only active images)
             PrimaryImageUrl = frame.ProductImages?.FirstOrDefault(i => i.IsPrimary && i.IsActive)?.ImageUrl
                 ?? frame.ProductImages?.FirstOrDefault(i => i.IsActive)?.ImageUrl,

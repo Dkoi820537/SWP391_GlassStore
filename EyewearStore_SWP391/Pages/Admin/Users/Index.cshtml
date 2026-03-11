@@ -1,306 +1,289 @@
-﻿@page
+@page
 @model EyewearStore_SWP391.Pages.Admin.Users.IndexModel
 @{
     ViewData["Title"] = "User Management";
 }
 
-<div class="container-fluid py-4">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
-            <li class="breadcrumb-item"><a asp-page="/Admin/Index">Admin</a></li>
-            <li class="breadcrumb-item active">User Management</li>
-        </ol>
-    </nav>
+<style>
+    .lenses-container { padding: 2rem; background: #ffffff; min-height: calc(100vh - 60px); font-family: 'Inter', sans-serif; }
+    
+    /* Header Section */
+    .page-header { margin-bottom: 2rem; border-left: 4px solid #0d9488; padding-left: 1rem; }
+    .page-title { font-size: 1.5rem; font-weight: 600; color: #111827; margin: 0; }
+    .page-subtitle { font-size: 0.9rem; color: #6b7280; margin-top: 0.35rem; }
+    
+    /* Stats Grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .stat-card { border-radius: 12px; padding: 1.5rem; background: #ffffff; border: 1px solid #e5e7eb; border-top: 4px solid #0d9488; display: flex; flex-direction: column; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+    .stat-title { font-size: 0.8rem; color: #4b5563; margin-bottom: 0.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 2.25rem; font-weight: 600; color: #0d9488; margin: 0 0 0.25rem 0; line-height: 1; }
+    .stat-desc { font-size: 0.8rem; color: #6b7280; margin: 0; }
+    
+    /* Controls Bar */
+    .controls-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap; }
+    .controls-left { display: flex; align-items: center; gap: 1rem; font-weight: 500; color: #111827; font-size: 1.1rem; }
+    .controls-left span { color: #6b7280; font-weight: normal; font-size: 0.95rem; }
+    .controls-right { display: flex; align-items: center; gap: 0.75rem; flex: 1; justify-content: flex-end; margin: 0; }
+    
+    .search-input-group { position: relative; min-width: 280px; }
+    .search-input-group .bi-search { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #6b7280; font-size: 0.9rem; }
+    .search-input-group .form-control { padding-left: 2.5rem; border-radius: 8px; border: 1px solid #e5e7eb; background: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,0.02); height: 40px; font-size: 0.9rem; }
+    .search-input-group .form-control:focus { border-color: #0d9488; outline: none; box-shadow: 0 0 0 3px rgba(13,148,136,0.1); }
+    
+    .btn-filter, .filter-select { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0 1rem; height: 40px; color: #374151; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.02); transition: all 0.2s; outline: none; }
+    .btn-filter:hover { background: #f9fafb; border-color: #d1d5db; }
+    .filter-select { padding-right: 2rem; appearance: auto; }
+    .filter-select:focus { border-color: #0d9488; box-shadow: 0 0 0 3px rgba(13,148,136,0.1); }
+    
+    .btn-create { background: #0d9488; color: white; border: none; border-radius: 8px; padding: 0 1.25rem; height: 40px; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; text-decoration: none; transition: all 0.2s; }
+    .btn-create:hover { background: #0f766e; color: white; }
 
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
-                👥 User Management
-            </h1>
-            <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin: 0;">
-                Manage user accounts, roles, and permissions
-            </p>
-        </div>
-        <div>
-            <a asp-page="./Create" class="btn btn-primary btn-lg">
-                <i class="bi bi-person-plus me-2"></i>Add New User
-            </a>
-        </div>
-    </div>
+    /* Table */
+    .table-container { background: #ffffff; border-radius: 12px; border: 1px solid #e5e7eb; overflow: visible; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+    .modern-table { width: 100%; border-collapse: collapse; overflow: visible; }
+    .modern-table th { background: #f0fdfa; color: #0f766e; font-weight: 600; font-size: 0.75rem; padding: 1rem 1.5rem; border-bottom: 1px solid #ccfbf1; text-align: left; }
+    .modern-table th:first-child { border-top-left-radius: 12px; }
+    .modern-table th:last-child { border-top-right-radius: 12px; }
+    .modern-table td { padding: 1rem 1.5rem; vertical-align: middle; border-bottom: 1px solid #e5e7eb; color: #111827; font-size: 0.9rem; background: #ffffff; }
+    .modern-table tbody tr:hover td { background: #f9fafb; }
+    
+    .customer-cell { display: flex; align-items: center; gap: 0.8rem; }
+    .avatar-circle { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 500; flex-shrink: 0; }
+    .customer-name { font-weight: 500; color: #111827; display: flex; align-items: center; }
+    .customer-email { color: #6b7280; font-size: 0.85rem; }
 
-    <!-- Alert Messages -->
+    .badge-modern { padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500; }
+    .badge-admin { background: #ecfdf5; color: #059669; }
+    .badge-staff { background: #f0fdf4; color: #0a736a; }
+    .badge-user { background: #f1f5f9; color: #4b5563; }
+    
+    .status-active { display: inline-flex; align-items: center; gap: 0.35rem; color: #374151; font-weight: 500; }
+    .status-active::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #0d9488; }
+    
+    .status-inactive { display: inline-flex; align-items: center; gap: 0.35rem; color: #6b7280; }
+    .status-inactive::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #9ca3af; }
+
+    /* Action Dropdown */
+    .modern-table td.action-cell { position: relative; overflow: visible; padding-right: 1.5rem; text-align: right; }
+    .btn-icon-only { background: transparent; border: none; color: #9ca3af; border-radius: 6px; padding: 0.4rem; cursor: pointer; transition: all 0.2s; font-size: 1.1rem; line-height: 1; outline: none; }
+    .btn-icon-only:hover { background: #f3f4f6; color: #111827; }
+    
+    .dropdown-menu-custom { position: absolute; right: 2rem; top: 1.5rem; min-width: 180px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); padding: 0.35rem 0; z-index: 999; display: none; margin-top: 0.25rem; }
+    .dropdown-menu-custom.show { display: block; }
+    
+    .dropdown-item-custom { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; color: #374151; text-decoration: none; font-size: 0.85rem; transition: background 0.2s; border: none; background: transparent; width: 100%; text-align: left; cursor: pointer; }
+    .dropdown-item-custom:hover { background: #f3f4f6; color: #0d9488; }
+    .dropdown-item-custom.text-danger:hover { color: #dc2626; background: #fef2f2; }
+    
+    .empty-state { text-align: center; padding: 4rem 2rem; color: #6b7280; }
+</style>
+
+<div class="lenses-container">
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle me-2"></i><strong>Success!</strong> @TempData["Success"]
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert" style="border-radius: 8px; background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;">
+            <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle me-2"></i><strong>Error!</strong> @TempData["Error"]
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert" style="border-radius: 8px; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca;">
+            <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Error"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
+    <!-- Header Section -->
+    <div class="page-header">
+        <h1 class="page-title">User management</h1>
+        <div class="page-subtitle">Manage your team members and their account permissions here.</div>
+    </div>
+
     <!-- Stats Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Total Users</div>
-                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.TotalUsers</div>
-                            <small style="opacity: 0.8;">@Model.Stats.ActiveUsers active</small>
-                        </div>
-                        <div style="font-size: 3rem; opacity: 0.3;">👥</div>
-                    </div>
-                </div>
-            </div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-title">Total Users</span>
+            <span class="stat-value">@Model.Stats.TotalUsers</span>
+            <span class="stat-desc">@Model.Stats.ActiveUsers active</span>
         </div>
-        <div class="col-md-3">
-            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Customers</div>
-                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.CustomerCount</div>
-                            <small style="opacity: 0.8;">Regular users</small>
-                        </div>
-                        <div style="font-size: 3rem; opacity: 0.3;">🛍️</div>
-                    </div>
-                </div>
-            </div>
+        <div class="stat-card">
+            <span class="stat-title">Customers</span>
+            <span class="stat-value">@Model.Stats.CustomerCount</span>
+            <span class="stat-desc">Regular users</span>
         </div>
-        <div class="col-md-3">
-            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Staff Members</div>
-                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.StaffCount</div>
-                            <small style="opacity: 0.8;">All roles</small>
-                        </div>
-                        <div style="font-size: 3rem; opacity: 0.3;">👔</div>
-                    </div>
-                </div>
-            </div>
+        <div class="stat-card">
+            <span class="stat-title">Staff Members</span>
+            <span class="stat-value">@Model.Stats.StaffCount</span>
+            <span class="stat-desc">All roles</span>
         </div>
-        <div class="col-md-3">
-            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Admins</div>
-                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.AdminCount</div>
-                            <small style="opacity: 0.8;">System admins</small>
-                        </div>
-                        <div style="font-size: 3rem; opacity: 0.3;">🔑</div>
-                    </div>
-                </div>
-            </div>
+        <div class="stat-card">
+            <span class="stat-title">Admins</span>
+            <span class="stat-value">@Model.Stats.AdminCount</span>
+            <span class="stat-desc">System admins</span>
         </div>
     </div>
 
-    <!-- Search and Filter -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="bi bi-funnel me-2"></i>Search & Filter Users</h5>
+    <!-- Controls Bar -->
+    <div class="controls-bar">
+        <div class="controls-left">
+            All users <span>@Model.Users.Count</span>
         </div>
-        <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-5">
-                    <label class="form-label fw-semibold">
-                        <i class="bi bi-search me-1"></i>Search
-                    </label>
-                    <input type="text"
-                           class="form-control"
-                           name="Search"
-                           value="@Model.Search"
-                           placeholder="Search by name, email, or phone..." />
-                </div>
+        
+        <form method="get" class="controls-right m-0 p-0">
+            <div class="search-input-group">
+                <i class="bi bi-search"></i>
+                <input type="text" class="form-control" name="Search" value="@Model.Search" placeholder="Search" />
+            </div>
+            
+            <select class="filter-select" name="RoleFilter">
+                <option value="">All Access</option>
+                @foreach (var role in Model.AvailableRoles)
+                {
+                    <option value="@role" selected="@(Model.RoleFilter == role)">@role.Substring(0, 1).ToUpper()@role.Substring(1)</option>
+                }
+            </select>
+            
+            <select class="filter-select" name="StatusFilter">
+                <option value="">All Statuses</option>
+                <option value="Active" selected="@(Model.StatusFilter == "Active")">Active</option>
+                <option value="Inactive" selected="@(Model.StatusFilter == "Inactive")">Inactive</option>
+            </select>
+            
+            <button type="submit" class="btn-filter" style="margin-right: 0.5rem;">
+                <i class="bi bi-funnel"></i> Filters
+            </button>
+            
+            <a asp-page="./Create" class="btn-create">
+                <i class="bi bi-plus-lg"></i> Add user
+            </a>
+        </form>
+    </div>
 
-                <div class="col-md-3">
-                    <label class="form-label fw-semibold">
-                        <i class="bi bi-person-badge me-1"></i>Role
-                    </label>
-                    <select class="form-select" name="RoleFilter">
-                        <option value="">All Roles</option>
-                        @foreach (var role in Model.AvailableRoles)
+    <!-- Table -->
+    <div class="table-container">
+        @if (!Model.Users.Any())
+        {
+            <div class="empty-state">
+                <i class="bi bi-inbox fs-1 mb-3 d-block"></i>
+                <h4>No Users Found</h4>
+                <p>Adjust your search/filters or add a new user.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive" style="overflow: visible;">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 48px; text-align: center;">
+                                <input type="checkbox" class="form-check-input" style="border-color: #d1d5db; cursor: pointer;" disabled>
+                            </th>
+                            <th>User name</th>
+                            <th>Access</th>
+                            <th>Status</th>
+                            <th>Date added</th>
+                            <th style="width: 48px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model.Users)
                         {
-                            <option value="@role" selected="@(Model.RoleFilter == role)">
-                                @role.ToUpper()
-                            </option>
-                        }
-                    </select>
-                </div>
-
-                <div class="col-md-2">
-                    <label class="form-label fw-semibold">
-                        <i class="bi bi-toggle-on me-1"></i>Status
-                    </label>
-                    <select class="form-select" name="StatusFilter">
-                        <option value="">All</option>
-                        <option value="Active" selected="@(Model.StatusFilter == "Active")">Active</option>
-                        <option value="Inactive" selected="@(Model.StatusFilter == "Inactive")">Inactive</option>
-                    </select>
-                </div>
-
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-funnel-fill me-1"></i>Apply Filter
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Users Table -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">
-                <i class="bi bi-people me-2"></i>User List (@Model.Users.Count users)
-            </h5>
-            <span class="badge bg-light text-dark">Last updated: @DateTime.Now.ToString("HH:mm:ss")</span>
-        </div>
-        <div class="card-body p-0">
-            @if (!Model.Users.Any())
-            {
-                <div class="text-center py-5">
-                    <i class="bi bi-inbox display-1 text-muted" style="opacity: 0.2;"></i>
-                    <h4 class="mt-3 text-muted">No Users Found</h4>
-                    <p class="text-muted">Try adjusting your search or filter criteria.</p>
-                </div>
-            }
-            else
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
                             <tr>
-                                <th style="padding: 1rem;">ID</th>
-                                <th style="padding: 1rem;">User</th>
-                                <th style="padding: 1rem;">Email</th>
-                                <th style="padding: 1rem;">Phone</th>
-                                <th style="padding: 1rem;">Role</th>
-                                <th style="padding: 1rem;">Status</th>
-                                <th style="padding: 1rem;">Created</th>
-                                <th style="padding: 1rem; text-align: center;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var user in Model.Users)
-                            {
-                                <tr>
-                                    <td style="padding: 1rem; font-weight: 700; color: var(--primary-navy);">
-                                        #@user.UserId
-                                    </td>
-                                    <td style="padding: 1rem;">
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar-circle me-2" style="background: @GetAvatarColor(user.Role);">
-                                                @if (!string.IsNullOrEmpty(user.FullName))
-                                                {
-                                                    @user.FullName.Substring(0, 1).ToUpper()
-                                                }
-                                                else
-                                                {
-                                                    <span>?</span>
-                                                }
-                                            </div>
-                                            <div>
-                                                <div class="fw-semibold">@(user.FullName ?? "N/A")</div>
-                                                @if (user.UserId == Model.CurrentUserId)
-                                                {
-                                                    <small class="badge bg-info">You</small>
-                                                }
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td style="padding: 1rem;">
-                                        <a href="mailto:@user.Email" class="text-decoration-none">
-                                            <i class="bi bi-envelope me-1"></i>@user.Email
-                                        </a>
-                                    </td>
-                                    <td style="padding: 1rem;">
-                                        @if (!string.IsNullOrEmpty(user.Phone))
-                                        {
-                                            <i class="bi bi-telephone me-1"></i>
-                                            @user.Phone
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">—</span>
-                                        }
-                                    </td>
-                                    <td style="padding: 1rem;">
+                                <td style="text-align: center;">
+                                    <input type="checkbox" class="form-check-input" style="border-color: #d1d5db; cursor: pointer;">
+                                </td>
+                                <td>
+                                    <div class="customer-cell">
                                         @{
-                                            var roleColor = user.Role switch
+                                            string[] avatarColors = { "#fdf4ff", "#ecfdf5", "#eff6ff", "#fef2f2", "#fffbeb", "#f3f4f6" };
+                                            string[] avatarTextColors = { "#a21caf", "#059669", "#1d4ed8", "#b91c1c", "#b45309", "#4b5563" };
+                                            int colorIndex = Math.Abs(user.UserId) % avatarColors.Length;
+                                        }
+                                        <div class="avatar-circle" style="background: @avatarColors[colorIndex]; color: @avatarTextColors[colorIndex];">
+                                            @if (!string.IsNullOrEmpty(user.FullName))
                                             {
-                                                "admin" => "danger",
-                                                "manager" => "warning",
-                                                "staff" => "primary",
-                                                "support" => "info",
-                                                "sale" or "sales" => "success",
-                                                _ => "secondary"
-                                            };
-                                        }
-                                        <span class="badge bg-@roleColor">
-                                            <i class="bi bi-person-badge me-1"></i>@user.Role.ToUpper()
-                                        </span>
-                                    </td>
-                                    <td style="padding: 1rem;">
-                                        @if (user.IsActive)
-                                        {
-                                            <span class="badge bg-success">
-                                                <i class="bi bi-check-circle me-1"></i>Active
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">
-                                                <i class="bi bi-x-circle me-1"></i>Inactive
-                                            </span>
-                                        }
-                                    </td>
-                                    <td style="padding: 1rem;">
-                                        <div>@user.CreatedAt.ToString("MMM dd, yyyy")</div>
-                                        <small class="text-muted">@user.CreatedAt.ToString("hh:mm tt")</small>
-                                    </td>
-                                    <td style="padding: 1rem; text-align: center;">
-                                        <div class="btn-group" role="group">
-                                            <a asp-page="./Edit"
-                                               asp-route-id="@user.UserId"
-                                               class="btn btn-sm btn-outline-primary"
-                                               title="Edit User">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                            @if (user.UserId != Model.CurrentUserId)
+                                                @user.FullName.Substring(0, 1).ToUpper()
+                                            }
+                                            else
                                             {
-                                                <button type="button"
-                                                        class="btn btn-sm btn-outline-danger"
-                                                        onclick="confirmDelete(@user.UserId, '@user.Email')"
-                                                        title="Delete User">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
+                                                <span>?</span>
                                             }
                                         </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                                        <div>
+                                            <div class="customer-name">
+                                                @(user.FullName ?? "N/A")
+                                                @if (user.UserId == Model.CurrentUserId)
+                                                {
+                                                    <span class="badge-modern badge-user ms-2" style="font-size: 0.65rem;">You</span>
+                                                }
+                                            </div>
+                                            <div class="customer-email">@user.Email</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    @{
+                                        var roleClass = user.Role.ToLower() switch {
+                                            "admin" => "badge-admin",
+                                            "manager" => "badge-admin",
+                                            "staff" => "badge-staff",
+                                            _ => "badge-user"
+                                        };
+                                        string roleDisplay = user.Role;
+                                        if (roleDisplay.Length > 0)
+                                        {
+                                            roleDisplay = roleDisplay.Substring(0, 1).ToUpper() + roleDisplay.Substring(1);
+                                        }
+                                    }
+                                    <span class="badge-modern @roleClass">@roleDisplay</span>
+                                </td>
+                                <td>
+                                    @if (user.IsActive)
+                                    {
+                                        <span class="status-active">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-inactive">Inactive</span>
+                                    }
+                                </td>
+                                <td style="color: #6b7280; font-size: 0.9rem;">
+                                    @user.CreatedAt.ToString("MMM d, yyyy")
+                                </td>
+                                <td class="action-cell">
+                                    <button type="button" class="btn-icon-only" onclick="toggleDropdown(event, @user.UserId)">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <div id="dropdown-@user.UserId" class="dropdown-menu-custom">
+                                        <a asp-page="./Edit" asp-route-id="@user.UserId" class="dropdown-item-custom">
+                                            <i class="bi bi-pencil" style="font-size: 0.95rem; color: #6b7280;"></i> Edit details
+                                        </a>
+                                        @if (user.UserId != Model.CurrentUserId)
+                                        {
+                                            <button type="button" class="dropdown-item-custom text-danger" onclick="confirmDelete(@user.UserId, '@user.Email')">
+                                                <i class="bi bi-trash" style="font-size: 0.95rem; color: #ef4444;"></i> Delete user
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="padding: 1rem 1.5rem; display: flex; justify-content: center; border-top: 1px solid #e5e7eb;">
+                <div style="display: flex; gap: 0.25rem;">
+                    <button class="btn btn-sm disabled" style="background: transparent; border: none; color: #9ca3af; padding: 0.25rem 0.6rem;"><i class="bi bi-chevron-left"></i></button>
+                    <button class="btn btn-sm" style="background: #0d9488; border: none; color: #ffffff; font-weight: 500; border-radius: 6px; padding: 0.25rem 0.85rem;">1</button>
+                    <button class="btn btn-sm disabled" style="background: transparent; border: none; color: #9ca3af; padding: 0.25rem 0.6rem;"><i class="bi bi-chevron-right"></i></button>
                 </div>
-            }
-        </div>
+            </div>
+        }
     </div>
 </div>
 
-<!-- Delete Confirmation Form -->
 <form id="deleteForm" method="post" asp-page-handler="Delete" style="display: none;">
     @Html.AntiForgeryToken()
     <input type="hidden" name="userId" id="deleteUserId" />
@@ -308,57 +291,43 @@
 
 @section Scripts {
     <script>
+        function toggleDropdown(event, id) {
+            event.stopPropagation(); // Prevents click from bubbling to document
+            const currentDropdown = document.getElementById('dropdown-' + id);
+            const isCurrentlyOpen = currentDropdown.classList.contains('show');
+            
+            // Close all
+            document.querySelectorAll('.dropdown-menu-custom.show').forEach(el => {
+                el.classList.remove('show');
+            });
+            
+            // Toggle current
+            if (!isCurrentlyOpen) {
+                currentDropdown.classList.add('show');
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.dropdown-menu-custom.show').forEach(el => {
+                el.classList.remove('show');
+            });
+        });
+
+        // Close on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                document.querySelectorAll('.dropdown-menu-custom.show').forEach(el => {
+                    el.classList.remove('show');
+                });
+            }
+        });
+
         function confirmDelete(userId, email) {
             if (confirm(`Are you sure you want to delete user: ${email}?\n\nThis action cannot be undone!`)) {
                 document.getElementById('deleteUserId').value = userId;
                 document.getElementById('deleteForm').submit();
             }
         }
-
-        // Auto-refresh every 2 minutes
-        setTimeout(() => {
-            location.reload();
-        }, 120000);
     </script>
-}
-
-@section Styles {
-    <style>
-        .avatar-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1rem;
-        }
-
-        .table tbody tr:hover {
-            background-color: rgba(212, 165, 116, 0.05);
-            transition: all 0.2s ease;
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-            transition: all 0.2s ease;
-        }
-    </style>
-}
-
-@functions {
-    string GetAvatarColor(string role)
-    {
-        return role switch
-        {
-            "admin" => "#dc3545",
-            "manager" => "#ffc107",
-            "staff" => "#0d6efd",
-            "support" => "#0dcaf0",
-            "sale" or "sales" => "#198754",
-            _ => "#6c757d"
-        };
-    }
 }

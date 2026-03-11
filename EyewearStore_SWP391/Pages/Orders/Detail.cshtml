@@ -128,10 +128,21 @@
                         <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--medium-gray);">
                             <div class="row align-items-center g-3">
                                 <div class="col-auto">
-                                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--light-gray), var(--secondary-cream)); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--medium-gray);">
-                                        <span style="font-size: 1.25rem;">
+                                    @{
+                                        var imgUrl = oi.Product?.ProductImages?.FirstOrDefault(img => img.IsPrimary && img.IsActive)?.ImageUrl;
+                                        if (string.IsNullOrEmpty(imgUrl))
+                                        {
+                                            imgUrl = oi.Product?.ProductImages?.FirstOrDefault(img => img.IsActive)?.ImageUrl;
+                                        }
+                                    }
+                                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--light-gray), var(--secondary-cream)); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--medium-gray); overflow: hidden; position: relative;">
+                                        <span style="font-size: 1.25rem; position: absolute; z-index: 1;">
                                             @(isServiceOrder ? "⚙" : (oi.Product?.ProductType switch { "frame" => "F", "lens" => "L", _ => "P" }))
                                         </span>
+                                        @if (!string.IsNullOrEmpty(imgUrl))
+                                        {
+                                            <img src="@imgUrl" alt="@(oi.Product?.Name)" style="width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 2;" onerror="this.style.display='none'" />
+                                        }
                                     </div>
                                 </div>
                                 <div class="col">

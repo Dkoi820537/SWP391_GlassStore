@@ -339,23 +339,58 @@
                                 <a class="nav-link dropdown-toggle text-danger fw-semibold" href="#"
                                    id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-shield-lock me-1"></i>Admin
+                                    <i class="bi bi-chevron-down shop-chevron"></i>
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="adminDropdown">
-                                    <li><a class="dropdown-item" asp-page="/Admin/Index"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</a></li>
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li class="dropdown-header text-muted small">Products</li>
-                                    <li><a class="dropdown-item" asp-page="/Lenses/Index"><i class="bi bi-eye me-2"></i>Lens Management</a></li>
-                                    <li><a class="dropdown-item" asp-page="/Frames/Index"><i class="bi bi-eyeglasses me-2"></i>Frame Management</a></li>
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><a class="dropdown-item" asp-page="/Sale/Orders/Index"><i class="bi bi-cart-check me-2"></i>Order Management</a></li>
-                                    <li><a class="dropdown-item" asp-page="/Sale/Refunds/Index"><i class="bi bi-arrow-return-left me-2"></i>Refund Requests</a></li>
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><a class="dropdown-item" asp-page="/Support/Orders/Index"><i class="bi bi-people me-2"></i>Sale Staff</a></li>
-                                    <li><a class="dropdown-item" asp-page="/Staff/Orders/Index"><i class="bi bi-people-fill me-2"></i>Staff</a></li>
-                                    <li><a class="dropdown-item" asp-page="/Manager/Index"><i class="bi bi-person-badge me-2"></i>Managers</a></li>
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><a class="dropdown-item" asp-page="/Admin/Users/Index"><i class="bi bi-people me-2"></i>User Management</a></li>
-                                    <li><a class="dropdown-item" asp-page="/Admin/AdminRole"><i class="bi bi-key me-2"></i>Admin Roles</a></li>
+                                <ul class="dropdown-menu shop-dropdown-menu p-2 dropdown-menu-end" aria-labelledby="adminDropdown">
+                                    <li>
+                                        <a class="shop-drop-item" asp-page="/Admin/Index">
+                                            <div class="shop-drop-icon frames"><i class="bi bi-speedometer2"></i></div>
+                                            <div class="shop-drop-text">
+                                                <div class="shop-drop-name">Admin Dashboard</div>
+                                                <div class="shop-drop-desc">System overview &amp; metrics</div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li><div class="shop-drop-divider"></div></li>
+                                    <li>
+                                        <a class="shop-drop-item" asp-page="/Sale/Refunds/Index">
+                                            <div class="shop-drop-icon lenses"><i class="bi bi-arrow-return-left"></i></div>
+                                            <div class="shop-drop-text">
+                                                <div class="shop-drop-name">Refund Requests</div>
+                                                <div class="shop-drop-desc">Manage customer returns</div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li><div class="shop-drop-divider"></div></li>
+                                    <li>
+                                        <a class="shop-drop-item" asp-page="/Support/Orders/Index">
+                                            <div class="shop-drop-icon rx"><i class="bi bi-people"></i></div>
+                                            <div class="shop-drop-text">
+                                                <div class="shop-drop-name">Sale Staff</div>
+                                                <div class="shop-drop-desc">Manage sales operations</div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li><div class="shop-drop-divider"></div></li>
+                                    <li>
+                                        <a class="shop-drop-item" asp-page="/Staff/Orders/Index">
+                                            <div class="shop-drop-icon frames"><i class="bi bi-people-fill"></i></div>
+                                            <div class="shop-drop-text">
+                                                <div class="shop-drop-name">Staff</div>
+                                                <div class="shop-drop-desc">General staff portal</div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li><div class="shop-drop-divider"></div></li>
+                                    <li>
+                                        <a class="shop-drop-item" asp-page="/Manager/Index">
+                                            <div class="shop-drop-icon lenses"><i class="bi bi-person-badge"></i></div>
+                                            <div class="shop-drop-text">
+                                                <div class="shop-drop-name">Managers</div>
+                                                <div class="shop-drop-desc">Management tools &amp; reports</div>
+                                            </div>
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                         }

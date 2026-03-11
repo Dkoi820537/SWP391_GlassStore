@@ -1,7 +1,9 @@
 @page
 @model EyewearStore_SWP391.Pages.Products.IndexModel
 @{
-    ViewData["Title"] = "Shop Eyewear - Browse Frames & Lenses";
+    ViewData["Title"] = !string.IsNullOrWhiteSpace(Model.BrandFilter)
+        ? $"Mắt Kính {Model.BrandFilter} - OptiPlus"
+        : "Shop Eyewear - Browse Frames & Lenses";
     Layout = "_Layout";
 }
 
@@ -96,6 +98,122 @@
             #wl-toast .wl-icon {
                 font-size: 16px;
             }
+
+        /* ══ Brand Page Header ══════════════════════════════════════════ */
+        .brand-page-header {
+            background: #fff;
+            border-bottom: 2px solid #e5e7eb;
+            padding: 44px 24px 36px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 0;
+        }
+
+            .brand-page-header::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg, rgba(0,117,106,.05) 0%, rgba(255,255,255,0) 55%);
+                pointer-events: none;
+            }
+
+            .brand-page-header::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 60px;
+                height: 3px;
+                background: #00756A;
+                border-radius: 3px 3px 0 0;
+            }
+
+        .brand-logo-wrap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border: 2px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 12px 36px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 24px rgba(0,0,0,.08);
+            min-width: 140px;
+        }
+
+        .brand-logo-name {
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #00756A;
+            font-family: 'Be Vietnam Pro', 'Segoe UI', sans-serif;
+        }
+
+        .brand-page-sub {
+            font-size: 11px;
+            font-weight: 700;
+            color: #9ca3af;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 0 0 10px;
+        }
+
+        .brand-page-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #111827;
+            margin: 0 0 6px;
+            letter-spacing: .3px;
+        }
+
+            .brand-page-title .brand-count {
+                color: #00756A;
+                font-size: 17px;
+                font-weight: 700;
+            }
+
+        .brand-page-desc {
+            font-size: 13px;
+            color: #9ca3af;
+            margin: 0;
+        }
+
+        .brand-back-link {
+            position: absolute;
+            top: 16px;
+            left: 24px;
+            font-size: 12px;
+            color: #6b7280;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 14px;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            background: #fff;
+            transition: all .2s;
+        }
+
+            .brand-back-link:hover {
+                color: #00756A;
+                border-color: #00756A;
+            }
+
+        @@media (max-width: 576px) {
+            .brand-back-link {
+                position: static;
+                display: inline-flex;
+                margin-bottom: 16px;
+            }
+
+            .brand-page-header {
+                padding: 24px 16px 28px;
+            }
+        }
     </style>
 }
 
@@ -105,15 +223,47 @@
         <ol>
             <li><a asp-page="/Index"><i class="bi bi-house-door"></i> Home</a></li>
             <li class="separator"><i class="bi bi-chevron-right"></i></li>
-            <li class="current" aria-current="page">Shop</li>
+            <li><a asp-page="/Products/Index">Shop</a></li>
+            @if (!string.IsNullOrWhiteSpace(Model.BrandFilter))
+            {
+                <li class="separator"><i class="bi bi-chevron-right"></i></li>
+                <li class="current" aria-current="page">@Model.BrandFilter</li>
+            }
+            else
+            {
+                <li class="separator"><i class="bi bi-chevron-right"></i></li>
+                <li class="current" aria-current="page">Shop</li>
+            }
         </ol>
     </nav>
 
-    <!-- Page Header -->
-    <header class="shop-header">
-        <h1>Browse Our Collection</h1>
-        <p class="shop-subtitle">Discover premium eyewear crafted for style and comfort</p>
-    </header>
+    @* ── Brand Header — chỉ hiện khi lọc theo brand ── *@
+    @if (!string.IsNullOrWhiteSpace(Model.BrandFilter))
+    {
+        var totalBrandProducts = Model.Catalog.TotalItems;
+        <div class="brand-page-header">
+            <a asp-page="/Products/Index" class="brand-back-link">
+                <i class="bi bi-arrow-left"></i> Tất cả sản phẩm
+            </a>
+            <div class="brand-logo-wrap">
+                <span class="brand-logo-name">@Model.BrandFilter.ToUpper()</span>
+            </div>
+            <p class="brand-page-sub">Thương Hiệu</p>
+            <p class="brand-page-title">
+                MẮT KÍNH THƯƠNG HIỆU @Model.BrandFilter.ToUpper()
+                <span class="brand-count">(@totalBrandProducts)</span>
+            </p>
+            <p class="brand-page-desc">Khám phá toàn bộ bộ sưu tập chính hãng từ @Model.BrandFilter</p>
+        </div>
+    }
+    else
+    {
+        <!-- Page Header — ẩn khi xem theo brand -->
+        <header class="shop-header">
+            <h1>Browse Our Collection</h1>
+            <p class="shop-subtitle">Discover premium eyewear crafted for style and comfort</p>
+        </header>
+    }
 
     <!-- Main Content -->
     <div class="shop-content">
@@ -157,11 +307,20 @@
                     <input type="hidden" name="FrameTypeFilter" value="@Model.FrameTypeFilter" />
                     <input type="hidden" name="LensTypeFilter" value="@Model.LensTypeFilter" />
                     <input type="hidden" name="SortBy" value="@Model.SortBy" />
+                    @* Giữ brand filter khi đổi product type *@
+                    @if (!string.IsNullOrWhiteSpace(Model.BrandFilter))
+                    {
+                        <input type="hidden" name="BrandFilter" value="@Model.BrandFilter" />
+                    }
                 </div>
             </form>
 
             <form method="get" asp-page="/Products/Index" id="searchFilterForm">
                 <input type="hidden" name="ProductTypeFilter" value="@Model.ProductTypeFilter" />
+                @if (!string.IsNullOrWhiteSpace(Model.BrandFilter))
+                {
+                    <input type="hidden" name="BrandFilter" value="@Model.BrandFilter" />
+                }
 
                 <div class="filter-section">
                     <h4>Search</h4>
@@ -314,7 +473,7 @@
                                     @product.ProductType
                                 </span>
 
-                                @* ── Wishlist Button: CHỈ hiện khi hết hàng (InventoryQty == 0) ── *@
+                                @* Wishlist button — chỉ hiện khi hết hàng *@
                                 @if (product.InventoryQty <= 0)
                                 {
                                     <button class="btn-wishlist"
@@ -371,7 +530,6 @@
                                 <div class="product-actions">
                                     @if (product.InventoryQty <= 0)
                                     {
-                                        @* Hết hàng: chỉ hiện nút Details, không có Add to Cart *@
                                         <span class="badge bg-secondary me-2" style="font-size:11px; padding: 6px 10px; align-self:center;">
                                             <i class="bi bi-x-circle me-1"></i>Out of Stock
                                         </span>
@@ -394,7 +552,6 @@
                                     }
                                     else
                                     {
-                                        @* Còn hàng: hiện Add to Cart + Details + Buy Now như bình thường *@
                                         @if (product.ProductType == "Frame")
                                         {
                                             <button onclick="addToCart(this, @product.ProductId)" class="btn-add-cart" title="Add to Cart">
@@ -444,6 +601,7 @@
                                        asp-route-FrameMaterialFilter="@Model.FrameMaterialFilter"
                                        asp-route-FrameTypeFilter="@Model.FrameTypeFilter"
                                        asp-route-LensTypeFilter="@Model.LensTypeFilter"
+                                       asp-route-BrandFilter="@Model.BrandFilter"
                                        asp-route-SortBy="@Model.SortBy"
                                        asp-route-CurrentPage="@(Model.CurrentPage - 1)"
                                        aria-label="Previous page">
@@ -477,6 +635,7 @@
                                        asp-route-FrameMaterialFilter="@Model.FrameMaterialFilter"
                                        asp-route-FrameTypeFilter="@Model.FrameTypeFilter"
                                        asp-route-LensTypeFilter="@Model.LensTypeFilter"
+                                       asp-route-BrandFilter="@Model.BrandFilter"
                                        asp-route-SortBy="@Model.SortBy"
                                        asp-route-CurrentPage="1">1</a>
                                 </li>
@@ -503,6 +662,7 @@
                                            asp-route-FrameMaterialFilter="@Model.FrameMaterialFilter"
                                            asp-route-FrameTypeFilter="@Model.FrameTypeFilter"
                                            asp-route-LensTypeFilter="@Model.LensTypeFilter"
+                                           asp-route-BrandFilter="@Model.BrandFilter"
                                            asp-route-SortBy="@Model.SortBy"
                                            asp-route-CurrentPage="@i">@i</a>
                                     }
@@ -524,6 +684,7 @@
                                        asp-route-FrameMaterialFilter="@Model.FrameMaterialFilter"
                                        asp-route-FrameTypeFilter="@Model.FrameTypeFilter"
                                        asp-route-LensTypeFilter="@Model.LensTypeFilter"
+                                       asp-route-BrandFilter="@Model.BrandFilter"
                                        asp-route-SortBy="@Model.SortBy"
                                        asp-route-CurrentPage="@Model.Catalog.TotalPages">@Model.Catalog.TotalPages</a>
                                 </li>
@@ -541,6 +702,7 @@
                                        asp-route-FrameMaterialFilter="@Model.FrameMaterialFilter"
                                        asp-route-FrameTypeFilter="@Model.FrameTypeFilter"
                                        asp-route-LensTypeFilter="@Model.LensTypeFilter"
+                                       asp-route-BrandFilter="@Model.BrandFilter"
                                        asp-route-SortBy="@Model.SortBy"
                                        asp-route-CurrentPage="@(Model.CurrentPage + 1)"
                                        aria-label="Next page">
@@ -602,10 +764,8 @@
         });
     </script>
 
-
     @* ── Wishlist Script ── *@
     <script>
-        // Toast helper
         let _wlToast = null;
         function showWlToast(msg, icon = '<i class="bi bi-heart"></i>') {
             if (!_wlToast) {
@@ -657,7 +817,6 @@
                         btn.dataset.inWishlist = 'true';
                         btn.querySelector('i').className = 'bi bi-heart-fill';
                         btn.classList.add('active');
-                        // Pop animation
                         btn.classList.add('pop');
                         btn.addEventListener('animationend', () => btn.classList.remove('pop'), { once: true });
                         showWlToast("Saved! We'll notify you when it's back", '');
@@ -672,7 +831,6 @@
             }
         }
 
-        // Highlight already-wishlisted items on load
         document.addEventListener('DOMContentLoaded', async () => {
             @if (User.Identity.IsAuthenticated)
             {
@@ -694,5 +852,5 @@
             }
         });
     </script>
-}
+}
 

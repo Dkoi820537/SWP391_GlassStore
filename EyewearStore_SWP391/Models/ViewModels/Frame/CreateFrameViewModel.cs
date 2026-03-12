@@ -1,12 +1,14 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
-
-namespace EyewearStore_SWP391.Models.ViewModels.Frame;
 
 public class CreateFrameViewModel
 {
+    // ── Single image (kept for backward compat, but multi-upload replaces it) ──
     [Display(Name = "Product Image")]
     public IFormFile? ImageFile { get; set; }
+
+    // ── NEW: Multiple images ───────────────────────────────────────────────────
+    [Display(Name = "Product Images")]
+    public List<IFormFile>? ImageFiles { get; set; }
 
     [StringLength(255)]
     [Display(Name = "Image Alt Text")]

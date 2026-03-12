@@ -12,7 +12,7 @@ public class CreateModel : PageModel
     private readonly IWebHostEnvironment _environment;
 
     private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
-    private const long MaxFileSize = 5 * 1024 * 1024;
+    private const long MaxFileSize = 5 * 1024 * 1024; // 5 MB
 
     public CreateModel(EyewearStoreContext context, IWebHostEnvironment environment)
     {
@@ -25,35 +25,36 @@ public class CreateModel : PageModel
 
     public IActionResult OnGet()
     {
-        Input = new CreateFrameViewModel
-        {
-            Currency = "VND",
-            IsActive = true
-        };
+        Input = new CreateFrameViewModel { Currency = "VND", IsActive = true };
         return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (Input.ImageFile != null)
-        {
-            if (Input.ImageFile.Length > MaxFileSize)
-                ModelState.AddModelError("Input.ImageFile",
-                    $"Image file size exceeds maximum allowed size of {MaxFileSize / (1024 * 1024)} MB");
+        // Collect files: prefer multi-upload, fallback to single
+        var files = new List<IFormFile>();
+        if (Input.ImageFiles != null && Input.ImageFiles.Any(f => f.Length > 0))
+            files.AddRange(Input.ImageFiles.Where(f => f != null && f.Length > 0));
+        else if (Input.ImageFile != null && Input.ImageFile.Length > 0)
+            files.Add(Input.ImageFile);
 
-            var extension = Path.GetExtension(Input.ImageFile.FileName).ToLowerInvariant();
-            if (!_allowedExtensions.Contains(extension))
-                ModelState.AddModelError("Input.ImageFile",
-                    $"Invalid file type. Allowed types: {string.Join(", ", _allowedExtensions)}");
+        // Validate
+        foreach (var file in files)
+        {
+            if (file.Length > MaxFileSize)
+                ModelState.AddModelError("Input.ImageFiles",
+                    $"'{file.FileName}' vuot qua {MaxFileSize / (1024 * 1024)} MB.");
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!_allowedExtensions.Contains(ext))
+                ModelState.AddModelError("Input.ImageFiles",
+                    $"'{file.FileName}' khong hop le. Chi chap nhan: jpg, jpeg, png, webp.");
         }
 
-        if (!ModelState.IsValid)
-            return Page();
+        if (!ModelState.IsValid) return Page();
 
-        var skuExists = await _context.Products.AnyAsync(p => p.Sku == Input.Sku);
-        if (skuExists)
+        if (await _context.Products.AnyAsync(p => p.Sku == Input.Sku))
         {
-            ModelState.AddModelError("Input.Sku", "This SKU already exists. Please use a different SKU.");
+            ModelState.AddModelError("Input.Sku", "SKU nay da ton tai.");
             return Page();
         }
 
@@ -70,57 +71,56 @@ public class CreateModel : PageModel
             IsActive = true,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            // Frame specs
             FrameMaterial = Input.FrameMaterial,
             FrameType = Input.FrameType,
             BridgeWidth = Input.BridgeWidth,
             TempleLength = Input.TempleLength,
-            // v2
             Brand = Input.Brand,
             Color = Input.Color,
             Gender = Input.Gender,
             FrameShape = Input.FrameShape,
-            // v3
             LensWidth = Input.LensWidth,
             Origin = Input.Origin,
         };
 
         _context.Frames.Add(frame);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(); // ProductId set after this
 
-        if (Input.ImageFile != null && Input.ImageFile.Length > 0)
-            await SaveProductImageAsync(frame.ProductId, Input.ImageFile, Input.ImageAltText);
+        if (files.Any())
+            await SaveProductImagesAsync(frame.ProductId, files, Input.ImageAltText);
 
         return RedirectToPage("./Index");
     }
 
-    private async Task SaveProductImageAsync(int productId, IFormFile file, string? altText)
+    // First file = primary
+    private async Task SaveProductImagesAsync(int productId, List<IFormFile> files, string? altText)
     {
-        var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "products", productId.ToString());
-        if (!Directory.Exists(uploadFolder))
-            Directory.CreateDirectory(uploadFolder);
+        var uploadFolder = Path.Combine(
+            _environment.WebRootPath, "uploads", "products", productId.ToString());
+        Directory.CreateDirectory(uploadFolder);
 
-        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-        var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-        var uniqueId = Guid.NewGuid().ToString("N")[..8];
-        var fileName = $"{timestamp}_{uniqueId}{extension}";
-        var filePath = Path.Combine(uploadFolder, fileName);
+        for (int i = 0; i < files.Count; i++)
+        {
+            var file = files[i];
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            var fileName = $"{DateTime.UtcNow:yyyyMMddHHmmss}_{i}_{Guid.NewGuid().ToString("N")[..8]}{ext}";
+            var filePath = Path.Combine(uploadFolder, fileName);
 
-        using (var stream = new FileStream(filePath, FileMode.Create))
+            using var stream = new FileStream(filePath, FileMode.Create);
             await file.CopyToAsync(stream);
 
-        var productImage = new ProductImage
-        {
-            ProductId = productId,
-            ImageUrl = $"/uploads/products/{productId}/{fileName}",
-            AltText = altText ?? Input.Name,
-            IsPrimary = true,
-            SortOrder = 0,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow
-        };
+            _context.ProductImages.Add(new ProductImage
+            {
+                ProductId = productId,
+                ImageUrl = $"/uploads/products/{productId}/{fileName}",
+                AltText = altText ?? Input.Name,
+                IsPrimary = i == 0,
+                SortOrder = i,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+            });
+        }
 
-        await _context.ProductImages.AddAsync(productImage);
         await _context.SaveChangesAsync();
     }
 }

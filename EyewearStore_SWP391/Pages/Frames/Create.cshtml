@@ -35,16 +35,57 @@
     .color-preview { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
     .color-dot { width:26px; height:26px; border-radius:50%; border:2px solid rgba(0,0,0,.15); cursor:pointer; transition:transform .15s; }
     .color-dot:hover { transform:scale(1.15); }
-    .image-upload-area { border:2px dashed #e0e0e8; border-radius:12px; padding:2rem; text-align:center; transition:all .3s; background:#fafafa; cursor:pointer; }
-    .image-upload-area:hover, .image-upload-area.drag-over { border-color:#667eea; background:rgba(102,126,234,.05); }
-    .image-upload-area .upload-icon { font-size:3rem; margin-bottom:1rem; }
-    .image-upload-area input[type="file"] { display:none; }
-    .image-preview-container { display:none; margin-top:1.5rem; text-align:center; }
-    .image-preview-container.has-image { display:block; }
-    .image-preview { max-width:300px; max-height:200px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.1); object-fit:cover; }
-    .image-preview-info { margin-top:.75rem; padding:.75rem; background:#f0f0f5; border-radius:8px; display:inline-block; }
-    .btn-remove-image { margin-top:.75rem; background:#dc3545; color:#fff; padding:.5rem 1rem; border:none; border-radius:6px; cursor:pointer; font-size:.85rem; }
-    .btn-remove-image:hover { background:#c82333; }
+
+    /* ── Drop zone ── */
+    .image-drop-zone {
+        border: 2px dashed #e0e0e8;
+        border-radius: 12px;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        background: #fafafa;
+        cursor: pointer;
+        transition: border-color .25s, background .25s;
+        user-select: none;
+    }
+    .image-drop-zone:hover, .image-drop-zone.drag-over {
+        border-color: #667eea;
+        background: rgba(102,126,234,.04);
+    }
+    .image-drop-zone .dz-icon { font-size: 2.8rem; color: #adb5bd; margin-bottom: .75rem; }
+    .image-drop-zone h4 { margin: 0 0 .35rem; font-size: 1rem; color: #4a4a68; }
+    .image-drop-zone p { margin: 0; font-size: .85rem; color: #6c757d; }
+
+    /* ── Thumbnail grid ── */
+    .thumb-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:1rem; margin-top:1.25rem; }
+    .thumb-card {
+        position: relative; border-radius: 10px; overflow: hidden;
+        border: 2px solid #e0e0e8; background: #f8f9fc;
+        aspect-ratio: 1; transition: border-color .2s, box-shadow .2s;
+    }
+    .thumb-card.is-primary { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,.25); }
+    .thumb-card img { width:100%; height:100%; object-fit:cover; display:block; }
+    .thumb-card .tc-actions {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,.65), transparent);
+        padding: .5rem .4rem .4rem;
+        display: flex; gap: .3rem; justify-content: center;
+        opacity: 0; transition: opacity .18s;
+    }
+    .thumb-card:hover .tc-actions { opacity: 1; }
+    .tc-btn { padding:.25rem .55rem; border-radius:5px; border:none; font-size:.72rem; font-weight:700; cursor:pointer; color:#fff; }
+    .tc-btn-primary { background:#667eea; }
+    .tc-btn-primary:hover { background:#5a6fd6; }
+    .tc-btn-remove  { background:#dc3545; }
+    .tc-btn-remove:hover  { background:#c82333; }
+    .tc-primary-badge {
+        position:absolute; top:6px; left:6px;
+        background:#667eea; color:#fff;
+        font-size:.65rem; font-weight:700;
+        padding:.2rem .45rem; border-radius:4px;
+    }
+    .upload-count-info { font-size:.85rem; color:#6c757d; margin-top:.75rem; text-align:right; }
+    .upload-count-info span { font-weight:600; color:#4a4a68; }
+
     .form-actions { display:flex; justify-content:flex-end; gap:1rem; padding:1.5rem 2rem; background:#f8f9fc; border-top:1px solid #f0f0f5; }
     .btn { display:inline-flex; align-items:center; gap:.5rem; padding:.75rem 1.5rem; border-radius:8px; font-weight:600; text-decoration:none; transition:all .2s; border:none; cursor:pointer; font-size:.95rem; }
     .btn-primary { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff; }
@@ -57,6 +98,7 @@
         .form-row, .form-row.tri { grid-template-columns:1fr; }
         .form-actions { flex-direction:column-reverse; }
         .btn { width:100%; justify-content:center; }
+        .thumb-grid { grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); }
     }
 </style>
 
@@ -73,10 +115,10 @@
     </div>
 
     <div class="form-card">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" id="createForm">
             <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
 
-            <!-- ── Basic Info ──────────────────────────────────────────── -->
+            <!-- Basic Info -->
             <div class="form-section">
                 <h2 class="section-title">Basic Information</h2>
                 <div class="form-row">
@@ -94,19 +136,18 @@
                 <div class="form-row single">
                     <div class="form-group">
                         <label asp-for="Input.Description">Description</label>
-                        <textarea asp-for="Input.Description" class="form-control" rows="3" placeholder="Enter frame description..."></textarea>
+                        <textarea asp-for="Input.Description" class="form-control" rows="3"></textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- ── Brand & Identity ────────────────────────────────────── -->
+            <!-- Brand & Identity -->
             <div class="form-section">
                 <h2 class="section-title">Brand &amp; Identity</h2>
                 <div class="form-row">
                     <div class="form-group">
                         <label asp-for="Input.Brand">Brand</label>
-                        <input asp-for="Input.Brand" class="form-control" placeholder="e.g., Ray-Ban, Bolon, Oakley" />
-                        <span class="helper-text">Displays as a clickable link on the product page</span>
+                        <input asp-for="Input.Brand" class="form-control" placeholder="e.g., Ray-Ban, Bolon" />
                     </div>
                     <div class="form-group">
                         <label asp-for="Input.Gender">Gender</label>
@@ -121,22 +162,19 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label asp-for="Input.Origin">Country of Origin</label>
-                        <input asp-for="Input.Origin" class="form-control" placeholder="e.g., P.R.C, Japan, Italy" />
-                        <span class="helper-text">Shown in product status row</span>
+                        <input asp-for="Input.Origin" class="form-control" placeholder="e.g., P.R.C, Japan" />
                     </div>
-                    <div class="form-group">
-                        <!-- spacer -->
-                    </div>
+                    <div class="form-group"></div>
                 </div>
             </div>
 
-            <!-- ── Frame Details ───────────────────────────────────────── -->
+            <!-- Frame Details -->
             <div class="form-section">
                 <h2 class="section-title">Frame Details</h2>
                 <div class="form-row">
                     <div class="form-group">
                         <label asp-for="Input.FrameMaterial">Frame Material</label>
-                        <input asp-for="Input.FrameMaterial" class="form-control" placeholder="e.g., Titanium, Acetate, Metal" />
+                        <input asp-for="Input.FrameMaterial" class="form-control" placeholder="e.g., Titanium, Acetate" />
                     </div>
                     <div class="form-group">
                         <label asp-for="Input.FrameType">Frame Type</label>
@@ -162,114 +200,102 @@
                             <option value="Wayfarer">Wayfarer</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <!-- spacer -->
-                    </div>
+                    <div class="form-group"></div>
                 </div>
-                <!-- ── Size measurements (4 fields in a row) ── -->
                 <div class="form-row tri">
                     <div class="form-group">
                         <label asp-for="Input.LensWidth">Lens Width (mm)</label>
-                        <input asp-for="Input.LensWidth" type="number" step="0.01" min="0" class="form-control" placeholder="e.g., 53.00" />
-                        <span class="helper-text">Horizontal lens diameter</span>
+                        <input asp-for="Input.LensWidth" type="number" step="0.01" min="0" class="form-control" placeholder="53" />
                     </div>
                     <div class="form-group">
                         <label asp-for="Input.BridgeWidth">Bridge Width (mm)</label>
-                        <input asp-for="Input.BridgeWidth" type="number" step="0.01" min="0" class="form-control" placeholder="e.g., 18.00" />
+                        <input asp-for="Input.BridgeWidth" type="number" step="0.01" min="0" class="form-control" placeholder="18" />
                     </div>
                     <div class="form-group">
                         <label asp-for="Input.TempleLength">Temple Length (mm)</label>
-                        <input asp-for="Input.TempleLength" type="number" step="0.01" min="0" class="form-control" placeholder="e.g., 140.00" />
+                        <input asp-for="Input.TempleLength" type="number" step="0.01" min="0" class="form-control" placeholder="140" />
                     </div>
                 </div>
             </div>
 
-            <!-- ── Color ──────────────────────────────────────────────── -->
+            <!-- Color -->
             <div class="form-section">
                 <h2 class="section-title">Color Options</h2>
                 <div class="form-row single">
                     <div class="form-group">
                         <label asp-for="Input.Color">Colors (comma-separated)</label>
                         <input asp-for="Input.Color" class="form-control" id="colorInput"
-                               placeholder="e.g., Black, Gold, Red"
-                               oninput="updateColorPreview()" />
-                        <span class="helper-text">Enter color names separated by commas. Each becomes a swatch on the product page.</span>
+                               placeholder="e.g., Black, Gold, Red" oninput="updateColorPreview()" />
+                        <span class="helper-text">Mỗi màu sẽ hiện thành swatch trên trang sản phẩm.</span>
                         <div class="color-preview" id="colorPreview"></div>
                     </div>
                 </div>
                 <div class="form-row single">
                     <div class="form-group">
                         <p class="helper-text">Quick add:</p>
-                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                            @foreach (var c in new[] { "Black", "Gold", "Red", "Silver", "Tortoise", "Blue", "Pink", "Green", "Transparent" })
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            @foreach (var c in new[] { "Black","Gold","Red","Silver","Tortoise","Blue","Pink","Green","Transparent" })
                             {
-                                <button type="button" class="color-dot" data-color="@c"
+                                <button type="button" class="color-dot" onclick="addColor('@c')" title="@c"
                                         style="background:@(c switch {
-                                            "Black" => "#1a1a1a",
-                                            "Gold"  => "#c9a96e",
-                                            "Red"   => "#cc2200",
-                                            "Silver"=> "linear-gradient(135deg,#d0d0d0,#f5f5f5,#b0b0b0)",
-                                            "Tortoise" => "#7b4f1e",
-                                            "Blue"  => "#1a4fa0",
-                                            "Pink"  => "#e879a0",
-                                            "Green" => "#2d7a3a",
-                                            _ => "rgba(180,220,255,.6)"
-                                        })"
-                                        onclick="addColor('@c')" title="@c"></button>
+                                            "Black"=>"#1a1a1a","Gold"=>"#c9a96e","Red"=>"#cc2200",
+                                            "Silver"=>"linear-gradient(135deg,#d0d0d0,#f5f5f5,#b0b0b0)",
+                                            "Tortoise"=>"#7b4f1e","Blue"=>"#1a4fa0","Pink"=>"#e879a0",
+                                            "Green"=>"#2d7a3a",_=>"rgba(180,220,255,.6)"})"></button>
                             }
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ── Pricing & Inventory ─────────────────────────────────── -->
+            <!-- Pricing & Inventory -->
             <div class="form-section">
                 <h2 class="section-title">Pricing &amp; Inventory</h2>
                 <div class="form-row tri">
                     <div class="form-group">
                         <label asp-for="Input.Price">Price <span class="req">*</span></label>
-                        <input asp-for="Input.Price" type="number" step="0.01" min="0.01" class="form-control" placeholder="0.00" />
+                        <input asp-for="Input.Price" type="number" step="0.01" min="0.01" class="form-control" />
                         <span asp-validation-for="Input.Price" class="field-validation-error"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="Input.Currency">Currency</label>
                         <input asp-for="Input.Currency" class="form-control" maxlength="3" placeholder="VND" />
-                        <span class="helper-text">3-char code (USD, VND…)</span>
                     </div>
                     <div class="form-group">
                         <label asp-for="Input.InventoryQty">Inventory Qty</label>
-                        <input asp-for="Input.InventoryQty" type="number" min="0" class="form-control" placeholder="0" />
+                        <input asp-for="Input.InventoryQty" type="number" min="0" class="form-control" />
                     </div>
                 </div>
             </div>
 
-            <!-- ── Product Image ──────────────────────────────────────── -->
+            <!-- Product Images (multi-upload) -->
             <div class="form-section">
-                <h2 class="section-title">Product Image</h2>
-                <div class="form-row single">
-                    <div class="form-group">
-                        <label id="imageUploadArea" class="image-upload-area" for="imageFileInput">
-                            <div class="upload-icon"><i class="bi bi-camera"></i></div>
-                            <h4>Upload Product Image</h4>
-                            <p>Drag and drop or click to select</p>
-                            <p class="helper-text">JPG, PNG, WEBP · Max 5 MB</p>
-                            <input type="file" id="imageFileInput" name="Input.ImageFile" accept=".jpg,.jpeg,.png,.webp" />
-                        </label>
-                        <div id="imagePreviewContainer" class="image-preview-container">
-                            <img id="imagePreview" class="image-preview" src="" alt="Preview" />
-                            <div class="image-preview-info">
-                                <span id="fileName"></span>
-                                <span id="fileSize" style="color:#6c757d;font-size:.85rem;margin-left:.5rem;"></span>
-                            </div><br/>
-                            <button type="button" id="removeImageBtn" class="btn-remove-image">Remove</button>
-                        </div>
-                    </div>
+                <h2 class="section-title">Product Images</h2>
+
+                
+                <input type="file" id="fileSubmit" name="Input.ImageFiles"
+                       accept=".jpg,.jpeg,.png,.webp" multiple style="display:none" />
+                
+                <input type="file" id="filePicker"
+                       accept=".jpg,.jpeg,.png,.webp" multiple style="display:none" />
+
+                <div class="image-drop-zone" id="dropZone">
+                    <div class="dz-icon"><i class="bi bi-images"></i></div>
+                    <h4>Upload Product Images</h4>
+                    <p>Drag &amp; drop hoặc click để chọn · Tối đa 10 ảnh</p>
+                    <p class="helper-text" style="margin-top:.4rem;">JPG, PNG, WEBP · Max 5 MB · Ảnh đầu tiên = ảnh chính</p>
                 </div>
-                <div class="form-row single">
+
+                <div class="thumb-grid" id="thumbGrid"></div>
+                <div class="upload-count-info" id="countInfo" style="display:none;">
+                    Đã chọn <span id="countText">0</span> ảnh — ảnh đầu tiên sẽ là ảnh chính (cover)
+                </div>
+
+                <div class="form-row single" style="margin-top:1.2rem;">
                     <div class="form-group">
                         <label asp-for="Input.ImageAltText">Image Alt Text</label>
-                        <input asp-for="Input.ImageAltText" class="form-control" placeholder="Describe the image" />
-                        <span class="helper-text">Optional. Helps accessibility &amp; SEO.</span>
+                        <input asp-for="Input.ImageAltText" class="form-control" placeholder="Mô tả ảnh (dùng cho tất cả ảnh)" />
+                        <span class="helper-text">Không bắt buộc. Hỗ trợ SEO &amp; accessibility.</span>
                     </div>
                 </div>
             </div>
@@ -285,61 +311,142 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-    const imageInput = document.getElementById('imageFileInput');
-    const uploadArea = document.getElementById('imageUploadArea');
-    const previewContainer = document.getElementById('imagePreviewContainer');
-    const imagePreview = document.getElementById('imagePreview');
-    const fileNameEl = document.getElementById('fileName');
-    const fileSizeEl = document.getElementById('fileSize');
+    var fileSubmit = document.getElementById('fileSubmit'); // named → submits
+    var filePicker = document.getElementById('filePicker'); // unnamed → dialog only
+    var dropZone   = document.getElementById('dropZone');
+    var thumbGrid  = document.getElementById('thumbGrid');
+    var countInfo  = document.getElementById('countInfo');
+    var countText  = document.getElementById('countText');
 
-    imageInput.addEventListener('change', e => handleFile(e.target.files[0]));
-    document.getElementById('removeImageBtn').addEventListener('click', () => {
-        imageInput.value = ''; previewContainer.classList.remove('has-image');
-        imagePreview.src = ''; fileNameEl.textContent = ''; fileSizeEl.textContent = '';
+    var MAX_FILES  = 10;
+    var MAX_BYTES  = 5 * 1024 * 1024;
+    var ALLOWED    = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    var fileList   = []; // [{ file, dataUrl }]
+
+    // Click drop zone → open picker
+    dropZone.addEventListener('click', function() { filePicker.click(); });
+
+    // Drag & drop
+    dropZone.addEventListener('dragover', function(e) {
+        e.preventDefault(); dropZone.classList.add('drag-over');
     });
-    uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
-    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
-    uploadArea.addEventListener('drop', e => {
-        e.preventDefault(); uploadArea.classList.remove('drag-over');
-        const f = e.dataTransfer.files[0];
-        if (f) { imageInput.files = e.dataTransfer.files; handleFile(f); }
+    dropZone.addEventListener('dragleave', function() {
+        dropZone.classList.remove('drag-over');
     });
-    function handleFile(f) {
-        if (!f) return;
-        if (!['image/jpeg','image/jpg','image/png','image/webp'].includes(f.type)) { alert('Invalid file type.'); return; }
-        if (f.size > 5*1024*1024) { alert('File too large (max 5MB).'); return; }
-        const reader = new FileReader();
-        reader.onload = e => {
-            imagePreview.src = e.target.result;
-            previewContainer.classList.add('has-image');
-            fileNameEl.textContent = f.name;
-            fileSizeEl.textContent = f.size < 1048576 ? (f.size/1024).toFixed(1)+' KB' : (f.size/1048576).toFixed(1)+' MB';
-        };
-        reader.readAsDataURL(f);
+    dropZone.addEventListener('drop', function(e) {
+        e.preventDefault(); dropZone.classList.remove('drag-over');
+        handleFiles(Array.from(e.dataTransfer.files));
+    });
+
+    // Picker selected → add to list, then reset picker
+    filePicker.addEventListener('change', function(e) {
+        handleFiles(Array.from(e.target.files));
+        e.target.value = ''; // reset so same file can be picked again
+    });
+
+    function handleFiles(incoming) {
+        for (var i = 0; i < incoming.length; i++) {
+            var file = incoming[i];
+            if (fileList.length >= MAX_FILES) { alert('Toi da ' + MAX_FILES + ' anh.'); break; }
+            if (ALLOWED.indexOf(file.type) === -1) { alert('"' + file.name + '" khong hop le.'); continue; }
+            if (file.size > MAX_BYTES) { alert('"' + file.name + '" vuot 5 MB.'); continue; }
+            addFile(file);
+        }
+        syncToSubmitInput();
+        updateCount();
     }
 
-    const COLOR_MAP = {
+    function addFile(file) {
+        var idx = fileList.length;
+        fileList.push({ file: file, dataUrl: null });
+        var reader = new FileReader();
+        reader.onload = (function(i) {
+            return function(ev) {
+                fileList[i].dataUrl = ev.target.result;
+                renderThumbs();
+            };
+        })(idx);
+        reader.readAsDataURL(file);
+    }
+
+    function renderThumbs() {
+        thumbGrid.innerHTML = '';
+        fileList.forEach(function(item, idx) {
+            if (!item.dataUrl) return;
+            var card = document.createElement('div');
+            card.className = 'thumb-card' + (idx === 0 ? ' is-primary' : '');
+            var badge = idx === 0 ? '<span class="tc-primary-badge">\u2605 Primary</span>' : '';
+            var setPrimaryBtn = idx !== 0
+                ? '<button type="button" class="tc-btn tc-btn-primary" onclick="setPrimary(' + idx + ')">Set Primary</button>'
+                : '';
+            card.innerHTML = badge
+                + '<img src="' + item.dataUrl + '" alt="Preview ' + (idx+1) + '">'
+                + '<div class="tc-actions">'
+                + setPrimaryBtn
+                + '<button type="button" class="tc-btn tc-btn-remove" onclick="removeImg(' + idx + ')">Remove</button>'
+                + '</div>';
+            thumbGrid.appendChild(card);
+        });
+    }
+
+    function setPrimary(idx) {
+        var item = fileList.splice(idx, 1)[0];
+        fileList.unshift(item);
+        renderThumbs();
+        syncToSubmitInput();
+    }
+
+    function removeImg(idx) {
+        fileList.splice(idx, 1);
+        renderThumbs();
+        syncToSubmitInput();
+        updateCount();
+    }
+
+    // Write fileList → fileSubmit.files using DataTransfer
+    // This makes normal form submit include all files in correct order
+    function syncToSubmitInput() {
+        try {
+            var dt = new DataTransfer();
+            fileList.forEach(function(item) { dt.items.add(item.file); });
+            fileSubmit.files = dt.files;
+        } catch(e) {
+            // DataTransfer not supported — very rare in modern browsers
+            console.warn('DataTransfer not supported:', e);
+        }
+    }
+
+    function updateCount() {
+        if (fileList.length > 0) {
+            countInfo.style.display = 'block';
+            countText.textContent = fileList.length;
+        } else {
+            countInfo.style.display = 'none';
+        }
+    }
+
+    // Color preview
+    var COLOR_MAP = {
         Black:'#1a1a1a', Red:'#cc2200', Gold:'#c9a96e', Silver:'#c0c0c0',
-        Tortoise:'#7b4f1e', Blue:'#1a4fa0', Pink:'#e879a0', Green:'#2d7a3a', Transparent:'rgba(180,220,255,.5)'
+        Tortoise:'#7b4f1e', Blue:'#1a4fa0', Pink:'#e879a0', Green:'#2d7a3a',
+        Transparent:'rgba(180,220,255,.5)'
     };
     function updateColorPreview() {
-        const val = document.getElementById('colorInput').value;
-        const container = document.getElementById('colorPreview');
+        var val = document.getElementById('colorInput').value;
+        var container = document.getElementById('colorPreview');
         container.innerHTML = '';
-        val.split(',').forEach(c => {
-            c = c.trim();
-            if (!c) return;
-            const dot = document.createElement('div');
-            dot.className = 'color-dot';
-            dot.title = c;
+        val.split(',').forEach(function(c) {
+            c = c.trim(); if (!c) return;
+            var dot = document.createElement('div');
+            dot.className = 'color-dot'; dot.title = c;
             dot.style.background = COLOR_MAP[c] || '#ccc';
             container.appendChild(dot);
         });
     }
     function addColor(color) {
-        const inp = document.getElementById('colorInput');
-        const existing = inp.value.split(',').map(s => s.trim()).filter(Boolean);
-        if (!existing.includes(color)) {
+        var inp = document.getElementById('colorInput');
+        var existing = inp.value.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+        if (existing.indexOf(color) === -1) {
             inp.value = existing.length ? existing.join(', ') + ', ' + color : color;
             updateColorPreview();
         }

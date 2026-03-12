@@ -67,6 +67,7 @@
             padding: 32px 24px 80px;
         }
 
+        /* ── Gallery: vertical thumbs left + main image right ── */
         .fd-grid {
             display: grid;
             grid-template-columns: 55% 1fr;
@@ -79,7 +80,90 @@
             top: 78px;
         }
 
+        /* Gallery inner: thumbs column + main image */
+        .gal-inner {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        /* Vertical thumbnail strip */
+        .gal-thumbs {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 72px;
+            flex-shrink: 0;
+            max-height: 480px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #e0e0e0 transparent;
+        }
+
+            .gal-thumbs::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            .gal-thumbs::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .gal-thumbs::-webkit-scrollbar-thumb {
+                background: #e0e0e0;
+                border-radius: 4px;
+            }
+
+        /* Scroll buttons */
+        .gal-scroll-btn {
+            width: 100%;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 0;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--sub);
+            text-align: center;
+            transition: background .15s, color .15s;
+            flex-shrink: 0;
+        }
+
+            .gal-scroll-btn:hover {
+                background: var(--teal-lt);
+                color: var(--teal);
+            }
+
+        .thumb {
+            width: 72px;
+            height: 72px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color .18s, box-shadow .18s;
+            flex-shrink: 0;
+            background: #f5f5f5;
+        }
+
+            .thumb:hover {
+                border-color: var(--teal);
+            }
+
+            .thumb.active {
+                border-color: var(--teal);
+                box-shadow: 0 0 0 3px rgba(0,117,106,.15);
+            }
+
+            .thumb img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+        /* Main image */
         .gal-main {
+            flex: 1;
             position: relative;
             border-radius: 16px;
             overflow: hidden;
@@ -90,6 +174,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            min-width: 0;
         }
 
             .gal-main img {
@@ -129,34 +214,7 @@
                 color: var(--teal);
             }
 
-        .thumbs {
-            display: flex;
-            gap: 10px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-        }
-
-        .thumb {
-            width: 80px;
-            height: 80px;
-            border-radius: 10px;
-            overflow: hidden;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: border-color .18s;
-            flex-shrink: 0;
-        }
-
-            .thumb:hover, .thumb.active {
-                border-color: var(--teal);
-            }
-
-            .thumb img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-
+        /* Size strip */
         .sz-strip {
             display: flex;
             gap: 10px;
@@ -190,6 +248,7 @@
             margin-top: 3px;
         }
 
+        /* ── Info panel ── */
         .info {
             padding-top: 2px;
         }
@@ -578,7 +637,6 @@
                 transform: none;
             }
 
-        /* Notify/Wishlist button — only shown when out of stock */
         .btn-notify {
             width: 100%;
             padding: 13px;
@@ -631,6 +689,7 @@
                 color: var(--red);
             }
 
+        /* Tabs */
         .tabs-wrap {
             max-width: 1280px;
             margin: 0 auto 64px;
@@ -727,6 +786,7 @@
                     color: var(--teal);
                 }
 
+        /* Related */
         .related {
             max-width: 1280px;
             margin: 0 auto 64px;
@@ -812,6 +872,7 @@
                 margin: 0;
             }
 
+        /* Sticky bar */
         .sticky-bar {
             display: none;
             position: fixed;
@@ -860,6 +921,24 @@
 
             .gal {
                 position: static;
+            }
+            /* On mobile: thumbs go horizontal below main image */
+            .gal-inner {
+                flex-direction: column;
+            }
+
+            .gal-thumbs {
+                flex-direction: row;
+                width: 100%;
+                max-height: none;
+                overflow-x: auto;
+                overflow-y: visible;
+            }
+
+            .thumb {
+                width: 64px;
+                height: 64px;
+                flex-shrink: 0;
             }
 
             .rel-grid {
@@ -943,45 +1022,52 @@
 
             <!-- LEFT: Gallery -->
             <div class="gal">
-                <div class="gal-main">
-                    @if (!string.IsNullOrEmpty(Model.Frame.Brand))
-                    {
-                        <a class="brand-badge"
-                           asp-page="/Products/Index"
-                           asp-route-BrandFilter="@Model.Frame.Brand"
-                           title="View all @Model.Frame.Brand">
-                            @Model.Frame.Brand.ToUpper()
-                        </a>
-                    }
-                    @if (!string.IsNullOrEmpty(Model.Frame.PrimaryImageUrl))
-                    {
-                        <img id="mainImg" src="@Model.Frame.PrimaryImageUrl" alt="@Model.Frame.Name" />
-                    }
-                    else
-                    {
-                        <div class="gal-ph"><i class="bi bi-eyeglasses"></i></div>
-                    }
-                </div>
+                <div class="gal-inner">
 
-                @if (Model.Frame.Images.Count > 1)
-                {
-                    <div class="thumbs">
-                        @foreach (var img in Model.Frame.Images)
+                    @* ── Vertical thumbnail strip (only if >1 image) ── *@
+                    @if (Model.Frame.Images.Count > 1)
+                    {
+                        <div class="gal-thumbs" id="thumbStrip">
+                            @foreach (var (img, i) in Model.Frame.Images.Select((x, i) => (x, i)))
+                            {
+                                <div class="thumb @(img.IsPrimary ? "active" : "")"
+                                     onclick="changeImg('@img.ImageUrl', this)"
+                                     title="@(img.AltText ?? Model.Frame.Name)">
+                                    <img src="@img.ImageUrl" alt="@(img.AltText ?? Model.Frame.Name)" loading="lazy" />
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @* ── Main image ── *@
+                    <div class="gal-main">
+                        @if (!string.IsNullOrEmpty(Model.Frame.Brand))
                         {
-                            <div class="thumb @(img.IsPrimary ? "active" : "")"
-                                 onclick="changeImg('@img.ImageUrl',this)">
-                                <img src="@img.ImageUrl" alt="@img.AltText" />
-                            </div>
+                            <a class="brand-badge"
+                               asp-page="/Products/Index"
+                               asp-route-BrandFilter="@Model.Frame.Brand"
+                               title="View all @Model.Frame.Brand">
+                                @Model.Frame.Brand.ToUpper()
+                            </a>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Frame.PrimaryImageUrl))
+                        {
+                            <img id="mainImg" src="@Model.Frame.PrimaryImageUrl" alt="@Model.Frame.Name" />
+                        }
+                        else
+                        {
+                            <div class="gal-ph"><i class="bi bi-eyeglasses"></i></div>
                         }
                     </div>
-                }
 
+                </div>
+
+                @* ── Size strip ── *@
                 @if (Model.Frame.LensWidth.HasValue || Model.Frame.BridgeWidth.HasValue || Model.Frame.TempleLength.HasValue)
                 {
                     var lensColor = Model.Frame.LensWidth.HasValue ? "#00756A" : "#ccc";
                     var bridgeColor = Model.Frame.BridgeWidth.HasValue ? "#00756A" : "#ccc";
                     var templeColor = Model.Frame.TempleLength.HasValue ? "#00756A" : "#ccc";
-
                     <div class="sz-strip">
                         <div class="sz-card">
                             <svg viewBox="0 0 70 46" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1025,16 +1111,11 @@
 
             <!-- RIGHT: Info -->
             <div class="info">
-
                 @if (!string.IsNullOrEmpty(Model.Frame.Brand))
                 {
-                    <a class="brand-link"
-                       asp-page="/Products/Index"
-                       asp-route-BrandFilter="@Model.Frame.Brand">@Model.Frame.Brand.ToUpper()</a>
+                    <a class="brand-link" asp-page="/Products/Index" asp-route-BrandFilter="@Model.Frame.Brand">@Model.Frame.Brand.ToUpper()</a>
                 }
-
                 <h1 class="prod-name">@Model.Frame.Name</h1>
-
                 <div class="status-row">
                     <span>Status: <strong>@(Model.Frame.IsInStock ? "In Stock" : "Out of Stock")</strong></span>
                     <span class="sep-dot">·</span>
@@ -1045,7 +1126,6 @@
                         <span>Origin: <strong>@Model.Frame.Origin</strong></span>
                     }
                 </div>
-
                 @if (!string.IsNullOrEmpty(Model.Frame.Gender) || !string.IsNullOrEmpty(Model.Frame.FrameShape) || !string.IsNullOrEmpty(Model.Frame.FrameType))
                 {
                     <div class="badges">
@@ -1063,7 +1143,6 @@
                         }
                     </div>
                 }
-
                 <div class="price-row">
                     <span class="price-lbl">Price:</span>
                     <span class="price-cur">@Model.Frame.Currency</span>
@@ -1073,15 +1152,10 @@
                         <span class="sold-txt"><strong>@Model.Frame.SoldCount</strong> sold</span>
                     }
                 </div>
-
                 @{
-                    var sc = Model.Frame.StockStatus == "OutOfStock" ? "out"
-                    : Model.Frame.StockStatus == "LowStock" ? "low"
-                    : "in";
-                    var stockMsg = Model.Frame.StockStatus == "OutOfStock"
-                    ? "Out of Stock"
-                    : Model.Frame.StockStatus == "LowStock"
-                    ? "Low Stock (" + Model.Frame.InventoryQty + " left)"
+                    var sc = Model.Frame.StockStatus == "OutOfStock" ? "out" : Model.Frame.StockStatus == "LowStock" ? "low" : "in";
+                    var stockMsg = Model.Frame.StockStatus == "OutOfStock" ? "Out of Stock"
+                    : Model.Frame.StockStatus == "LowStock" ? "Low Stock (" + Model.Frame.InventoryQty + " left)"
                     : "In Stock (" + Model.Frame.InventoryQty + " available)";
                 }
                 <div class="stock-row">
@@ -1092,10 +1166,12 @@
                         }
                         else if (sc == "low")
                         {
+
                             <i class="bi bi-exclamation-circle-fill"></i>
                         }
                         else
                         {
+
                             <i class="bi bi-x-circle-fill"></i>
                         }
                         <span>@stockMsg</span>
@@ -1104,15 +1180,12 @@
 
                 @if (!string.IsNullOrEmpty(Model.Frame.Color))
                 {
-                    var cols = Model.Frame.Color
-                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                    .ToList();
+                    var cols = Model.Frame.Color.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
                     <div class="section-lbl">Color <span class="cur" id="colorLbl">@cols[0]</span></div>
                     <div class="color-opts">
                         @foreach (var c in cols)
                         {
-                            <button class="color-opt @(c == cols[0] ? "active" : "")"
-                                    data-color="@c" onclick="selColor(this,'@c')">
+                            <button class="color-opt @(c == cols[0] ? "active" : "")" data-color="@c" onclick="selColor(this,'@c')">
                                 <span class="c-dot" style="@ColorStyle(c)"></span>
                                 @c.ToUpper()
                             </button>
@@ -1123,9 +1196,7 @@
                 @if (!string.IsNullOrEmpty(Model.Frame.SizeLabel))
                 {
                     <div class="section-lbl">Size</div>
-                    <div class="size-opts">
-                        <button class="size-opt active">@Model.Frame.SizeLabel</button>
-                    </div>
+                    <div class="size-opts"><button class="size-opt active">@Model.Frame.SizeLabel</button></div>
                 }
 
                 <div class="specs">
@@ -1162,7 +1233,6 @@
 
                 @if (Model.Frame.IsInStock)
                 {
-                    // In stock: show qty + buy/cart buttons
                     <form method="post" asp-page-handler="AddToCart" id="cartForm">
                         <input type="hidden" asp-for="AddToCartInput.ProductId" />
                         <div class="qty-row">
@@ -1186,7 +1256,6 @@
                 }
                 else
                 {
-                    // Out of stock: disabled buttons + Notify When Available (wishlist)
                     <div class="qty-row">
                         <span class="qty-lbl">Quantity:</span>
                         <div class="qty-ctrl">
@@ -1199,16 +1268,12 @@
                         <button class="btn-buy" disabled><i class="bi bi-lightning-fill"></i> BUY NOW</button>
                         <button class="btn-cart" disabled><i class="bi bi-cart-plus"></i> ADD TO CART</button>
                     </div>
-
-                    // Wishlist / notify button — only for out-of-stock items
                     <button type="button" class="btn-notify" id="notifyBtn"
-                            data-product-id="@Model.Frame.ProductId"
-                            data-in="false">
+                            data-product-id="@Model.Frame.ProductId" data-in="false">
                         <i class="bi bi-bell" id="notifyIcon"></i>
                         <span id="notifyLabel">Notify When Available</span>
                     </button>
                 }
-
         </div>
     </div>
 </div>
@@ -1220,7 +1285,6 @@
         <button class="tab-btn" onclick="switchTab('specs',this)">Specifications</button>
         <button class="tab-btn" onclick="switchTab('care',this)">Care Instructions</button>
     </div>
-
     <div id="tab-desc" class="tab-panel on">
         <h3>Product Description</h3>
         <p style="color:var(--sub);line-height:1.8;font-size:15px;">
@@ -1229,11 +1293,10 @@
                         : Model.Frame.Description)
         </p>
     </div>
-
-        <div id="tab-specs" class="tab-panel">
-            <h3>Technical Specifications</h3>
-            <div class="spec-grid">
-                <div class="spec-row"><span class="spec-k">SKU</span><span class="spec-v">@Model.Frame.Sku</span></div>
+    <div id="tab-specs" class="tab-panel">
+        <h3>Technical Specifications</h3>
+        <div class="spec-grid">
+            <div class="spec-row"><span class="spec-k">SKU</span><span class="spec-v">@Model.Frame.Sku</span></div>
             @if (!string.IsNullOrEmpty(Model.Frame.Brand))
                 {
                     <div class="spec-row"><span class="spec-k">Brand</span><span class="spec-v">@Model.Frame.Brand</span></div>
@@ -1276,7 +1339,6 @@
                 }
             </div>
         </div>
-
         <div id="tab-care" class="tab-panel">
             <h3>Care &amp; Cleaning</h3>
             <ul class="care-list">
@@ -1303,6 +1365,7 @@
                             }
                             else
                             {
+
                                 <div class="rel-ph"><i class="bi bi-eyeglasses"></i></div>
                             }
                         </div>
@@ -1326,9 +1389,8 @@
             }
             else
             {
-                <button class="sticky-btn" style="background:#6b7280;" onclick="document.getElementById('notifyBtn')?.click()">
-                    <i class="bi bi-bell"></i> Notify Me
-                </button>
+
+                <button class="sticky-btn" style="background:#6b7280;" onclick="document.getElementById('notifyBtn')?.click()"><i class="bi bi-bell"></i> Notify Me</button>
             }
         </div>
     </div>
@@ -1346,156 +1408,80 @@ else
     <script>
         function changeImg(url, el) {
             var img = document.getElementById('mainImg');
-            if (img) {
-                img.style.opacity = '0';
-                setTimeout(function () { img.src = url; img.style.opacity = '1'; }, 200);
-            }
-            document.querySelectorAll('.thumb').forEach(function (t) { t.classList.remove('active'); });
+            if (img) { img.style.opacity='0'; setTimeout(function(){ img.src=url; img.style.opacity='1'; }, 200); }
+            document.querySelectorAll('.thumb').forEach(function(t){ t.classList.remove('active'); });
             if (el) el.classList.add('active');
         }
-
         function chQty(d) {
-            var inp = document.getElementById('qInput');
-            if (!inp) return;
-            var max = parseInt(inp.max) || 99;
-            var v = Math.max(1, Math.min(max, (parseInt(inp.value) || 1) + d));
-            inp.value = v;
-            document.getElementById('qMinus').disabled = v <= 1;
-            document.getElementById('qPlus').disabled = v >= max;
+            var inp=document.getElementById('qInput'); if(!inp) return;
+            var max=parseInt(inp.max)||99;
+            var v=Math.max(1, Math.min(max, (parseInt(inp.value)||1)+d));
+            inp.value=v;
+            document.getElementById('qMinus').disabled=v<=1;
+            document.getElementById('qPlus').disabled=v>=max;
         }
-        document.addEventListener('DOMContentLoaded', function () {
-            if (document.getElementById('qInput')) chQty(0);
+        document.addEventListener('DOMContentLoaded', function(){
+            if(document.getElementById('qInput')) chQty(0);
             initNotifyBtn();
         });
-
         function selColor(btn, name) {
-            document.querySelectorAll('.color-opt').forEach(function (b) { b.classList.remove('active'); });
+            document.querySelectorAll('.color-opt').forEach(function(b){ b.classList.remove('active'); });
             btn.classList.add('active');
-            var lbl = document.getElementById('colorLbl');
-            if (lbl) lbl.textContent = name;
+            var lbl=document.getElementById('colorLbl');
+            if(lbl) lbl.textContent=name;
         }
-
         function switchTab(name, btn) {
-            document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('on'); });
-            document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('on'); });
-            var panel = document.getElementById('tab-' + name);
-            if (panel) panel.classList.add('on');
+            document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('on'); });
+            document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('on'); });
+            var panel=document.getElementById('tab-'+name);
+            if(panel) panel.classList.add('on');
             btn.classList.add('on');
         }
+        var sb=document.getElementById('stickyBar'), cf=document.getElementById('cartForm');
+        if(sb&&cf){ window.addEventListener('scroll', function(){ if(window.innerWidth<=991) sb.style.display=cf.getBoundingClientRect().bottom<0?'block':'none'; }); }
 
-        // Mobile sticky
-        var sb = document.getElementById('stickyBar');
-        var cf = document.getElementById('cartForm');
-        if (sb && cf) {
-            window.addEventListener('scroll', function () {
-                if (window.innerWidth <= 991)
-                    sb.style.display = cf.getBoundingClientRect().bottom < 0 ? 'block' : 'none';
-            });
-        }
-
-        // ── Notify / Wishlist (only rendered when out of stock) ──────────────────
         function initNotifyBtn() {
-            var btn = document.getElementById('notifyBtn');
-            if (!btn) return; // not out of stock, button not rendered
-
-            var pid = parseInt(btn.dataset.productId);
-
+            var btn=document.getElementById('notifyBtn'); if(!btn) return;
+            var pid=parseInt(btn.dataset.productId);
             @if (User.Identity != null && User.Identity.IsAuthenticated)
             {
                     <text>
-                    // Check if already wishlisted
-                    fetch('/api/wishlist/my').then(function (r) {
-                        if (r.ok) return r.json();
-                    }).then(function (d) {
-                        if (d && d.some(function (i) { return i.productId === pid; })) {
-                            setNotifyState(true);
-                        }
-                    }).catch(function () {});
+                    fetch('/api/wishlist/my').then(function(r){ if(r.ok) return r.json(); }).then(function(d){
+                        if(d&&d.some(function(i){ return i.productId===pid; })) setNotifyState(true);
+                    }).catch(function(){});
                     </text>
             }
-
-            btn.addEventListener('click', function () {
+            btn.addEventListener('click', function(){
                 @if (User.Identity == null || !User.Identity.IsAuthenticated)
                 {
-                        <text>
-                        window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
-                        return;
-                        </text>
+                        <text>window.location.href='/Account/Login?returnUrl='+encodeURIComponent(window.location.pathname); return;</text>
                 }
-
-                var isIn = btn.dataset.in === 'true';
-                btn.disabled = true;
-
-                if (isIn) {
-                    fetch('/api/wishlist/remove', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ productId: pid })
-                    }).then(function (r) {
-                        if (r.ok) {
-                            setNotifyState(false);
-                            showToast('Removed from wishlist.');
-                        } else {
-                            showToast('Could not remove. Try again.');
-                        }
-                    }).catch(function () {
-                        showToast('Network error.');
-                    }).finally(function () {
-                        btn.disabled = false;
-                    });
+                var isIn=btn.dataset.in==='true'; btn.disabled=true;
+                if(isIn){
+                    fetch('/api/wishlist/remove',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productId:pid})})
+                    .then(function(r){ if(r.ok){ setNotifyState(false); showToast('Removed from wishlist.'); } else { showToast('Could not remove.'); } })
+                    .catch(function(){ showToast('Network error.'); }).finally(function(){ btn.disabled=false; });
                 } else {
-                    fetch('/api/wishlist/add', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ productId: pid })
-                    }).then(function (r) {
-                        return r.json().then(function (d) { return { ok: r.ok, data: d }; });
-                    }).then(function (res) {
-                        if (res.ok) {
-                            setNotifyState(true);
-                            showToast('Added to wishlist! Go to your wishlist to enable email notifications.');
-                        } else {
-                            showToast(res.data.message || 'Could not add to wishlist.');
-                        }
-                    }).catch(function () {
-                        showToast('Network error.');
-                    }).finally(function () {
-                        btn.disabled = false;
-                    });
+                    fetch('/api/wishlist/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productId:pid})})
+                    .then(function(r){ return r.json().then(function(d){ return {ok:r.ok,data:d}; }); })
+                    .then(function(res){ if(res.ok){ setNotifyState(true); showToast('Added! We\'ll notify you when back in stock.'); } else { showToast(res.data.message||'Could not add.'); } })
+                    .catch(function(){ showToast('Network error.'); }).finally(function(){ btn.disabled=false; });
                 }
             });
         }
-
         function setNotifyState(isIn) {
-            var btn = document.getElementById('notifyBtn');
-            var lbl = document.getElementById('notifyLabel');
-            var ico = document.getElementById('notifyIcon');
-            if (!btn || !lbl || !ico) return;
-            btn.dataset.in = isIn ? 'true' : 'false';
-            if (isIn) {
-                btn.classList.add('active');
-                ico.className = 'bi bi-bell-fill';
-                lbl.textContent = 'Added to Wishlist';
-            } else {
-                btn.classList.remove('active');
-                ico.className = 'bi bi-bell';
-                lbl.textContent = 'Notify When Available';
-            }
+            var btn=document.getElementById('notifyBtn'), lbl=document.getElementById('notifyLabel'), ico=document.getElementById('notifyIcon');
+            if(!btn||!lbl||!ico) return;
+            btn.dataset.in=isIn?'true':'false';
+            if(isIn){ btn.classList.add('active'); ico.className='bi bi-bell-fill'; lbl.textContent='Added to Wishlist'; }
+            else { btn.classList.remove('active'); ico.className='bi bi-bell'; lbl.textContent='Notify When Available'; }
         }
-
         var _toastTimer;
         function showToast(msg) {
-            var t = document.getElementById('_toast');
-            if (!t) {
-                t = document.createElement('div');
-                t.id = '_toast';
-                t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;border-radius:10px;padding:12px 22px;font-size:13px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.25);z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);max-width:90vw;white-space:normal;text-align:center;';
-                document.body.appendChild(t);
-            }
-            t.textContent = msg;
-            t.style.transform = 'translateX(-50%) translateY(0)';
-            clearTimeout(_toastTimer);
-            _toastTimer = setTimeout(function () { t.style.transform = 'translateX(-50%) translateY(80px)'; }, 4000);
+            var t=document.getElementById('_toast');
+            if(!t){ t=document.createElement('div'); t.id='_toast'; t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;border-radius:10px;padding:12px 22px;font-size:13px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.25);z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);max-width:90vw;text-align:center;'; document.body.appendChild(t); }
+            t.textContent=msg; t.style.transform='translateX(-50%) translateY(0)';
+            clearTimeout(_toastTimer); _toastTimer=setTimeout(function(){ t.style.transform='translateX(-50%) translateY(80px)'; }, 4000);
         }
     </script>
 }
@@ -1504,22 +1490,15 @@ else
     string ColorStyle(string color)
     {
         var m = new System.Collections.Generic.Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
-            { "Black",            "background:#1a1a1a" },
-            { "Red",              "background:#cc2200" },
-            { "Gold",             "background:#c9a96e" },
-            { "Tortoise",         "background:linear-gradient(135deg,#7b4f1e,#c8892a,#1a0e00)" },
-            { "Silver",           "background:linear-gradient(135deg,#d0d0d0,#f5f5f5,#b0b0b0)" },
-            { "Blue",             "background:#1a4fa0" },
-            { "Pink",             "background:#e879a0" },
-            { "Green",            "background:#2d7a3a" },
-            { "Transparent",      "background:linear-gradient(135deg,rgba(180,220,255,.5),rgba(255,255,255,.9));border:1px solid #ddd" },
-            { "White",            "background:#f0f0f0;border:1px solid #ddd" },
-            { "Brown",            "background:#8B4513" },
-            { "Olive",            "background:#808000" },
-            { "Grey",             "background:#808080" },
-            { "Gray",             "background:#808080" },
-            { "Purple",           "background:#6b21a8" },
-            { "Transparent Grey", "background:linear-gradient(135deg,rgba(180,180,180,.5),rgba(240,240,240,.9));border:1px solid #ccc" }
+            {"Black","background:#1a1a1a"},{"Red","background:#cc2200"},{"Gold","background:#c9a96e"},
+            {"Tortoise","background:linear-gradient(135deg,#7b4f1e,#c8892a,#1a0e00)"},
+            {"Silver","background:linear-gradient(135deg,#d0d0d0,#f5f5f5,#b0b0b0)"},
+            {"Blue","background:#1a4fa0"},{"Pink","background:#e879a0"},{"Green","background:#2d7a3a"},
+            {"Transparent","background:linear-gradient(135deg,rgba(180,220,255,.5),rgba(255,255,255,.9));border:1px solid #ddd"},
+            {"White","background:#f0f0f0;border:1px solid #ddd"},{"Brown","background:#8B4513"},
+            {"Olive","background:#808000"},{"Grey","background:#808080"},{"Gray","background:#808080"},
+            {"Purple","background:#6b21a8"},
+            {"Transparent Grey","background:linear-gradient(135deg,rgba(180,180,180,.5),rgba(240,240,240,.9));border:1px solid #ccc"}
         };
         return m.TryGetValue(color.Trim(), out var s) ? s : "background:#ccc";
     }

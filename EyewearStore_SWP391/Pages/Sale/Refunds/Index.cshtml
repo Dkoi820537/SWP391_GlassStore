@@ -4,28 +4,29 @@
     ViewData["Title"] = "Refund Requests";
 }
 
-<div class="container py-5">
+<div class="refund-container">
+
     <!-- Page Header -->
-    <div class="mb-5">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
-                <li class="breadcrumb-item"><a asp-page="/Sale/Orders/Index">Orders</a></li>
-                <li class="breadcrumb-item active">Refund Requests</li>
+    <div class="page-header">
+        <nav class="refund-breadcrumb" aria-label="Breadcrumb">
+            <ol>
+                <li><a asp-page="/Index">Home</a></li>
+                <li class="sep">›</li>
+                <li><a asp-page="/Sale/Orders/Index">Orders</a></li>
+                <li class="sep">›</li>
+                <li class="current">Refund Requests</li>
             </ol>
         </nav>
 
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div>
-                <h1 style="font-family: var(--font-secondary);
-                           color: var(--primary-navy);
-                           font-size: 2.5rem;
-                           margin-bottom: 0.5rem;">
-                    <i class="bi bi-credit-card me-2"></i>Refund Requests
-                </h1>
-                <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin: 0;">
-                    Manage customer refund requests
-                </p>
+        <div class="header-banner">
+            <div class="header-banner-left">
+                <div class="header-icon-wrap">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </div>
+                <div>
+                    <h1 class="page-title">Refund Requests</h1>
+                    <p class="page-sub">Review and manage customer refund requests</p>
+                </div>
             </div>
         </div>
     </div>
@@ -33,209 +34,176 @@
     <!-- Alerts -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 10px; border: none; border-left: 4px solid #4caf50;">
-            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert alert-ok" role="alert">
+            <i class="bi bi-check-circle"></i>
+            <span>@TempData["SuccessMessage"]</span>
+            <button class="alert-close" onclick="this.parentElement.remove()">×</button>
         </div>
     }
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px; border: none; border-left: 4px solid #f44336;">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert alert-err" role="alert">
+            <i class="bi bi-exclamation-circle"></i>
+            <span>@TempData["ErrorMessage"]</span>
+            <button class="alert-close" onclick="this.parentElement.remove()">×</button>
         </div>
     }
 
-    <!-- Stats Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card stat-card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-sm);
-                                               background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);">
-                <div class="card-body text-center py-3">
-                    <div style="font-size: 2rem; font-weight: 700; color: #e65100;">@Model.PendingCount</div>
-                    <div style="color: #bf360c; font-size: 0.9rem; font-weight: 600;">Pending</div>
-                </div>
-            </div>
+    <!-- Stats -->
+    <div class="stats-row">
+        <div class="stat-item">
+            <span class="stat-num">@Model.PendingCount</span>
+            <span class="stat-label">Pending</span>
+            <span class="stat-dot dot-pending"></span>
         </div>
-        <div class="col-md-3">
-            <div class="card stat-card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-sm);
-                                               background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
-                <div class="card-body text-center py-3">
-                    <div style="font-size: 2rem; font-weight: 700; color: #2e7d32;">@Model.ApprovedCount</div>
-                    <div style="color: #1b5e20; font-size: 0.9rem; font-weight: 600;">Approved</div>
-                </div>
-            </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item stat-item-green">
+            <span class="stat-num">@Model.ApprovedCount</span>
+            <span class="stat-label">Approved</span>
+            <span class="stat-dot dot-approved"></span>
         </div>
-        <div class="col-md-3">
-            <div class="card stat-card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-sm);
-                                               background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);">
-                <div class="card-body text-center py-3">
-                    <div style="font-size: 2rem; font-weight: 700; color: #c62828;">@Model.RejectedCount</div>
-                    <div style="color: #b71c1c; font-size: 0.9rem; font-weight: 600;">Rejected</div>
-                </div>
-            </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+            <span class="stat-num">@Model.RejectedCount</span>
+            <span class="stat-label">Rejected</span>
+            <span class="stat-dot dot-rejected"></span>
         </div>
-        <div class="col-md-3">
-            <div class="card stat-card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-sm);
-                                               background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
-                <div class="card-body text-center py-3">
-                    <div style="font-size: 2rem; font-weight: 700; color: #1565c0;">@Model.TotalCount</div>
-                    <div style="color: #0d47a1; font-size: 0.9rem; font-weight: 600;">Total</div>
-                </div>
-            </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+            <span class="stat-num">@Model.TotalCount</span>
+            <span class="stat-label">Total</span>
+            <span class="stat-dot dot-total"></span>
         </div>
     </div>
 
     <!-- Filter Tabs -->
-    <div class="mb-4">
-        <div class="btn-group" role="group">
-            <a asp-page="/Sale/Refunds/Index" asp-route-filter="Pending"
-               class="btn @(Model.CurrentFilter == "Pending" ? "btn-warning" : "btn-outline-warning")"
-               style="border-radius: 8px 0 0 8px; font-weight: 600; padding: 0.5rem 1.25rem;">
-                <i class="bi bi-hourglass-split me-1"></i>Pending (@Model.PendingCount)
-            </a>
-            <a asp-page="/Sale/Refunds/Index" asp-route-filter="Approved"
-               class="btn @(Model.CurrentFilter == "Approved" ? "btn-success" : "btn-outline-success")"
-               style="font-weight: 600; padding: 0.5rem 1.25rem;">
-                <i class="bi bi-check-circle me-1"></i>Approved (@Model.ApprovedCount)
-            </a>
-            <a asp-page="/Sale/Refunds/Index" asp-route-filter="Rejected"
-               class="btn @(Model.CurrentFilter == "Rejected" ? "btn-danger" : "btn-outline-danger")"
-               style="font-weight: 600; padding: 0.5rem 1.25rem;">
-                <i class="bi bi-x-circle me-1"></i>Rejected (@Model.RejectedCount)
-            </a>
-            <a asp-page="/Sale/Refunds/Index" asp-route-filter="All"
-               class="btn @(Model.CurrentFilter == "All" ? "btn-primary" : "btn-outline-primary")"
-               style="border-radius: 0 8px 8px 0; font-weight: 600; padding: 0.5rem 1.25rem;">
-                <i class="bi bi-list-ul me-1"></i>All (@Model.TotalCount)
-            </a>
-        </div>
+    <div class="filter-tabs">
+        <a asp-page="/Sale/Refunds/Index" asp-route-filter="Pending"
+           class="tab @(Model.CurrentFilter == "Pending" ? "tab-active" : "")">
+            Pending
+            <span class="tab-badge">@Model.PendingCount</span>
+        </a>
+        <a asp-page="/Sale/Refunds/Index" asp-route-filter="Approved"
+           class="tab @(Model.CurrentFilter == "Approved" ? "tab-active" : "")">
+            Approved
+            <span class="tab-badge">@Model.ApprovedCount</span>
+        </a>
+        <a asp-page="/Sale/Refunds/Index" asp-route-filter="Rejected"
+           class="tab @(Model.CurrentFilter == "Rejected" ? "tab-active" : "")">
+            Rejected
+            <span class="tab-badge">@Model.RejectedCount</span>
+        </a>
+        <a asp-page="/Sale/Refunds/Index" asp-route-filter="All"
+           class="tab @(Model.CurrentFilter == "All" ? "tab-active" : "")">
+            All
+            <span class="tab-badge">@Model.TotalCount</span>
+        </a>
     </div>
 
-    <!-- Refund Requests Table -->
-    <div class="card" style="border: none; border-radius: 16px; box-shadow: var(--shadow-md); overflow: hidden;">
-        <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
-                    padding: 1.25rem 2rem;">
-            <h5 style="color: white; margin: 0; font-weight: 600;">
-                <i class="bi bi-table me-2"></i>@Model.CurrentFilter Refund Requests
-            </h5>
+    <!-- Table Card -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <span class="table-title">@Model.CurrentFilter Requests</span>
+            @if (Model.RefundRequests.Any())
+            {
+                <span class="table-count">@Model.RefundRequests.Count result@(Model.RefundRequests.Count == 1 ? "" : "s")</span>
+            }
         </div>
 
         @if (Model.RefundRequests.Any())
         {
-            <div class="table-responsive">
-                <table class="table table-hover mb-0" style="font-size: 0.95rem;">
-                    <thead style="background: #f8f9fa;">
+            <div class="table-wrap">
+                <table class="refund-table">
+                    <thead>
                         <tr>
-                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700;">#ID</th>
-                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700;">Customer</th>
-                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700;">Product</th>
-                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700;">Order</th>
-                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700;">Amount</th>
-                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700;">Reason</th>
-                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700;">Requested</th>
-                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700;">Status</th>
-                            <th style="padding: 1rem 1.25rem; color: var(--primary-navy); font-weight: 700; text-align: center;">Actions</th>
+                            <th>ID</th>
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Order</th>
+                            <th>Amount</th>
+                            <th>Reason</th>
+                            <th>Requested</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model.RefundRequests)
                         {
-                            <tr style="vertical-align: middle;">
-                                <td style="padding: 1rem 1.25rem;">
-                                    <span style="font-weight: 700; color: var(--primary-navy);">#@item.ReturnId</span>
+                            <tr>
+                                <td>
+                                    <span class="id-cell">#@item.ReturnId</span>
                                 </td>
-                                <td style="padding: 1rem 1.25rem;">
-                                    <div style="font-weight: 600; color: var(--primary-navy);">@item.CustomerName</div>
-                                    <div style="font-size: 0.8rem; color: var(--secondary-warm-gray);">@item.CustomerEmail</div>
+                                <td>
+                                    <span class="customer-name">@item.CustomerName</span>
+                                    <span class="customer-email">@item.CustomerEmail</span>
                                 </td>
-                                <td style="padding: 1rem 1.25rem;">
-                                    <div style="font-weight: 600;">@item.ProductName</div>
-                                    <div style="font-size: 0.8rem; color: var(--secondary-warm-gray);">Qty: @item.Quantity</div>
+                                <td>
+                                    <span class="product-name">@item.ProductName</span>
+                                    <span class="product-qty">Qty: @item.Quantity</span>
                                 </td>
-                                <td style="padding: 1rem 1.25rem;">
-                                    <a asp-page="/Sale/Orders/Details" asp-route-id="@item.OrderId"
-                                       style="color: var(--primary-gold); font-weight: 600; text-decoration: none;">
+                                <td>
+                                    <a asp-page="/Sale/Orders/Details" asp-route-id="@item.OrderId" class="order-link">
                                         #@item.OrderId
                                     </a>
                                 </td>
-                                <td style="padding: 1rem 1.25rem;">
-                                    <span style="font-weight: 700; color: var(--primary-gold);">
-                                        @item.RefundAmount.ToString("N0") VND
+                                <td>
+                                    <span class="amount-cell">@item.RefundAmount.ToString("N0")</span>
+                                    <span class="amount-currency">VND</span>
+                                </td>
+                                <td>
+                                    <span class="reason-cell" title="@item.Reason">
+                                        @(item.Reason?.Length > 50 ? item.Reason.Substring(0, 50) + "…" : item.Reason)
                                     </span>
                                 </td>
-                                <td style="padding: 1rem 1.25rem; max-width: 200px;">
-                                    <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                         title="@item.Reason">
-                                        @(item.Reason?.Length > 50 ? item.Reason.Substring(0, 50) + "..." : item.Reason)
-                                    </div>
+                                <td>
+                                    <span class="date-cell">@item.CreatedAt.ToString("MMM dd, yyyy")</span>
+                                    <span class="date-ago">@(item.DaysAgo == 0 ? "Today" : $"{item.DaysAgo}d ago")</span>
                                 </td>
-                                <td style="padding: 1rem 1.25rem;">
-                                    <div style="font-size: 0.9rem;">@item.CreatedAt.ToString("MMM dd, yyyy")</div>
-                                    <div style="font-size: 0.8rem; color: var(--secondary-warm-gray);">
-                                        @(item.DaysAgo == 0 ? "Today" : $"{item.DaysAgo}d ago")
-                                    </div>
-                                </td>
-                                <td style="padding: 1rem 1.25rem;">
+                                <td>
                                     @if (item.Status == "Pending")
                                     {
-                                        <span class="badge" style="background: linear-gradient(135deg, #ff9800, #ffb74d);
-                                                                   padding: 0.4rem 0.75rem; border-radius: 12px; font-size: 0.8rem;">
-                                            <i class="bi bi-hourglass-split me-1"></i>Pending
-                                        </span>
+                                        <span class="status-badge status-pending">Pending</span>
                                     }
                                     else if (item.Status == "Approved")
                                     {
-                                        <span class="badge" style="background: linear-gradient(135deg, #4caf50, #66bb6a);
-                                                                   padding: 0.4rem 0.75rem; border-radius: 12px; font-size: 0.8rem;">
-                                            <i class="bi bi-check-circle me-1"></i>Approved
-                                        </span>
+                                        <span class="status-badge status-approved">Approved</span>
                                         @if (item.RefundResolvedAt.HasValue)
                                         {
-                                            <div style="font-size: 0.75rem; color: var(--secondary-warm-gray); margin-top: 2px;">
-                                                @item.RefundResolvedAt.Value.ToString("MMM dd")
-                                            </div>
+                                            <span class="status-date">@item.RefundResolvedAt.Value.ToString("MMM dd")</span>
                                         }
                                     }
                                     else if (item.Status == "Rejected")
                                     {
-                                        <span class="badge" style="background: linear-gradient(135deg, #f44336, #ef5350);
-                                                                   padding: 0.4rem 0.75rem; border-radius: 12px; font-size: 0.8rem;">
-                                            <i class="bi bi-x-circle me-1"></i>Rejected
-                                        </span>
+                                        <span class="status-badge status-rejected">Rejected</span>
                                         @if (item.RefundResolvedAt.HasValue)
                                         {
-                                            <div style="font-size: 0.75rem; color: var(--secondary-warm-gray); margin-top: 2px;">
-                                                @item.RefundResolvedAt.Value.ToString("MMM dd")
-                                            </div>
+                                            <span class="status-date">@item.RefundResolvedAt.Value.ToString("MMM dd")</span>
                                         }
                                     }
                                 </td>
-                                <td style="padding: 1rem 1.25rem; text-align: center;">
+                                <td>
                                     @if (item.Status == "Pending")
                                     {
-                                        <div class="d-flex gap-2 justify-content-center">
-                                            <!-- Approve Button -->
+                                        <div class="action-group">
                                             <form method="post" asp-page-handler="Approve" style="display:inline;">
                                                 <input type="hidden" name="returnId" value="@item.ReturnId" />
-                                                <button type="button" class="btn btn-sm btn-approve"
-                                                        onclick="confirmApprove(this.closest('form'), @item.ReturnId, '@item.CustomerName.Replace("'", "\\'")' , '@item.RefundAmount.ToString("N0")')">
-                                                    <i class="bi bi-check-lg me-1"></i>Approve
+                                                <button type="button" class="btn-action btn-approve"
+                                                        onclick="confirmApprove(this.closest('form'), @item.ReturnId, '@item.CustomerName.Replace("'", "\\'")', '@item.RefundAmount.ToString("N0")')">
+                                                    Approve
                                                 </button>
                                             </form>
-
-                                            <!-- Reject Button -->
-                                            <button type="button" class="btn btn-sm btn-reject"
+                                            <button type="button" class="btn-action btn-reject"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#rejectModal"
                                                     onclick="setRejectId(@item.ReturnId, '@item.CustomerName.Replace("'", "\\'")' )">
-                                                <i class="bi bi-x-lg me-1"></i>Reject
+                                                Reject
                                             </button>
                                         </div>
                                     }
                                     else
                                     {
-                                        <span style="color: var(--secondary-warm-gray); font-size: 0.85rem;">—</span>
+                                        <span class="action-done">—</span>
                                     }
                                 </td>
                             </tr>
@@ -246,36 +214,42 @@
         }
         else
         {
-            <div class="text-center py-5" style="color: var(--secondary-warm-gray);">
-                <i class="bi bi-inbox" style="font-size: 4rem; opacity: 0.2;"></i>
-                <h5 class="mt-3" style="color: var(--primary-navy);">No @Model.CurrentFilter.ToLower() refund requests</h5>
-                <p>There are no refund requests matching this filter.</p>
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="bi bi-inbox"></i>
+                </div>
+                <p class="empty-title">No @Model.CurrentFilter.ToLower() requests</p>
+                <p class="empty-sub">There are no refund requests matching this filter.</p>
             </div>
         }
     </div>
 </div>
 
-<!-- Approve Confirmation Modal -->
+<!-- Approve Modal -->
 <div class="modal fade" id="approveModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border: none; border-radius: 16px; overflow: hidden;">
-            <div style="background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); padding: 1.25rem 1.5rem;">
-                <h5 class="modal-title" style="color: white; margin: 0;">
-                    <i class="bi bi-check-circle me-2"></i>Confirm Refund Approval
-                </h5>
+    <div class="modal-dialog modal-dialog-centered modal-sm-custom">
+        <div class="modal-content modal-clean">
+            <div class="modal-clean-header">
+                <h5>Confirm Approval</h5>
+                <button type="button" class="modal-close-btn" data-bs-dismiss="modal">×</button>
             </div>
-            <div class="modal-body" style="padding: 1.5rem;">
-                <p>Are you sure you want to <strong>approve</strong> this refund?</p>
-                <div class="alert alert-info" style="border-radius: 8px; border: none; background: rgba(33,150,243,0.08); font-size: 0.9rem;">
-                    <p class="mb-1"><strong>Customer:</strong> <span id="approveCustomerName"></span></p>
-                    <p class="mb-1"><strong>Refund Amount:</strong> <span id="approveAmount"></span> VND</p>
-                    <p class="mb-0"><i class="bi bi-info-circle me-1"></i>This will initiate a Stripe refund and notify the customer via email.</p>
+            <div class="modal-clean-body">
+                <p class="modal-desc">You are about to approve this refund request. A Stripe refund will be initiated automatically.</p>
+                <div class="modal-info-block">
+                    <div class="modal-info-row">
+                        <span class="modal-info-label">Customer</span>
+                        <span class="modal-info-val" id="approveCustomerName"></span>
+                    </div>
+                    <div class="modal-info-row">
+                        <span class="modal-info-label">Refund Amount</span>
+                        <span class="modal-info-val modal-amount"><span id="approveAmount"></span> VND</span>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer" style="border-top: 1px solid #eee;">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
-                <button type="button" class="btn btn-success" id="confirmApproveBtn" style="border-radius: 8px; font-weight: 600;">
-                    <i class="bi bi-check-lg me-1"></i>Yes, Approve Refund
+            <div class="modal-clean-footer">
+                <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn-modal-confirm btn-modal-approve" id="confirmApproveBtn">
+                    Approve Refund
                 </button>
             </div>
         </div>
@@ -284,34 +258,25 @@
 
 <!-- Reject Modal -->
 <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border: none; border-radius: 16px; overflow: hidden;">
-            <div style="background: linear-gradient(135deg, #f44336 0%, #ef5350 100%); padding: 1.25rem 1.5rem;">
-                <h5 class="modal-title" style="color: white; margin: 0;">
-                    <i class="bi bi-x-circle me-2"></i>Reject Refund — <span id="rejectCustomerName"></span>
-                </h5>
+    <div class="modal-dialog modal-dialog-centered modal-sm-custom">
+        <div class="modal-content modal-clean">
+            <div class="modal-clean-header">
+                <h5>Reject Request — <span id="rejectCustomerName" style="font-weight:400;color:#6b7280;"></span></h5>
+                <button type="button" class="modal-close-btn" data-bs-dismiss="modal">×</button>
             </div>
             <form method="post" asp-page-handler="Reject">
                 <input type="hidden" name="returnId" id="rejectReturnId" />
-                <div class="modal-body" style="padding: 1.5rem;">
-                    <div class="mb-3">
-                        <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">
-                            Reason for rejection (optional)
-                        </label>
-                        <textarea name="rejectionReason" class="form-control" rows="3"
-                                  placeholder="Explain why this refund request is being rejected..."
-                                  style="border-radius: 8px; border: 2px solid var(--medium-gray);"></textarea>
-                    </div>
-                    <div class="alert alert-warning" style="border-radius: 8px; border: none; font-size: 0.9rem;">
-                        <i class="bi bi-exclamation-triangle me-1"></i>
-                        The customer will be notified via email about this decision.
+                <div class="modal-clean-body">
+                    <p class="modal-desc">The customer will be notified via email about this decision.</p>
+                    <div class="form-field">
+                        <label class="field-label">Reason for rejection <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
+                        <textarea name="rejectionReason" class="field-textarea" rows="3"
+                                  placeholder="Explain why this refund is being rejected..."></textarea>
                     </div>
                 </div>
-                <div class="modal-footer" style="border-top: 1px solid #eee;">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
-                    <button type="submit" class="btn btn-danger" style="border-radius: 8px; font-weight: 600;">
-                        <i class="bi bi-x-lg me-1"></i>Reject Refund
-                    </button>
+                <div class="modal-clean-footer">
+                    <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modal-confirm btn-modal-reject">Reject Refund</button>
                 </div>
             </form>
         </div>
@@ -319,75 +284,734 @@
 </div>
 
 <style>
-    .breadcrumb {
-        background: transparent;
+    /* ── Base ── */
+    .refund-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 32px 24px 60px;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    /* ── Breadcrumb ── */
+    .refund-breadcrumb ol {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        list-style: none;
         padding: 0;
+        margin: 0 0 16px;
+        font-size: 13px;
     }
 
-    .breadcrumb-item + .breadcrumb-item::before {
-        content: "›";
-        color: var(--secondary-warm-gray);
-    }
-
-    .breadcrumb-item a {
-        color: var(--primary-gold);
+    .refund-breadcrumb a {
+        color: #00756A;
         text-decoration: none;
     }
 
-    .stat-card {
-        transition: all 0.3s ease;
+        .refund-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+    .refund-breadcrumb .sep {
+        color: #d1d5db;
     }
 
-    .stat-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 16px rgba(0,0,0,0.12) !important;
+    .refund-breadcrumb .current {
+        color: #6b7280;
     }
 
-    .table th {
-        border-bottom: 2px solid var(--medium-gray);
+    /* ── Header Banner ── */
+    .page-header {
+        margin-bottom: 24px;
+    }
+
+    .header-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(135deg, #00756A 0%, #009688 100%);
+        border-radius: 12px;
+        padding: 24px 28px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .header-banner::after {
+            content: '';
+            position: absolute;
+            right: -20px;
+            top: -20px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+        }
+
+        .header-banner::before {
+            content: '';
+            position: absolute;
+            right: 60px;
+            bottom: -30px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+        }
+
+    .header-banner-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .header-icon-wrap {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .page-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: #fff;
+        margin: 0 0 3px;
+        letter-spacing: -0.2px;
+    }
+
+    .page-sub {
+        font-size: 13.5px;
+        color: rgba(255,255,255,0.75);
+        margin: 0;
+    }
+
+    /* ── Alerts ── */
+    .alert {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+    }
+
+        .alert span {
+            flex: 1;
+        }
+
+    .alert-ok {
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+        color: #15803d;
+    }
+
+    .alert-err {
+        background: #fef2f2;
+        border-color: #fecaca;
+        color: #dc2626;
+    }
+
+    .alert-close {
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        color: inherit;
+        opacity: 0.6;
+        line-height: 1;
+        padding: 0;
+    }
+
+        .alert-close:hover {
+            opacity: 1;
+        }
+
+    /* ── Stats Row ── */
+    .stats-row {
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 18px 28px;
+        margin-bottom: 24px;
+        gap: 0;
+        border-top: 3px solid #00756A;
+    }
+
+    .stat-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        position: relative;
+    }
+
+    .stat-item-green .stat-num {
+        color: #00756A;
+    }
+
+    .stat-num {
+        font-size: 28px;
+        font-weight: 700;
+        color: #111827;
+        letter-spacing: -0.5px;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        font-weight: 500;
+    }
+
+    .stat-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        margin-top: 2px;
+    }
+
+    .dot-pending {
+        background: #f59e0b;
+    }
+
+    .dot-approved {
+        background: #00756A;
+    }
+
+    .dot-rejected {
+        background: #ef4444;
+    }
+
+    .dot-total {
+        background: #9ca3af;
+    }
+
+    .stat-divider {
+        width: 1px;
+        height: 40px;
+        background: #e5e7eb;
+        flex-shrink: 0;
+    }
+
+    /* ── Filter Tabs ── */
+    .filter-tabs {
+        display: flex;
+        gap: 2px;
+        border-bottom: 2px solid #e5e7eb;
+        margin-bottom: 20px;
+    }
+
+    .tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 18px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #6b7280;
+        text-decoration: none;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        transition: color .2s, border-color .2s;
         white-space: nowrap;
     }
 
-    .table td {
-        border-bottom: 1px solid #f0f0f0;
+        .tab:hover {
+            color: #111827;
+        }
+
+    .tab-active {
+        color: #00756A;
+        border-bottom-color: #00756A;
+        font-weight: 600;
     }
 
-    .table tbody tr:hover {
-        background-color: rgba(212, 165, 116, 0.04);
+    .tab-badge {
+        background: #f3f4f6;
+        color: #374151;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 7px;
+        border-radius: 10px;
+        min-width: 22px;
+        text-align: center;
+    }
+
+    .tab-active .tab-badge {
+        background: #e6f4f2;
+        color: #00756A;
+    }
+
+    /* ── Table Card ── */
+    .table-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .table-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px;
+        background: #00756A;
+    }
+
+    .table-title {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #fff;
+    }
+
+    .table-count {
+        font-size: 12.5px;
+        color: rgba(255,255,255,0.65);
+    }
+
+    /* ── Table ── */
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .refund-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+    }
+
+        .refund-table thead tr {
+            background: #f0fdf9;
+        }
+
+        .refund-table th {
+            padding: 11px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #00756A;
+            white-space: nowrap;
+            border-bottom: 1px solid #d1fae5;
+        }
+
+        .refund-table td {
+            padding: 14px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .refund-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .refund-table tbody tr:hover {
+            background: #f9fffe;
+        }
+
+    /* ── Cell Styles ── */
+    .id-cell {
+        font-weight: 600;
+        color: #374151;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .customer-name {
+        display: block;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 2px;
+    }
+
+    .customer-email {
+        display: block;
+        font-size: 12px;
+        color: #9ca3af;
+    }
+
+    .product-name {
+        display: block;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 2px;
+    }
+
+    .product-qty {
+        display: block;
+        font-size: 12px;
+        color: #9ca3af;
+    }
+
+    .order-link {
+        color: #00756A;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 13px;
+    }
+
+        .order-link:hover {
+            text-decoration: underline;
+        }
+
+    .amount-cell {
+        font-weight: 700;
+        color: #00756A;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .amount-currency {
+        font-size: 11px;
+        color: #9ca3af;
+        margin-left: 3px;
+    }
+
+    .reason-cell {
+        color: #4b5563;
+        max-width: 180px;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .date-cell {
+        display: block;
+        color: #374151;
+        margin-bottom: 2px;
+    }
+
+    .date-ago {
+        display: block;
+        font-size: 12px;
+        color: #9ca3af;
+    }
+
+    /* ── Status Badges ── */
+    .status-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11.5px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-approved {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-date {
+        display: block;
+        font-size: 11px;
+        color: #9ca3af;
+        margin-top: 3px;
+    }
+
+    /* ── Action Buttons ── */
+    .action-group {
+        display: flex;
+        gap: 6px;
+    }
+
+    .btn-action {
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 12.5px;
+        font-weight: 600;
+        border: 1.5px solid transparent;
+        cursor: pointer;
+        transition: all .15s ease;
+        white-space: nowrap;
     }
 
     .btn-approve {
-        background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
-        border: none;
-        color: white;
-        padding: 0.4rem 1rem;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        transition: all 0.2s ease;
+        background: #00756A;
+        color: #fff;
+        border-color: #00756A;
     }
 
-    .btn-approve:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 3px 8px rgba(76,175,80,0.35);
-        color: white;
-    }
+        .btn-approve:hover {
+            background: #005a51;
+            border-color: #005a51;
+        }
 
     .btn-reject {
-        background: linear-gradient(135deg, #f44336 0%, #ef5350 100%);
-        border: none;
-        color: white;
-        padding: 0.4rem 1rem;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        transition: all 0.2s ease;
+        background: #fff;
+        color: #374151;
+        border-color: #d1d5db;
     }
 
-    .btn-reject:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 3px 8px rgba(244,67,54,0.35);
-        color: white;
+        .btn-reject:hover {
+            border-color: #9ca3af;
+            color: #111827;
+        }
+
+    .action-done {
+        color: #d1d5db;
+        font-size: 14px;
+    }
+
+    /* ── Empty State ── */
+    .empty-state {
+        padding: 60px 24px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        font-size: 40px;
+        color: #e5e7eb;
+        margin-bottom: 14px;
+    }
+
+    .empty-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #374151;
+        margin: 0 0 6px;
+    }
+
+    .empty-sub {
+        font-size: 13px;
+        color: #9ca3af;
+        margin: 0;
+    }
+
+    /* ── Modals ── */
+    .modal-sm-custom {
+        max-width: 420px;
+    }
+
+    .modal-clean {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,.15);
+    }
+
+    .modal-clean-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 22px 14px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+        .modal-clean-header h5 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #111827;
+            margin: 0;
+        }
+
+    .modal-close-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: #9ca3af;
+        cursor: pointer;
+        line-height: 1;
+        padding: 0;
+    }
+
+        .modal-close-btn:hover {
+            color: #374151;
+        }
+
+    .modal-clean-body {
+        padding: 20px 22px;
+    }
+
+    .modal-desc {
+        font-size: 13.5px;
+        color: #6b7280;
+        margin: 0 0 16px;
+        line-height: 1.6;
+    }
+
+    .modal-info-block {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .modal-info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        font-size: 13.5px;
+    }
+
+        .modal-info-row + .modal-info-row {
+            border-top: 1px solid #e5e7eb;
+        }
+
+    .modal-info-label {
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .modal-info-val {
+        color: #111827;
+        font-weight: 600;
+    }
+
+    .modal-amount {
+        color: #00756A;
+    }
+
+    /* Form */
+    .form-field {
+        margin-top: 4px;
+    }
+
+    .field-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+
+    .field-textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 13.5px;
+        color: #111827;
+        resize: vertical;
+        transition: border-color .2s;
+        font-family: inherit;
+        box-sizing: border-box;
+    }
+
+        .field-textarea:focus {
+            outline: none;
+            border-color: #00756A;
+        }
+
+    .modal-clean-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 14px 22px 18px;
+        border-top: 1px solid #f3f4f6;
+    }
+
+    .btn-modal-cancel {
+        padding: 8px 18px;
+        background: #fff;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 7px;
+        font-size: 13.5px;
+        font-weight: 500;
+        color: #374151;
+        cursor: pointer;
+        transition: border-color .2s;
+    }
+
+        .btn-modal-cancel:hover {
+            border-color: #9ca3af;
+        }
+
+    .btn-modal-confirm {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 7px;
+        font-size: 13.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background .2s;
+    }
+
+    .btn-modal-approve {
+        background: #00756A;
+        color: #fff;
+    }
+
+        .btn-modal-approve:hover {
+            background: #005a51;
+        }
+
+    .btn-modal-reject {
+        background: #111827;
+        color: #fff;
+    }
+
+        .btn-modal-reject:hover {
+            background: #1f2937;
+        }
+
+    /* ── Responsive ── */
+    @@media (max-width: 768px) {
+        .stats-row {
+            flex-wrap: wrap;
+            padding: 14px 16px;
+        }
+
+        .stat-divider {
+            display: none;
+        }
+
+        .stat-item {
+            min-width: 45%;
+        }
+
+        .refund-container {
+            padding: 20px 16px 40px;
+        }
+
+        .filter-tabs {
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 10px 14px;
+            font-size: 13px;
+        }
+
+        .header-banner {
+            padding: 18px 20px;
+        }
+
+        .header-icon-wrap {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+
+        .page-title {
+            font-size: 18px;
+        }
     }
 </style>
 
@@ -403,9 +1027,7 @@
     }
 
     document.getElementById('confirmApproveBtn').addEventListener('click', function () {
-        if (pendingApproveForm) {
-            pendingApproveForm.submit();
-        }
+        if (pendingApproveForm) pendingApproveForm.submit();
     });
 
     function setRejectId(returnId, customerName) {

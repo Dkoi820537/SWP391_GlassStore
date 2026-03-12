@@ -1,10 +1,10 @@
-﻿@page "{id:int}"
+@page "{id:int}"
 @model EyewearStore_SWP391.Pages.Admin.Users.EditModel
 @{
     ViewData["Title"] = "Edit User";
 }
 
-<div class="container-fluid py-4">
+<div class="container-fluid py-4 px-4 px-md-5">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb">
@@ -45,71 +45,151 @@
         </div>
     }
 
-    <form method="post">
-        <div class="row g-4">
-            <!-- User Information -->
-            <div class="col-lg-8">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>User Information</h5>
-                    </div>
-                    <div class="card-body" style="padding: 2rem;">
+<style>
+    .admin-edit-form-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .admin-edit-form .form-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: #6b7280;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.35rem;
+        font-weight: 600;
+    }
+    .admin-edit-form .input-group-text {
+        background: #fdfdfd;
+        border: 1px solid #d1d5db;
+        border-right: none;
+        color: #9ca3af;
+        font-size: 1rem;
+        padding-right: 0.5rem;
+    }
+    .admin-edit-form .form-control, .admin-edit-form .form-select {
+        border: 1px solid #d1d5db;
+        font-size: 0.95rem;
+        padding: 0.45rem 0.75rem;
+        box-shadow: none !important;
+        color: #1f2937;
+    }
+    .admin-edit-form .form-control {
+        border-left: none;
+    }
+    .admin-edit-form .form-control:focus, .admin-edit-form .form-select:focus {
+        border-color: #20c997;
+        box-shadow: none !important;
+    }
+    .admin-edit-form .input-group:focus-within .input-group-text,
+    .admin-edit-form .input-group:focus-within .form-control {
+        border-color: #20c997;
+    }
+    .admin-edit-form .section-title {
+        color: var(--primary-navy, #0f2027);
+        border-left: 3px solid #20c997;
+        padding-left: 0.6rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 1.25rem;
+    }
+    .admin-edit-form .form-switch .form-check-input {
+        cursor: pointer;
+        width: 2.5em;
+        height: 1.25em;
+    }
+    .admin-edit-form .form-switch .form-check-input:checked {
+        background-color: #20c997;
+        border-color: #20c997;
+    }
+    .admin-edit-form .btn-outline-cancel {
+        border: 1px solid #d1d5db;
+        color: #4b5563;
+        background: transparent;
+        font-weight: 500;
+        font-size: 0.9rem;
+        border-radius: 6px;
+    }
+    .admin-edit-form .btn-outline-cancel:hover {
+        background: #f3f4f6;
+        color: #1f2937;
+    }
+    .admin-edit-form .btn-save {
+        background-color: var(--primary-navy, #0f2027);
+        border: none;
+        color: white;
+        font-weight: 500;
+        font-size: 0.9rem;
+        border-radius: 6px;
+    }
+    .admin-edit-form .btn-save:hover {
+        background-color: #1a3644;
+        color: white;
+    }
+    .user-info-box {
+        background: #f9fafb;
+        border-radius: 8px;
+        border-left: 3px solid rgba(32, 201, 151, 0.5);
+        padding: 1.25rem;
+        font-size: 0.85rem;
+        line-height: 1.6;
+        color: #4b5563;
+    }
+</style>
+
+<div class="admin-edit-form-container">
+    <div class="card shadow-sm border" style="border-radius: 12px; border-color: #e5e7eb !important;">
+        <div class="card-body p-4 p-md-5">
+            <form method="post" class="admin-edit-form">
+                <div class="row gx-5 gy-4">
+                    <!-- User Information -->
+                    <div class="col-lg-7">
+                        <h6 class="section-title">User Information</h6>
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">
-                                    Email <span class="text-danger">*</span>
-                                </label>
+                            <div class="col-12">
+                                <label class="form-label">Email</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                                     <input asp-for="Input.Email" class="form-control" required />
                                 </div>
-                                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                                <span asp-validation-for="Input.Email" class="text-danger small" style="font-size: 0.8rem;"></span>
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">
-                                    Full Name <span class="text-danger">*</span>
-                                </label>
+                            <div class="col-12">
+                                <label class="form-label">Full Name</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-person"></i></span>
                                     <input asp-for="Input.FullName" class="form-control" required />
                                 </div>
-                                <span asp-validation-for="Input.FullName" class="text-danger small"></span>
+                                <span asp-validation-for="Input.FullName" class="text-danger small" style="font-size: 0.8rem;"></span>
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Phone Number</label>
+                            <div class="col-12">
+                                <label class="form-label">Phone Number</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-telephone"></i></span>
                                     <input asp-for="Input.Phone" class="form-control" />
                                 </div>
-                                <span asp-validation-for="Input.Phone" class="text-danger small"></span>
+                                <span asp-validation-for="Input.Phone" class="text-danger small" style="font-size: 0.8rem;"></span>
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">New Password</label>
+                            <div class="col-12">
+                                <label class="form-label">New Password</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                     <input asp-for="Input.NewPassword" type="password" class="form-control" placeholder="Leave blank to keep current" />
                                 </div>
-                                <small class="text-muted">Leave blank to keep current password</small>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Role & Status -->
-            <div class="col-lg-4">
-                <div class="card shadow-sm mb-3">
-                    <div class="card-header bg-warning text-dark">
-                        <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>Role & Status</h5>
-                    </div>
-                    <div class="card-body" style="padding: 1.5rem;">
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">
-                                User Role <span class="text-danger">*</span>
-                            </label>
+                    <!-- Role & Status -->
+                    <div class="col-lg-5">
+                        <h6 class="section-title">Role & Status</h6>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">User Role</label>
                             <select asp-for="Input.Role" class="form-select" required>
                                 <option value="">-- Select Role --</option>
                                 <option value="customer">Customer</option>
@@ -121,55 +201,43 @@
                             </select>
                         </div>
 
-                        <div class="mb-0">
-                            <label class="form-label fw-semibold">Account Status</label>
-                            <div class="form-check form-switch">
+                        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom" style="border-color: #f3f4f6 !important;">
+                            <label class="form-label mb-0" style="margin-bottom: 0 !important;">Account Status</label>
+                            <div class="form-check form-switch mb-0">
                                 <input asp-for="Input.IsActive" class="form-check-input" type="checkbox" id="activeSwitch" />
-                                <label class="form-check-label" for="activeSwitch">
-                                    <i class="bi bi-check-circle text-success me-1"></i>Active
-                                </label>
+                            </div>
+                        </div>
+
+                        <!-- User Info Box -->
+                        <div class="user-info-box mt-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>User ID:</span>
+                                <strong class="text-dark">#@Model.UserId</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Created:</span>
+                                <strong class="text-dark">@Model.CreatedAt.ToString("MMM dd, yyyy")</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Current Role:</span>
+                                <span style="color: var(--primary-navy, #0f2027); font-weight: 600;">@Model.CurrentRole</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- User Info -->
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h6 style="color: var(--primary-navy); margin-bottom: 1rem;">
-                            <i class="bi bi-info-circle me-1"></i>User Details
-                        </h6>
-                        <div style="font-size: 0.9rem;">
-                            <p style="margin-bottom: 0.5rem;">
-                                <strong>User ID:</strong> #@Model.UserId
-                            </p>
-                            <p style="margin-bottom: 0.5rem;">
-                                <strong>Created:</strong> @Model.CreatedAt.ToString("MMM dd, yyyy")
-                            </p>
-                            <p style="margin-bottom: 0;">
-                                <strong>Current Role:</strong>
-                                <span class="badge bg-secondary">@Model.CurrentRole</span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="card shadow-sm mt-4">
-            <div class="card-body">
-                <div class="d-flex justify-content-end gap-2">
-                    <a asp-page="./Index" class="btn btn-secondary px-4">
-                        <i class="bi bi-x-circle me-1"></i>Cancel
+                <!-- Actions -->
+                <div class="d-flex justify-content-end gap-3 mt-5 pt-4 border-top" style="border-color: #f3f4f6 !important;">
+                    <a asp-page="./Index" class="btn btn-outline-cancel px-4 py-2">
+                        Cancel
                     </a>
-                    <button type="submit" class="btn btn-primary px-4">
-                        <i class="bi bi-check-circle me-1"></i>Save Changes
+                    <button type="submit" class="btn btn-save px-4 py-2">
+                        Save Changes
                     </button>
                 </div>
-            </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 
 @section Scripts {

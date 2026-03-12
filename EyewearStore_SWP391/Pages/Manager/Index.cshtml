@@ -1,416 +1,402 @@
-﻿@page
+@page
 @model EyewearStore_SWP391.Pages.Manager.IndexModel
 @{
     ViewData["Title"] = "Manager Dashboard";
 }
 
-<div class="container-fluid py-4">
-    <!-- Page Header -->
-    <div class="mb-4">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
-                <li class="breadcrumb-item active">Manager Dashboard</li>
-            </ol>
-        </nav>
+@section Styles {
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style data-purpose="custom-colors">
+        /* Using teal-600/700 for primary actions and highlights to match user request */
+        .bg-primary-teal { background-color: #134e4a; } /* Very dark teal for nav */
+        .bg-active-teal { background-color: #0d9488; } /* Standard teal */
+        .text-teal-accent { color: #0d9488; }
+        .border-teal-accent { border-color: #0d9488; }
+        
+        /* Stop tailwind from ruining Bootstrap tables / body styling that leaks */
+        .tw-root {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            color: #1e293b;
+        }
+        
+        .tw-root h1, .tw-root h2, .tw-root h3, .tw-root p, .tw-root span {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+}
 
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
-                    <i class="bi bi-person-badge me-2"></i> Manager Dashboard
-                </h1>
-                <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin: 0;">
-                    Business overview, analytics, and system management
-                </p>
-            </div>
-            <div>
-                <button class="btn btn-outline-secondary me-2" onclick="window.location.reload()">
-                    <i class="bi bi-arrow-clockwise me-1"></i> Refresh
-                </button>
-                <button class="btn btn-primary" onclick="window.print()">
-                    <i class="bi bi-printer me-1"></i> Print Report
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Stats Cards (5 CARDS - ADDED PENDING RETURNS) -->
-    <div class="row g-3 mb-4">
-        <!-- Card 1: Total Revenue -->
-        <div class="col-md-3">
-            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Total Revenue</div>
-                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.TotalRevenue.ToString("N0")</div>
-                            <small style="opacity: 0.8;">VND this month</small>
-                        </div>
-                        <div style="font-size: 3rem; opacity: 0.3;"><i class="bi bi-cash-stack"></i></div>
-                    </div>
+<div class="tw-root py-8">
+    <main class="max-w-[1400px] mx-auto p-6">
+        <!-- BEGIN: Breadcrumbs & Header -->
+        <div class="mb-6">
+            <nav class="text-xs text-slate-500 mb-2">
+                <a asp-page="/Index" class="hover:text-teal-700">Home</a> &gt; <span class="text-slate-800">Manager Dashboard</span>
+            </nav>
+            <div class="flex justify-between items-end">
+                <div>
+                    <h1 class="text-3xl font-serif font-bold text-slate-900 flex items-center">
+                        Manager Dashboard
+                    </h1>
+                    <p class="text-sm text-slate-500 mt-1 italic">Business overview, analytics, and system management</p>
+                </div>
+                <div class="flex space-x-3">
+                    <button class="text-xs text-slate-500 flex items-center hover:text-teal-600" onclick="window.location.reload()">
+                        <span class="mr-1">↺</span> REFRESH
+                    </button>
+                    <button class="bg-slate-800 text-white px-6 py-2 rounded text-sm font-semibold flex items-center uppercase tracking-wider hover:bg-slate-700" onclick="window.print()">
+                        <span class="material-symbols-outlined mr-2 text-sm">print</span> Print Report
+                    </button>
                 </div>
             </div>
         </div>
+        <!-- END: Breadcrumbs & Header -->
 
-        <!-- Card 2: Total Orders -->
-        <div class="col-md-3">
-            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Total Orders</div>
-                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.TotalOrders</div>
-                            <small style="opacity: 0.8;">
-                                @if (Model.Stats.OrderGrowth >= 0)
-                                {
-                                    <span><i class="bi bi-graph-up-arrow text-success"></i> +@Model.Stats.OrderGrowth% growth</span>
-                                }
-                                else
-                                {
-                                    <span><i class="bi bi-graph-down-arrow text-danger"></i> @Model.Stats.OrderGrowth% change</span>
-                                }
-                            </small>
-                        </div>
-                        <div style="font-size: 3rem; opacity: 0.3;"><i class="bi bi-box-seam"></i></div>
-                    </div>
+        <!-- BEGIN: Summary Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <!-- Total Revenue -->
+            <div class="bg-teal-700 text-white p-6 rounded-lg shadow-sm relative overflow-hidden">
+                <div class="relative z-10">
+                    <h3 class="text-sm font-medium opacity-80 uppercase">Total Revenue</h3>
+                    <p class="text-4xl font-bold mt-2">@Model.Stats.TotalRevenue.ToString("N0")</p>
+                    <p class="text-xs mt-1 opacity-70">VND this month</p>
                 </div>
+                <span class="absolute bottom-4 right-4 text-white opacity-20 text-5xl">
+                    <span class="material-symbols-outlined text-5xl opacity-20">payments</span>
+                </span>
+            </div>
+            
+            <!-- Total Orders -->
+            <div class="bg-teal-600 text-white p-6 rounded-lg shadow-sm relative overflow-hidden">
+                <div class="relative z-10">
+                    <h3 class="text-sm font-medium opacity-80 uppercase">Total Orders</h3>
+                    <p class="text-4xl font-bold mt-2">@Model.Stats.TotalOrders</p>
+                    <p class="text-xs mt-1 text-teal-100 font-semibold">
+                        @if (Model.Stats.OrderGrowth >= 0)
+                        {
+                            <span>📈 +@Model.Stats.OrderGrowth% growth</span>
+                        }
+                        else
+                        {
+                            <span class="text-red-300">📉 @Model.Stats.OrderGrowth% change</span>
+                        }
+                    </p>
+                </div>
+                <span class="absolute bottom-4 right-4 text-white opacity-20 text-5xl">
+                    <span class="material-symbols-outlined text-5xl opacity-20">inventory_2</span>
+                </span>
+            </div>
+            
+            <!-- Active Products -->
+            <div class="bg-slate-700 text-white p-6 rounded-lg shadow-sm relative overflow-hidden">
+                <div class="relative z-10">
+                    <h3 class="text-sm font-medium opacity-80 uppercase">Active Products</h3>
+                    <p class="text-4xl font-bold mt-2">@Model.Stats.ActiveProducts</p>
+                    <p class="text-xs mt-1 text-teal-400 font-semibold">
+                        @if (Model.Stats.LowStockCount > 0)
+                        {
+                            <span class="text-amber-400 text-sm">⚠️ @Model.Stats.LowStockCount low stock</span>
+                        }
+                        else
+                        {
+                            <span>✓ All stocked well</span>
+                        }
+                    </p>
+                </div>
+                <span class="absolute bottom-4 right-4 text-white opacity-20 text-5xl">
+                    <span class="material-symbols-outlined text-5xl opacity-20">bar_chart</span>
+                </span>
+            </div>
+            
+            <!-- Staff Members -->
+            <div class="bg-slate-600 text-white p-6 rounded-lg shadow-sm relative overflow-hidden">
+                <div class="relative z-10">
+                    <h3 class="text-sm font-medium opacity-80 uppercase">Staff Members</h3>
+                    <p class="text-4xl font-bold mt-2">@Model.Stats.TotalStaff</p>
+                    <p class="text-xs mt-1 opacity-70">@Model.Stats.ActiveStaff active today</p>
+                </div>
+                <span class="absolute bottom-4 right-4 text-white opacity-20 text-5xl">
+                    <span class="material-symbols-outlined text-5xl opacity-20">groups</span>
+                </span>
+            </div>
+            
+            <!-- Pending Returns (Second Row Start) -->
+            <div class="bg-teal-800 text-white p-6 rounded-lg shadow-sm relative overflow-hidden md:col-span-1">
+                <div class="relative z-10">
+                    <h3 class="text-sm font-medium opacity-80 uppercase">Pending Returns</h3>
+                    <p class="text-4xl font-bold mt-2">@Model.Stats.PendingReturns</p>
+                    <p class="text-xs mt-1 text-teal-300 font-semibold">
+                        @if (Model.Stats.PendingReturns > 0)
+                        {
+                            <span class="text-amber-400 text-sm">⚠️ Awaiting review</span>
+                        }
+                        else
+                        {
+                            <span>✓ All processed</span>
+                        }
+                    </p>
+                </div>
+                <span class="absolute bottom-4 right-4 text-white opacity-20 text-5xl">
+                    <span class="material-symbols-outlined text-5xl opacity-20">keyboard_return</span>
+                </span>
             </div>
         </div>
+        <!-- END: Summary Cards Grid -->
 
-        <!-- Card 3: Active Products -->
-        <div class="col-md-3">
-            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Active Products</div>
-                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.ActiveProducts</div>
-                            <small style="opacity: 0.8;">
-                                @if (Model.Stats.LowStockCount > 0)
-                                {
-                                    <span><i class="bi bi-exclamation-triangle-fill text-warning"></i> @Model.Stats.LowStockCount low stock</span>
-                                }
-                                else
-                                {
-                                    <span><i class="bi bi-check-circle-fill text-success"></i> All stocked well</span>
-                                }
-                            </small>
-                        </div>
-                        <div style="font-size: 3rem; opacity: 0.3;"><i class="bi bi-bar-chart-line"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card 4: Staff Members -->
-        <div class="col-md-3">
-            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Staff Members</div>
-                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.TotalStaff</div>
-                            <small style="opacity: 0.8;">@Model.Stats.ActiveStaff active today</small>
-                        </div>
-                        <div style="font-size: 3rem; opacity: 0.3;"><i class="bi bi-people"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ✅ Card 5: PENDING RETURNS (NEW) -->
-        <div class="col-md-3">
-            <div class="card" style="border: none; border-radius: 12px; background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%); color: white;">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Pending Returns</div>
-                            <div style="font-size: 2rem; font-weight: 700;">@Model.Stats.PendingReturns</div>
-                            <small style="opacity: 0.8;">
-                                @if (Model.Stats.PendingReturns > 0)
-                                {
-                                    <span><i class="bi bi-exclamation-triangle-fill text-warning"></i> Awaiting review</span>
-                                }
-                                else
-                                {
-                                    <span><i class="bi bi-check-circle-fill text-success"></i> All processed</span>
-                                }
-                            </small>
-                        </div>
-                        <div style="font-size: 3rem; opacity: 0.3;"><i class="bi bi-arrow-repeat"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions (ADDED MANAGE RETURNS BUTTON) -->
-    <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); background: linear-gradient(135deg, rgba(26, 35, 50, 0.02) 0%, rgba(212, 165, 116, 0.05) 100%);">
-        <div class="card-body" style="padding: 1.5rem;">
-            <h5 style="color: var(--primary-navy); margin-bottom: 1rem; font-weight: 600;">
-                <i class="bi bi-lightning-charge-fill text-warning me-2"></i> Quick Actions
-            </h5>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
-                <a asp-page="/Frames/Index" class="btn btn-outline-primary" style="padding: 0.75rem;">
-                    <i class="bi bi-eyeglasses me-2"></i>Manage Frames
+        <!-- BEGIN: Quick Actions -->
+        <section class="mb-8">
+            <h2 class="text-sm font-bold flex items-center mb-4 uppercase text-slate-700">
+                Quick Actions
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                <a asp-page="/Frames/Index" class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
+                    <span>MANAGE FRAMES</span>
                 </a>
-                <a asp-page="/Lenses/Index" class="btn btn-outline-primary" style="padding: 0.75rem;">
-                    <i class="bi bi-circle me-2"></i>Manage Lenses
+                <a asp-page="/Lenses/Index" class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
+                    <span>MANAGE LENSES</span>
                 </a>
-                <a asp-page="/Manager/Staff" class="btn btn-outline-primary" style="padding: 0.75rem;">
-                    <i class="bi bi-people me-2"></i>Manage Staff
+                <a asp-page="/Manager/Staff" class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
+                    <span>MANAGE STAFF</span>
                 </a>
-                <a asp-page="/Manager/Reports" class="btn btn-outline-primary" style="padding: 0.75rem;">
-                    <i class="bi bi-graph-up me-2"></i>Revenue Reports
+                <a asp-page="/Manager/Reports" class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
+                    <span>REVENUE REPORTS</span>
                 </a>
-
-                @* ✅ ADDED: MANAGE RETURNS BUTTON *@
-                <a asp-page="/Manager/Returns" class="btn btn-outline-warning" style="padding: 0.75rem; position: relative;">
-                    <i class="bi bi-arrow-repeat me-2"></i>Manage Returns
+                <a asp-page="/Sale/Refunds/Index" class="text-teal-600 text-[10px] font-bold uppercase p-3 hover:underline">
+                    ↺ Manage Returns
                     @if (Model.Stats.PendingReturns > 0)
                     {
-                        <span class="badge bg-danger ms-2">@Model.Stats.PendingReturns</span>
+                        <span class="bg-red-500 text-white rounded-full px-2 py-0.5 ml-1">@Model.Stats.PendingReturns</span>
                     }
                 </a>
-
-                <a asp-page="/Manager/Policies" class="btn btn-outline-secondary" style="padding: 0.75rem;">
-                    <i class="bi bi-file-text me-2"></i>Business Policies
-                </a>
-                <a asp-page="/Manager/Settings" class="btn btn-outline-secondary" style="padding: 0.75rem;">
-                    <i class="bi bi-gear me-2"></i>System Settings
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-4">
-        <!-- Left Column -->
-        <div class="col-lg-8">
-            <!-- Revenue Chart -->
-            <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
-                <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%); padding: 1.5rem; border-radius: 12px 12px 0 0;">
-                    <h5 style="color: white; margin: 0; font-weight: 600;">
-                        <i class="bi bi-graph-up me-2"></i>Revenue Overview (Last 7 Days)
-                    </h5>
-                </div>
-                <div class="card-body" style="padding: 2rem;">
-                    <canvas id="revenueChart" style="max-height: 300px;"></canvas>
+                <div class="col-span-1 flex items-center space-x-6 ml-auto">
+                    <a asp-page="/Manager/Policies" class="text-slate-500 text-[10px] font-bold uppercase flex items-center hover:text-slate-800">Business Policies</a>
+                    <a asp-page="/Manager/Settings" class="text-slate-500 text-[10px] font-bold uppercase flex items-center hover:text-slate-800">System Settings</a>
                 </div>
             </div>
+        </section>
+        <!-- END: Quick Actions -->
 
-            <!-- Recent Orders (UNCHANGED - already has pagination) -->
-            <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
-                <div style="background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-light) 100%); padding: 1.5rem; border-radius: 12px 12px 0 0;">
-                    <h5 style="color: white; margin: 0; font-weight: 600;">
-                        <i class="bi bi-cart-check me-2"></i>Recent Orders
-                    </h5>
+        <!-- BEGIN: Data Visualization & Sidebars -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left Column: Chart & Table -->
+            <div class="lg:col-span-8 space-y-6">
+                <!-- Revenue Overview Chart -->
+                <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
+                    <div class="bg-slate-800 text-white p-3 flex items-center text-sm font-semibold">
+                        Revenue Overview (Last 7 Days)
+                    </div>
+                    <div class="p-6 h-64 bg-white relative">
+                        <canvas class="w-full h-full" id="revenueChart"></canvas>
+                    </div>
                 </div>
-
-                <div class="card-body p-3">
-                    @if (!Model.RecentOrders.Any())
-                    {
-                        <div style="text-align: center; padding: 3rem;">
-                            <div style="font-size: 3rem; opacity: 0.2;"><i class="bi bi-box-seam"></i></div>
-                            <p style="color: var(--secondary-warm-gray); margin: 0;">No recent orders</p>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead style="background: var(--light-gray);">
+                
+                <!-- Recent Orders Table -->
+                <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
+                    <div class="bg-amber-100 text-amber-900 p-3 flex items-center text-sm font-semibold">
+                        Recent Orders
+                    </div>
+                    <div class="overflow-x-auto">
+                        @if (!Model.RecentOrders.Any())
+                        {
+                            <div class="text-center p-10">
+                                <span class="material-symbols-outlined text-4xl text-slate-300">inbox</span>
+                                <p class="text-slate-500 mt-2">No recent orders</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-50 border-b border-slate-200 uppercase text-slate-500">
                                     <tr>
-                                        <th style="padding: 1rem;">Order ID</th>
-                                        <th style="padding: 1rem;">Customer</th>
-                                        <th style="padding: 1rem;">Date</th>
-                                        <th style="padding: 1rem;">Status</th>
-                                        <th style="padding: 1rem; text-align: right;">Total</th>
+                                        <th class="p-4 font-semibold">Order ID</th>
+                                        <th class="p-4 font-semibold">Customer</th>
+                                        <th class="p-4 font-semibold">Date</th>
+                                        <th class="p-4 font-semibold">Status</th>
+                                        <th class="p-4 font-semibold text-right">Total</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="divide-y divide-slate-100">
                                     @foreach (var order in Model.RecentOrders)
                                     {
-                                        <tr>
-                                            <td style="padding: 1rem; font-weight: 700; color: var(--primary-navy);">#@order.OrderId</td>
-                                            <td style="padding: 1rem;">@order.CustomerName</td>
-                                            <td style="padding: 1rem; color: var(--secondary-warm-gray);">@order.CreatedAt.ToString("MMM dd, yyyy")</td>
-                                            <td style="padding: 1rem;">
+                                        <tr class="hover:bg-slate-50 transition-colors">
+                                            <td class="p-4 font-bold text-slate-800">#@order.OrderId</td>
+                                            <td class="p-4 text-slate-700">@order.CustomerName</td>
+                                            <td class="p-4 text-slate-500">@order.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                            <td class="p-4">
                                                 @{
-                                                    var statusColor = order.Status switch
+                                                    var statusClass = order.Status switch
                                                     {
-                                                        "Completed" => "#4caf50",
-                                                        "Shipped" => "#2196f3",
-                                                        "Processing" => "#ff9800",
-                                                        "Confirmed" => "#00bcd4",
-                                                        _ => "#9e9e9e"
+                                                        "Completed" => "bg-emerald-100 text-emerald-800",
+                                                        "Shipped" => "bg-blue-100 text-blue-800",
+                                                        "Processing" => "bg-amber-100 text-amber-800",
+                                                        "Confirmed" => "bg-cyan-100 text-cyan-800",
+                                                        "Pending" => "bg-slate-200 text-slate-600",
+                                                        _ => "bg-slate-200 text-slate-600"
                                                     };
                                                 }
-                                                <span style="background:@statusColor; color:white; padding:0.35rem 0.75rem; border-radius:6px; font-size:0.85rem;">
+                                                <span class="@statusClass px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">
                                                     @order.Status
                                                 </span>
                                             </td>
-                                            <td style="padding: 1rem; text-align: right; font-weight: 700; color: var(--primary-gold);">
-                                                @order.TotalAmount.ToString("N0") VND
-                                            </td>
+                                            <td class="p-4 text-right font-bold text-teal-700">@order.TotalAmount.ToString("N0") VND</td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
-                        </div>
-                    }
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
+            <!-- END: Left Column -->
 
-        <!-- Right Column -->
-        <div class="col-lg-4">
-            <!-- System Alerts (ALREADY HAS PENDING RETURNS ALERT) -->
-            <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
-                <div style="background: linear-gradient(135deg, #f44336 0%, #e57373 100%); padding: 1.5rem; border-radius: 12px 12px 0 0;">
-                    <h5 style="color: white; margin: 0; font-weight: 600;">
-                        <i class="bi bi-exclamation-triangle me-2"></i>System Alerts
-                    </h5>
-                </div>
-                <div class="card-body" style="padding: 1.5rem;">
-                    @if (Model.Stats.LowStockCount > 0)
+            <!-- Right Column: Alerts & Top Products -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- System Alerts -->
+                <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
+                    <div class="bg-red-500 text-white p-3 flex items-center text-sm font-semibold">
+                        System Alerts
+                    </div>
+                    
+                    @if (Model.Stats.LowStockCount > 0 || Model.Stats.PendingReturns > 0)
                     {
-                        <div class="alert alert-warning" style="border-radius: 8px;">
-                            <strong><i class="bi bi-exclamation-triangle-fill"></i> Low Stock Alert</strong><br />
-                            @Model.Stats.LowStockCount products need restocking
-                            <a asp-page="/Manager/Inventory" class="alert-link d-block mt-2">View Details →</a>
-                        </div>
-                    }
-                    @if (Model.Stats.PendingReturns > 0)
-                    {
-                        <div class="alert alert-info" style="border-radius: 8px;">
-                            <strong><i class="bi bi-arrow-repeat"></i> Pending Returns</strong><br />
-                            @Model.Stats.PendingReturns returns awaiting approval
-                            <a asp-page="/Manager/Returns" class="alert-link d-block mt-2">Review Returns →</a>
-                        </div>
-                    }
-                    @if (Model.Stats.LowStockCount == 0 && Model.Stats.PendingReturns == 0)
-                    {
-                        <div style="text-align: center; padding: 2rem;">
-                            <div style="font-size: 3rem; opacity: 0.2;"><i class="bi bi-check-circle-fill"></i></div>
-                            <p style="color: var(--secondary-warm-gray); margin: 0;">All systems operational</p>
-                        </div>
-                    }
-                </div>
-            </div>
-
-            <!-- Top Products -->
-            <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md);">
-                <div style="background: linear-gradient(135deg, var(--secondary-teal) 0%, #4a7c7e 100%); padding: 1.5rem; border-radius: 12px 12px 0 0;">
-                    <h5 style="color: white; margin: 0; font-weight: 600;">
-                        <i class="bi bi-trophy me-2"></i>Top Selling Products
-                    </h5>
-                </div>
-                <div class="card-body" style="padding: 1.5rem;">
-                    @if (!Model.TopProducts.Any())
-                    {
-                        <div style="text-align: center; padding: 2rem;">
-                            <div style="font-size: 3rem; opacity: 0.2;"><i class="bi bi-box-seam"></i></div>
-                            <p style="color: var(--secondary-warm-gray); margin: 0;">No sales data available</p>
-                        </div>
-                    }
-                    else
-                    {
-                        <div style="display: flex; flex-direction: column; gap: 1rem;">
-                            @foreach (var product in Model.TopProducts)
+                        <div class="p-4 space-y-3">
+                            @if (Model.Stats.LowStockCount > 0)
                             {
-                                <div style="padding: 1rem; background: var(--light-gray); border-radius: 8px; border-left: 4px solid var(--primary-gold);">
-                                    <div style="font-weight: 600; color: var(--primary-navy); margin-bottom: 0.5rem;">@product.Name</div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span style="font-size: 0.9rem; color: var(--secondary-warm-gray);">@product.SoldCount sold</span>
-                                        <span style="font-weight: 700; color: var(--primary-gold);">@product.Revenue.ToString("N0") VND</span>
+                                <div class="bg-amber-50 border border-amber-200 rounded p-3 text-amber-900 text-sm">
+                                    <div class="font-bold flex items-center">
+                                        <span class="material-symbols-outlined text-amber-500 mr-2 text-sm">inventory_2</span> Low Stock Alert
                                     </div>
+                                    <p class="mt-1 text-amber-700">@Model.Stats.LowStockCount products need restocking</p>
+                                    <a asp-page="/Manager/Inventory" class="text-amber-600 font-semibold text-xs mt-2 inline-block hover:underline">View Details →</a>
+                                </div>
+                            }
+                            @if (Model.Stats.PendingReturns > 0)
+                            {
+                                <div class="bg-blue-50 border border-blue-200 rounded p-3 text-blue-900 text-sm">
+                                    <div class="font-bold flex items-center">
+                                        <span class="material-symbols-outlined text-blue-500 mr-2 text-sm">assignment_return</span> Pending Returns
+                                    </div>
+                                    <p class="mt-1 text-blue-700">@Model.Stats.PendingReturns returns awaiting approval</p>
+                                    <a asp-page="/Sale/Refunds/Index" class="text-blue-600 font-semibold text-xs mt-2 inline-block hover:underline">Review Returns →</a>
                                 </div>
                             }
                         </div>
                     }
+                    else
+                    {
+                        <div class="p-10 flex flex-col items-center justify-center text-center">
+                            <div class="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-4 border border-emerald-100">
+                            </div>
+                            <p class="text-xs text-slate-500 font-semibold">All systems operational</p>
+                        </div>
+                    }
+                </div>
+
+                <!-- Top Selling Products -->
+                <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
+                    <div class="bg-teal-700 text-white p-3 flex items-center text-sm font-semibold">
+                        Top Selling Products
+                    </div>
+                    <div class="p-4 space-y-3">
+                        @if (!Model.TopProducts.Any())
+                        {
+                            <div class="text-center p-6">
+                                <span class="material-symbols-outlined text-2xl text-slate-300">category</span>
+                                <p class="text-slate-500 mt-2 text-xs">No sales data available</p>
+                            </div>
+                        }
+                        else
+                        {
+                            @foreach (var product in Model.TopProducts)
+                            {
+                                <div class="bg-slate-50 border-l-4 border-teal-600 p-3 flex justify-between items-center rounded-r">
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-800">@product.Name</p>
+                                        <p class="text-[10px] text-slate-500 mt-1">@product.SoldCount sold</p>
+                                    </div>
+                                    <div class="text-xs font-bold text-teal-700">
+                                        @product.Revenue.ToString("N0") VND
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
                 </div>
             </div>
+            <!-- END: Right Column -->
         </div>
-    </div>
+        <!-- END: Data Visualization & Sidebars -->
+    </main>
 </div>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const ctx = document.getElementById('revenueChart');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartData.Labels)),
-                datasets: [{
-                    label: 'Revenue (VND)',
-                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartData.Values)),
-                    borderColor: '#d4a574',
-                    backgroundColor: 'rgba(212, 165, 116, 0.1)',
-                    tension: 0.4,
-                    fill: true,
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return 'Revenue: ' + context.parsed.y.toLocaleString() + ' VND';
+        document.addEventListener("DOMContentLoaded", function () {
+            const canvas = document.getElementById('revenueChart');
+            if (!canvas) return;
+
+            const labelsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartData.Labels));
+            const valuesData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartData.Values));
+
+            // Setup ChartJS instead of the static canvas drawing
+            new Chart(canvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: labelsData,
+                    datasets: [{
+                        label: 'Revenue (VND)',
+                        data: valuesData,
+                        borderColor: '#0d9488', // teal-600 to match design
+                        backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#0d9488',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            padding: 10,
+                            titleFont: { family: 'Inter', size: 13 },
+                            bodyFont: { family: 'Inter', size: 12 },
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Revenue: ' + context.parsed.y.toLocaleString() + ' VND';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { 
+                                font: { family: 'Inter', size: 10 },
+                                color: '#64748b'
+                            }
+                        },
+                        y: {
+                            border: { display: false },
+                            grid: { color: '#f1f5f9' },
+                            beginAtZero: true,
+                            ticks: {
+                                font: { family: 'Inter', size: 10 },
+                                color: '#64748b',
+                                callback: function(value) { return (value / 1000).toLocaleString() + 'K'; }
                             }
                         }
                     }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) { return (value / 1000).toLocaleString() + 'K'; }
-                        }
-                    }
                 }
-            }
+            });
         });
     </script>
-}
-
-@section Styles {
-    <style>
-        .btn:hover {
-            transform: translateY(-2px);
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .table tbody tr:hover {
-            background-color: rgba(212, 165, 116, 0.05);
-            transition: all 0.2s ease;
-        }
-
-        .card {
-            transition: transform 0.2s ease;
-        }
-
-            .card:hover {
-                transform: translateY(-2px);
-            }
-
-        .badge {
-            animation: pulse 2s infinite;
-        }
-
-        @@keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.7;
-            }
-        }
-    </style>
 }

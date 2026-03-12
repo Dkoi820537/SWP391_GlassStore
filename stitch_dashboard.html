@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OptiPlus - Manager Dashboard</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style data-purpose="typography">
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9fafb;
+    }
+  </style>
+<style data-purpose="custom-colors">
+    /* Using teal-600/700 for primary actions and highlights to match user request */
+    .bg-primary-teal { background-color: #134e4a; } /* Very dark teal for nav */
+    .bg-active-teal { background-color: #0d9488; } /* Standard teal */
+    .text-teal-accent { color: #0d9488; }
+    .border-teal-accent { border-color: #0d9488; }
+  </style>
+</head>
+<body class="text-slate-800">
+<!-- BEGIN: Top Navigation Bar -->
+<!-- Kept exactly as in original image: Dark teal background, centered links -->
+<nav class="bg-[#134e4a] text-white py-2 px-6 flex items-center justify-between text-[13px] border-b border-teal-800 shadow-sm"><div class="max-w-[1920px] mx-auto flex items-center justify-between w-full px-12">
+<div class="flex items-center space-x-12">
+<div class="flex items-center text-white">
+<span class="material-symbols-outlined mr-1 text-lg">all_inclusive</span>
+<span class="font-bold text-lg">OptiPlus</span>
+</div>
+<div class="flex space-x-8 items-center text-white">
+<a class="hover:text-teal-200 flex items-center space-x-1" href="#">
+<span class="material-symbols-outlined text-sm">home</span>
+<span>Home</span>
+</a>
+<div class="group relative">
+<button class="hover:text-teal-200 flex items-center space-x-1">
+<span class="material-symbols-outlined text-sm">shopping_bag</span>
+<span>Shop</span>
+<span class="material-symbols-outlined text-xs">expand_more</span>
+</button>
+</div>
+<div class="group relative">
+<button class="hover:text-teal-200 flex items-center space-x-1">
+<span class="material-symbols-outlined text-sm">construction</span>
+<span>Services</span>
+<span class="material-symbols-outlined text-xs">expand_more</span>
+</button>
+</div>
+<a class="hover:text-teal-200 flex items-center space-x-1" href="#">
+<span class="material-symbols-outlined text-sm">contact_support</span>
+<span>Contact</span>
+</a>
+<div class="group relative">
+<button class="hover:text-teal-200 flex items-center space-x-1 border-b-2 border-teal-300 pb-0.5">
+<span class="material-symbols-outlined text-sm text-teal-300">verified_user</span>
+<span>Admin</span>
+<span class="material-symbols-outlined text-xs">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex items-center space-x-6 text-white">
+<button class="hover:text-teal-200">
+<span class="material-symbols-outlined text-lg">favorite</span>
+</button>
+<button class="hover:text-teal-200 relative">
+<span class="material-symbols-outlined text-lg">shopping_basket</span>
+<span class="absolute -top-1.5 -right-1.5 bg-red-500 text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold">0</span>
+</button>
+<div class="flex items-center space-x-2 bg-teal-800/50 py-1 px-3 rounded-full border border-teal-700">
+<div class="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">person</span>
+</div>
+<span class="font-medium">admin</span>
+<span class="material-symbols-outlined text-xs">expand_more</span>
+</div>
+</div>
+</div></nav>
+<!-- END: Top Navigation Bar -->
+<!-- BEGIN: Main Content -->
+<main class="max-w-[1400px] mx-auto p-6">
+<!-- BEGIN: Breadcrumbs & Header -->
+<div class="mb-6">
+<nav class="text-xs text-slate-500 mb-2">
+        Home &gt; <span class="text-slate-800">Manager Dashboard</span>
+</nav>
+<div class="flex justify-between items-end">
+<div>
+<h1 class="text-3xl font-serif font-bold text-slate-900 flex items-center"><span class="material-symbols-outlined mr-3 text-3xl">folder</span> Manager Dashboard</h1>
+<p class="text-sm text-slate-500 mt-1 italic">Business overview, analytics, and system management</p>
+</div>
+<div class="flex space-x-3">
+<button class="text-xs text-slate-500 flex items-center hover:text-teal-600">
+<span class="mr-1">↺</span> REFRESH
+          </button>
+<button class="bg-slate-800 text-white px-6 py-2 rounded text-sm font-semibold flex items-center uppercase tracking-wider hover:bg-slate-700"><span class="material-symbols-outlined mr-2 text-sm">print</span> Print Report</button>
+</div>
+</div>
+</div>
+<!-- END: Breadcrumbs & Header -->
+<!-- BEGIN: Summary Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+<!-- Total Revenue -->
+<div class="bg-teal-700 text-white p-6 rounded-lg shadow-sm relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="text-sm font-medium opacity-80 uppercase">Total Revenue</h3>
+<p class="text-4xl font-bold mt-2">500</p>
+<p class="text-xs mt-1 opacity-70">VND this month</p>
+</div>
+<span class="absolute bottom-4 right-4 text-white opacity-20 text-5xl"><span class="material-symbols-outlined text-5xl opacity-20">payments</span></span>
+</div>
+<!-- Total Orders -->
+<div class="bg-teal-600 text-white p-6 rounded-lg shadow-sm relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="text-sm font-medium opacity-80 uppercase">Total Orders</h3>
+<p class="text-4xl font-bold mt-2">1</p>
+<p class="text-xs mt-1 text-teal-100 font-semibold">📈 +100% growth</p>
+</div>
+<span class="absolute bottom-4 right-4 text-white opacity-20 text-5xl"><span class="material-symbols-outlined text-5xl opacity-20">inventory_2</span></span>
+</div>
+<!-- Active Products -->
+<div class="bg-slate-700 text-white p-6 rounded-lg shadow-sm relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="text-sm font-medium opacity-80 uppercase">Active Products</h3>
+<p class="text-4xl font-bold mt-2">2</p>
+<p class="text-xs mt-1 text-teal-400 font-semibold">✓ All stocked well</p>
+</div>
+<span class="absolute bottom-4 right-4 text-white opacity-20 text-5xl"><span class="material-symbols-outlined text-5xl opacity-20">bar_chart</span></span>
+</div>
+<!-- Staff Members -->
+<div class="bg-slate-600 text-white p-6 rounded-lg shadow-sm relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="text-sm font-medium opacity-80 uppercase">Staff Members</h3>
+<p class="text-4xl font-bold mt-2">1</p>
+<p class="text-xs mt-1 opacity-70">1 active today</p>
+</div>
+<span class="absolute bottom-4 right-4 text-white opacity-20 text-5xl"><span class="material-symbols-outlined text-5xl opacity-20">groups</span></span>
+</div>
+<!-- Pending Returns (Second Row Start) -->
+<div class="bg-teal-800 text-white p-6 rounded-lg shadow-sm relative overflow-hidden md:col-span-1">
+<div class="relative z-10">
+<h3 class="text-sm font-medium opacity-80 uppercase">Pending Returns</h3>
+<p class="text-4xl font-bold mt-2">0</p>
+<p class="text-xs mt-1 text-teal-300 font-semibold">✓ All processed</p>
+</div>
+<span class="absolute bottom-4 right-4 text-white opacity-20 text-5xl"><span class="material-symbols-outlined text-5xl opacity-20">keyboard_return</span></span>
+</div>
+</div>
+<!-- END: Summary Cards Grid -->
+<!-- BEGIN: Quick Actions -->
+<section class="mb-8">
+<h2 class="text-sm font-bold flex items-center mb-4 uppercase text-slate-700"><span class="material-symbols-outlined text-yellow-500 mr-2">bolt</span> Quick Actions</h2>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+<button class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors">
+<span>MANAGE FRAMES</span>
+</button>
+<button class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors">
+<span>MANAGE LENSES</span>
+</button>
+<button class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors">
+<span>MANAGE STAFF</span>
+</button>
+<button class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors">
+<span>REVENUE REPORTS</span>
+</button>
+<button class="text-teal-600 text-[10px] font-bold uppercase p-3 hover:underline">
+          ↺ Manage Returns
+        </button>
+<div class="col-span-1 flex items-center space-x-6 ml-auto">
+<button class="text-slate-500 text-[10px] font-bold uppercase flex items-center">Business Policies</button>
+<button class="text-slate-500 text-[10px] font-bold uppercase flex items-center">System Settings</button>
+</div>
+</div>
+</section>
+<!-- END: Quick Actions -->
+<!-- BEGIN: Data Visualization & Sidebars -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left Column: Chart & Table -->
+<div class="lg:col-span-8 space-y-6">
+<!-- Revenue Overview Chart -->
+<div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
+<div class="bg-slate-800 text-white p-3 flex items-center text-sm font-semibold"><span class="material-symbols-outlined mr-2">trending_up</span> Revenue Overview (Last 7 Days)</div>
+<div class="p-6 h-64 bg-white">
+<!-- Canvas Placeholder for Chart -->
+<canvas class="w-full h-full" id="revenueChart"></canvas>
+</div>
+</div>
+<!-- Recent Orders Table -->
+<div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
+<div class="bg-amber-100 text-amber-900 p-3 flex items-center text-sm font-semibold"><span class="material-symbols-outlined mr-2">shopping_cart</span> Recent Orders</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-xs">
+<thead class="bg-slate-50 border-b border-slate-200 uppercase text-slate-500">
+<tr>
+<th class="p-4 font-semibold">Order ID</th>
+<th class="p-4 font-semibold">Customer</th>
+<th class="p-4 font-semibold">Date</th>
+<th class="p-4 font-semibold">Status</th>
+<th class="p-4 font-semibold text-right">Total</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<tr class="hover:bg-slate-50 transition-colors">
+<td class="p-4 font-bold">#1</td>
+<td class="p-4">LE NGUYEN DINH KHOI</td>
+<td class="p-4 text-slate-500">Mar 11, 2026</td>
+<td class="p-4">
+<span class="bg-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-bold">Pending Confirmation</span>
+</td>
+<td class="p-4 text-right font-bold text-teal-700">500 VND</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- END: Left Column -->
+<!-- Right Column: Alerts & Top Products -->
+<div class="lg:col-span-4 space-y-6">
+<!-- System Alerts -->
+<div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
+<div class="bg-red-500 text-white p-3 flex items-center text-sm font-semibold"><span class="material-symbols-outlined mr-2">warning</span> System Alerts</div>
+<div class="p-10 flex flex-col items-center justify-center text-center">
+<div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+<span class="text-slate-400 text-2xl">✓</span>
+</div>
+<p class="text-xs text-slate-400">All systems operational</p>
+</div>
+</div>
+<!-- Top Selling Products -->
+<div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
+<div class="bg-teal-700 text-white p-3 flex items-center text-sm font-semibold"><span class="material-symbols-outlined mr-2">emoji_events</span> Top Selling Products</div>
+<div class="p-4 space-y-4">
+<div class="bg-slate-50 border-l-4 border-teal-600 p-4 flex justify-between items-center rounded-r">
+<div>
+<p class="text-xs font-bold text-slate-800">Classic frame</p>
+<p class="text-[10px] text-slate-500 mt-1">1 sold</p>
+</div>
+<div class="text-xs font-bold text-teal-700">
+                500 VND
+              </div>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Right Column -->
+</div>
+<!-- END: Data Visualization & Sidebars -->
+</main>
+<!-- END: Main Content -->
+<!-- BEGIN: Chart Scripts -->
+<script data-purpose="canvas-setup">
+    // Simple line chart rendering on canvas
+    window.onload = function() {
+      const canvas = document.getElementById('revenueChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const width = rect.width;
+      const height = rect.height;
+      const padding = 40;
+
+      // Draw Grid
+      ctx.strokeStyle = '#f1f5f9';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 5; i++) {
+        const y = padding + (i * (height - padding * 2) / 5);
+        ctx.beginPath();
+        ctx.moveTo(padding, y);
+        ctx.lineTo(width - padding, y);
+        ctx.stroke();
+      }
+
+      // Draw Labels (Mock)
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px Inter';
+      const labels = ['Mar 06', 'Mar 07', 'Mar 08', 'Mar 09', 'Mar 10', 'Mar 11', 'Mar 12'];
+      labels.forEach((label, i) => {
+        const x = padding + (i * (width - padding * 2) / (labels.length - 1));
+        ctx.fillText(label, x - 15, height - 15);
+      });
+
+      // Draw Data Path (Representing the curve in the image)
+      ctx.beginPath();
+      ctx.strokeStyle = '#c2410c'; // Matching the brown/orange line
+      ctx.lineWidth = 2;
+      const points = [
+        {x: 0, y: 0}, {x: 1, y: 0.05}, {x: 2, y: 0.1}, {x: 3, y: 0.05}, {x: 4, y: 0.2}, {x: 5, y: 0.8}, {x: 6, y: 0.1}
+      ];
+
+      points.forEach((p, i) => {
+        const x = padding + (p.x * (width - padding * 2) / (labels.length - 1));
+        const y = (height - padding) - (p.y * (height - padding * 2));
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+
+        // Draw point circles
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      });
+      ctx.stroke();
+    };
+  </script>
+<!-- END: Chart Scripts -->
+</body></html>

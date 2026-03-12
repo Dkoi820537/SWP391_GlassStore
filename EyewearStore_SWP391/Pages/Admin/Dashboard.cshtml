@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model EyewearStore_SWP391.Pages.Admin.DashboardModel
 @{
     ViewData["Title"] = "Dashboard";
@@ -7,6 +7,7 @@
 
 @section Styles {
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #f5f6fa;
@@ -493,8 +494,149 @@
             font-size: 13px
         }
 
+        /* BREADCRUMB */
+        .db-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted);
+            margin-bottom: 20px
+        }
+        .db-breadcrumb a { color: var(--muted); text-decoration: none; transition: color .2s }
+        .db-breadcrumb a:hover { color: var(--info) }
+        .db-breadcrumb .sep { color: rgba(139,141,168,.4); margin: 0 2px }
+        .db-breadcrumb .current { color: var(--txt); font-weight: 700 }
+
+        /* WELCOME BANNER */
+        .db-welcome {
+            background: var(--navy);
+            border-radius: 14px;
+            padding: 20px 26px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+            box-shadow: 0 4px 16px rgba(13,27,42,.18)
+        }
+        .db-welcome .wave { font-size: 30px }
+        .db-welcome h2 { color: #fff; font-size: 18px; font-weight: 700; margin: 0 0 3px }
+        .db-welcome p { color: rgba(255,255,255,.45); font-size: 13px; margin: 0 }
+
+        /* MANAGEMENT GRID (from Stitch design) */
+        .mgmt-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 28px
+        }
+        .mgmt-card {
+            background: var(--surf);
+            border-radius: 18px;
+            border: 1px solid var(--bdr);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all .3s ease;
+            box-shadow: var(--sh);
+            text-decoration: none;
+            color: inherit
+        }
+        .mgmt-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.1)
+        }
+        .mgmt-card-header {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative
+        }
+        .mgmt-card-header .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,.95);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 6px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.08)
+        }
+        .mgmt-card-header .icon-wrap {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.2);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,.15)
+        }
+        .mgmt-card-header .icon-wrap .material-symbols-outlined {
+            font-size: 32px;
+            color: #fff
+        }
+        .mgmt-card-body {
+            padding: 22px 22px 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column
+        }
+        .mgmt-card-body h3 {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--txt);
+            margin: 0 0 6px
+        }
+        .mgmt-card-body p {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.6;
+            margin: 0 0 18px;
+            flex: 1
+        }
+        .mgmt-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            padding: 11px 0;
+            background: var(--navy);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all .2s
+        }
+        .mgmt-btn:hover { background: #1a2332 }
+        .mgmt-btn .material-symbols-outlined { font-size: 18px; transition: transform .2s }
+        .mgmt-card:hover .mgmt-btn .material-symbols-outlined { transform: translateX(3px) }
+
+        /* COLOR THEMES for card headers */
+        .mgmt-blue { background: linear-gradient(135deg, #3b82f6, #2563eb) }
+        .mgmt-blue .badge { color: #3b82f6 }
+        .mgmt-purple { background: linear-gradient(135deg, #a855f7, #9333ea) }
+        .mgmt-purple .badge { color: #a855f7 }
+        .mgmt-green { background: linear-gradient(135deg, #10b981, #059669) }
+        .mgmt-green .badge { color: #10b981 }
+        .mgmt-red { background: linear-gradient(135deg, #ef4444, #dc2626) }
+        .mgmt-red .badge { color: #ef4444 }
+
         @@media(max-width:1100px) {
             .stats-g {
+                grid-template-columns: repeat(2,1fr)
+            }
+            .mgmt-grid {
                 grid-template-columns: repeat(2,1fr)
             }
         }
@@ -507,6 +649,9 @@
 
         @@media(max-width:600px) {
             .stats-g {
+                grid-template-columns: 1fr
+            }
+            .mgmt-grid {
                 grid-template-columns: 1fr
             }
 
@@ -523,6 +668,22 @@
 
 <div class="db-wrap">
 
+    <!-- BREADCRUMB -->
+    <nav class="db-breadcrumb">
+        <a href="/">Home</a>
+        <span class="sep">›</span>
+        <span class="current">Admin Dashboard</span>
+    </nav>
+
+    <!-- WELCOME BANNER (Stitch design) -->
+    <div class="db-welcome">
+        <span class="wave">👋</span>
+        <div>
+            <h2>Welcome, @(User.Identity?.Name ?? "admin")!</h2>
+            <p>Manage your OptiPlus eyewear store from this central dashboard.</p>
+        </div>
+    </div>
+
     <!-- HERO -->
     <div class="db-hero">
         <div>
@@ -534,6 +695,63 @@
             <div class="rev-val">@Model.Revenue.ToString("N0") ₫</div>
             <div class="rev-sub">+@Model.RevenueToday.ToString("N0") ₫ today</div>
         </div>
+    </div>
+
+    <!-- MANAGEMENT MODULES (from Stitch design) -->
+    <div class="sec-lbl" style="margin-top:4px">🎛️ Quick Access</div>
+    <div class="mgmt-grid">
+        <a class="mgmt-card" href="/Lenses">
+            <div class="mgmt-card-header mgmt-blue">
+                <span class="badge">CRUD</span>
+                <div class="icon-wrap">
+                    <span class="material-symbols-outlined">monetization_on</span>
+                </div>
+            </div>
+            <div class="mgmt-card-body">
+                <h3>Lens Management</h3>
+                <p>Control stock status, pricing, lens types, and specifications for all your optical lenses.</p>
+                <span class="mgmt-btn">Manage Lenses <span class="material-symbols-outlined">arrow_right_alt</span></span>
+            </div>
+        </a>
+        <a class="mgmt-card" href="/Frames">
+            <div class="mgmt-card-header mgmt-purple">
+                <span class="badge">CRUD</span>
+                <div class="icon-wrap">
+                    <span class="material-symbols-outlined">link</span>
+                </div>
+            </div>
+            <div class="mgmt-card-body">
+                <h3>Frame Management</h3>
+                <p>Manage frame products, materials, dimensions, and specifications for all your eyeglass frames.</p>
+                <span class="mgmt-btn">Manage Frames <span class="material-symbols-outlined">arrow_right_alt</span></span>
+            </div>
+        </a>
+        <a class="mgmt-card" href="/Admin/Orders">
+            <div class="mgmt-card-header mgmt-green">
+                <span class="badge">ORDERS</span>
+                <div class="icon-wrap">
+                    <span class="material-symbols-outlined">shopping_bag</span>
+                </div>
+            </div>
+            <div class="mgmt-card-body">
+                <h3>Order Management</h3>
+                <p>View and process customer orders. Track status, manage shipping, and handle returns and refunds.</p>
+                <span class="mgmt-btn">Manage Orders <span class="material-symbols-outlined">arrow_right_alt</span></span>
+            </div>
+        </a>
+        <a class="mgmt-card" href="/Admin/Users">
+            <div class="mgmt-card-header mgmt-red">
+                <span class="badge">USERS</span>
+                <div class="icon-wrap">
+                    <span class="material-symbols-outlined">person</span>
+                </div>
+            </div>
+            <div class="mgmt-card-body">
+                <h3>User Management</h3>
+                <p>Manage customer accounts, admin users, and roles. View customer details and handle account requests.</p>
+                <span class="mgmt-btn">Manage Users <span class="material-symbols-outlined">arrow_right_alt</span></span>
+            </div>
+        </a>
     </div>
 
     <!-- ALERTS -->

@@ -9,6 +9,7 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/homepage.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/EyewearStore_SWP391.styles.css" asp-append-version="true" />
@@ -136,109 +137,147 @@
             transform: rotate(180deg);
         }
 
-        /* ── User dropdown ── */
-        .user-menu .dropdown-item {
-            border-radius: 8px;
-            margin: 2px 0;
-            padding: .7rem 1rem !important;
-            transition: background .15s;
+        /* ── Profile Dropdown ── */
+        .user-menu {
+            padding: 0;
+            overflow: hidden;
+            width: 250px;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            background-color: #f8f9fa;
         }
 
-        /* ── My Service Orders item — special gradient ── */
-        .dropdown-item-service {
-            background: linear-gradient(135deg, rgba(124,58,237,.06) 0%, rgba(79,70,229,.06) 100%);
-            border: 1px solid rgba(124,58,237,.12);
-            border-radius: 10px !important;
-            margin: 4px 0 !important;
+        .profile-topbar {
+            background-color: #0d9488;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
         }
 
-            .dropdown-item-service:hover {
-                background: linear-gradient(135deg, rgba(124,58,237,.14) 0%, rgba(79,70,229,.14) 100%) !important;
-                border-color: rgba(124,58,237,.25);
-            }
-
-            .dropdown-item-service .svc-icon-wrap {
-                width: 28px;
-                height: 28px;
-                background: linear-gradient(135deg, #7c3aed, #4f46e5);
-                border-radius: 7px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 13px;
-                flex-shrink: 0;
-            }
-
-            .dropdown-item-service .svc-label {
-                font-weight: 700;
-                color: #5b21b6;
-            }
-
-            .dropdown-item-service .svc-sub {
-                font-size: 10px;
-                color: #8b5cf6;
-                display: block;
-                margin-top: 1px;
-            }
-
-        /* ── Wishlist item ── */
-        .dropdown-item-wishlist {
-            padding: 0.75rem 1rem;
-            background: linear-gradient(135deg, rgba(201,169,110,0.06) 0%, rgba(232,208,176,0.06) 100%);
+        .profile-avatar-small {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: white;
         }
 
-            .dropdown-item-wishlist:hover {
-                background: linear-gradient(135deg, rgba(201,169,110,0.15) 0%, rgba(232,208,176,0.15) 100%);
-            }
+        .icon-svg-small { height: 20px; width: 20px; }
+        .icon-svg-md { height: 20px; width: 20px; }
+        .icon-svg-large { height: 32px; width: 32px; }
 
-            .dropdown-item-wishlist .wl-label {
-                font-weight: 600;
-                color: #9a7840;
-            }
+        .profile-role-badge {
+            background-color: #2d3748;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+        }
 
-            .dropdown-item-wishlist .wl-badge {
-                font-size: 10px;
-                padding: 2px 7px;
-                border-radius: 100px;
-                background: linear-gradient(135deg, #c9a96e 0%, #e8d5b0 100%);
-                color: #fff;
-                font-weight: 700;
-                margin-left: auto;
-                display: none;
-            }
+        .profile-main {
+            padding: 16px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .profile-avatar-large {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .profile-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            text-decoration: none;
+            color: #000 !important;
+            font-weight: 700;
+            font-size: 14px;
+            transition: color 0.15s;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .profile-nav-link:hover, .profile-nav-link:focus {
+            color: #0d9488 !important;
+            outline: none;
+        }
+        
+        .profile-nav-link:hover .text-dark-gray, .profile-nav-link:focus .text-dark-gray {
+            color: #0d9488 !important;
+        }
+        
+        .profile-nav-icon {
+            width: 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .text-dark-gray { color: #000 !important; transition: color 0.15s; }
+
+        .wl-badge-new {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 100px;
+            background: #c9a96e;
+            color: #fff;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+        }
     </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-optiplus">
-            <div class="container">
-                <a class="navbar-brand" asp-page="/Index">
-                    <i class="bi bi-eyeglasses me-2"></i>OptiPlus
-                </a>
+        <nav class="stitch-navbar">
+            <div class="navbar-container">
+                <div class="stitch-nav-left">
+                    <a class="stitch-brand" asp-page="/Index">
+                        <span class="material-symbols-outlined">all_inclusive</span>
+                        <span>OptiPlus</span>
+                    </a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#mainNavbar" aria-controls="mainNavbar"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="mainNavbar">
-                    <ul class="navbar-nav me-auto mb-2 mb-sm-0 align-items-center">
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-page="/Index">
-                                <i class="bi bi-house-door me-1"></i>Home
+                    <ul class="stitch-menu">
+                        <li>
+                            <a class="stitch-menu-link" asp-page="/Index">
+                                <span class="material-symbols-outlined icon">home</span>
+                                <span>Home</span>
                             </a>
                         </li>
 
                         <!-- ══ SHOP DROPDOWN ══ -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#"
-                               id="shopDropdown" role="button"
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-shop me-1"></i>Shop
-                                <i class="bi bi-chevron-down shop-chevron"></i>
-                            </a>
+                        <li class="dropdown">
+                            <button class="stitch-menu-link" id="shopDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="material-symbols-outlined icon">shopping_bag</span>
+                                <span>Shop</span>
+                                <span class="material-symbols-outlined chevron">expand_more</span>
+                            </button>
                             <ul class="dropdown-menu shop-dropdown-menu p-2" aria-labelledby="shopDropdown">
                                 <li>
                                     <a class="shop-drop-item" href="/Products?ProductTypeFilter=Frame">
@@ -276,13 +315,12 @@
                         </li>
 
                         <!-- ══ SERVICES DROPDOWN ══ -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#"
-                               id="servicesDropdown" role="button"
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-gear me-1"></i>Services
-                                <i class="bi bi-chevron-down shop-chevron"></i>
-                            </a>
+                        <li class="dropdown">
+                            <button class="stitch-menu-link" id="servicesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="material-symbols-outlined icon">construction</span>
+                                <span>Services</span>
+                                <span class="material-symbols-outlined chevron">expand_more</span>
+                            </button>
                             <ul class="dropdown-menu shop-dropdown-menu p-2" aria-labelledby="servicesDropdown">
                                 <li>
                                     <a class="shop-drop-item" asp-page="/Customer/Services/CustomGlasses">
@@ -326,21 +364,21 @@
                             </ul>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="#footer">
-                                <i class="bi bi-envelope me-1"></i>Contact
+                        <li>
+                            <a class="stitch-menu-link" href="#footer">
+                                <span class="material-symbols-outlined icon">contact_support</span>
+                                <span>Contact</span>
                             </a>
                         </li>
 
-                        @* ADMIN DROPDOWN *@
-                        @if (User.IsInRole("admin"))
+                        @if (User.IsInRole("admin") || User.IsInRole("manager"))
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-danger fw-semibold" href="#"
-                                   id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-shield-lock me-1"></i>Admin
-                                    <i class="bi bi-chevron-down shop-chevron"></i>
-                                </a>
+                            <li class="dropdown">
+                                <button class="stitch-menu-link active-admin" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="material-symbols-outlined icon text-teal-300">verified_user</span>
+                                    <span>Admin</span>
+                                    <span class="material-symbols-outlined chevron">expand_more</span>
+                                </button>
                                 <ul class="dropdown-menu shop-dropdown-menu p-2 dropdown-menu-end" aria-labelledby="adminDropdown">
                                     <li>
                                         <a class="shop-drop-item" asp-page="/Admin/Index">
@@ -395,119 +433,128 @@
                             </li>
                         }
                     </ul>
+                </div>
 
-                    <ul class="navbar-nav align-items-center">
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item me-1">
-                                <a class="nav-wishlist-btn nav-link" asp-page="/Customer/Wishlist" title="My Wishlist">
-                                    <i class="bi bi-heart"></i>
-                                    <span class="wl-count" id="navWlCount"></span>
-                                </a>
-                            </li>
-                        }
+                <div class="stitch-nav-right">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a class="stitch-icon-btn" asp-page="/Customer/Wishlist" title="My Wishlist">
+                            <span class="material-symbols-outlined text-lg border-0 bg-transparent p-0 w-auto">favorite</span>
+                            <span class="stitch-badge" id="navWlCount" style="display:none;"></span>
+                        </a>
+                    }
 
-                        @await Html.PartialAsync("_CartSummary")
+                    @await Html.PartialAsync("_CartSummary")
 
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
-                                   id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="me-2 avatar-inline" aria-hidden="true">
-                                        <i class="bi bi-person-circle fs-4"></i>
-                                    </span>
-                                    <span class="user-name">@User.Identity.Name</span>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end user-menu shadow" aria-labelledby="userDropdown" style="min-width:300px;padding:8px">
-
-                                    <!-- User info header -->
-                                    <li class="px-3 py-2">
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3"
-                                                 style="width:50px;height:50px">
-                                                <i class="bi bi-person-circle fs-3"></i>
-                                            </div>
-                                            <div class="user-meta">
-                                                <div class="fw-bold user-fullname">@User.Identity.Name</div>
-                                                <div class="text-muted small">
-                                                    Role: <span class="badge bg-secondary">@User.FindFirst(ClaimTypes.Role)?.Value</span>
-                                                </div>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div class="dropdown">
+                            <button class="stitch-user-btn" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="stitch-user-avatar">
+                                    <span class="material-symbols-outlined">person</span>
+                                </div>
+                                <span class="stitch-user-name">@User.Identity.Name</span>
+                                <span class="material-symbols-outlined" style="font-size:12px;">expand_more</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end user-menu" aria-labelledby="userDropdown">
+                                <!-- BEGIN: TopBar -->
+                                <li class="profile-topbar">
+                                    <div class="profile-avatar-small">
+                                        <svg class="icon-svg-small" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path></svg>
+                                    </div>
+                                    <span class="text-white fw-bold fs-5">@User.Identity.Name</span>
+                                </li>
+                                <!-- END: TopBar -->
+                                
+                                <li class="profile-main">
+                                    <!-- BEGIN: ProfileHeader -->
+                                    <div class="profile-header">
+                                        <div class="profile-avatar-large">
+                                            <svg class="icon-svg-large" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path></svg>
+                                        </div>
+                                        <div>
+                                            <h2 class="fs-4 fw-bold text-dark-gray mb-1">@User.Identity.Name</h2>
+                                            <div class="d-flex align-items-center gap-2 mt-1">
+                                                <span class="text-muted fw-bold small">Role:</span>
+                                                <span class="profile-role-badge">@(User.FindFirst(ClaimTypes.Role)?.Value ?? "user")</span>
                                             </div>
                                         </div>
-                                    </li>
-                                    <li><hr class="dropdown-divider" /></li>
+                                    </div>
+                                    <!-- END: ProfileHeader -->
 
-                                    <!-- Profile -->
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center" asp-page="/Profile/Index">
-                                            <i class="bi bi-person-lines-fill me-2 text-primary"></i>
+                                    <hr class="border-gray-300 mb-4 mt-0"/>
+
+                                    <!-- BEGIN: NavMenu -->
+                                    <nav class="d-flex flex-column gap-2 mb-4">
+                                        <!-- My Profile -->
+                                        <a class="profile-nav-link" asp-page="/Profile/Index">
+                                            <div class="profile-nav-icon">
+                                                <svg class="icon-svg-md text-dark-gray" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                            </div>
                                             <span>My Profile</span>
                                         </a>
-                                    </li>
-
-                                    <!-- My Orders -->
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center" asp-page="/Orders/Index">
-                                            <i class="bi bi-box-seam me-2 text-success"></i>
+                                        
+                                        <!-- My Orders -->
+                                        <a class="profile-nav-link" asp-page="/Orders/Index">
+                                            <div class="profile-nav-icon">
+                                                <svg class="icon-svg-md text-dark-gray" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                            </div>
                                             <span>My Orders</span>
                                         </a>
-                                    </li>
-
-                                    <!-- ── MY SERVICE ORDERS ── -->
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center dropdown-item-service"
-                                           asp-page="/Customer/ServiceTracking">
-                                            <span class="svc-icon-wrap me-2"><i class="bi bi-nut"></i></span>
-                                            <span>
-                                                <span class="svc-label">My Service Orders</span>
-                                                <span class="svc-sub">Track eyewear fitting &amp; repairs</span>
+                                        
+                                        <!-- My Service Orders -->
+                                        <a class="profile-nav-link" asp-page="/Customer/ServiceTracking">
+                                            <div class="profile-nav-icon">
+                                                <svg class="icon-svg-md text-dark-gray" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                            </div>
+                                            <span class="d-flex align-items-center justify-content-between w-100">
+                                                My Service Orders
                                             </span>
-                                            <i class="bi bi-chevron-right ms-auto" style="font-size:10px;color:#8b5cf6;opacity:.7"></i>
                                         </a>
-                                    </li>
-
-                                    <!-- Wishlist -->
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center dropdown-item-wishlist" asp-page="/Customer/Wishlist">
-                                            <i class="bi bi-heart-fill me-2" style="color:#c9a96e"></i>
-                                            <span class="wl-label">My Wishlist</span>
-                                            <span class="wl-badge" id="dropdownWlCount"></span>
+                                        
+                                        <!-- My Wishlist -->
+                                        <a class="profile-nav-link" asp-page="/Customer/Wishlist">
+                                            <div class="profile-nav-icon">
+                                                <svg class="icon-svg-md text-dark-gray" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
+                                            </div>
+                                            <span>My Wishlist</span>
+                                            <span class="wl-badge-new" id="dropdownWlCount" style="display:none; margin-left: auto;"></span>
                                         </a>
-                                    </li>
-
-                                    <!-- Prescriptions -->
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center" asp-page="/Customer/Prescriptions/Index"
-                                           style="background:linear-gradient(135deg,rgba(156,39,176,0.05),rgba(186,104,200,0.05));border-radius:8px">
-                                            <i class="bi bi-eyeglasses me-2" style="color:#9c27b0"></i>
-                                            <span style="font-weight:600;color:#9c27b0">My Prescriptions</span>
-                                            <span class="badge ms-auto" style="background:linear-gradient(135deg,#9c27b0,#ba68c8)">New</span>
+                                        
+                                        <!-- My Prescriptions -->
+                                        <a class="profile-nav-link" asp-page="/Customer/Prescriptions/Index">
+                                            <div class="profile-nav-icon">
+                                                <svg class="icon-svg-md text-dark-gray" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                            </div>
+                                            <span>My Prescriptions</span>
                                         </a>
-                                    </li>
+                                    </nav>
+                                    <!-- END: NavMenu -->
 
-                                    <li><hr class="dropdown-divider" /></li>
+                                    <hr class="border-gray-300 my-4"/>
 
-                                    <!-- Logout -->
-                                    <li>
-                                        <form method="post" asp-page="/Account/Logout" class="m-0">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit"
-                                                    class="btn btn-link dropdown-item text-danger p-0 d-flex align-items-center"
-                                                    style="width:100%;text-decoration:none;padding:.7rem 1rem!important;border-radius:8px">
-                                                <i class="bi bi-box-arrow-right me-2"></i><span>Logout</span>
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item"><a class="nav-link" asp-page="/Account/Login"><i class="bi bi-box-arrow-in-right me-1"></i>Login</a></li>
-                            <li class="nav-item"><a class="nav-link btn btn-primary text-white ms-2" asp-page="/Account/Register"><i class="bi bi-person-plus me-1"></i>Register</a></li>
-                        }
-                    </ul>
+                                    <!-- BEGIN: LogoutSection -->
+                                    <form method="post" asp-page="/Account/Logout" class="m-0">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="profile-nav-link text-uppercase mt-2 flex items-center">
+                                            <div class="profile-nav-icon">
+                                                <svg class="icon-svg-md text-dark-gray" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                            </div>
+                                            <span class="fw-bold">Logout</span>
+                                        </button>
+                                    </form>
+                                    <!-- END: LogoutSection -->
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="stitch-auth-group">
+                            <a class="stitch-btn-login" asp-page="/Account/Login">Login</a>
+                            <a class="stitch-btn-register" asp-page="/Account/Register">Register</a>
+                        </div>
+                    }
                 </div>
             </div>
         </nav>

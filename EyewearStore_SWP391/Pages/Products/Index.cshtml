@@ -11,13 +11,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
     <style>
-        /* ── Product Card — improved image display ── */
+        /* ── Product Card ── */
         .product-card {
             background: #fff;
             border-radius: 14px;
             overflow: hidden;
             box-shadow: 0 2px 12px rgba(0,0,0,.06);
-            transition: transform .25s, box-shadow .25s;
+            transition: transform .25s,box-shadow .25s;
             display: flex;
             flex-direction: column;
         }
@@ -27,11 +27,10 @@
                 box-shadow: 0 12px 32px rgba(0,0,0,.12);
             }
 
-        /* Fixed-ratio image container */
         .product-image {
             position: relative;
             width: 100%;
-            padding-top: 100%; /* 1:1 ratio */
+            padding-top: 100%;
             overflow: hidden;
             background: #f8f9fb;
         }
@@ -59,7 +58,6 @@
             color: #d1d5db;
         }
 
-        /* Badge */
         .product-badge {
             position: absolute;
             top: 12px;
@@ -83,7 +81,6 @@
                 color: #fff;
             }
 
-        /* Out-of-stock overlay */
         .oos-overlay {
             position: absolute;
             inset: 0;
@@ -104,7 +101,6 @@
             letter-spacing: .4px;
         }
 
-        /* Wishlist heart */
         .btn-wishlist {
             position: absolute;
             top: 10px;
@@ -121,7 +117,7 @@
             font-size: 15px;
             color: #aaa;
             backdrop-filter: blur(6px);
-            transition: color .2s, background .2s, transform .25s, border-color .2s;
+            transition: color .2s,background .2s,transform .25s,border-color .2s;
             z-index: 5;
             box-shadow: 0 2px 8px rgba(0,0,0,.10);
         }
@@ -133,8 +129,7 @@
                 transform: scale(1.12);
             }
 
-            .btn-wishlist.active,
-            .btn-wishlist[data-in-wishlist="true"] {
+            .btn-wishlist.active, .btn-wishlist[data-in-wishlist="true"] {
                 color: #c9a96e;
                 background: #fffbf5;
                 border-color: #e8d5b0;
@@ -158,7 +153,6 @@
             }
         }
 
-        /* Product info */
         .product-info {
             padding: 14px 16px 16px;
             display: flex;
@@ -224,7 +218,6 @@
                 color: #6d28d9;
             }
 
-        /* Action buttons */
         .product-actions {
             display: flex;
             gap: 6px;
@@ -267,7 +260,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: border-color .2s, color .2s;
+            transition: border-color .2s,color .2s;
             white-space: nowrap;
         }
 
@@ -286,7 +279,7 @@
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-            transition: background .2s, border-color .2s;
+            transition: background .2s,border-color .2s;
             margin-top: 5px;
         }
 
@@ -295,7 +288,6 @@
                 border-color: #e53935;
             }
 
-        /* Toast */
         #wl-toast {
             position: fixed;
             bottom: 28px;
@@ -321,7 +313,7 @@
                 transform: translateX(-50%) translateY(0);
             }
 
-        /* Brand page header */
+        /* ── Brand page header ── */
         .brand-page-header {
             background: #fff;
             border-bottom: 2px solid #e5e7eb;
@@ -371,7 +363,6 @@
             letter-spacing: 4px;
             text-transform: uppercase;
             color: #00756A;
-            font-family: 'Be Vietnam Pro','Segoe UI',sans-serif;
         }
 
         .brand-page-sub {
@@ -435,6 +426,309 @@
             .brand-page-header {
                 padding: 24px 16px 28px;
             }
+        }
+
+        /* ══ SMART SEARCH ══════════════════════════════════════ */
+        .smart-search-wrap {
+            position: relative;
+        }
+
+        .smart-search-row {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color .18s, box-shadow .18s;
+        }
+
+            .smart-search-row:focus-within {
+                border-color: #00756A;
+                box-shadow: 0 0 0 3px rgba(0,117,106,.1);
+            }
+
+        .ss-icon {
+            padding: 0 10px 0 14px;
+            color: #9ca3af;
+            font-size: 15px;
+            flex-shrink: 0;
+            transition: color .18s;
+        }
+
+        .smart-search-row:focus-within .ss-icon {
+            color: #00756A;
+        }
+
+        .ss-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 11px 4px;
+            font-size: 13px;
+            font-family: inherit;
+            color: #111827;
+            background: transparent;
+            min-width: 0;
+        }
+
+            .ss-input::placeholder {
+                color: #9ca3af;
+            }
+
+        .ss-clear {
+            padding: 0 12px;
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 13px;
+            display: none;
+            align-items: center;
+            transition: color .15s;
+            flex-shrink: 0;
+        }
+
+            .ss-clear:hover {
+                color: #374151;
+            }
+
+            .ss-clear.show {
+                display: flex;
+            }
+
+        /* Dropdown */
+        .ss-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,.13);
+            z-index: 9999;
+            overflow: hidden;
+            max-height: 440px;
+            overflow-y: auto;
+        }
+
+            .ss-dropdown.open {
+                display: block;
+            }
+
+            .ss-dropdown::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            .ss-dropdown::-webkit-scrollbar-track {
+                background: #f9fafb;
+            }
+
+            .ss-dropdown::-webkit-scrollbar-thumb {
+                background: #d1d5db;
+                border-radius: 4px;
+            }
+
+        .ss-group-title {
+            padding: 10px 14px 5px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #fafafa;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        /* Brand row */
+        .ss-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            text-decoration: none;
+            transition: background .15s;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+            .ss-brand:hover {
+                background: #f0fdf9;
+            }
+
+        .ss-brand-icon {
+            width: 34px;
+            height: 34px;
+            background: #e8f5f4;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #00756A;
+            font-weight: 900;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .ss-brand-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #111827;
+            flex: 1;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .ss-brand-count {
+            font-size: 11px;
+            color: #6b7280;
+            background: #f3f4f6;
+            padding: 2px 8px;
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+
+        /* Frame row */
+        .ss-frame {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            text-decoration: none;
+            transition: background .15s;
+            border-bottom: 1px solid #f9fafb;
+        }
+
+            .ss-frame:hover {
+                background: #f9fafb;
+            }
+
+        .ss-frame-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f5f5f5;
+            flex-shrink: 0;
+            border: 1px solid #efefef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .ss-frame-thumb img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .ss-frame-thumb i {
+                font-size: 22px;
+                color: #d1d5db;
+            }
+
+        .ss-frame-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .ss-frame-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ss-frame-meta {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            margin-top: 2px;
+        }
+
+        .ss-frame-brand-tag {
+            background: #e8f5f4;
+            color: #00756A;
+            padding: 1px 6px;
+            border-radius: 5px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .ss-frame-sku {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .ss-frame-price {
+            font-size: 13px;
+            font-weight: 700;
+            color: #00756A;
+            flex-shrink: 0;
+        }
+
+        /* States */
+        .ss-empty, .ss-loading {
+            padding: 22px 14px;
+            text-align: center;
+            font-size: 13px;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .ss-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e5e7eb;
+            border-top-color: #00756A;
+            border-radius: 50%;
+            animation: ssspin .65s linear infinite;
+            flex-shrink: 0;
+        }
+
+        @@keyframes ssspin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Footer */
+        .ss-footer {
+            padding: 9px 14px;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+            font-size: 12px;
+            color: #9ca3af;
+            background: #fafafa;
+        }
+
+            .ss-footer a {
+                color: #00756A;
+                font-weight: 600;
+                text-decoration: none;
+            }
+
+                .ss-footer a:hover {
+                    text-decoration: underline;
+                }
+
+        /* Highlight match */
+        .ss-hl {
+            background: #d1fae5;
+            color: #065f46;
+            border-radius: 2px;
+            padding: 0 1px;
         }
     </style>
 }
@@ -534,11 +828,22 @@
 
                 <div class="filter-section">
                     <h4>Search</h4>
-                    <div class="search-input-wrapper">
-                        <i class="bi bi-search search-icon"></i>
-                        <input type="text" name="SearchTerm" value="@Model.SearchTerm"
-                               placeholder="Search products..." class="search-input" id="searchInput" />
+                    <div class="smart-search-wrap" id="ssWrap">
+                        <div class="smart-search-row">
+                            <span class="ss-icon"><i class="bi bi-search"></i></span>
+                            <input type="text"
+                                   id="ssInput"
+                                   class="ss-input"
+                                   placeholder="Tìm gọng kính, thương hiệu..."
+                                   autocomplete="off"
+                                   spellcheck="false" />
+                            <button type="button" class="ss-clear" id="ssClear" title="Xóa">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                        <div class="ss-dropdown" id="ssDropdown"></div>
                     </div>
+                    <input type="hidden" name="SearchTerm" id="ssHidden" value="@Model.SearchTerm" />
                 </div>
 
                 <div class="filter-section">
@@ -633,7 +938,6 @@
                     }
                     else
                     {
-
                         <span>No products found</span>
                     }
                 </div>
@@ -661,8 +965,6 @@
                     @foreach (var product in Model.Catalog.Products)
                     {
                         <article class="product-card" id="product-@product.ProductId">
-
-                            <!-- ── Image container (fixed 1:1 ratio) ── -->
                             <div class="product-image">
                                 @if (!string.IsNullOrEmpty(product.PrimaryImageUrl))
                                 {
@@ -670,21 +972,14 @@
                                 }
                                 else
                                 {
-                                    <div class="product-image-placeholder">
-                                        <i class="bi bi-eyeglasses"></i>
-                                    </div>
+                                    <div class="product-image-placeholder"><i class="bi bi-eyeglasses"></i></div>
                                 }
-
-                                <!-- Type badge -->
                                 <span class="product-badge @product.ProductType.ToLower()">@product.ProductType</span>
-
-                                <!-- Out-of-stock dim overlay -->
                                 @if (product.InventoryQty <= 0)
                                 {
                                     <div class="oos-overlay">
                                         <span class="oos-label"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
                                     </div>
-                                    <!-- Wishlist / notify button -->
                                     <button class="btn-wishlist"
                                             data-product-id="@product.ProductId"
                                             data-in-wishlist="false"
@@ -695,21 +990,16 @@
                                     </button>
                                 }
                             </div>
-
-                            <!-- ── Product info ── -->
                             <div class="product-info">
                                 <h3 class="product-name">@product.Name</h3>
-
                                 <p class="product-price">
                                     <span class="currency">@product.Currency</span>
                                     @product.Price.ToString("N0")
                                 </p>
-
                                 @if (!string.IsNullOrEmpty(product.Description))
                                 {
                                     <p class="product-description">@product.Description</p>
                                 }
-
                                 <div class="product-attributes">
                                     @if (product.ProductType == "Frame")
                                     {
@@ -734,7 +1024,6 @@
                                         }
                                     }
                                 </div>
-
                                 <div class="product-actions">
                                     @if (product.InventoryQty <= 0)
                                     {
@@ -796,7 +1085,6 @@
                                     <span class="page-link prev disabled"><i class="bi bi-chevron-left"></i></span>
                                 }
                             </li>
-
                             @{
                                 int startPage = Math.Max(1, Model.CurrentPage - 2);
                                 int endPage = Math.Min(Model.Catalog.TotalPages, Model.CurrentPage + 2);
@@ -840,7 +1128,6 @@
                                 }
                                 <li class="page-item"><a class="page-link" asp-page="/Products/Index" asp-route-CurrentPage="@Model.Catalog.TotalPages" asp-route-ProductTypeFilter="@Model.ProductTypeFilter" asp-route-SortBy="@Model.SortBy" asp-route-BrandFilter="@Model.BrandFilter">@Model.Catalog.TotalPages</a></li>
                             }
-
                             <li class="page-item @(!Model.Catalog.HasNextPage ? "disabled" : "")">
                                 @if (Model.Catalog.HasNextPage)
                                 {
@@ -886,13 +1173,14 @@
             url.searchParams.set('CurrentPage', '1');
             window.location.href = url.toString();
         }
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggle = document.getElementById('mobileFilterToggle');
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggle  = document.getElementById('mobileFilterToggle');
             const sidebar = document.getElementById('filterSidebar');
             if (toggle && sidebar) {
-                toggle.addEventListener('click', function() { sidebar.classList.toggle('show'); toggle.classList.toggle('active'); });
+                toggle.addEventListener('click', () => { sidebar.classList.toggle('show'); toggle.classList.toggle('active'); });
             }
-            document.addEventListener('click', function(e) {
+            document.addEventListener('click', e => {
                 if (window.innerWidth < 992 && sidebar?.classList.contains('show') &&
                     !sidebar.contains(e.target) && !toggle.contains(e.target)) {
                     sidebar.classList.remove('show'); toggle.classList.remove('active');
@@ -900,49 +1188,159 @@
             });
         });
 
-        /* Wishlist */
+        /* ── Wishlist ── */
         let _wlToast = null;
-        function showWlToast(msg, icon='<i class="bi bi-heart"></i>') {
-            if (!_wlToast) { _wlToast=document.createElement('div'); _wlToast.id='wl-toast'; document.body.appendChild(_wlToast); }
-            _wlToast.innerHTML=`<span>${icon}</span>${msg}`;
+        function showWlToast(msg, icon = '<i class="bi bi-heart"></i>') {
+            if (!_wlToast) { _wlToast = document.createElement('div'); _wlToast.id = 'wl-toast'; document.body.appendChild(_wlToast); }
+            _wlToast.innerHTML = `<span>${icon}</span>${msg}`;
             _wlToast.classList.add('show');
             clearTimeout(_wlToast._t);
-            _wlToast._t=setTimeout(()=>_wlToast.classList.remove('show'), 2800);
+            _wlToast._t = setTimeout(() => _wlToast.classList.remove('show'), 2800);
         }
         async function toggleWishlist(btn) {
             @if (!User.Identity.IsAuthenticated)
             {
                     <text>showWlToast('Please login to save items',''); setTimeout(()=>window.location.href='/Account/Login',1200); return;</text>
             }
-            const productId=parseInt(btn.dataset.productId);
-            const isIn=btn.dataset.inWishlist==='true';
-            btn.disabled=true;
+            const productId = parseInt(btn.dataset.productId);
+            const isIn = btn.dataset.inWishlist === 'true';
+            btn.disabled = true;
             try {
                 if (isIn) {
-                    const res=await fetch('/api/wishlist/remove',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productId})});
-                    if(res.ok){ btn.dataset.inWishlist='false'; btn.querySelector('i').className='bi bi-heart'; btn.classList.remove('active'); showWlToast('Removed from wishlist',''); }
+                    const res = await fetch('/api/wishlist/remove', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ productId }) });
+                    if (res.ok) { btn.dataset.inWishlist='false'; btn.querySelector('i').className='bi bi-heart'; btn.classList.remove('active'); showWlToast('Removed from wishlist',''); }
                 } else {
-                    const res=await fetch('/api/wishlist/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productId})});
-                    const data=await res.json();
-                    if(res.ok){ btn.dataset.inWishlist='true'; btn.querySelector('i').className='bi bi-heart-fill'; btn.classList.add('active','pop'); btn.addEventListener('animationend',()=>btn.classList.remove('pop'),{once:true}); showWlToast("Saved! We'll notify you when it's back",''); }
+                    const res  = await fetch('/api/wishlist/add', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ productId }) });
+                    const data = await res.json();
+                    if (res.ok) { btn.dataset.inWishlist='true'; btn.querySelector('i').className='bi bi-heart-fill'; btn.classList.add('active','pop'); btn.addEventListener('animationend',()=>btn.classList.remove('pop'),{once:true}); showWlToast("Saved! We'll notify you when it's back",''); }
                     else { showWlToast(data.message||'Something went wrong',''); }
                 }
             } catch { showWlToast('Network error. Try again.',''); }
-            finally { btn.disabled=false; }
+            finally { btn.disabled = false; }
         }
         document.addEventListener('DOMContentLoaded', async () => {
             @if (User.Identity.IsAuthenticated)
             {
                     <text>
                     try {
-                        const res=await fetch('/api/wishlist/my'); if(!res.ok) return;
-                        const items=await res.json(); const ids=new Set(items.map(i=>i.productId));
-                        document.querySelectorAll('.btn-wishlist').forEach(btn=>{
-                            if(ids.has(parseInt(btn.dataset.productId))){ btn.dataset.inWishlist='true'; btn.querySelector('i').className='bi bi-heart-fill'; btn.classList.add('active'); }
+                        const res = await fetch('/api/wishlist/my'); if (!res.ok) return;
+                        const items = await res.json();
+                        const ids = new Set(items.map(i => i.productId));
+                        document.querySelectorAll('.btn-wishlist').forEach(btn => {
+                            if (ids.has(parseInt(btn.dataset.productId))) {
+                                btn.dataset.inWishlist='true';
+                                btn.querySelector('i').className='bi bi-heart-fill';
+                                btn.classList.add('active');
+                            }
                         });
                     } catch {}
                     </text>
             }
         });
+
+        /* ════════════════════════════════════════════════
+           SMART SEARCH
+        ════════════════════════════════════════════════ */
+        (function () {
+            const inp  = document.getElementById('ssInput');
+            const dd   = document.getElementById('ssDropdown');
+            const clr  = document.getElementById('ssClear');
+            const hid  = document.getElementById('ssHidden');
+            if (!inp || !dd) return;
+
+            // Restore nếu đang có SearchTerm từ filter
+            const cur = '@Html.Raw(Model.SearchTerm?.Replace("'", "\'") ?? "")';
+            if (cur) { inp.value = cur; clr.classList.add('show'); }
+
+            let timer = null, lastQ = '';
+
+            inp.addEventListener('input', () => {
+                const q = inp.value.trim();
+                hid.value = q;
+                clr.classList.toggle('show', q.length > 0);
+                if (!q) { close(); return; }
+                if (q === lastQ) return;
+                clearTimeout(timer);
+                timer = setTimeout(() => search(q), 280);
+            });
+
+            clr.addEventListener('click', () => {
+                inp.value = ''; hid.value = '';
+                clr.classList.remove('show');
+                close(); inp.focus();
+            });
+
+            document.addEventListener('click', e => {
+                if (!document.getElementById('ssWrap')?.contains(e.target)) close();
+            });
+
+            inp.addEventListener('keydown', e => {
+                if (e.key === 'Escape') { close(); return; }
+                if (e.key === 'Enter') {
+                    hid.value = inp.value.trim();
+                    document.getElementById('searchFilterForm')?.submit();
+                }
+            });
+
+            async function search(q) {
+                if (q === lastQ) return;
+                lastQ = q;
+                dd.innerHTML = '<div class="ss-loading"><div class="ss-spinner"></div> Đang tìm...</div>';
+                open();
+                try {
+                    const r = await fetch(`/Products?handler=Search&q=${encodeURIComponent(q)}&limit=6`);
+                    render(q, await r.json());
+                } catch { close(); }
+            }
+
+            function render(q, data) {
+                const { frames = [], brands = [] } = data;
+                if (!frames.length && !brands.length) {
+                    dd.innerHTML = `<div class="ss-empty"><i class="bi bi-search"></i>&nbsp;Không có kết quả cho "<strong>${x(q)}</strong>"</div>`;
+                    open(); return;
+                }
+                let h = '';
+                if (brands.length) {
+                    h += `<div class="ss-group-title"><i class="bi bi-building"></i> Thương hiệu</div>`;
+                    brands.forEach(b => {
+                        h += `<a class="ss-brand" href="/Products?BrandFilter=${encodeURIComponent(b.brand)}&ProductTypeFilter=Frame">
+                            <div class="ss-brand-icon">${x((b.brand||'?')[0])}</div>
+                            <span class="ss-brand-name">${x(b.brand)}</span>
+                            <span class="ss-brand-count">${b.count} sản phẩm</span>
+                        </a>`;
+                    });
+                }
+                if (frames.length) {
+                    h += `<div class="ss-group-title"><i class="bi bi-eyeglasses"></i> Gọng kính</div>`;
+                    frames.forEach(f => {
+                        const img = f.imageUrl
+                            ? `<img src="${x(f.imageUrl)}" alt="${x(f.name)}" loading="lazy">`
+                            : `<i class="bi bi-eyeglasses"></i>`;
+                        const br = f.brand ? `<span class="ss-frame-brand-tag">${x(f.brand)}</span>` : '';
+                        h += `<a class="ss-frame" href="/Products/FrameDetails/${f.productId}">
+                            <div class="ss-frame-thumb">${img}</div>
+                            <div class="ss-frame-body">
+                                <div class="ss-frame-name">${hl(x(f.name), q)}</div>
+                                <div class="ss-frame-meta">${br}<span class="ss-frame-sku">${x(f.sku)}</span></div>
+                            </div>
+                            <span class="ss-frame-price">${x(f.currency)} ${Number(f.price).toLocaleString('vi-VN')}</span>
+                        </a>`;
+                    });
+                }
+                h += `<div class="ss-footer">Xem tất cả kết quả cho <a href="/Products?SearchTerm=${encodeURIComponent(q)}">"${x(q)}"</a></div>`;
+                dd.innerHTML = h; open();
+            }
+
+            function open()  { dd.classList.add('open'); }
+            function close() { dd.classList.remove('open'); lastQ = ''; }
+            function hl(t, q) {
+                if (!q) return t;
+                return t.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'),
+                    '<span class="ss-hl">$1</span>');
+            }
+            function x(s) {
+                return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            }
+        })();
     </script>
 }

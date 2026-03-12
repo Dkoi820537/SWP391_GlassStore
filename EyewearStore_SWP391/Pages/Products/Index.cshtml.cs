@@ -42,7 +42,6 @@ public class IndexModel : PageModel
     [BindProperty(SupportsGet = true)]
     public string? LensTypeFilter { get; set; }
 
-    // ── NEW: Brand filter (used by brand links on FrameDetails page) ──────────
     [BindProperty(SupportsGet = true)]
     public string? BrandFilter { get; set; }
 
@@ -60,7 +59,6 @@ public class IndexModel : PageModel
         if (CurrentPage < 1) CurrentPage = 1;
         if (PageSize < 1 || PageSize > 48) PageSize = DefaultPageSize;
 
-        // When BrandFilter is set, force to Frames only (brands only exist on frames)
         if (!string.IsNullOrWhiteSpace(BrandFilter))
             ProductTypeFilter = "Frame";
 
@@ -77,7 +75,6 @@ public class IndexModel : PageModel
                 .AsNoTracking()
                 .Where(f => f.IsActive);
 
-            // Brand filter — exact match, case-insensitive
             if (!string.IsNullOrWhiteSpace(BrandFilter))
                 framesQuery = framesQuery.Where(f => f.Brand != null && f.Brand.ToLower() == BrandFilter.ToLower());
 
@@ -218,8 +215,53 @@ public class IndexModel : PageModel
         return Page();
     }
 
-    // ── Cart handlers (unchanged) ─────────────────────────────────────────────
+    // ── Smart Search API ──────────────────────────────────────────────────────
+    // GET /Products?handler=Search&q=molsion&limit=6
+    public async Task<IActionResult> OnGetSearchAsync(string? q, int limit = 8)
+    {
+        if (string.IsNullOrWhiteSpace(q) || q.Length < 1)
+            return new JsonResult(new { frames = Array.Empty<object>(), brands = Array.Empty<object>() });
 
+        var term = q.Trim().ToLower();
+
+        var frames = await _context.Frames
+            .Where(f => f.IsActive && (
+                f.Name.ToLower().Contains(term) ||
+                f.Sku.ToLower().Contains(term) ||
+                (f.Brand != null && f.Brand.ToLower().Contains(term))))
+            .OrderBy(f => f.Name)
+            .Take(limit)
+            .Select(f => new
+            {
+                productId = f.ProductId,
+                name = f.Name,
+                sku = f.Sku,
+                price = f.Price,
+                currency = f.Currency,
+                brand = f.Brand,
+                imageUrl = f.ProductImages
+                             .Where(i => i.IsActive)
+                             .OrderByDescending(i => i.IsPrimary)
+                             .ThenBy(i => i.SortOrder)
+                             .Select(i => i.ImageUrl)
+                             .FirstOrDefault()
+            })
+            .AsNoTracking()
+            .ToListAsync();
+
+        var brands = await _context.Frames
+            .Where(f => f.IsActive && f.Brand != null && f.Brand.ToLower().Contains(term))
+            .GroupBy(f => f.Brand)
+            .Select(g => new { brand = g.Key, count = g.Count() })
+            .OrderBy(b => b.brand)
+            .Take(5)
+            .AsNoTracking()
+            .ToListAsync();
+
+        return new JsonResult(new { frames, brands });
+    }
+
+    // ── Cart handlers ─────────────────────────────────────────────────────────
     public async Task<IActionResult> OnPostAddToCartAsync([FromBody] AddToCartRequest request)
     {
         if (request == null || request.ProductId <= 0 || request.Quantity <= 0)
@@ -404,6 +446,7 @@ public class IndexModel : PageModel
         return new JsonResult(new { prescriptions });
     }
 
+    // ── Request DTOs ──────────────────────────────────────────────────────────
     public class AddToCartRequest { public int ProductId { get; set; } public int Quantity { get; set; } public int? PrescriptionId { get; set; } }
     public class RemoveCartItemRequest { public int CartItemId { get; set; } }
     public class UpdateCartItemQtyRequest { public int CartItemId { get; set; } public int NewQuantity { get; set; } }

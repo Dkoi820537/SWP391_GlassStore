@@ -730,6 +730,210 @@
             border-radius: 2px;
             padding: 0 1px;
         }
+
+        /* ══ MEGA FILTER BAR ═══════════════════════════════ */
+        .brand-mega-bar {
+            background: #fff;
+            border-bottom: 1.5px solid #e5e7eb;
+            border-top: 1px solid #f3f4f6;
+            position: relative;
+            z-index: 500;
+        }
+
+        .brand-mega-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+        }
+
+        /* Each tab */
+        .mega-tab {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .mega-tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 13px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: color .15s, background .15s;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1.5px;
+            height: 100%;
+        }
+
+            .mega-tab-btn:hover,
+            .mega-tab:hover .mega-tab-btn {
+                color: #00756A;
+                border-bottom-color: #00756A;
+            }
+
+            .mega-tab-btn.is-active {
+                color: #00756A;
+                border-bottom-color: #00756A;
+            }
+
+        .mega-chevron {
+            font-size: 9px;
+            opacity: .6;
+            transition: transform .2s;
+        }
+
+        .mega-tab:hover .mega-chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Dropdown */
+        .mega-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 1.5px);
+            left: 0;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0 12px 12px 12px;
+            box-shadow: 0 12px 40px rgba(0,0,0,.12);
+            z-index: 9000;
+            animation: megaDrop .15s ease;
+        }
+
+        .mega-tab:hover .mega-dropdown {
+            display: block;
+        }
+
+        @@keyframes megaDrop {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Brands grid dropdown */
+        .brands-dropdown {
+            padding: 14px;
+            min-width: 480px;
+        }
+
+        .bmd-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+        }
+
+        /* Simple list dropdown (gender, shape, type) */
+        .simple-dropdown {
+            padding: 8px 0;
+            min-width: 180px;
+        }
+
+        /* Items */
+        .bmd-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            text-decoration: none;
+            transition: background .13s;
+            color: #111827;
+            border-radius: 8px;
+        }
+
+            .bmd-item:hover {
+                background: #f0fdf9;
+                color: #00756A;
+            }
+
+            .bmd-item.active {
+                background: #e8f5f4;
+                color: #00756A;
+                font-weight: 700;
+            }
+
+        .bmd-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #00756A;
+            flex-shrink: 0;
+            opacity: .35;
+        }
+
+        .bmd-item:hover .bmd-dot,
+        .bmd-item.active .bmd-dot {
+            opacity: 1;
+        }
+
+        .bmd-name {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            flex: 1;
+        }
+
+        .bmd-count {
+            font-size: 11px;
+            color: #9ca3af;
+            background: #f3f4f6;
+            padding: 1px 7px;
+            border-radius: 8px;
+        }
+
+        /* All Products button */
+        .mega-all-btn {
+            margin-left: auto;
+            align-self: center;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 16px;
+            background: #f3f4f6;
+            color: #374151;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            transition: background .18s, color .18s;
+            white-space: nowrap;
+        }
+
+            .mega-all-btn:hover,
+            .mega-all-btn.is-active {
+                background: #00756A;
+                color: #fff;
+            }
+
+        /* shop-container must not clip dropdowns */
+        .shop-container {
+            overflow: visible !important;
+        }
+
+        @@media(max-width: 768px) {
+            .brand-mega-bar {
+                display: none;
+            }
+        }
     </style>
 }
 
@@ -777,6 +981,103 @@
             <p class="shop-subtitle">Discover premium eyewear crafted for style and comfort</p>
         </header>
     }
+
+    @* ── Mega Filter Bar ── *@
+    <div class="brand-mega-bar">
+        <div class="brand-mega-inner">
+
+            @* ── Brands ── *@
+            <div class="mega-tab">
+                <button class="mega-tab-btn @(!string.IsNullOrWhiteSpace(Model.BrandFilter) ? "is-active" : "")">
+                    <i class="bi bi-tags"></i> Brands
+                    <i class="bi bi-chevron-down mega-chevron"></i>
+                </button>
+                <div class="mega-dropdown brands-dropdown">
+                    @if (Model.AllBrands.Any())
+                    {
+                        <div class="bmd-grid">
+                            @foreach (var b in Model.AllBrands)
+                            {
+                                <a class="bmd-item @(Model.BrandFilter?.ToLower() == b.Brand.ToLower() ? "active" : "")"
+                                   href="/Products?BrandFilter=@Uri.EscapeDataString(b.Brand)&ProductTypeFilter=Frame">
+                                    <span class="bmd-dot"></span>
+                                    <span class="bmd-name">@b.Brand</span>
+                                    <span class="bmd-count">@b.Count</span>
+                                </a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p style="padding:16px;color:#9ca3af;font-size:13px;">No brands available</p>
+                    }
+                </div>
+            </div>
+
+            @* ── Gender ── *@
+            <div class="mega-tab">
+                <button class="mega-tab-btn @(!string.IsNullOrWhiteSpace(Model.GenderFilter) ? "is-active" : "")">
+                    <i class="bi bi-person"></i> Gender
+                    <i class="bi bi-chevron-down mega-chevron"></i>
+                </button>
+                <div class="mega-dropdown simple-dropdown">
+                    <a class="bmd-item @(Model.GenderFilter == "Male" ? "active" : "")"
+                       href="/Products?GenderFilter=Male&ProductTypeFilter=Frame@(!string.IsNullOrWhiteSpace(Model.BrandFilter) ? "&BrandFilter=" + Uri.EscapeDataString(Model.BrandFilter) : "")">
+                        <span class="bmd-dot"></span><span class="bmd-name">Male</span>
+                    </a>
+                    <a class="bmd-item @(Model.GenderFilter == "Female" ? "active" : "")"
+                       href="/Products?GenderFilter=Female&ProductTypeFilter=Frame@(!string.IsNullOrWhiteSpace(Model.BrandFilter) ? "&BrandFilter=" + Uri.EscapeDataString(Model.BrandFilter) : "")">
+                        <span class="bmd-dot"></span><span class="bmd-name">Female</span>
+                    </a>
+                    <a class="bmd-item @(Model.GenderFilter == "Unisex" ? "active" : "")"
+                       href="/Products?GenderFilter=Unisex&ProductTypeFilter=Frame@(!string.IsNullOrWhiteSpace(Model.BrandFilter) ? "&BrandFilter=" + Uri.EscapeDataString(Model.BrandFilter) : "")">
+                        <span class="bmd-dot"></span><span class="bmd-name">Unisex</span>
+                    </a>
+                </div>
+            </div>
+
+            @* ── Frame Shape ── *@
+            <div class="mega-tab">
+                <button class="mega-tab-btn @(!string.IsNullOrWhiteSpace(Model.FrameShapeFilter) ? "is-active" : "")">
+                    <i class="bi bi-circle"></i> Frame Shape
+                    <i class="bi bi-chevron-down mega-chevron"></i>
+                </button>
+                <div class="mega-dropdown simple-dropdown">
+                    @foreach (var shape in new[] { "Round", "Square", "Rectangle", "Aviator", "Cat-eye", "Oval", "Browline" })
+                    {
+                        <a class="bmd-item @(Model.FrameShapeFilter == shape ? "active" : "")"
+                           href="/Products?FrameShapeFilter=@Uri.EscapeDataString(shape)&ProductTypeFilter=Frame">
+                            <span class="bmd-dot"></span><span class="bmd-name">@shape</span>
+                        </a>
+                    }
+                </div>
+            </div>
+
+            @* ── Frame Type ── *@
+            <div class="mega-tab">
+                <button class="mega-tab-btn @(!string.IsNullOrWhiteSpace(Model.FrameTypeFilter) ? "is-active" : "")">
+                    <i class="bi bi-eyeglasses"></i> Frame Type
+                    <i class="bi bi-chevron-down mega-chevron"></i>
+                </button>
+                <div class="mega-dropdown simple-dropdown">
+                    @foreach (var ft in new[] { "Full-Rim", "Half-Rim", "Rimless" })
+                    {
+                        <a class="bmd-item @(Model.FrameTypeFilter == ft ? "active" : "")"
+                           href="/Products?FrameTypeFilter=@Uri.EscapeDataString(ft)&ProductTypeFilter=Frame">
+                            <span class="bmd-dot"></span><span class="bmd-name">@ft</span>
+                        </a>
+                    }
+                </div>
+            </div>
+
+            @* ── All Products ── *@
+            <a class="mega-all-btn @(string.IsNullOrWhiteSpace(Model.BrandFilter) && string.IsNullOrWhiteSpace(Model.GenderFilter) && string.IsNullOrWhiteSpace(Model.FrameShapeFilter) ? "is-active" : "")"
+               href="/Products?ProductTypeFilter=All">
+                <i class="bi bi-grid-3x3-gap-fill"></i> All Products
+            </a>
+
+        </div>
+    </div>
 
     <div class="shop-content">
         <!-- Filter Sidebar -->

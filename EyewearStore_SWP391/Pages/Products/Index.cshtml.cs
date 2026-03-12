@@ -21,6 +21,10 @@ public class IndexModel : PageModel
 
     public ProductCatalogViewModel Catalog { get; set; } = new();
 
+    // Brand list for mega bar
+    public List<BrandItem> AllBrands { get; set; } = new();
+    public record BrandItem(string Brand, int Count);
+
     [BindProperty(SupportsGet = true)]
     public string ProductTypeFilter { get; set; } = "All";
 
@@ -44,6 +48,12 @@ public class IndexModel : PageModel
 
     [BindProperty(SupportsGet = true)]
     public string? BrandFilter { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public string? GenderFilter { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public string? FrameShapeFilter { get; set; }
 
     [BindProperty(SupportsGet = true)]
     public string SortBy { get; set; } = "name";
@@ -94,6 +104,10 @@ public class IndexModel : PageModel
                 framesQuery = framesQuery.Where(f => f.FrameMaterial == FrameMaterialFilter);
             if (!string.IsNullOrWhiteSpace(FrameTypeFilter))
                 framesQuery = framesQuery.Where(f => f.FrameType == FrameTypeFilter);
+            if (!string.IsNullOrWhiteSpace(GenderFilter))
+                framesQuery = framesQuery.Where(f => f.Gender != null && f.Gender.ToLower() == GenderFilter.ToLower());
+            if (!string.IsNullOrWhiteSpace(FrameShapeFilter))
+                framesQuery = framesQuery.Where(f => f.FrameShape != null && f.FrameShape.ToLower() == FrameShapeFilter.ToLower());
 
             var frames = await framesQuery.ToListAsync();
             productList.AddRange(frames.Select(f => new ProductCatalogItemViewModel
@@ -211,6 +225,16 @@ public class IndexModel : PageModel
             AvailableFrameTypes = availableFrameTypes,
             AvailableLensTypes = availableLensTypes
         };
+
+        // ── Brand mega bar data ───────────────────────────────────────────────
+        AllBrands = await _context.Frames
+            .Where(f => f.IsActive && f.Brand != null)
+            .GroupBy(f => f.Brand)
+            .Select(g => new { Brand = g.Key!, Count = g.Count() })
+            .OrderBy(b => b.Brand)
+            .AsNoTracking()
+            .ToListAsync()
+            .ContinueWith(t => t.Result.Select(x => new BrandItem(x.Brand, x.Count)).ToList());
 
         return Page();
     }

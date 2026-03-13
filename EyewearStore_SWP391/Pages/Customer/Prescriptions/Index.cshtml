@@ -1,11 +1,11 @@
-﻿
+
 @page
 @model EyewearStore_SWP391.Pages.Customer.Prescriptions.IndexModel
 @{
     ViewData["Title"] = "My Prescriptions";
 }
 
-<div class="container-fluid py-4">
+<div class="container py-4 py-lg-5 px-3 px-md-4">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb">
@@ -42,8 +42,8 @@
                 <input type="hidden" name="pageNumber" value="1" />
             </form>
 
-            <a asp-page="./Create" class="btn btn-sm btn-primary px-3" style="background-color: var(--primary-teal, #008080); border-color: var(--primary-teal, #008080);">
-                <i class="bi bi-plus-lg me-1"></i> Add New
+            <a asp-page="./Create" class="btn btn-sm px-3" style="background-color: var(--primary-navy, #0D1B34); border-color: var(--primary-navy, #0D1B34); color: white; border-radius: 6px;">
+                <i class="bi bi-plus-lg me-1"></i> ADD NEW
             </a>
         </div>
     </div>
@@ -67,16 +67,37 @@
     <!-- If no prescriptions -->
     @if (!Model.Prescriptions.Any())
     {
-        <div class="card shadow-sm">
-            <div class="card-body text-center py-5">
-                <div style="font-size: 4rem; opacity: 0.2; margin-bottom: 1rem;">👓</div>
-                <h4 style="color: var(--primary-navy);">No Prescription Profiles Yet</h4>
-                <p style="color: var(--secondary-warm-gray);">
+        <div class="d-flex justify-content-center align-items-center py-5">
+            <div class="bg-white text-center w-100" style="max-width: 42rem; padding: 3rem; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08); border-radius: 1rem !important;">
+                
+                <!-- Illustration Placeholder (Modern Teal Glasses) -->
+                <div class="mb-4 d-flex justify-content-center">
+                    <div class="position-relative d-flex align-items-center justify-content-center" style="width: 16rem; height: 10rem;">
+                        <!-- Stylized SVG Illustration of Glasses -->
+                        <svg viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-100 h-100" style="opacity: 0.8;">
+                            <path d="M40 50C40 38.9543 48.9543 30 60 30H75C86.0457 30 95 38.9543 95 50V60C95 71.0457 86.0457 80 75 80H60C48.9543 80 40 71.0457 40 60V50Z" stroke="var(--primary-teal, #008080)" stroke-width="4"/>
+                            <path d="M105 50C105 38.9543 113.954 30 125 30H140C151.046 30 160 38.9543 160 50V60C160 71.0457 151.046 80 140 80H125C113.954 80 105 71.0457 105 60V50Z" stroke="var(--primary-teal, #008080)" stroke-width="4"/>
+                            <path d="M95 45C95 45 97.5 40 100 40C102.5 40 105 45 105 45" stroke="var(--primary-teal, #008080)" stroke-width="4" stroke-linecap="round"/>
+                            <path d="M40 50L15 45C10 44 10 35 15 35" stroke="var(--primary-teal, #008080)" stroke-width="3" stroke-dasharray="4 4" opacity="0.4"/>
+                            <path d="M160 50L185 45C190 44 190 35 185 35" stroke="var(--primary-teal, #008080)" stroke-width="3" stroke-dasharray="4 4" opacity="0.4"/>
+                            <!-- Decorative Blobs -->
+                            <circle cx="35" cy="75" r="8" fill="var(--primary-teal, #008080)" fill-opacity="0.1"/>
+                            <rect x="155" y="15" width="12" height="12" transform="rotate(15 155 15)" fill="var(--primary-teal, #008080)" fill-opacity="0.1"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <h2 class="fw-bold mb-3" style="color: var(--primary-navy, #0D1B34); font-size: 1.75rem; font-family: 'Playfair Display', serif;">No Prescription Profiles Yet</h2>
+                
+                <p class="text-muted mb-4 mx-auto" style="font-size: 1.125rem; max-width: 24rem; line-height: 1.6;">
                     Add your first prescription to get started with personalized eyewear.
                 </p>
-                <a asp-page="./Create" class="btn btn-primary mt-3">
-                    <i class="bi bi-plus-circle me-2"></i>Add Your First Prescription
-                </a>
+
+                <div class="mb-3">
+                    <a asp-page="./Create" class="btn text-white fw-semibold px-4 py-3 rounded-pill" style="background-color: var(--primary-navy, #0D1B34); font-size: 0.875rem; letter-spacing: 0.05em; text-transform: uppercase;">
+                        <span class="fs-5 me-1 lh-1" style="vertical-align: middle;">+</span> ADD YOUR FIRST PRESCRIPTION
+                    </a>
+                </div>
             </div>
         </div>
     }
@@ -87,70 +108,63 @@
             @foreach (var prescription in Model.Prescriptions)
             {
                 <div class="col-sm-12 col-md-6 col-lg-4">
-                    <div class="card h-100 shadow-sm" style="border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; border-left: 4px solid @(prescription.IsActive ? "var(--primary-teal, #008080)" : "var(--secondary-warm-gray, #9e9e9e)"); @(!prescription.IsActive ? "opacity: 0.75;" : "")">
+                    <div class="card h-100 shadow-sm" style="border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; border-top: 4px solid @(prescription.IsActive ? "var(--primary-teal, #008080)" : "var(--secondary-warm-gray, #9e9e9e)"); @(!prescription.IsActive ? "opacity: 0.75;" : "")">
                         
                         <!-- Card Header -->
                         <div class="px-3 pt-3 pb-2 d-flex justify-content-between align-items-center border-bottom border-light">
-                            <h6 class="mb-0" style="color: var(--primary-navy); font-weight: 600; font-size: 0.95rem;">
+                            <h6 class="mb-0" style="color: var(--primary-navy); font-weight: 600; font-size: 1rem;">
                                 @(prescription.ProfileName ?? "Prescription")
                             </h6>
                             @if (prescription.IsActive)
                             {
-                                <span class="badge rounded-pill" style="background-color: rgba(0, 128, 128, 0.1); color: var(--primary-teal, #008080); font-weight: 500; font-size: 0.7rem;">Active</span>
+                                <span class="badge rounded-pill d-flex align-items-center" style="background-color: rgba(0, 128, 128, 0.1); color: var(--primary-teal, #008080); font-weight: 500; font-size: 0.75rem; padding: 0.4em 0.8em;">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Active
+                                </span>
                             }
                         </div>
 
-                        <div class="card-body p-3">
+                        <div class="card-body p-0">
                             <!-- Right Eye -->
-                            <div>
-                                <div class="text-muted mb-1" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Right Eye (OD)</div>
-                                <div class="d-flex gap-2 my-1">
-                                    <div class="flex-fill bg-light rounded text-center py-1 px-0">
-                                        <div class="text-muted" style="font-size: 0.6rem;">SPH</div>
-                                        <div style="font-size: 0.85rem; font-weight: 500;">@(prescription.RightSph?.ToString("0.00") ?? "—")</div>
-                                    </div>
-                                    <div class="flex-fill bg-light rounded text-center py-1 px-0">
-                                        <div class="text-muted" style="font-size: 0.6rem;">CYL</div>
-                                        <div style="font-size: 0.85rem; font-weight: 500;">@(prescription.RightCyl?.ToString("0.00") ?? "—")</div>
-                                    </div>
-                                    <div class="flex-fill bg-light rounded text-center py-1 px-0">
-                                        <div class="text-muted" style="font-size: 0.6rem;">AXIS</div>
-                                        <div style="font-size: 0.85rem; font-weight: 500;">@(prescription.RightAxis?.ToString() ?? "—")</div>
-                                    </div>
-                                </div>
+                            <div class="d-flex justify-content-between px-3 py-2 bg-light border-bottom" style="font-size: 0.65rem; color: #6c757d; font-weight: 500;">
+                                <div style="flex: 2;">RIGHT EYE (OD)</div>
+                                <div style="flex: 1; text-align: center;">SPH</div>
+                                <div style="flex: 1; text-align: center;">CYL</div>
+                                <div style="flex: 1; text-align: center;">AXIS</div>
+                            </div>
+                            <div class="d-flex justify-content-between px-3 py-2 border-bottom" style="font-size: 0.85rem;">
+                                <div style="flex: 2; color: #6c757d;">OD</div>
+                                <div style="flex: 1; text-align: center;">@(prescription.RightSph?.ToString("+0.00;-0.00;0.00") ?? "—")</div>
+                                <div style="flex: 1; text-align: center;">@(prescription.RightCyl?.ToString("+0.00;-0.00;0.00") ?? "—")</div>
+                                <div style="flex: 1; text-align: center;">@(prescription.RightAxis?.ToString() ?? "—")</div>
                             </div>
 
-                            <hr class="text-secondary my-2" style="opacity: 0.15;">
-
                             <!-- Left Eye -->
-                            <div>
-                                <div class="text-muted mb-1" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Left Eye (OS)</div>
-                                <div class="d-flex gap-2 my-1">
-                                    <div class="flex-fill bg-light rounded text-center py-1 px-0">
-                                        <div class="text-muted" style="font-size: 0.6rem;">SPH</div>
-                                        <div style="font-size: 0.85rem; font-weight: 500;">@(prescription.LeftSph?.ToString("0.00") ?? "—")</div>
-                                    </div>
-                                    <div class="flex-fill bg-light rounded text-center py-1 px-0">
-                                        <div class="text-muted" style="font-size: 0.6rem;">CYL</div>
-                                        <div style="font-size: 0.85rem; font-weight: 500;">@(prescription.LeftCyl?.ToString("0.00") ?? "—")</div>
-                                    </div>
-                                    <div class="flex-fill bg-light rounded text-center py-1 px-0">
-                                        <div class="text-muted" style="font-size: 0.6rem;">AXIS</div>
-                                        <div style="font-size: 0.85rem; font-weight: 500;">@(prescription.LeftAxis?.ToString() ?? "—")</div>
-                                    </div>
-                                </div>
+                            <div class="d-flex justify-content-between px-3 py-2 bg-light border-bottom" style="font-size: 0.65rem; color: #6c757d; font-weight: 500;">
+                                <div style="flex: 2;">LEFT EYE (OS)</div>
+                                <div style="flex: 1; text-align: center;">SPH</div>
+                                <div style="flex: 1; text-align: center;">CYL</div>
+                                <div style="flex: 1; text-align: center;">AXIS</div>
+                            </div>
+                            <div class="d-flex justify-content-between px-3 py-2 border-bottom" style="font-size: 0.85rem;">
+                                <div style="flex: 2; color: #6c757d;">OS</div>
+                                <div style="flex: 1; text-align: center;">@(prescription.LeftSph?.ToString("+0.00;-0.00;0.00") ?? "—")</div>
+                                <div style="flex: 1; text-align: center;">@(prescription.LeftCyl?.ToString("+0.00;-0.00;0.00") ?? "—")</div>
+                                <div style="flex: 1; text-align: center;">@(prescription.LeftAxis?.ToString() ?? "—")</div>
                             </div>
                         </div>
 
                         <!-- Actions and Date -->
-                        <div class="px-3 pb-3 pt-0 d-flex justify-content-between align-items-center">
-                            <div class="text-muted" style="font-size: 0.75rem;">
+                        <div class="px-3 pb-3 pt-3 d-flex justify-content-between align-items-center">
+                            <div class="text-muted" style="font-size: 0.85rem;">
                                 @prescription.CreatedAt.ToString("MMM dd, yyyy")
                             </div>
-                            <div class="d-flex align-items-center gap-2" style="font-size: 0.8rem; font-weight: 500;">
-                                <a asp-page="./Edit" asp-route-id="@prescription.PrescriptionId" class="text-decoration-none" style="color: var(--primary-teal, #008080);">Edit</a>
-                                <span class="text-muted" style="opacity:0.5;">|</span>
-                                <a href="javascript:void(0)" onclick="confirmDelete(@prescription.PrescriptionId)" class="text-decoration-none text-danger" style="display: inline;">Delete</a>
+                            <div class="d-flex align-items-center gap-2">
+                                <a asp-page="./Edit" asp-route-id="@prescription.PrescriptionId" class="btn btn-sm d-flex justify-content-center align-items-center" style="background-color: var(--primary-navy, #0D1B34); color: white; border-radius: 6px; width: 32px; height: 32px; font-size: 0.9rem;">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                                <a href="javascript:void(0)" onclick="confirmDelete(@prescription.PrescriptionId)" class="btn btn-sm d-flex justify-content-center align-items-center" style="background-color: #ffe4e6; color: #f43f5e; border-radius: 6px; width: 32px; height: 32px; font-size: 0.9rem;">
+                                    <i class="bi bi-trash"></i>
+                                </a>
                             </div>
                         </div>
                     </div>

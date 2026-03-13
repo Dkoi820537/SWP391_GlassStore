@@ -191,7 +191,7 @@
                         }
                         else
                         {
-                            <table class="w-full text-left text-xs">
+                            <table class="w-full text-left text-xs" id="recentOrdersTable">
                                 <thead class="bg-slate-50 border-b border-slate-200 uppercase text-slate-500">
                                     <tr>
                                         <th class="p-4 font-semibold">Order ID</th>
@@ -201,10 +201,10 @@
                                         <th class="p-4 font-semibold text-right">Total</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-100">
+                                <tbody class="divide-y divide-slate-100" id="recentOrdersBody">
                                     @foreach (var order in Model.RecentOrders)
                                     {
-                                        <tr class="hover:bg-slate-50 transition-colors">
+                                        <tr class="hover:bg-slate-50 transition-colors order-row">
                                             <td class="p-4 font-bold text-slate-800">#@order.OrderId</td>
                                             <td class="p-4 text-slate-700">@order.CustomerName</td>
                                             <td class="p-4 text-slate-500">@order.CreatedAt.ToString("MMM dd, yyyy")</td>
@@ -229,6 +229,16 @@
                                     }
                                 </tbody>
                             </table>
+                            
+                            <!-- Pagination Controls -->
+                            <div id="paginationControls" class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between transition-opacity duration-300">
+                                <div class="text-slate-500 text-[10px] font-medium" id="paginationStatus">
+                                    Showing items...
+                                </div>
+                                <div class="flex items-center space-x-1" id="paginationButtons">
+                                    <!-- Buttons will be injected by JS -->
+                                </div>
+                            </div>
                         }
                     </div>
                 </div>
@@ -391,6 +401,92 @@
                     }
                 }
             });
+
+            // --- RECENT ORDERS PAGINATION LOGIC ---
+            const rowsPerPage = 5;
+            let currentPage = 1;
+            const rows = document.querySelectorAll('.order-row');
+            const totalRows = rows.length;
+            const paginationControls = document.getElementById('paginationControls');
+            const paginationStatus = document.getElementById('paginationStatus');
+            const paginationButtons = document.getElementById('paginationButtons');
+
+            function updatePagination() {
+                if (totalRows <= rowsPerPage) {
+                    if (paginationControls) paginationControls.classList.add('hidden');
+                    return;
+                }
+
+                const totalPages = Math.ceil(totalRows / rowsPerPage);
+                const startIdx = (currentPage - 1) * rowsPerPage;
+                const endIdx = Math.min(startIdx + rowsPerPage, totalRows);
+
+                // Update row visibility
+                rows.forEach((row, index) => {
+                    if (index >= startIdx && index < endIdx) {
+                        row.classList.remove('hidden');
+                    } else {
+                        row.classList.add('hidden');
+                    }
+                });
+
+                // Update status text
+                paginationStatus.innerText = `Showing ${startIdx + 1}–${endIdx} of ${totalRows} orders`;
+
+                // Render buttons
+                paginationButtons.innerHTML = '';
+
+                // Previous Button
+                const prevBtn = createPageButton('Previous', currentPage > 1, () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        updatePagination();
+                    }
+                });
+                paginationButtons.appendChild(prevBtn);
+
+                // Numbered Buttons
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageBtn = createPageButton(i.toString(), true, () => {
+                        currentPage = i;
+                        updatePagination();
+                    }, i === currentPage);
+                    paginationButtons.appendChild(pageBtn);
+                }
+
+                // Next Button
+                const nextBtn = createPageButton('Next', currentPage < totalPages, () => {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        updatePagination();
+                    }
+                });
+                paginationButtons.appendChild(nextBtn);
+            }
+
+            function createPageButton(label, enabled, onClick, isActive = false) {
+                const btn = document.createElement('button');
+                btn.innerText = label;
+                btn.className = `px-3 py-1 text-[10px] font-bold rounded transition-colors border ${
+                    isActive 
+                        ? 'bg-[#0d9488] text-white border-[#0d9488]' 
+                        : 'bg-white text-slate-600 border-slate-300 hover:border-[#0d9488] hover:text-[#0d9488]'
+                }`;
+                
+                if (!enabled) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-40', 'cursor-not-allowed');
+                } else {
+                    btn.onclick = (e) => {
+                        e.preventDefault();
+                        onClick();
+                    };
+                }
+                return btn;
+            }
+
+            // Initialize pagination
+            updatePagination();
         });
     </script>
 }

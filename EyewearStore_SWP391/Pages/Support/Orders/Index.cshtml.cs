@@ -1,17 +1,19 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using EyewearStore_SWP391.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EyewearStore_SWP391.Pages.Support.Orders
 {
     /// <summary>
-    /// Support Staff Order Management - OPTIMIZED (no heavy navigation property loads)
+    /// Support Staff Order Management
+    /// Default scope: Pending Confirmation + Confirmed
+    /// Processing and later statuses will move to Staff dashboard
     /// </summary>
     [Authorize(Roles = "support,sales,sale,admin,Administrator")]
     public class IndexModel : PageModel
@@ -23,7 +25,6 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             _context = context;
         }
 
-        // ── Lightweight DTO — avoids loading full entity graphs ──────
         public class OrderSummaryDto
         {
             public int OrderId { get; set; }
@@ -34,53 +35,65 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             public decimal TotalAmount { get; set; }
             public bool HasPrescription { get; set; }
             public bool HasReturn { get; set; }
-            public bool IsLowStock { get; set; }   // any item qty > inventory
+            public bool IsLowStock { get; set; }
         }
 
         public List<OrderSummaryDto> Orders { get; set; } = new();
         public DashboardStats Stats { get; set; } = new();
 
-        [BindProperty(SupportsGet = true)] public string? Search { get; set; }
-        [BindProperty(SupportsGet = true)] public string? StatusFilter { get; set; }
-        [BindProperty(SupportsGet = true)] public string? TypeFilter { get; set; }
-        [BindProperty(SupportsGet = true)] public string? PriorityFilter { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public string? Search { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? StatusFilter { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? TypeFilter { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? PriorityFilter { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public int PageNumber { get; set; } = 1;
+
+        [BindProperty(SupportsGet = true)]
+        public int PageSize { get; set; } = 10;
+
+        public int TotalOrders { get; set; }
+        public int TotalPages { get; set; } = 1;
+        public int FirstItemIndex => TotalOrders == 0 ? 0 : (PageNumber - 1) * PageSize + 1;
+        public int LastItemIndex => Math.Min(PageNumber * PageSize, TotalOrders);
+
+        public List<int> DisplayPageNumbers { get; set; } = new();
+        private const int PageWindow = 7;
 
         public List<string> Statuses { get; } = new()
         {
-            "Pending Confirmation", "Confirmed", "Processing",
-            "Shipped", "Delivered", "Completed", "Cancelled"
+            "Pending Confirmation",
+            "Confirmed",
+            "Processing",
+            "Shipped",
+            "Delivered",
+            "Completed",
+            "Cancelled"
         };
 
         public class DashboardStats
         {
             public int PendingCount { get; set; }
+            public int ConfirmedCount { get; set; }
             public int PrescriptionCount { get; set; }
             public int ReturnCount { get; set; }
             public int TodayConfirmedCount { get; set; }
         }
 
-        // ── Pagination ───────────────────────────────────────────────
-        [BindProperty(SupportsGet = true)] public int PageNumber { get; set; } = 1;
-        [BindProperty(SupportsGet = true)] public int PageSize { get; set; } = 10;
-        public int TotalOrders { get; set; }
-        public int TotalPages { get; set; } = 1;
-        public int FirstItemIndex => TotalOrders == 0 ? 0 : (PageNumber - 1) * PageSize + 1;
-        public int LastItemIndex => Math.Min(PageNumber * PageSize, TotalOrders);
-        public List<int> DisplayPageNumbers { get; set; } = new();
-        private const int PageWindow = 7;
-
-        // ── GET ──────────────────────────────────────────────────────
         public async Task OnGetAsync()
         {
             if (PageSize <= 0) PageSize = 10;
             if (PageSize > 100) PageSize = 100;
 
-            // Stats — lightweight scalar queries, run in parallel
             await CalculateStatsAsync();
 
-            // ── Build a flat projection query (NO heavy .Include chains) ──
-            // We pull only the columns we need via a DTO projection.
-            // EF Core translates this to a single SQL with LEFT JOINs / subqueries.
             var query = _context.Orders
                 .AsNoTracking()
                 .Select(o => new OrderSummaryDto
@@ -94,20 +107,20 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
                     HasPrescription = o.OrderItems.Any(oi => oi.PrescriptionId != null),
                     HasReturn = o.OrderItems.Any(oi => oi.Returns.Any()),
                     IsLowStock = o.OrderItems.Any(oi =>
-                                          oi.Product != null &&
-                                          oi.Product.InventoryQty < oi.Quantity &&
-                                          (oi.SnapshotJson == null ||
-                                           (!oi.SnapshotJson.Contains("\"isServiceOrder\":true") &&
-                                            !oi.SnapshotJson.Contains("\"lensProductId\":"))))
+                        oi.Product != null &&
+                        oi.Product.InventoryQty < oi.Quantity &&
+                        (oi.SnapshotJson == null ||
+                         (!oi.SnapshotJson.Contains("\"isServiceOrder\":true") &&
+                          !oi.SnapshotJson.Contains("\"lensProductId\":"))))
                 })
                 .AsQueryable();
 
-            // ── Status filter ────────────────────────────────────────
+            // Default: only Pending Confirmation + Confirmed
             if (string.IsNullOrWhiteSpace(StatusFilter))
             {
-                // Default: show only orders that need support attention
                 query = query.Where(o =>
                     o.Status == "Pending Confirmation" ||
+                    o.Status == "Confirmed" ||
                     o.HasReturn);
             }
             else
@@ -115,21 +128,25 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
                 query = query.Where(o => o.Status == StatusFilter);
             }
 
-            // ── Search ───────────────────────────────────────────────
             if (!string.IsNullOrWhiteSpace(Search))
             {
                 var term = Search.Trim();
+
                 if (int.TryParse(term, out var oid))
-                    query = query.Where(o => o.OrderId == oid ||
+                {
+                    query = query.Where(o =>
+                        o.OrderId == oid ||
                         (o.UserEmail != null && o.UserEmail.Contains(term)) ||
                         (o.UserFullName != null && o.UserFullName.Contains(term)));
+                }
                 else
+                {
                     query = query.Where(o =>
                         (o.UserEmail != null && o.UserEmail.Contains(term)) ||
                         (o.UserFullName != null && o.UserFullName.Contains(term)));
+                }
             }
 
-            // ── Type filter (translatable to SQL) ────────────────────
             if (!string.IsNullOrWhiteSpace(TypeFilter))
             {
                 switch (TypeFilter)
@@ -146,19 +163,29 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
                 }
             }
 
-            // ── Priority filter ──────────────────────────────────────
             if (!string.IsNullOrWhiteSpace(PriorityFilter))
             {
                 var twoDaysAgo = DateTime.UtcNow.AddDays(-2);
+
                 if (PriorityFilter == "High")
-                    query = query.Where(o => o.HasPrescription || o.CreatedAt < twoDaysAgo || o.HasReturn);
+                {
+                    query = query.Where(o =>
+                        o.HasPrescription ||
+                        o.HasReturn ||
+                        o.CreatedAt < twoDaysAgo);
+                }
                 else if (PriorityFilter == "Normal")
-                    query = query.Where(o => !o.HasPrescription && o.CreatedAt >= twoDaysAgo && !o.HasReturn);
+                {
+                    query = query.Where(o =>
+                        !o.HasPrescription &&
+                        !o.HasReturn &&
+                        o.CreatedAt >= twoDaysAgo);
+                }
             }
 
-            // ── Count then page ──────────────────────────────────────
             TotalOrders = await query.CountAsync();
             TotalPages = Math.Max(1, (int)Math.Ceiling(TotalOrders / (double)PageSize));
+
             if (PageNumber < 1) PageNumber = 1;
             if (PageNumber > TotalPages) PageNumber = TotalPages;
 
@@ -171,7 +198,6 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             BuildDisplayPageNumbers();
         }
 
-        // ── Stats: sequential COUNT queries (DbContext is NOT thread-safe) ──
         private async Task CalculateStatsAsync()
         {
             var today = DateTime.UtcNow.Date;
@@ -180,26 +206,33 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             Stats.PendingCount = await _context.Orders
                 .CountAsync(o => o.Status == "Pending Confirmation");
 
+            Stats.ConfirmedCount = await _context.Orders
+                .CountAsync(o => o.Status == "Confirmed");
+
             Stats.PrescriptionCount = await _context.Orders
-                .CountAsync(o => (o.Status == "Pending Confirmation" || o.Status == "Confirmed")
-                              && o.OrderItems.Any(oi => oi.PrescriptionId != null));
+                .CountAsync(o =>
+                    (o.Status == "Pending Confirmation" || o.Status == "Confirmed") &&
+                    o.OrderItems.Any(oi => oi.PrescriptionId != null));
 
             Stats.ReturnCount = await _context.Returns
                 .CountAsync(r => r.Status == "Pending" || r.Status == "Under Review");
 
             Stats.TodayConfirmedCount = await _context.Orders
-                .CountAsync(o => (o.Status == "Confirmed" || o.Status == "Processing" || o.Status == "Shipped")
-                              && o.CreatedAt >= today && o.CreatedAt < tomorrow);
+                .CountAsync(o =>
+                    (o.Status == "Confirmed" || o.Status == "Processing") &&
+                    o.CreatedAt >= today &&
+                    o.CreatedAt < tomorrow);
         }
 
-        // ── Quick confirm (unchanged logic) ─────────────────────────
         public async Task<IActionResult> OnPostQuickConfirmAsync(int orderId)
         {
             var order = await _context.Orders
-                .Include(o => o.OrderItems).ThenInclude(oi => oi.Prescription)
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Prescription)
                 .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
-            if (order == null) return NotFound();
+            if (order == null)
+                return NotFound();
 
             if (order.OrderItems.Any(oi => oi.PrescriptionId != null))
             {
@@ -210,7 +243,15 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             if (order.Status != "Pending Confirmation")
             {
                 TempData["Error"] = "Only pending orders can be confirmed.";
-                return RedirectToPage();
+                return RedirectToPage(new
+                {
+                    pageNumber = PageNumber,
+                    pageSize = PageSize,
+                    Search,
+                    StatusFilter,
+                    TypeFilter,
+                    PriorityFilter
+                });
             }
 
             order.Status = "Confirmed";
@@ -218,20 +259,39 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             await _context.SaveChangesAsync();
 
             TempData["Success"] = $"Order #{orderId} confirmed successfully!";
-            return RedirectToPage(new { pageNumber = PageNumber, pageSize = PageSize, Search, StatusFilter, TypeFilter, PriorityFilter });
+            return RedirectToPage(new
+            {
+                pageNumber = PageNumber,
+                pageSize = PageSize,
+                Search,
+                StatusFilter,
+                TypeFilter,
+                PriorityFilter
+            });
         }
 
-        // ── Page number helper ───────────────────────────────────────
         private void BuildDisplayPageNumbers()
         {
             DisplayPageNumbers = new List<int>();
+
             int total = TotalPages;
             int current = PageNumber;
-            if (total <= PageWindow) { for (int i = 1; i <= total; i++) DisplayPageNumbers.Add(i); return; }
+
+            if (total <= PageWindow)
+            {
+                for (int i = 1; i <= total; i++)
+                    DisplayPageNumbers.Add(i);
+                return;
+            }
+
             int left = Math.Max(1, current - PageWindow / 2);
             int right = Math.Min(total, left + PageWindow - 1);
-            if (right - left + 1 < PageWindow) left = Math.Max(1, right - PageWindow + 1);
-            for (int i = left; i <= right; i++) DisplayPageNumbers.Add(i);
+
+            if (right - left + 1 < PageWindow)
+                left = Math.Max(1, right - PageWindow + 1);
+
+            for (int i = left; i <= right; i++)
+                DisplayPageNumbers.Add(i);
         }
     }
 }

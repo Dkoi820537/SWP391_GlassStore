@@ -1,16 +1,56 @@
 ﻿@page
 @model EyewearStore_SWP391.Pages.Staff.Orders.IndexModel
 @{
-    ViewData["Title"] = "Operations - Order Management";
+    ViewData["Title"] = "Operations Dashboard";
 }
 
 @section Styles {
     <style>
-        .ops-header {
-            background: linear-gradient(135deg, #0d1b2a 0%, #1a2f54 100%);
+        :root {
+            --navy: #0d1b2a;
+            --navy2: #1a2f54;
+            --teal: #0f766e;
+            --teal2: #0d9488;
+            --red: #dc2626;
+            --red-s: rgba(220,38,38,.08);
+            --ok: #059669;
+            --ok-s: rgba(5,150,105,.08);
+            --warn: #d97706;
+            --purp: #7c3aed;
+            --txt: #0f172a;
+            --txt2: #475569;
+            --muted: #94a3b8;
+            --surf: #fff;
+            --bg: #f1f5f9;
+            --bg2: #e8edf4;
+            --bdr: #e2e8f0;
+            --bdr2: #cbd5e1;
+            --sh: 0 1px 4px rgba(0,0,0,.06), 0 2px 10px rgba(0,0,0,.04);
+            --sh-md: 0 4px 20px rgba(0,0,0,.09);
+            --r: 12px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box
+        }
+
+        body {
+            background: var(--bg);
+            font-family: 'Segoe UI', system-ui, sans-serif
+        }
+
+        .ops-pg {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 28px 20px 80px
+        }
+
+        /* ── Header ── */
+        .ops-hdr {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
             border-radius: 16px;
             padding: 24px 28px;
-            margin-bottom: 24px;
+            margin-bottom: 22px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -18,533 +58,971 @@
             flex-wrap: wrap;
         }
 
-        .ops-header-left h1 {
-            font-size: 1.6rem;
+        .ops-hdr-left h1 {
+            font-size: 1.55rem;
             font-weight: 900;
             color: #fff;
-            margin: 0 0 4px;
-            letter-spacing: -.5px;
+            margin: 0 0 3px;
+            letter-spacing: -.5px
         }
 
-        .ops-header-left p {
+        .ops-hdr-left p {
             font-size: 13px;
             color: rgba(255,255,255,.45);
-            margin: 0;
+            margin: 0
         }
 
-        .ops-header-actions {
+        .hdr-actions {
             display: flex;
             gap: 10px;
             align-items: center;
-            flex-wrap: wrap;
+            flex-wrap: wrap
         }
 
         .btn-svc-jobs {
             display: inline-flex;
             align-items: center;
-            gap: 9px;
-            background: linear-gradient(135deg, #7c3aed, #4f46e5);
-            color: #fff !important;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--teal), var(--teal2));
+            color: #fff;
             padding: 10px 20px;
             border-radius: 10px;
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 700;
-            text-decoration: none !important;
-            box-shadow: 0 4px 16px rgba(124,58,237,.35);
-            transition: all .22s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(15,118,110,.35);
+            transition: all .22s;
             white-space: nowrap;
-            border: 1px solid rgba(255,255,255,.12);
         }
 
             .btn-svc-jobs:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 8px 24px rgba(124,58,237,.5);
-                color: #fff !important;
-            }
-
-            .btn-svc-jobs .sj-icon {
-                width: 28px;
-                height: 28px;
-                background: rgba(255,255,255,.15);
-                border-radius: 7px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 14px;
-                flex-shrink: 0;
-            }
-
-            .btn-svc-jobs .sj-arrow {
-                width: 16px;
-                height: 16px;
-                opacity: .75;
-                flex-shrink: 0;
+                box-shadow: 0 6px 20px rgba(15,118,110,.45);
+                color: #fff
             }
 
         .btn-refresh {
             display: inline-flex;
             align-items: center;
-            gap: 7px;
+            gap: 6px;
             background: rgba(255,255,255,.1);
             border: 1px solid rgba(255,255,255,.18);
-            color: rgba(255,255,255,.85) !important;
+            color: rgba(255,255,255,.85);
             padding: 10px 18px;
             border-radius: 10px;
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all .22s;
-            white-space: nowrap;
         }
 
             .btn-refresh:hover {
                 background: rgba(255,255,255,.18);
-                color: #fff !important;
-                border-color: rgba(255,255,255,.3);
+                color: #fff
             }
+
+        /* ── Alerts ── */
+        .al {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 16px
+        }
+
+        .al-ok {
+            background: var(--ok-s);
+            border: 1px solid rgba(5,150,105,.2);
+            color: var(--ok);
+            animation: sIn .3s ease
+        }
+
+        .al-err {
+            background: var(--red-s);
+            border: 1px solid rgba(220,38,38,.2);
+            color: var(--red)
+        }
+
+        @@keyframes sIn {
+            from {
+                opacity: 0;
+                transform: translateY(-4px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* ── Stats ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 14px;
+            margin-bottom: 22px
+        }
+
+        .stat-card {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r);
+            padding: 18px 20px;
+            box-shadow: var(--sh);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+            .stat-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px
+            }
+
+        .stat-c1::before {
+            background: var(--warn)
+        }
+
+        .stat-c2::before {
+            background: var(--teal)
+        }
+
+        .stat-c3::before {
+            background: var(--purp)
+        }
+
+        .stat-c4::before {
+            background: var(--ok)
+        }
+
+        .stat-ico {
+            width: 44px;
+            height: 44px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0
+        }
+
+        .ico-warn {
+            background: rgba(217,119,6,.1);
+            color: var(--warn)
+        }
+
+        .ico-teal {
+            background: var(--ok-s);
+            color: var(--teal)
+        }
+
+        .ico-purp {
+            background: rgba(124,58,237,.1);
+            color: var(--purp)
+        }
+
+        .ico-ok {
+            background: var(--ok-s);
+            color: var(--ok)
+        }
+
+        .stat-lbl {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            margin-bottom: 4px
+        }
+
+        .stat-val {
+            font-size: 1.9rem;
+            font-weight: 900;
+            color: var(--navy);
+            line-height: 1
+        }
+
+        .stat-sub {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 3px
+        }
+
+        /* ── Filter ── */
+        .filter-card {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r);
+            padding: 16px 18px;
+            margin-bottom: 16px;
+            box-shadow: var(--sh)
+        }
+
+            .filter-card h6 {
+                font-size: 11px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: .8px;
+                color: var(--muted);
+                margin: 0 0 12px
+            }
+
+        .filter-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: flex-end
+        }
+
+        .fi {
+            background: var(--bg);
+            border: 1.5px solid var(--bdr);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: var(--txt);
+            font-family: inherit;
+            transition: border-color .2s;
+            flex: 1;
+            min-width: 150px;
+        }
+
+            .fi:focus {
+                outline: none;
+                border-color: var(--teal);
+                box-shadow: 0 0 0 3px rgba(15,118,110,.1)
+            }
+
+        .fi-search {
+            flex: 2;
+            min-width: 220px
+        }
+
+        .fi-sm {
+            width: 90px;
+            flex: none
+        }
+
+        .btn-filter {
+            padding: 9px 20px;
+            background: linear-gradient(135deg, var(--navy), var(--navy2));
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .btn-filter:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(13,27,42,.25)
+            }
+
+        /* Quick filter tags */
+        .qf-row {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+            margin-top: 10px
+        }
+
+        .qf {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-decoration: none;
+            border: 1.5px solid;
+            transition: all .15s
+        }
+
+        .qf-navy {
+            color: var(--navy);
+            border-color: var(--navy)
+        }
+
+            .qf-navy:hover {
+                background: var(--navy);
+                color: #fff
+            }
+
+        .qf-teal {
+            color: var(--teal);
+            border-color: var(--teal)
+        }
+
+            .qf-teal:hover {
+                background: var(--teal);
+                color: #fff
+            }
+
+        .qf-purp {
+            color: var(--purp);
+            border-color: var(--purp)
+        }
+
+            .qf-purp:hover {
+                background: var(--purp);
+                color: #fff
+            }
+
+        .qf-warn {
+            color: var(--warn);
+            border-color: var(--warn)
+        }
+
+            .qf-warn:hover {
+                background: var(--warn);
+                color: #fff
+            }
+
+        /* ── Table ── */
+        .tbl-card {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r);
+            overflow: hidden;
+            box-shadow: var(--sh-md)
+        }
+
+        .tbl-top {
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--navy), var(--navy2));
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+            .tbl-top h5 {
+                font-size: 13px;
+                font-weight: 800;
+                color: #fff;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                gap: 8px
+            }
+
+        .tbl-badge {
+            background: rgba(255,255,255,.15);
+            border-radius: 6px;
+            padding: 2px 10px;
+            font-size: 11px;
+            font-weight: 700
+        }
+
+        .tbl-info {
+            font-size: 12px;
+            color: rgba(255,255,255,.55)
+        }
+
+            .tbl-info strong {
+                color: rgba(255,255,255,.9)
+            }
+
+        .ops-tbl {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+            .ops-tbl th {
+                font-size: 10px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: .9px;
+                color: var(--muted);
+                padding: 11px 16px;
+                background: var(--bg2);
+                border-bottom: 1px solid var(--bdr);
+                text-align: left;
+                white-space: nowrap;
+            }
+
+            .ops-tbl td {
+                padding: 13px 16px;
+                border-bottom: 1px solid var(--bdr);
+                font-size: 13px;
+                color: var(--txt2);
+                vertical-align: middle
+            }
+
+            .ops-tbl tbody tr:last-child td {
+                border-bottom: none
+            }
+
+            .ops-tbl tbody tr:hover td {
+                background: rgba(15,118,110,.025)
+            }
+
+            .ops-tbl tbody tr.urgent-row td {
+                background: rgba(220,38,38,.018)
+            }
+
+        /* Cell styles */
+        .cell-id {
+            font-weight: 800;
+            color: var(--navy);
+            font-size: 14px
+        }
+
+        .cell-sub {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        .cust-name {
+            font-weight: 700;
+            color: var(--txt);
+            font-size: 13px
+        }
+
+        .cust-email {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .price-val {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--red)
+        }
+
+        /* Pills */
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700
+        }
+
+        .p-pending {
+            background: rgba(217,119,6,.1);
+            color: #b45309;
+            border: 1px solid rgba(217,119,6,.2)
+        }
+
+        .p-confirmed {
+            background: rgba(15,118,110,.1);
+            color: var(--teal);
+            border: 1px solid rgba(15,118,110,.2)
+        }
+
+        .p-processing {
+            background: rgba(13,27,42,.08);
+            color: var(--navy2);
+            border: 1px solid rgba(13,27,42,.15)
+        }
+
+        .p-shipped {
+            background: var(--ok-s);
+            color: #065f46;
+            border: 1px solid rgba(15,118,110,.15)
+        }
+
+        .p-delivered {
+            background: var(--ok-s);
+            color: #065f46;
+            border: 1px solid rgba(15,118,110,.15)
+        }
+
+        .p-completed {
+            background: rgba(13,27,42,.07);
+            color: var(--navy);
+            border: 1px solid rgba(13,27,42,.12)
+        }
+
+        .p-cancelled {
+            background: var(--red-s);
+            color: var(--red);
+            border: 1px solid rgba(220,38,38,.2)
+        }
+
+        .p-rx {
+            background: rgba(13,27,42,.07);
+            color: var(--navy2);
+            border: 1px solid rgba(13,27,42,.12)
+        }
+
+        .p-svc {
+            background: rgba(124,58,237,.08);
+            color: #6d28d9;
+            border: 1px solid rgba(124,58,237,.18)
+        }
+
+        .p-pre {
+            background: var(--bg2);
+            color: var(--txt2);
+            border: 1px solid var(--bdr)
+        }
+
+        .p-std {
+            background: var(--ok-s);
+            color: var(--teal);
+            border: 1px solid rgba(15,118,110,.15)
+        }
+
+        .p-urgent {
+            background: var(--red-s);
+            color: var(--red);
+            border: 1px solid rgba(220,38,38,.2)
+        }
+
+        /* Actions */
+        .btn-process {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 16px;
+            background: linear-gradient(135deg, var(--teal), var(--teal2));
+            color: #fff;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+
+            .btn-process:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(15,118,110,.3);
+                color: #fff
+            }
+
+        .btn-svc-mini {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: rgba(124,58,237,.08);
+            border: 1.5px solid rgba(124,58,237,.2);
+            color: #6d28d9;
+            border-radius: 7px;
+            font-size: 13px;
+            text-decoration: none;
+            transition: all .15s;
+            margin-left: 4px;
+        }
+
+            .btn-svc-mini:hover {
+                background: #6d28d9;
+                color: #fff;
+                border-color: #6d28d9
+            }
+
+        /* Empty */
+        .empty {
+            text-align: center;
+            padding: 60px 20px
+        }
+
+        .empty-icon {
+            font-size: 52px;
+            color: var(--muted);
+            opacity: .25;
+            margin-bottom: 16px
+        }
+
+        .empty h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--txt2);
+            margin: 0 0 6px
+        }
+
+        .empty p {
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0
+        }
+
+        /* Pagination */
+        .pag-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 13px 18px;
+            border-top: 1px solid var(--bdr);
+            background: var(--bg2)
+        }
+
+        .pag-info {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 600
+        }
+
+        .pag {
+            display: flex;
+            gap: 4px;
+            list-style: none;
+            margin: 0;
+            padding: 0
+        }
+
+        .pag-item a, .pag-item span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 34px;
+            height: 34px;
+            padding: 0 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            border: 1.5px solid var(--bdr);
+            color: var(--txt2);
+            background: var(--surf);
+            transition: all .15s;
+        }
+
+            .pag-item a:hover {
+                border-color: var(--teal);
+                color: var(--teal)
+            }
+
+        .pag-item.active span {
+            background: var(--navy);
+            border-color: var(--navy);
+            color: #fff
+        }
+
+        .pag-item.disabled span {
+            opacity: .35;
+            pointer-events: none
+        }
+
+        @@media(max-width:960px) {
+            .stats-row {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+
+        @@media(max-width:600px) {
+            .filter-row {
+                flex-direction: column
+            }
+
+            .fi {
+                min-width: 100%
+            }
+        }
     </style>
 }
 
-<div class="container-fluid py-4">
+<div class="ops-pg">
 
-    <!-- ── HEADER ──────────────────────────────────────────── -->
-    <div class="ops-header">
-        <div class="ops-header-left">
-            <h1><i class="bi bi-wrench me-2"></i>Operations Dashboard</h1>
-            <p>Process orders, manage inventory, and handle shipments</p>
+    <!-- ── Header ── -->
+    <div class="ops-hdr">
+        <div class="ops-hdr-left">
+            <h1><i class="bi bi-box-seam me-2"></i>Operations Dashboard</h1>
+            <p>Đóng gói · Vận chuyển · Cập nhật tracking · Xử lý đơn kính thuốc</p>
         </div>
-        <div class="ops-header-actions">
+        <div class="hdr-actions">
             <a asp-page="/Staff/ServiceOrders/Index" class="btn-svc-jobs">
-                <i class="bi bi-nut sj-icon"></i>
-                Service Jobs
-                <svg class="sj-arrow" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2.5"
-                     stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
+                <i class="bi bi-nut"></i> Service Jobs <i class="bi bi-arrow-right"></i>
             </a>
             <button class="btn-refresh" onclick="window.location.reload()">
-                <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+                <i class="bi bi-arrow-clockwise"></i> Refresh
             </button>
         </div>
     </div>
 
-    <!-- ── ALERTS ───────────────────────────────────────────── -->
-    @if (TempData["Success"] != null)
+    @if (TempData["Success"] is string ok)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert"
-             style="border-radius: 10px; border-left: 4px solid #059669; font-weight: 600;">
-            <i class="bi bi-check-circle-fill me-1"></i> @TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+        <div class="al al-ok"><i class="bi bi-check-circle-fill"></i> @ok</div>
     }
-    @if (TempData["Error"] != null)
+    @if (TempData["Error"] is string err)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert"
-             style="border-radius: 10px; border-left: 4px solid #dc2626; font-weight: 600;">
-            <i class="bi bi-exclamation-triangle-fill me-1"></i> @TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+        <div class="al al-err"><i class="bi bi-exclamation-circle-fill"></i> @err</div>
     }
 
-    <!-- ── STAT CARDS ───────────────────────────────────────── -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card" style="border:none;border-radius:14px;background:linear-gradient(135deg,#ff9800,#ffc107);color:white;box-shadow:0 4px 16px rgba(255,152,0,.3)">
-                <div class="card-body py-3">
-                    <div style="display:flex;justify-content:space-between;align-items:center">
-                        <div>
-                            <div style="font-size:.85rem;opacity:.9;margin-bottom:.2rem;font-weight:600">Pending</div>
-                            <div style="font-size:2rem;font-weight:800;line-height:1">@Model.Stats.PendingCount</div>
-                        </div>
-                        <div style="font-size:2.6rem;opacity:.25">⏳</div>
-                    </div>
-                </div>
+    <!-- ── Stats ── -->
+    <div class="stats-row">
+        <div class="stat-card stat-c1">
+            <div class="stat-ico ico-warn"><i class="bi bi-hourglass-split"></i></div>
+            <div>
+                <div class="stat-lbl">Processing</div>
+                <div class="stat-val">@Model.Stats.ProcessingCount</div>
+                <div class="stat-sub">Chờ đóng gói</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card" style="border:none;border-radius:14px;background:linear-gradient(135deg,#2196f3,#03a9f4);color:white;box-shadow:0 4px 16px rgba(33,150,243,.3)">
-                <div class="card-body py-3">
-                    <div style="display:flex;justify-content:space-between;align-items:center">
-                        <div>
-                            <div style="font-size:.85rem;opacity:.9;margin-bottom:.2rem;font-weight:600">Processing</div>
-                            <div style="font-size:2rem;font-weight:800;line-height:1">@Model.Stats.ProcessingCount</div>
-                        </div>
-                        <div style="font-size:2.6rem;opacity:.25"><i class="bi bi-gear"></i></div>
-                    </div>
-                </div>
+        <div class="stat-card stat-c2">
+            <div class="stat-ico ico-teal"><i class="bi bi-truck"></i></div>
+            <div>
+                <div class="stat-lbl">Shipped Today</div>
+                <div class="stat-val">@Model.Stats.ShippedTodayCount</div>
+                <div class="stat-sub">Đã giao hôm nay</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card" style="border:none;border-radius:14px;background:linear-gradient(135deg,#9c27b0,#ba68c8);color:white;box-shadow:0 4px 16px rgba(156,39,176,.3)">
-                <div class="card-body py-3">
-                    <div style="display:flex;justify-content:space-between;align-items:center">
-                        <div>
-                            <div style="font-size:.85rem;opacity:.9;margin-bottom:.2rem;font-weight:600">Prescription</div>
-                            <div style="font-size:2rem;font-weight:800;line-height:1">@Model.Stats.PrescriptionCount</div>
-                        </div>
-                        <div style="font-size:2.6rem;opacity:.25"><i class="bi bi-eyeglasses"></i></div>
-                    </div>
-                </div>
+        <div class="stat-card stat-c3">
+            <div class="stat-ico ico-purp"><i class="bi bi-nut"></i></div>
+            <div>
+                <div class="stat-lbl">Service Orders</div>
+                <div class="stat-val">@Model.Stats.ServiceCount</div>
+                <div class="stat-sub">Đang xử lý service</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card" style="border:none;border-radius:14px;background:linear-gradient(135deg,#4caf50,#66bb6a);color:white;box-shadow:0 4px 16px rgba(76,175,80,.3)">
-                <div class="card-body py-3">
-                    <div style="display:flex;justify-content:space-between;align-items:center">
-                        <div>
-                            <div style="font-size:.85rem;opacity:.9;margin-bottom:.2rem;font-weight:600">Today's Shipped</div>
-                            <div style="font-size:2rem;font-weight:800;line-height:1">@Model.Stats.ShippedTodayCount</div>
-                        </div>
-                        <div style="font-size:2.6rem;opacity:.25"><i class="bi bi-box-seam"></i></div>
-                    </div>
-                </div>
+        <div class="stat-card stat-c4">
+            <div class="stat-ico ico-ok"><i class="bi bi-eyeglasses"></i></div>
+            <div>
+                <div class="stat-lbl">Prescription</div>
+                <div class="stat-val">@Model.Stats.PrescriptionCount</div>
+                <div class="stat-sub">Đơn kính thuốc</div>
             </div>
         </div>
     </div>
 
-    <!-- ── FILTER ────────────────────────────────────────────── -->
-    <div class="card mb-4" style="border:none;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)">
-        <div class="card-body py-3">
-            <form method="get" class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label" style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:#64748b">
-                        <i class="bi bi-search me-1"></i> Search Orders
-                    </label>
-                    <input type="text" class="form-control" name="Search" value="@Model.Search"
-                           placeholder="Order ID, Email, or Name..."
-                           style="border:1.5px solid #e2e8f0;border-radius:9px;padding:.65rem .9rem;font-size:13px" />
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label" style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:#64748b">
-                        <i class="bi bi-bar-chart me-1"></i> Status
-                    </label>
-                    <select class="form-select" name="StatusFilter"
-                            style="border:1.5px solid #e2e8f0;border-radius:9px;padding:.65rem .9rem;font-size:13px">
-                        <option value="">All Statuses</option>
-                        @foreach (var s in Model.Statuses)
+    <!-- ── Filter ── -->
+    <div class="filter-card">
+        <h6><i class="bi bi-funnel me-1"></i>Tìm kiếm & Lọc</h6>
+        <form method="get" class="filter-row">
+            <input type="text" class="fi fi-search" name="Search" value="@Model.Search" placeholder="Order ID, email, tên khách hàng…" />
+            <select class="fi" name="StatusFilter">
+                <option value="">Tất cả trạng thái</option>
+                @foreach (var s in Model.Statuses)
+                {
+                    <option value="@s" selected="@(Model.StatusFilter == s)">@s</option>
+                }
+            </select>
+            <select class="fi" name="TypeFilter">
+                <option value="">Tất cả loại</option>
+                <option value="Prescription" selected="@(Model.TypeFilter == "Prescription")">Prescription (Rx)</option>
+                <option value="Service" selected="@(Model.TypeFilter == "Service")">Service / Fitting</option>
+                <option value="PreOrder" selected="@(Model.TypeFilter == "PreOrder")">Pre-Order</option>
+                <option value="Standard" selected="@(Model.TypeFilter == "Standard")">Standard</option>
+            </select>
+            <select class="fi" name="PriorityFilter">
+                <option value="">Tất cả ưu tiên</option>
+                <option value="High" selected="@(Model.PriorityFilter == "High")">Ưu tiên cao</option>
+                <option value="Normal" selected="@(Model.PriorityFilter == "Normal")">Bình thường</option>
+            </select>
+            <select class="fi fi-sm" name="pageSize">
+                <option value="10" selected="@(Model.PageSize == 10)">10</option>
+                <option value="25" selected="@(Model.PageSize == 25)">25</option>
+                <option value="50" selected="@(Model.PageSize == 50)">50</option>
+            </select>
+            <input type="hidden" name="pageNumber" value="1" />
+            <button type="submit" class="btn-filter"><i class="bi bi-funnel-fill"></i> Lọc</button>
+        </form>
+        <div class="qf-row">
+            <a href="?StatusFilter=Processing" class="qf qf-warn"><i class="bi bi-hourglass-split"></i> Processing</a>
+            <a href="?StatusFilter=Shipped" class="qf qf-teal"><i class="bi bi-truck"></i> Shipped</a>
+            <a href="?TypeFilter=Service" class="qf qf-purp"><i class="bi bi-nut"></i> Service</a>
+            <a href="?TypeFilter=Prescription" class="qf qf-navy"><i class="bi bi-eyeglasses"></i> Prescription</a>
+        </div>
+    </div>
+
+    <!-- ── Table ── -->
+    <div class="tbl-card">
+        <div class="tbl-top">
+            <h5>
+                <i class="bi bi-list-check"></i> Hàng đợi Operations
+                <span class="tbl-badge">@Model.TotalOrders đơn</span>
+            </h5>
+            <div class="tbl-info">
+                Hiển thị <strong>@Model.FirstItemIndex–@Model.LastItemIndex</strong> / <strong>@Model.TotalOrders</strong>
+            </div>
+        </div>
+
+        @if (!Model.Orders.Any())
+        {
+            <div class="empty">
+                <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+                <h4>Không có đơn hàng</h4>
+                <p>Không có đơn nào khớp với bộ lọc hiện tại.</p>
+            </div>
+        }
+        else
+        {
+            <div style="overflow-x:auto">
+                <table class="ops-tbl">
+                    <thead>
+                        <tr>
+                            <th>Đơn hàng</th>
+                            <th>Khách hàng</th>
+                            <th>Ngày tạo</th>
+                            <th>Trạng thái</th>
+                            <th>Loại đơn</th>
+                            <th>Vận chuyển</th>
+                            <th style="text-align:right">Tổng tiền</th>
+                            <th style="text-align:center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var o in Model.Orders)
                         {
-                            if (Model.StatusFilter == s)
+                            bool isUrgent = o.HasPrescription || o.HasService || o.CreatedAt < DateTime.UtcNow.AddDays(-2);
+
+                            string statusCss = o.Status switch
                             {
-                                <option value="@s" selected="selected">@s</option>
+                                "Pending Confirmation" => "p-pending",
+                                "Confirmed" => "p-confirmed",
+                                "Processing" => "p-processing",
+                                "Shipped" => "p-shipped",
+                                "Delivered" => "p-delivered",
+                                "Completed" => "p-completed",
+                                "Cancelled" => "p-cancelled",
+                                _ => ""
+                            };
+
+                            <tr class="@(isUrgent ? "urgent-row" : "")">
+                                <td>
+                                    <div class="cell-id">#@o.OrderId</div>
+                                    <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:3px">
+                                        @if (isUrgent)
+                                        {
+                                            <span class="pill p-urgent" style="font-size:10px"><i class="bi bi-exclamation-triangle"></i> Urgent</span>
+                                        }
+                                        @if (o.HasService)
+                                        {
+                                            <span class="pill p-svc" style="font-size:10px"><i class="bi bi-nut"></i> Service</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cust-name">@o.UserFullName</div>
+                                    <div class="cust-email">@o.UserEmail</div>
+                                </td>
+                                <td>
+                                    <div style="font-size:13px;color:var(--txt)">@o.CreatedAt.ToString("dd/MM/yyyy")</div>
+                                    <div class="cell-sub">@o.CreatedAt.ToString("HH:mm")</div>
+                                </td>
+                                <td><span class="pill @statusCss">@o.Status</span></td>
+                                <td>
+                                    @if (o.HasPrescription)
+                                    {
+                                        <span class="pill p-rx"><i class="bi bi-eyeglasses"></i> Rx</span>
+                                    }
+                                    else if (o.HasService)
+                                    {
+
+                                        <span class="pill p-svc"><i class="bi bi-nut"></i> Service</span>
+                                    }
+                                    else if (o.IsPreOrder)
+                                    {
+
+                                        <span class="pill p-pre"><i class="bi bi-hourglass-split"></i> Pre-Order</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="pill p-std"><i class="bi bi-check-circle"></i> Standard</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(o.TrackingNumber))
+                                    {
+                                        <div style="font-size:13px;font-weight:600;color:var(--txt)">
+                                            <i class="bi bi-box-seam me-1" style="color:var(--teal)"></i>@o.TrackingNumber
+                                        </div>
+                                        <div class="cell-sub">@o.Carrier</div>
+                                    }
+                                    else
+                                    {
+                                        <span style="color:var(--muted);font-size:12px">Chưa có</span>
+                                    }
+                                </td>
+                                <td style="text-align:right">
+                                    <span class="price-val">@o.TotalAmount.ToString("N0") ₫</span>
+                                </td>
+                                <td style="text-align:center">
+                                    <div style="display:flex;gap:5px;justify-content:center;align-items:center">
+                                        <a asp-page="./Details" asp-route-id="@o.OrderId" class="btn-process">
+                                            <i class="bi bi-arrow-right-circle"></i> Xử lý
+                                        </a>
+                                        @if (o.HasService)
+                                        {
+                                            <a asp-page="/Staff/ServiceOrders/Detail" asp-route-orderId="@o.OrderId"
+                                               class="btn-svc-mini" title="Xem Service Job">
+                                                <i class="bi bi-nut"></i>
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pag-row">
+                <div class="pag-info">Trang @Model.PageNumber / @Model.TotalPages</div>
+                <ul class="pag">
+                    <li class="pag-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                        <a asp-page="./Index" asp-route-pageNumber="1" asp-route-pageSize="@Model.PageSize"
+                           asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
+                           asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">«</a>
+                    </li>
+                    <li class="pag-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                        <a asp-page="./Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize"
+                           asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
+                           asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">‹</a>
+                    </li>
+                    @foreach (var p in Model.DisplayPageNumbers)
+                    {
+                        <li class="pag-item @(p == Model.PageNumber ? "active" : "")">
+                            @if (p == Model.PageNumber)
+                            {
+                                <span>@p</span>
                             }
                             else
                             {
-                                <option value="@s">@s</option>
+                                <a asp-page="./Index" asp-route-pageNumber="@p" asp-route-pageSize="@Model.PageSize"
+                                   asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
+                                   asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">@p</a>
                             }
-                        }
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label" style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:#64748b">
-                        <i class="bi bi-tag me-1"></i> Order Type
-                    </label>
-                    <select class="form-select" name="TypeFilter"
-                            style="border:1.5px solid #e2e8f0;border-radius:9px;padding:.65rem .9rem;font-size:13px">
-                        <option value="">All Types</option>
-                        <option value="Prescription" selected="@(Model.TypeFilter == "Prescription")">Prescription Orders</option>
-                        <option value="ReadyStock" selected="@(Model.TypeFilter == "ReadyStock")">Ready Stock</option>
-                        <option value="PreOrder" selected="@(Model.TypeFilter == "PreOrder")">Pre-Orders</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label" style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:#64748b">
-                        <i class="bi bi-lightning me-1"></i> Priority
-                    </label>
-                    <select class="form-select" name="PriorityFilter"
-                            style="border:1.5px solid #e2e8f0;border-radius:9px;padding:.65rem .9rem;font-size:13px">
-                        <option value="">All</option>
-                        <option value="High" selected="@(Model.PriorityFilter == "High")">High Priority</option>
-                        <option value="Normal" selected="@(Model.PriorityFilter == "Normal")">Normal</option>
-                    </select>
-                </div>
-                <div class="col-md-2 d-flex align-items-end gap-2">
-                    <input type="hidden" name="pageNumber" value="1" />
-                    <select class="form-select" name="pageSize"
-                            style="width:90px;border:1.5px solid #e2e8f0;border-radius:9px;padding:.65rem .6rem;font-size:13px;flex-shrink:0">
-                        <option value="10" selected="@(Model.PageSize == 10)">10</option>
-                        <option value="25" selected="@(Model.PageSize == 25)">25</option>
-                        <option value="50" selected="@(Model.PageSize == 50)">50</option>
-                    </select>
-                    <button type="submit" class="btn btn-primary w-100"
-                            style="border-radius:9px;padding:.65rem;font-size:13px;font-weight:700">
-                        <i class="bi bi-funnel me-1"></i> Filter
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ── ORDERS TABLE ──────────────────────────────────────── -->
-    <div class="card" style="border:none;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.09);overflow:hidden">
-
-        <!-- Table header bar -->
-        <div style="background:linear-gradient(135deg,#0d1b2a,#1a2f54);padding:1.25rem 1.5rem">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 style="color:white;margin:0;font-weight:700;font-size:15px">
-                    <i class="bi bi-card-list me-1"></i> Orders Queue
-                    <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:2px 10px;font-size:12px;margin-left:6px">
-                        @Model.TotalOrders
-                    </span>
-                </h5>
-                <div style="color:rgba(255,255,255,.6);font-size:12px">
-                    Showing <strong style="color:white">@Model.FirstItemIndex</strong>–<strong style="color:white">@Model.LastItemIndex</strong>
-                    of <strong style="color:white">@Model.TotalOrders</strong>
-                </div>
+                        </li>
+                    }
+                    <li class="pag-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                        <a asp-page="./Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize"
+                           asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
+                           asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">›</a>
+                    </li>
+                    <li class="pag-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                        <a asp-page="./Index" asp-route-pageNumber="@Model.TotalPages" asp-route-pageSize="@Model.PageSize"
+                           asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
+                           asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">»</a>
+                    </li>
+                </ul>
             </div>
-        </div>
-
-        <div class="card-body p-0">
-            @if (!Model.Orders.Any())
-            {
-                <div style="text-align:center;padding:4rem 2rem">
-                    <div style="font-size:3.5rem;opacity:.15;margin-bottom:1rem"><i class="bi bi-box-seam"></i></div>
-                    <h4 style="color:#0d1b2a;margin-bottom:.5rem;font-weight:800">No Orders Found</h4>
-                    <p style="color:#94a3b8">All orders are processed! Or adjust your filters.</p>
-                </div>
-            }
-            else
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0" style="font-size:.9rem">
-                        <thead>
-                            <tr style="background:#f8fafc;border-bottom:2px solid #e2e8f0">
-                                <th style="padding:1rem 1.1rem;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b">Order</th>
-                                <th style="padding:1rem 1.1rem;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b">Customer</th>
-                                <th style="padding:1rem 1.1rem;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b">Created</th>
-                                <th style="padding:1rem 1.1rem;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b">Status</th>
-                                <th style="padding:1rem 1.1rem;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b">Type</th>
-                                <th style="padding:1rem 1.1rem;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b">Shipment</th>
-                                <th style="padding:1rem 1.1rem;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b;text-align:right">Total</th>
-                                <th style="padding:1rem 1.1rem;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b;text-align:center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var o in Model.Orders)
-                            {
-                                var isPrescription = o.OrderItems.Any(oi => oi.PrescriptionId != null);
-                                var isPreOrder = o.OrderItems.Any(oi => (oi.Product?.InventoryQty ?? 0) < oi.Quantity);
-                                var isHighPriority = isPrescription || o.CreatedAt < DateTime.UtcNow.AddDays(-2);
-                                var hasService = o.OrderItems.Any(oi =>
-                                !string.IsNullOrEmpty(oi.SnapshotJson) &&
-                                (oi.SnapshotJson.Contains("\"isServiceOrder\":true") ||
-                                oi.SnapshotJson.Contains("\"lensProductId\":")));
-
-                                string badgeClass;
-                                string badgeIcon;
-                                switch (o.Status)
-                                {
-                                    case "Pending Confirmation": badgeClass = "bg-warning text-dark"; badgeIcon = "⏳"; break;
-                                    case "Confirmed": badgeClass = "bg-info text-dark"; badgeIcon = "✓"; break;
-                                    case "Processing": badgeClass = "bg-primary"; badgeIcon = "⊛"; break;
-                                    case "Shipped": badgeClass = "bg-secondary text-white"; badgeIcon = "▣"; break;
-                                    case "Delivered": badgeClass = "bg-success"; badgeIcon = "●"; break;
-                                    case "Completed": badgeClass = "bg-success"; badgeIcon = "★"; break;
-                                    case "Cancelled": badgeClass = "bg-danger"; badgeIcon = "✕"; break;
-                                    default: badgeClass = "bg-secondary text-white"; badgeIcon = ""; break;
-                                }
-
-                                <tr style="border-bottom:1px solid #f1f5f9;@(isHighPriority ? "background:rgba(255,82,82,.025);" : "")">
-                                    <td style="padding:.9rem 1.1rem;vertical-align:middle">
-                                        <div style="font-weight:800;color:#0d1b2a;font-size:1rem">#@o.OrderId</div>
-                                        @if (isHighPriority)
-                                        {
-                                            <span style="background:#ff5252;color:white;padding:.2rem .5rem;border-radius:4px;font-size:.7rem;font-weight:700">
-                                                <i class="bi bi-exclamation-triangle me-1"></i> HIGH
-                                            </span>
-                                        }
-                                        @if (hasService)
-                                        {
-                                            <span style="background:rgba(124,58,237,.1);color:#7c3aed;border:1px solid rgba(124,58,237,.2);padding:.2rem .5rem;border-radius:4px;font-size:.7rem;font-weight:700;display:inline-block;margin-top:2px">
-                                                <i class="bi bi-nut me-1"></i> SERVICE
-                                            </span>
-                                        }
-                                    </td>
-                                    <td style="padding:.9rem 1.1rem;vertical-align:middle">
-                                        <div style="font-weight:600;color:#1e293b;font-size:13px">@o.User?.FullName</div>
-                                        <div style="font-size:.8rem;color:#94a3b8">@o.User?.Email</div>
-                                    </td>
-                                    <td style="padding:.9rem 1.1rem;vertical-align:middle">
-                                        <div style="color:#334155;font-size:13px">@o.CreatedAt.ToString("MMM dd, yyyy")</div>
-                                        <div style="font-size:.8rem;color:#94a3b8">@o.CreatedAt.ToString("hh:mm tt")</div>
-                                    </td>
-                                    <td style="padding:.9rem 1.1rem;vertical-align:middle">
-                                        <span class="badge @badgeClass"
-                                              style="padding:.35rem .75rem;border-radius:7px;font-weight:600;font-size:12px">
-                                            @badgeIcon @o.Status
-                                        </span>
-                                    </td>
-                                    <td style="padding:.9rem 1.1rem;vertical-align:middle">
-                                        @if (isPrescription)
-                                        {
-                                            <span style="background:#9c27b0;color:white;padding:.3rem .65rem;border-radius:6px;font-weight:600;font-size:12px">
-                                                <i class="bi bi-eyeglasses me-1"></i> Prescription
-                                            </span>
-                                        }
-                                        else if (isPreOrder)
-                                        {
-                                            <span style="background:#607d8b;color:white;padding:.3rem .65rem;border-radius:6px;font-weight:600;font-size:12px">
-                                                <i class="bi bi-clock me-1"></i> Pre-Order
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span style="background:#4caf50;color:white;padding:.3rem .65rem;border-radius:6px;font-weight:600;font-size:12px">
-                                                ✓ Ready Stock
-                                            </span>
-                                        }
-                                    </td>
-                                    <td style="padding:.9rem 1.1rem;vertical-align:middle">
-                                        @if (o.Shipments != null && o.Shipments.Any())
-                                        {
-                                            var shipment = o.Shipments.FirstOrDefault();
-                                            <div style="font-size:.85rem;color:#334155;font-weight:600">
-                                                <i class="bi bi-box-seam me-1"></i> @(string.IsNullOrWhiteSpace(shipment?.TrackingNumber) ? "n/a" : shipment.TrackingNumber)
-                                            </div>
-                                            <div style="font-size:.75rem;color:#94a3b8">
-                                                @(string.IsNullOrWhiteSpace(shipment?.Carrier) ? "—" : shipment.Carrier)
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <span style="color:#cbd5e1;font-size:.85rem">—</span>
-                                        }
-                                    </td>
-                                    <td style="padding:.9rem 1.1rem;vertical-align:middle;text-align:right">
-                                        <div style="font-weight:800;color:#b8862a;font-size:14px">
-                                            @o.TotalAmount.ToString("N0") ₫
-                                        </div>
-                                    </td>
-                                    <td style="padding:.9rem 1.1rem;vertical-align:middle;text-align:center">
-                                        <div style="display:flex;gap:6px;justify-content:center;align-items:center">
-                                            <a asp-page="./Details" asp-route-id="@o.OrderId"
-                                               class="btn btn-sm btn-primary"
-                                               style="padding:.45rem 1rem;border-radius:8px;font-size:12px;font-weight:700">
-                                                <i class="bi bi-eye me-1"></i> Process
-                                            </a>
-                                            @if (hasService)
-                                            {
-                                                <a asp-page="/Staff/ServiceOrders/Detail" asp-route-orderId="@o.OrderId"
-                                                   style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;padding:.45rem .85rem;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;transition:all .2s;white-space:nowrap"
-                                                   title="View Service Job">
-                                                    <i class="bi bi-nut"></i>
-                                                </a>
-                                            }
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- PAGINATION -->
-                <div class="d-flex justify-content-between align-items-center p-3"
-                     style="border-top:1px solid #f1f5f9;background:#fafbfc">
-                    <small style="color:#94a3b8;font-weight:600">
-                        Page <strong style="color:#0d1b2a">@Model.PageNumber</strong>
-                        of <strong style="color:#0d1b2a">@Model.TotalPages</strong>
-                    </small>
-
-                    <nav>
-                        <ul class="pagination mb-0" style="gap:3px">
-                            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
-                                <a class="page-link" asp-page="./Index"
-                                   asp-route-pageNumber="1"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-Search="@Model.Search"
-                                   asp-route-StatusFilter="@Model.StatusFilter"
-                                   asp-route-TypeFilter="@Model.TypeFilter"
-                                   asp-route-PriorityFilter="@Model.PriorityFilter">«</a>
-                            </li>
-                            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
-                                <a class="page-link" asp-page="./Index"
-                                   asp-route-pageNumber="@(Model.PageNumber - 1)"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-Search="@Model.Search"
-                                   asp-route-StatusFilter="@Model.StatusFilter"
-                                   asp-route-TypeFilter="@Model.TypeFilter"
-                                   asp-route-PriorityFilter="@Model.PriorityFilter">‹</a>
-                            </li>
-
-                            @foreach (var p in Model.DisplayPageNumbers)
-                            {
-                                <li class="page-item @(p == Model.PageNumber ? "active" : "")">
-                                    <a class="page-link" asp-page="./Index"
-                                       asp-route-pageNumber="@p"
-                                       asp-route-pageSize="@Model.PageSize"
-                                       asp-route-Search="@Model.Search"
-                                       asp-route-StatusFilter="@Model.StatusFilter"
-                                       asp-route-TypeFilter="@Model.TypeFilter"
-                                       asp-route-PriorityFilter="@Model.PriorityFilter">@p</a>
-                                </li>
-                            }
-
-                            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
-                                <a class="page-link" asp-page="./Index"
-                                   asp-route-pageNumber="@(Model.PageNumber + 1)"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-Search="@Model.Search"
-                                   asp-route-StatusFilter="@Model.StatusFilter"
-                                   asp-route-TypeFilter="@Model.TypeFilter"
-                                   asp-route-PriorityFilter="@Model.PriorityFilter">›</a>
-                            </li>
-                            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
-                                <a class="page-link" asp-page="./Index"
-                                   asp-route-pageNumber="@Model.TotalPages"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-Search="@Model.Search"
-                                   asp-route-StatusFilter="@Model.StatusFilter"
-                                   asp-route-TypeFilter="@Model.TypeFilter"
-                                   asp-route-PriorityFilter="@Model.PriorityFilter">»</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            }
-        </div>
+        }
     </div>
 </div>
 
-<style>
-    .table tbody tr {
-        transition: background .15s
-    }
-
-        .table tbody tr:hover {
-            background: rgba(13,27,42,.025) !important
-        }
-
-    .pagination .page-link {
-        border-radius: 8px !important;
-        margin: 0 1px;
-        min-width: 36px;
-        text-align: center;
-        font-weight: 600;
-        font-size: 13px;
-        border-color: #e2e8f0;
-        color: #475569;
-    }
-
-    .pagination .page-item.active .page-link {
-        background: linear-gradient(135deg, #0d1b2a, #1a2f54);
-        border-color: #0d1b2a;
-        color: #fff;
-    }
-
-    .pagination .page-item.disabled .page-link {
-        opacity: .35
-    }
-</style>
-
 @section Scripts {
     <script>
-        // Auto-dismiss alerts after 4s
         setTimeout(() => {
-            document.querySelectorAll('.alert').forEach(a => {
-                const bsAlert = bootstrap.Alert.getOrCreateInstance(a);
-                bsAlert.close();
+            document.querySelectorAll('.al-ok').forEach(a => {
+                a.style.transition = 'opacity .5s';
+                setTimeout(() => a.style.opacity = '0', 3500);
             });
-        }, 4000);
+        }, 100);
     </script>
 }

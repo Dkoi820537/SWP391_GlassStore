@@ -111,7 +111,6 @@
             color: var(--red)
         }
 
-        /* Stats */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(4,1fr);
@@ -176,7 +175,6 @@
             margin-top: 4px
         }
 
-        /* Filter */
         .filter-card {
             background: var(--surf);
             border: 1px solid var(--bdr);
@@ -302,7 +300,6 @@
             flex: none
         }
 
-        /* Table */
         .tbl-card {
             background: var(--surf);
             border: 1px solid var(--bdr);
@@ -410,7 +407,6 @@
             color: var(--red)
         }
 
-        /* Pills */
         .pill {
             display: inline-flex;
             align-items: center;
@@ -493,7 +489,6 @@
             border: 1px solid rgba(217,119,6,.15)
         }
 
-        /* Action btns */
         .act-process {
             display: inline-flex;
             align-items: center;
@@ -536,7 +531,6 @@
                 color: #fff
             }
 
-        /* Empty */
         .empty {
             text-align: center;
             padding: 60px 20px
@@ -562,7 +556,6 @@
             margin: 0
         }
 
-        /* Pagination */
         .pag-row {
             display: flex;
             justify-content: space-between;
@@ -695,7 +688,6 @@
         <div class="al al-err"><i class="bi bi-exclamation-circle-fill"></i> @err</div>
     }
 
-    <!-- Header -->
     <div class="pg-hdr">
         <div>
             <h1><i class="bi bi-chat-dots me-2"></i>Support Dashboard</h1>
@@ -707,7 +699,6 @@
         </div>
     </div>
 
-    <!-- Stats -->
     <div class="stats-row">
         <div class="stat-card c1">
             <div class="stat-label">Pending Confirmation</div>
@@ -715,9 +706,9 @@
             <div class="stat-sub">Requires attention</div>
         </div>
         <div class="stat-card c2">
-            <div class="stat-label">Prescription Orders</div>
-            <div class="stat-value">@Model.Stats.PrescriptionCount</div>
-            <div class="stat-sub">Need verification</div>
+            <div class="stat-label">Confirmed</div>
+            <div class="stat-value">@Model.Stats.ConfirmedCount</div>
+            <div class="stat-sub">Ready for processing</div>
         </div>
         <div class="stat-card c3">
             <div class="stat-label">Returns Queue</div>
@@ -731,7 +722,6 @@
         </div>
     </div>
 
-    <!-- Filter -->
     <div class="filter-card">
         <h6><i class="bi bi-funnel me-1"></i> Search & Filter</h6>
         <form method="get" class="filter-row">
@@ -764,13 +754,13 @@
         </form>
         <div class="quick-links">
             <a href="?StatusFilter=Pending+Confirmation" class="ql ql-navy"><i class="bi bi-exclamation-circle"></i> Pending</a>
+            <a href="?StatusFilter=Confirmed" class="ql ql-teal"><i class="bi bi-check-circle"></i> Confirmed</a>
             <a href="?TypeFilter=Prescription" class="ql ql-teal"><i class="bi bi-eyeglasses"></i> Prescription</a>
             <a href="?TypeFilter=PreOrder" class="ql ql-navy"><i class="bi bi-hourglass"></i> Pre-Orders</a>
             <a asp-page="/Support/Returns/Index" class="ql ql-red"><i class="bi bi-arrow-return-left"></i> Returns</a>
         </div>
     </div>
 
-    <!-- Table -->
     <div class="tbl-card">
         <div class="tbl-hdr">
             <h5><i class="bi bi-list-check"></i> Support Queue (@Model.TotalOrders orders)</h5>
@@ -876,7 +866,6 @@
                 </table>
             </div>
 
-            <!-- Pagination -->
             <div class="pag-row">
                 <div class="pag-info">Page @Model.PageNumber of @Model.TotalPages</div>
                 <ul class="pag">
@@ -933,7 +922,6 @@
             document.getElementById('quickConfirmOrderId').value = orderId;
             document.getElementById('quickConfirmForm').submit();
         }
-        // Auto-refresh every 2 min
         setTimeout(() => location.reload(), 120000);
     </script>
 }

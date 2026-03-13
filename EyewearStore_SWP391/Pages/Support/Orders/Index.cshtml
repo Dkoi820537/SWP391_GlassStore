@@ -33,14 +33,12 @@
             font-family: 'Segoe UI', system-ui, sans-serif
         }
 
-        /* ── Page ── */
         .sp-pg {
             max-width: 1280px;
             margin: 0 auto;
             padding: 28px 20px 80px
         }
 
-        /* ── Breadcrumb ── */
         .bc {
             display: flex;
             gap: 6px;
@@ -60,7 +58,6 @@
                     color: var(--teal)
                 }
 
-        /* ── Page header ── */
         .pg-hdr {
             display: flex;
             justify-content: space-between;
@@ -91,7 +88,6 @@
             align-items: center
         }
 
-        /* ── Alerts ── */
         .al {
             display: flex;
             align-items: center;
@@ -115,7 +111,7 @@
             color: var(--red)
         }
 
-        /* ── Stats ── */
+        /* Stats */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(4,1fr);
@@ -180,7 +176,7 @@
             margin-top: 4px
         }
 
-        /* ── Filter bar ── */
+        /* Filter */
         .filter-card {
             background: var(--surf);
             border: 1px solid var(--bdr);
@@ -273,7 +269,7 @@
 
         .ql-navy {
             color: var(--navy);
-            border-color: var(--navy);
+            border-color: var(--navy)
         }
 
             .ql-navy:hover {
@@ -301,7 +297,12 @@
                 color: #fff
             }
 
-        /* ── Table card ── */
+        .ps-sel {
+            width: 90px;
+            flex: none
+        }
+
+        /* Table */
         .tbl-card {
             background: var(--surf);
             border: 1px solid var(--bdr);
@@ -376,7 +377,6 @@
                 background: rgba(220,38,38,.025)
             }
 
-        /* ── Cells ── */
         .order-id {
             font-weight: 800;
             color: var(--navy);
@@ -410,7 +410,7 @@
             color: var(--red)
         }
 
-        /* ── Pills ── */
+        /* Pills */
         .pill {
             display: inline-flex;
             align-items: center;
@@ -493,7 +493,7 @@
             border: 1px solid rgba(217,119,6,.15)
         }
 
-        /* ── Action btns ── */
+        /* Action btns */
         .act-process {
             display: inline-flex;
             align-items: center;
@@ -536,7 +536,7 @@
                 color: #fff
             }
 
-        /* ── Empty ── */
+        /* Empty */
         .empty {
             text-align: center;
             padding: 60px 20px
@@ -562,7 +562,7 @@
             margin: 0
         }
 
-        /* ── Pagination ── */
+        /* Pagination */
         .pag-row {
             display: flex;
             justify-content: space-between;
@@ -617,13 +617,6 @@
             pointer-events: none
         }
 
-        /* ── Page size select in filter ── */
-        .ps-sel {
-            width: 90px;
-            flex: none
-        }
-
-        /* ── Returns btn ── */
         .btn-returns {
             display: inline-flex;
             align-items: center;
@@ -655,7 +648,6 @@
             border-radius: 8px;
             font-size: 12px;
             font-weight: 700;
-            text-decoration: none;
             cursor: pointer;
             transition: all .15s
         }
@@ -663,28 +655,6 @@
             .btn-refresh:hover {
                 background: var(--bg);
                 color: var(--txt)
-            }
-
-        /* Stats modal trigger */
-        .btn-stats {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            background: rgba(13,27,42,.07);
-            border: 1.5px solid rgba(13,27,42,.12);
-            color: var(--navy2);
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all .15s
-        }
-
-            .btn-stats:hover {
-                background: var(--navy);
-                color: #fff;
-                border-color: var(--navy)
             }
 
         @@media(max-width:960px) {
@@ -710,7 +680,6 @@
 }
 
 <div class="sp-pg">
-    <!-- Breadcrumb -->
     <div class="bc">
         <a asp-page="/Index">Home</a>
         <span style="opacity:.4">›</span>
@@ -734,7 +703,6 @@
         </div>
         <div class="hdr-actions">
             <button class="btn-refresh" onclick="window.location.reload()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
-            <button class="btn-stats" data-bs-toggle="modal" data-bs-target="#statsModal"><i class="bi bi-graph-up"></i> Stats</button>
             <a asp-page="/Support/Returns/Index" class="btn-returns"><i class="bi bi-arrow-return-left"></i> Returns Queue</a>
         </div>
     </div>
@@ -742,7 +710,7 @@
     <!-- Stats -->
     <div class="stats-row">
         <div class="stat-card c1">
-            <div class="stat-label">Pending Verification</div>
+            <div class="stat-label">Pending Confirmation</div>
             <div class="stat-value">@Model.Stats.PendingCount</div>
             <div class="stat-sub">Requires attention</div>
         </div>
@@ -837,10 +805,9 @@
                     <tbody>
                         @foreach (var order in Model.Orders)
                         {
-                            bool isPrescription = order.OrderItems.Any(oi => oi.PrescriptionId != null);
-                            bool isPreOrder = order.OrderItems.Any(oi => (oi.Product?.InventoryQty ?? 0) < oi.Quantity);
-                            bool isHighPriority = isPrescription || order.CreatedAt < DateTime.UtcNow.AddDays(-2);
-                            bool hasReturns = order.OrderItems.Any(oi => oi.Returns.Any());
+                            bool isHighPriority = order.HasPrescription
+                            || order.CreatedAt < DateTime.UtcNow.AddDays(-2)
+                            || order.HasReturn;
 
                             string statusPill = order.Status switch
                             {
@@ -861,14 +828,14 @@
                                     {
                                         <span class="pill pill-urgent" style="margin-top:3px"><i class="bi bi-exclamation-triangle"></i> Urgent</span>
                                     }
-                                    @if (hasReturns)
+                                    @if (order.HasReturn)
                                     {
                                         <span class="pill pill-return" style="margin-top:3px"><i class="bi bi-arrow-return-left"></i> Return</span>
                                     }
                                 </td>
                                 <td>
-                                    <div class="cust-name">@order.User?.FullName</div>
-                                    <div class="cust-email">@order.User?.Email</div>
+                                    <div class="cust-name">@order.UserFullName</div>
+                                    <div class="cust-email">@order.UserEmail</div>
                                 </td>
                                 <td>
                                     <div class="date-main">@order.CreatedAt.ToString("MMM dd, yyyy")</div>
@@ -876,18 +843,16 @@
                                 </td>
                                 <td><span class="pill @statusPill">@order.Status</span></td>
                                 <td>
-                                    @if (isPrescription)
+                                    @if (order.HasPrescription)
                                     {
                                         <span class="pill pill-rx"><i class="bi bi-eyeglasses"></i> Rx</span>
                                     }
-                                    else if (isPreOrder)
+                                    else if (order.IsLowStock)
                                     {
-
                                         <span class="pill pill-preorder"><i class="bi bi-hourglass-split"></i> Pre-Order</span>
                                     }
                                     else
                                     {
-
                                         <span class="pill pill-ready"><i class="bi bi-check-circle"></i> Ready</span>
                                     }
                                 </td>
@@ -956,34 +921,6 @@
     </div>
 </div>
 
-<!-- Stats Modal -->
-<div class="modal fade" id="statsModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content" style="border-radius:14px; overflow:hidden; border:none">
-            <div class="modal-header" style="background:linear-gradient(135deg,var(--navy),var(--navy2)); border:none">
-                <h5 class="modal-title text-white fw-bold"><i class="bi bi-graph-up me-2"></i>Support Statistics</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" style="padding:20px">
-                <div class="row g-3">
-                    <div class="col-6">
-                        <div style="background:var(--bg);border-radius:10px;padding:18px;text-align:center">
-                            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Today's Orders</div>
-                            <div style="font-size:2rem;font-weight:900;color:var(--navy)">@Model.Stats.TodayConfirmedCount</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div style="background:var(--bg);border-radius:10px;padding:18px;text-align:center">
-                            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Avg. Processing</div>
-                            <div style="font-size:2rem;font-weight:900;color:var(--teal)">~15m</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <form id="quickConfirmForm" method="post" asp-page-handler="QuickConfirm" style="display:none">
     @Html.AntiForgeryToken()
     <input type="hidden" name="orderId" id="quickConfirmOrderId" />
@@ -996,6 +933,7 @@
             document.getElementById('quickConfirmOrderId').value = orderId;
             document.getElementById('quickConfirmForm').submit();
         }
+        // Auto-refresh every 2 min
         setTimeout(() => location.reload(), 120000);
     </script>
 }

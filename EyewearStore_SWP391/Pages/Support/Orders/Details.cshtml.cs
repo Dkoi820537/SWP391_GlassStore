@@ -12,10 +12,14 @@ using System.Text.Json;
 namespace EyewearStore_SWP391.Pages.Support.Orders
 {
     /// <summary>
-    /// Sale/Support can only advance an order linearly:
-    ///   Pending Confirmation → Confirmed → Processing
-    /// Beyond Processing, Operations and Manager take over.
-    /// NO free-form status selection — one button, one direction.
+    /// Full 5-role linear workflow:
+    ///
+    ///   [Sale/Support]   Pending Confirmation → Confirmed → Processing
+    ///   [Operations]     Processing → Shipped → Delivered
+    ///   [Manager]        Delivered → Completed
+    ///
+    /// Each role only sees and can press the ONE button that moves the order
+    /// to the NEXT step in their scope. No dropdown, no free-form selection.
     /// </summary>
     [Authorize(Roles = "support,sales,sale,admin,Administrator")]
     public class DetailsModel : PageModel
@@ -27,19 +31,18 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             _context = context;
         }
 
-        // ── Workflow rules ──────────────────────────────────────────
-        // Sale/Support scope: Pending Confirmation → Confirmed → Processing
-        // Map: current status → next status allowed for this role
+        // ── Workflow: what Sale/Support is allowed to advance ────────
         private static readonly Dictionary<string, string> SaleNextStatus = new()
         {
             ["Pending Confirmation"] = "Confirmed",
             ["Confirmed"] = "Processing",
         };
 
-        // Statuses that require the service job to be Done before advancing
-        private static readonly string[] ServiceLockedNextStatuses = { "Processing" };
+        // Statuses that must wait for service job to be Done
+        private static readonly HashSet<string> ServiceLockedNextStatuses =
+            new() { "Processing" };
 
-        // ── Page properties ─────────────────────────────────────────
+        // ── Page properties ──────────────────────────────────────────
         [BindProperty(SupportsGet = true)]
         public int OrderId { get; set; }
 
@@ -61,14 +64,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
         public string ServiceName { get; set; } = "";
         public string FrameName { get; set; } = "";
 
-        // Not used for rendering (no dropdown) but kept for reference
-        public List<string> AllStatuses { get; } = new()
-        {
-            "Pending Confirmation", "Confirmed", "Processing",
-            "Shipped", "Delivered", "Completed", "Cancelled"
-        };
-
-        // ── DTOs ────────────────────────────────────────────────────
+        // ── DTOs ─────────────────────────────────────────────────────
         public class OrderItemDto
         {
             public int OrderItemId { get; set; }
@@ -94,7 +90,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             public int? RightAxis { get; set; }
         }
 
-        // ── GET ──────────────────────────────────────────────────────
+        // ── GET ───────────────────────────────────────────────────────
         public async Task<IActionResult> OnGetAsync(int id)
         {
             OrderId = id;
@@ -122,12 +118,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             return Page();
         }
 
-        // ── POST: Advance Status (SALE/SUPPORT ONLY, LINEAR) ─────────
-        /// <summary>
-        /// The ONLY status-change action for Sale/Support.
-        /// Validates the current status, resolves the next step,
-        /// and enforces service-lock if needed.
-        /// </summary>
+        // ── POST: Advance Status — the ONLY mutation for Sale/Support ─
         public async Task<IActionResult> OnPostAdvanceStatusAsync(int orderId)
         {
             var order = await _context.Orders
@@ -136,22 +127,21 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
 
             if (order == null) return NotFound();
 
-            // 1. Check that the current status has a valid next step for Sale/Support
+            // 1. Does this status have a next step for Sale/Support?
             if (!SaleNextStatus.TryGetValue(order.Status, out var nextStatus))
             {
                 TempData["Error"] = order.Status switch
                 {
-                    "Processing" or "Shipped" or "Delivered" or "Completed" =>
-                        "This order is already past the Sale/Support stage. Operations and Manager handle the remaining steps.",
-                    "Cancelled" =>
-                        "This order has been cancelled.",
-                    _ =>
-                        $"Cannot advance order from '{order.Status}'."
+                    "Processing" or "Shipped" or "Delivered" or "Completed"
+                        => "This order has been handed to Operations / Manager. Sale/Support cannot advance it further.",
+                    "Cancelled"
+                        => "This order has been cancelled.",
+                    _ => $"Cannot advance order from '{order.Status}'."
                 };
                 return RedirectToPage(new { id = orderId });
             }
 
-            // 2. Prescription check — must verify all Rx before confirming
+            // 2. Prescription must be verified before Confirming
             if (nextStatus == "Confirmed" &&
                 order.OrderItems.Any(oi => oi.PrescriptionId != null))
             {
@@ -161,12 +151,13 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
 
                 if (unverified.Any())
                 {
-                    TempData["Error"] = $"Cannot confirm order — {unverified.Count} prescription(s) still need verification.";
+                    TempData["Error"] =
+                        $"Cannot confirm — {unverified.Count} prescription(s) still need verification.";
                     return RedirectToPage(new { id = orderId });
                 }
             }
 
-            // 3. Service-lock check — cannot advance to Processing until service job is Done
+            // 3. Service-lock: cannot advance to Processing until service job is Done
             if (ServiceLockedNextStatuses.Contains(nextStatus))
             {
                 var serviceItems = order.OrderItems
@@ -189,22 +180,20 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
                     if (svcStatus != "Done" && svcStatus != "Cancelled")
                     {
                         TempData["Error"] =
-                            $"Cannot advance to \"{nextStatus}\" — " +
-                            $"the service job is still \"{svcStatus}\". " +
-                            $"Please wait for the technician team to mark it Done.";
+                            $"Cannot advance to \"{nextStatus}\" — service job is still \"{svcStatus}\". " +
+                            $"Wait for the technician to mark it Done.";
                         return RedirectToPage(new { id = orderId });
                     }
                 }
             }
 
             // 4. All checks passed — advance
-            var prevStatus = order.Status;
             order.Status = nextStatus;
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
 
             TempData["Success"] = nextStatus == "Processing"
-                ? $"Order #{orderId} confirmed and passed to Operations team for processing!"
+                ? $"Order #{orderId} is now Processing — handed off to Operations team!"
                 : $"Order #{orderId} advanced to: {nextStatus}";
 
             return RedirectToPage(new { id = orderId });
@@ -226,7 +215,6 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
 
             var p = orderItem.Prescription;
             var errors = new List<string>();
-
             if (p.LeftSph < -20 || p.LeftSph > 20) errors.Add("Left SPH out of range (-20 to +20)");
             if (p.RightSph < -20 || p.RightSph > 20) errors.Add("Right SPH out of range (-20 to +20)");
             if (p.LeftCyl < -6 || p.LeftCyl > 6) errors.Add("Left CYL out of range (-6 to +6)");
@@ -254,21 +242,40 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
             if (order == null) return NotFound();
 
-            // In a real system you'd write a flag/notification here.
             TempData["Success"] = $"Order #{orderId} has been flagged for Manager review.";
             return RedirectToPage(new { id = orderId });
         }
 
-        // ── Private helpers ──────────────────────────────────────────
+        // ── POST: Cancel Order ────────────────────────────────────────
+        public async Task<IActionResult> OnPostCancelOrderAsync(int orderId)
+        {
+            var order = await _context.Orders
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+            if (order == null) return NotFound();
+
+            if (order.Status != "Pending Confirmation")
+            {
+                TempData["Error"] = "Only orders in 'Pending Confirmation' can be cancelled by Support.";
+                return RedirectToPage(new { id = orderId });
+            }
+
+            order.Status = "Cancelled";
+            _context.Orders.Update(order);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Order #{orderId} has been cancelled.";
+            return RedirectToPage(new { id = orderId });
+        }
+
+        // ── Helpers ───────────────────────────────────────────────────
         private void PopulateCustomerInfo(Order order)
         {
             CustomerName = order.User?.FullName ?? "Unknown";
             CustomerEmail = order.User?.Email ?? "";
             CustomerPhone = order.User?.Phone ?? "";
             CustomerSince = order.User?.CreatedAt ?? DateTime.UtcNow;
-            ShippingAddress = order.Address?.AddressLine
-                ?? order.AddressLine
-                ?? "No address provided";
+            ShippingAddress = order.Address?.AddressLine ?? order.AddressLine ?? "No address provided";
         }
 
         private void PopulateOrderItems(Order order)
@@ -299,8 +306,8 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             HasPrescriptionItems = OrderItems.Any(oi => oi.PrescriptionId != null);
             IsPreOrder = OrderItems.Any(oi => (oi.ProductInventory ?? 0) < oi.Quantity);
             IsHighPriority = HasPrescriptionItems
-                                || Order.CreatedAt < DateTime.UtcNow.AddDays(-2)
-                                || OrderItems.Any(oi => oi.HasReturn);
+                                   || Order.CreatedAt < DateTime.UtcNow.AddDays(-2)
+                                   || OrderItems.Any(oi => oi.HasReturn);
         }
 
         private Task ParseServiceInfo()
@@ -322,7 +329,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
                 if (root.TryGetProperty("frameName", out var fn)) FrameName = fn.GetString() ?? "";
                 else if (root.TryGetProperty("productName", out var pn)) FrameName = pn.GetString() ?? "";
             }
-            catch { /* malformed JSON — ignore */ }
+            catch { }
 
             return Task.CompletedTask;
         }

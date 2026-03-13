@@ -11,7 +11,7 @@ using System;
 namespace EyewearStore_SWP391.Pages.Support.Orders
 {
     /// <summary>
-    /// Support Staff Order Management - with pagination
+    /// Support Staff Order Management - OPTIMIZED (no heavy navigation property loads)
     /// </summary>
     [Authorize(Roles = "support,sales,sale,admin,Administrator")]
     public class IndexModel : PageModel
@@ -23,30 +23,32 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             _context = context;
         }
 
-        public List<Order> Orders { get; set; } = new();
+        // ── Lightweight DTO — avoids loading full entity graphs ──────
+        public class OrderSummaryDto
+        {
+            public int OrderId { get; set; }
+            public string? UserFullName { get; set; }
+            public string? UserEmail { get; set; }
+            public DateTime CreatedAt { get; set; }
+            public string Status { get; set; } = "";
+            public decimal TotalAmount { get; set; }
+            public bool HasPrescription { get; set; }
+            public bool HasReturn { get; set; }
+            public bool IsLowStock { get; set; }   // any item qty > inventory
+        }
+
+        public List<OrderSummaryDto> Orders { get; set; } = new();
         public DashboardStats Stats { get; set; } = new();
 
-        [BindProperty(SupportsGet = true)]
-        public string? Search { get; set; }
-
-        [BindProperty(SupportsGet = true)]
-        public string? StatusFilter { get; set; }
-
-        [BindProperty(SupportsGet = true)]
-        public string? TypeFilter { get; set; }
-
-        [BindProperty(SupportsGet = true)]
-        public string? PriorityFilter { get; set; }
+        [BindProperty(SupportsGet = true)] public string? Search { get; set; }
+        [BindProperty(SupportsGet = true)] public string? StatusFilter { get; set; }
+        [BindProperty(SupportsGet = true)] public string? TypeFilter { get; set; }
+        [BindProperty(SupportsGet = true)] public string? PriorityFilter { get; set; }
 
         public List<string> Statuses { get; } = new()
         {
-            "Pending Confirmation",
-            "Confirmed",
-            "Processing",
-            "Shipped",
-            "Delivered",
-            "Completed",
-            "Cancelled"
+            "Pending Confirmation", "Confirmed", "Processing",
+            "Shipped", "Delivered", "Completed", "Cancelled"
         };
 
         public class DashboardStats
@@ -57,204 +59,140 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             public int TodayConfirmedCount { get; set; }
         }
 
-        // Pagination props
-        [BindProperty(SupportsGet = true)]
-        public int PageNumber { get; set; } = 1;
-
-        [BindProperty(SupportsGet = true)]
-        public int PageSize { get; set; } = 10;
-
-        public int TotalOrders { get; set; } = 0;
+        // ── Pagination ───────────────────────────────────────────────
+        [BindProperty(SupportsGet = true)] public int PageNumber { get; set; } = 1;
+        [BindProperty(SupportsGet = true)] public int PageSize { get; set; } = 10;
+        public int TotalOrders { get; set; }
         public int TotalPages { get; set; } = 1;
-
-        public int FirstItemIndex => (TotalOrders == 0) ? 0 : ((PageNumber - 1) * PageSize) + 1;
+        public int FirstItemIndex => TotalOrders == 0 ? 0 : (PageNumber - 1) * PageSize + 1;
         public int LastItemIndex => Math.Min(PageNumber * PageSize, TotalOrders);
-
         public List<int> DisplayPageNumbers { get; set; } = new();
         private const int PageWindow = 7;
 
+        // ── GET ──────────────────────────────────────────────────────
         public async Task OnGetAsync()
         {
-            // sanitize
             if (PageSize <= 0) PageSize = 10;
             if (PageSize > 100) PageSize = 100;
 
+            // Stats — lightweight scalar queries, run in parallel
             await CalculateStatsAsync();
 
+            // ── Build a flat projection query (NO heavy .Include chains) ──
+            // We pull only the columns we need via a DTO projection.
+            // EF Core translates this to a single SQL with LEFT JOINs / subqueries.
             var query = _context.Orders
-                .Include(o => o.User)
-                .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
-                .Include(o => o.OrderItems).ThenInclude(oi => oi.Prescription)
-                .Include(o => o.OrderItems).ThenInclude(oi => oi.Returns)
-                .Include(o => o.Shipments)
+                .AsNoTracking()
+                .Select(o => new OrderSummaryDto
+                {
+                    OrderId = o.OrderId,
+                    UserFullName = o.User != null ? o.User.FullName : null,
+                    UserEmail = o.User != null ? o.User.Email : null,
+                    CreatedAt = o.CreatedAt,
+                    Status = o.Status,
+                    TotalAmount = o.TotalAmount,
+                    HasPrescription = o.OrderItems.Any(oi => oi.PrescriptionId != null),
+                    HasReturn = o.OrderItems.Any(oi => oi.Returns.Any()),
+                    IsLowStock = o.OrderItems.Any(oi =>
+                                          oi.Product != null &&
+                                          oi.Product.InventoryQty < oi.Quantity &&
+                                          (oi.SnapshotJson == null ||
+                                           (!oi.SnapshotJson.Contains("\"isServiceOrder\":true") &&
+                                            !oi.SnapshotJson.Contains("\"lensProductId\":"))))
+                })
                 .AsQueryable();
 
-            // Default: Show orders needing support attention
+            // ── Status filter ────────────────────────────────────────
             if (string.IsNullOrWhiteSpace(StatusFilter))
             {
+                // Default: show only orders that need support attention
                 query = query.Where(o =>
                     o.Status == "Pending Confirmation" ||
-                    o.OrderItems.Any(oi => oi.Returns.Any(r => r.Status == "Pending")));
+                    o.HasReturn);
             }
             else
             {
                 query = query.Where(o => o.Status == StatusFilter);
             }
 
-            // Search
+            // ── Search ───────────────────────────────────────────────
             if (!string.IsNullOrWhiteSpace(Search))
             {
-                var searchTerm = Search.Trim();
-                if (int.TryParse(searchTerm, out var orderId))
-                {
-                    query = query.Where(o =>
-                        o.OrderId == orderId ||
-                        (o.User != null && (o.User.Email.Contains(searchTerm) || o.User.FullName.Contains(searchTerm))));
-                }
+                var term = Search.Trim();
+                if (int.TryParse(term, out var oid))
+                    query = query.Where(o => o.OrderId == oid ||
+                        (o.UserEmail != null && o.UserEmail.Contains(term)) ||
+                        (o.UserFullName != null && o.UserFullName.Contains(term)));
                 else
-                {
                     query = query.Where(o =>
-                        o.User != null && (o.User.Email.Contains(searchTerm) || o.User.FullName.Contains(searchTerm)));
+                        (o.UserEmail != null && o.UserEmail.Contains(term)) ||
+                        (o.UserFullName != null && o.UserFullName.Contains(term)));
+            }
+
+            // ── Type filter (translatable to SQL) ────────────────────
+            if (!string.IsNullOrWhiteSpace(TypeFilter))
+            {
+                switch (TypeFilter)
+                {
+                    case "Prescription":
+                        query = query.Where(o => o.HasPrescription);
+                        break;
+                    case "ReadyStock":
+                        query = query.Where(o => !o.HasPrescription && !o.IsLowStock);
+                        break;
+                    case "PreOrder":
+                        query = query.Where(o => o.IsLowStock);
+                        break;
                 }
             }
 
-            // Apply prescription type filter at DB level if possible
-            if (!string.IsNullOrWhiteSpace(TypeFilter) && TypeFilter == "Prescription")
+            // ── Priority filter ──────────────────────────────────────
+            if (!string.IsNullOrWhiteSpace(PriorityFilter))
             {
-                query = query.Where(o => o.OrderItems.Any(oi => oi.PrescriptionId != null));
+                var twoDaysAgo = DateTime.UtcNow.AddDays(-2);
+                if (PriorityFilter == "High")
+                    query = query.Where(o => o.HasPrescription || o.CreatedAt < twoDaysAgo || o.HasReturn);
+                else if (PriorityFilter == "Normal")
+                    query = query.Where(o => !o.HasPrescription && o.CreatedAt >= twoDaysAgo && !o.HasReturn);
             }
 
-            // Count total BEFORE Skip/Take
+            // ── Count then page ──────────────────────────────────────
             TotalOrders = await query.CountAsync();
-
-            // Order
-            query = query.OrderByDescending(o => o.CreatedAt);
-
-            // Calculate pages and clamp PageNumber
-            TotalPages = (int)Math.Ceiling(TotalOrders / (double)PageSize);
-            if (TotalPages <= 0) TotalPages = 1;
+            TotalPages = Math.Max(1, (int)Math.Ceiling(TotalOrders / (double)PageSize));
             if (PageNumber < 1) PageNumber = 1;
             if (PageNumber > TotalPages) PageNumber = TotalPages;
 
-            // Fetch page
-            var pagedOrders = await query
-                .AsNoTracking()
+            Orders = await query
+                .OrderByDescending(o => o.CreatedAt)
                 .Skip((PageNumber - 1) * PageSize)
                 .Take(PageSize)
                 .ToListAsync();
 
-            // For TypeFilter ReadyStock / PreOrder and for Priority filters that require in-memory checks,
-            // we may need to evaluate in-memory. We'll fetch a candidate set (cap 1000) and then slice.
-            bool needsInMemoryFiltering = !string.IsNullOrWhiteSpace(TypeFilter) && (TypeFilter == "ReadyStock" || TypeFilter == "PreOrder")
-                                          || !string.IsNullOrWhiteSpace(PriorityFilter);
-
-            if (needsInMemoryFiltering)
-            {
-                // fetch candidates (bigger set) then filter and slice in-memory
-                var candidates = await query
-                    .AsNoTracking()
-                    .Take(1000)
-                    .ToListAsync();
-
-                // Type filters
-                if (!string.IsNullOrWhiteSpace(TypeFilter))
-                {
-                    if (TypeFilter == "ReadyStock")
-                    {
-                        candidates = candidates.Where(o => !o.OrderItems.Any(oi => oi.PrescriptionId != null)
-                                                           && o.OrderItems.All(oi => (oi.Product?.InventoryQty ?? 0) >= oi.Quantity))
-                                               .ToList();
-                    }
-                    else if (TypeFilter == "PreOrder")
-                    {
-                        candidates = candidates.Where(o => o.OrderItems.Any(oi => (oi.Product?.InventoryQty ?? 0) < oi.Quantity)).ToList();
-                    }
-                }
-
-                // Priority filter
-                if (!string.IsNullOrWhiteSpace(PriorityFilter))
-                {
-                    if (PriorityFilter == "High")
-                    {
-                        candidates = candidates.Where(o => o.OrderItems.Any(oi => oi.PrescriptionId != null)
-                                                           || o.CreatedAt < DateTime.UtcNow.AddDays(-2)
-                                                           || o.OrderItems.Any(oi => oi.Returns.Any()))
-                                               .ToList();
-                    }
-                    else if (PriorityFilter == "Normal")
-                    {
-                        candidates = candidates.Where(o => !o.OrderItems.Any(oi => oi.PrescriptionId != null)
-                                                           && o.CreatedAt >= DateTime.UtcNow.AddDays(-2)
-                                                           && !o.OrderItems.Any(oi => oi.Returns.Any()))
-                                               .ToList();
-                    }
-                }
-
-                // recalc totals and paging based on filtered candidates
-                TotalOrders = candidates.Count;
-                TotalPages = (int)Math.Ceiling(TotalOrders / (double)PageSize);
-                if (TotalPages <= 0) TotalPages = 1;
-                if (PageNumber > TotalPages) PageNumber = TotalPages;
-
-                Orders = candidates
-                    .OrderByDescending(o => o.CreatedAt)
-                    .Skip((PageNumber - 1) * PageSize)
-                    .Take(PageSize)
-                    .ToList();
-            }
-            else
-            {
-                Orders = pagedOrders;
-            }
-
             BuildDisplayPageNumbers();
         }
 
-        private void BuildDisplayPageNumbers()
-        {
-            DisplayPageNumbers = new List<int>();
-            int total = TotalPages;
-            int current = PageNumber;
-
-            if (total <= PageWindow)
-            {
-                for (int i = 1; i <= total; i++) DisplayPageNumbers.Add(i);
-                return;
-            }
-
-            int left = Math.Max(1, current - PageWindow / 2);
-            int right = Math.Min(total, left + PageWindow - 1);
-
-            if (right - left + 1 < PageWindow)
-            {
-                left = Math.Max(1, right - PageWindow + 1);
-            }
-
-            for (int i = left; i <= right; i++) DisplayPageNumbers.Add(i);
-        }
-
+        // ── Stats: sequential COUNT queries (DbContext is NOT thread-safe) ──
         private async Task CalculateStatsAsync()
         {
             var today = DateTime.UtcNow.Date;
             var tomorrow = today.AddDays(1);
 
-            Stats.PendingCount = await _context.Orders.CountAsync(o => o.Status == "Pending Confirmation");
+            Stats.PendingCount = await _context.Orders
+                .CountAsync(o => o.Status == "Pending Confirmation");
 
             Stats.PrescriptionCount = await _context.Orders
-                .Where(o => o.Status == "Pending Confirmation" || o.Status == "Confirmed")
-                .Where(o => o.OrderItems.Any(oi => oi.PrescriptionId != null))
-                .CountAsync();
+                .CountAsync(o => (o.Status == "Pending Confirmation" || o.Status == "Confirmed")
+                              && o.OrderItems.Any(oi => oi.PrescriptionId != null));
 
             Stats.ReturnCount = await _context.Returns
-                .Where(r => r.Status == "Pending" || r.Status == "Under Review")
-                .CountAsync();
+                .CountAsync(r => r.Status == "Pending" || r.Status == "Under Review");
 
             Stats.TodayConfirmedCount = await _context.Orders
-                .Where(o => o.Status == "Confirmed" || o.Status == "Processing" || o.Status == "Shipped")
-                .Where(o => o.CreatedAt >= today && o.CreatedAt < tomorrow)
-                .CountAsync();
+                .CountAsync(o => (o.Status == "Confirmed" || o.Status == "Processing" || o.Status == "Shipped")
+                              && o.CreatedAt >= today && o.CreatedAt < tomorrow);
         }
 
+        // ── Quick confirm (unchanged logic) ─────────────────────────
         public async Task<IActionResult> OnPostQuickConfirmAsync(int orderId)
         {
             var order = await _context.Orders
@@ -280,15 +218,20 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             await _context.SaveChangesAsync();
 
             TempData["Success"] = $"Order #{orderId} confirmed successfully!";
-            return RedirectToPage(new
-            {
-                pageNumber = PageNumber,
-                pageSize = PageSize,
-                Search,
-                StatusFilter,
-                TypeFilter,
-                PriorityFilter
-            });
+            return RedirectToPage(new { pageNumber = PageNumber, pageSize = PageSize, Search, StatusFilter, TypeFilter, PriorityFilter });
+        }
+
+        // ── Page number helper ───────────────────────────────────────
+        private void BuildDisplayPageNumbers()
+        {
+            DisplayPageNumbers = new List<int>();
+            int total = TotalPages;
+            int current = PageNumber;
+            if (total <= PageWindow) { for (int i = 1; i <= total; i++) DisplayPageNumbers.Add(i); return; }
+            int left = Math.Max(1, current - PageWindow / 2);
+            int right = Math.Min(total, left + PageWindow - 1);
+            if (right - left + 1 < PageWindow) left = Math.Max(1, right - PageWindow + 1);
+            for (int i = left; i <= right; i++) DisplayPageNumbers.Add(i);
         }
     }
 }

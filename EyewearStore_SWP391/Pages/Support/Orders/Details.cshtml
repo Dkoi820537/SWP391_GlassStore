@@ -7,21 +7,22 @@
 
     bool serviceDone = Model.ServiceStatus == "Done";
     bool serviceCancelled = Model.ServiceStatus == "Cancelled";
-    var blockedStatuses = new[] { "Shipped", "Delivered", "Completed" };
 
-    // ── Workflow definition ──────────────────────────────────────
-    // Sale/Support can only advance:  Pending Confirmation → Confirmed → Processing
-    // After Processing it hands off to Operations (they see it in their queue)
-    // Sale/Support CANNOT go beyond Processing
+    // ── Workflow pipeline (all 5 roles, linear) ─────────────────────
+    // Sale/Support  : Pending Confirmation → Confirmed → Processing
+    // Operations    : Processing → Shipped → Delivered
+    // Manager       : Delivered → Completed
+    //
+    // This page is Sale/Support — we can only advance the first two steps.
     string? nextStatus = Model.Order?.Status switch
     {
         "Pending Confirmation" => "Confirmed",
         "Confirmed" => "Processing",
-        _ => null   // nothing left for Sale/Support to advance
+        _ => null
     };
     bool canAdvance = nextStatus != null;
 
-    // If the order has a service item AND it is not done, block advancing to "Processing"
+    // Block advancing to Processing if service job isn't done yet
     bool serviceBlocked = nextStatus == "Processing"
                           && Model.HasServiceItem
                           && !serviceDone
@@ -123,6 +124,7 @@
             }
         }
 
+        /* Header */
         .pg-hdr {
             display: flex;
             justify-content: space-between;
@@ -182,7 +184,7 @@
             border-radius: var(--r);
             padding: 18px 22px;
             margin-bottom: 18px;
-            box-shadow: var(--sh);
+            box-shadow: var(--sh)
         }
 
         .wf-track-title {
@@ -191,22 +193,21 @@
             text-transform: uppercase;
             letter-spacing: .9px;
             color: var(--muted);
-            margin-bottom: 14px;
+            margin-bottom: 14px
         }
 
         .wf-steps {
             display: flex;
             align-items: center;
-            gap: 0;
             overflow-x: auto;
-            padding-bottom: 4px;
+            padding-bottom: 4px
         }
 
         .wf-node {
             display: flex;
             flex-direction: column;
             align-items: center;
-            flex-shrink: 0;
+            flex-shrink: 0
         }
 
         .wf-circle {
@@ -223,7 +224,7 @@
             color: var(--muted);
             transition: all .3s;
             position: relative;
-            z-index: 1;
+            z-index: 1
         }
 
         .wf-node.done .wf-circle {
@@ -255,7 +256,7 @@
             margin-top: 6px;
             text-align: center;
             max-width: 70px;
-            line-height: 1.3;
+            line-height: 1.3
         }
 
         .wf-node.done .wf-label {
@@ -277,7 +278,7 @@
             background: var(--bdr);
             min-width: 24px;
             max-width: 60px;
-            margin-bottom: 22px;
+            margin-bottom: 22px
         }
 
             .wf-line.done {
@@ -291,7 +292,7 @@
             border-radius: 4px;
             margin-top: 3px;
             text-transform: uppercase;
-            letter-spacing: .4px;
+            letter-spacing: .4px
         }
 
         .rb-sale {
@@ -309,22 +310,22 @@
             color: var(--navy2)
         }
 
-        /* ── ADVANCE BUTTON ── */
+        /* ── ADVANCE CARD ── */
         .advance-card {
             background: var(--surf);
             border: 1px solid var(--bdr);
             border-radius: var(--r);
             overflow: hidden;
             box-shadow: var(--sh);
-            margin-bottom: 14px;
+            margin-bottom: 14px
         }
 
         .advance-hdr {
             padding: 12px 16px;
-            background: linear-gradient(135deg, var(--teal), var(--teal2));
+            background: linear-gradient(135deg,var(--teal),var(--teal2));
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 8px
         }
 
             .advance-hdr h3 {
@@ -334,7 +335,7 @@
                 margin: 0;
                 flex: 1;
                 text-transform: uppercase;
-                letter-spacing: .5px;
+                letter-spacing: .5px
             }
 
         .advance-body {
@@ -347,7 +348,7 @@
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            background: linear-gradient(135deg, var(--navy), var(--navy2));
+            background: linear-gradient(135deg,var(--navy),var(--navy2));
             color: #fff;
             font-size: 15px;
             font-weight: 900;
@@ -356,18 +357,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 10px
         }
 
             .btn-advance:hover:not(:disabled) {
                 transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(13,27,42,.3);
+                box-shadow: 0 6px 20px rgba(13,27,42,.3)
             }
 
             .btn-advance:disabled {
                 opacity: .45;
                 cursor: not-allowed;
-                transform: none;
+                transform: none
             }
 
             .btn-advance .arrow-icon {
@@ -378,7 +379,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 16px;
+                font-size: 16px
             }
 
         .next-status-label {
@@ -389,14 +390,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 6px
         }
 
             .next-status-label strong {
                 color: var(--teal)
             }
 
-        /* Locked hint */
         .lock-hint {
             display: flex;
             align-items: flex-start;
@@ -407,7 +407,7 @@
             padding: 11px 14px;
             font-size: 12px;
             color: var(--red);
-            line-height: 1.5;
+            line-height: 1.5
         }
 
             .lock-hint i {
@@ -415,7 +415,6 @@
                 margin-top: 1px
             }
 
-        /* Handed-off card */
         .handoff-card {
             background: var(--ok-s);
             border: 1px solid rgba(5,150,105,.2);
@@ -423,7 +422,7 @@
             padding: 14px 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 12px
         }
 
             .handoff-card i {
@@ -843,12 +842,6 @@
                 box-shadow: 0 4px 10px rgba(0,0,0,.12)
             }
 
-            .act-btn.confirm {
-                background: linear-gradient(135deg,#15803d,#16a34a);
-                color: #fff;
-                grid-column: 1/-1
-            }
-
             .act-btn.contact {
                 background: rgba(15,118,110,.08);
                 border: 1.5px solid rgba(15,118,110,.2);
@@ -1012,22 +1005,20 @@
         </span>
     </div>
 
-    <!-- ── WORKFLOW TRACKER ── -->
+    <!-- ── WORKFLOW TRACKER (full 5-role pipeline) ── -->
     <div class="wf-track">
         <div class="wf-track-title"><i class="bi bi-signpost-2 me-1"></i>Order Workflow Pipeline</div>
         <div class="wf-steps">
             @{
-                // Full pipeline definition: (status, label, role-badge-text, role-badge-css)
                 var pipeline = new (string Status, string Label, string Role, string RoleCss)[]
                 {
-                        ("Pending Confirmation", "Pending",    "Sale/Support", "rb-sale"),
+                        ("Pending Confirmation", "Pending",   "Sale/Support", "rb-sale"),
                         ("Confirmed",           "Confirmed",  "Sale/Support", "rb-sale"),
                         ("Processing",          "Processing", "Sale/Support", "rb-sale"),
                         ("Shipped",             "Shipped",    "Operations",   "rb-ops"),
                         ("Delivered",           "Delivered",  "Operations",   "rb-ops"),
                         ("Completed",           "Completed",  "Manager",      "rb-manager"),
                 };
-
                 int curIdx = Array.FindIndex(pipeline, p => p.Status == Model.Order.Status);
             }
             @for (int i = 0; i < pipeline.Length; i++)
@@ -1035,13 +1026,11 @@
                 var (pStatus, pLabel, pRole, pRoleCss) = pipeline[i];
                 string cls = i < curIdx ? "done" : i == curIdx ? "active" : i == curIdx + 1 ? "next" : "";
                 string icon = i < curIdx ? "✓" : i == curIdx ? "●" : (i + 1).ToString();
-
                 <div class="wf-node @cls">
                     <div class="wf-circle">@icon</div>
                     <div class="wf-label">@pLabel</div>
                     <span class="wf-role-badge @pRoleCss">@pRole</span>
                 </div>
-
                 if (i < pipeline.Length - 1)
                 {
                     <div class="wf-line @(i < curIdx ? "done" : "")"></div>
@@ -1062,11 +1051,7 @@
                 @if (serviceDone)
                 {
                     <p class="svc-title" style="color:var(--ok)">Service Completed — Order ready to fulfil</p>
-                    <p class="svc-desc">
-                        Service job for <strong>@Model.FrameName</strong>
-                        (@(string.IsNullOrEmpty(Model.ServiceName) ? "eyewear service" : Model.ServiceName))
-                        marked <strong>Done</strong>. Sale/Support can advance to Processing.
-                    </p>
+                    <p class="svc-desc">Service for <strong>@Model.FrameName</strong> (@(string.IsNullOrEmpty(Model.ServiceName) ? "eyewear service" : Model.ServiceName)) marked <strong>Done</strong>. You can now advance to Processing.</p>
                 }
                 else if (serviceCancelled)
                 {
@@ -1077,10 +1062,9 @@
                 {
                     <p class="svc-title" style="color:var(--red)">Waiting for Service Completion</p>
                     <p class="svc-desc">
-                        Order contains a custom eyewear service
-                        (@(string.IsNullOrEmpty(Model.ServiceName) ? "fitting/customization" : Model.ServiceName)
+                        Contains a custom service (@(string.IsNullOrEmpty(Model.ServiceName) ? "fitting/customization" : Model.ServiceName)
                         @(string.IsNullOrEmpty(Model.FrameName) ? "" : $"for \"{Model.FrameName}\"")).
-                        <strong>Cannot advance to Processing</strong> until the technician marks the job <strong>Done</strong>.
+                        <strong>Cannot advance to Processing</strong> until the technician marks it <strong>Done</strong>.
                     </p>
                     <div class="svc-steps">
                         @{
@@ -1335,12 +1319,11 @@
                         }
                         else if (Model.Order.Status is "Shipped" or "Delivered" or "Completed")
                         {
-                            <!-- Already past Sale/Support scope -->
                             <div class="handoff-card">
                                 <i class="bi bi-check-circle-fill"></i>
                                 <div>
                                     <div class="handoff-card-title">Handed Off to Operations</div>
-                                    <div class="handoff-card-sub">This order is now in the <strong>@Model.Order.Status</strong> stage. Operations / Manager team is handling it.</div>
+                                    <div class="handoff-card-sub">Order is now <strong>@Model.Order.Status</strong>. Operations / Manager team is handling it.</div>
                                 </div>
                             </div>
                         }
@@ -1359,9 +1342,9 @@
                             <div class="lock-hint">
                                 <i class="bi bi-lock-fill"></i>
                                 <div>
-                                    Cannot advance to <strong>Processing</strong> — the service job is
+                                    Cannot advance to <strong>Processing</strong> — service job is
                                     <strong>@Model.ServiceStatus</strong>.
-                                    Please wait for the technician to mark it <strong>Done</strong> first.
+                                    Wait for the technician to mark it <strong>Done</strong> first.
                                 </div>
                             </div>
                         }
@@ -1377,8 +1360,7 @@
                             <div class="next-status-label">
                                 <i class="bi bi-arrow-right-circle" style="color:var(--teal);font-size:14px"></i>
                                 Current: <span style="color:var(--txt2);font-weight:700">@Model.Order.Status</span>
-                                &nbsp;→&nbsp;
-                                Next: <strong>@nextStatus</strong>
+                                &nbsp;→&nbsp; Next: <strong>@nextStatus</strong>
                             </div>
                         }
                         else
@@ -1391,7 +1373,7 @@
                     </div>
                 </div>
 
-                <!-- Other Actions -->
+                <!-- Support Actions -->
                 <div class="dc">
                     <div class="dc-hdr dark"><i class="bi bi-tools" style="color:rgba(255,255,255,.7)"></i><h3>Support Actions</h3></div>
                     <div class="dc-body">
@@ -1403,13 +1385,9 @@
                                     <i class="bi bi-arrow-right" style="margin-left:auto"></i>
                                 </a>
                             }
-                            <button type="button" class="act-btn contact" onclick="contactCustomer()">
-                                <i class="bi bi-envelope-fill"></i> Contact
-                            </button>
-                            <button type="button" class="act-btn escalate" onclick="escalateToManager()">
-                                <i class="bi bi-arrow-up-circle-fill"></i> Escalate
-                            </button>
-                            @if (Model.Order.Status != "Cancelled" && Model.Order.Status == "Pending Confirmation")
+                            <button type="button" class="act-btn contact" onclick="contactCustomer()"><i class="bi bi-envelope-fill"></i> Contact</button>
+                            <button type="button" class="act-btn escalate" onclick="escalateToManager()"><i class="bi bi-arrow-up-circle-fill"></i> Escalate</button>
+                            @if (Model.Order.Status == "Pending Confirmation")
                             {
                                 <button type="button" class="act-btn cancel" onclick="cancelOrder()">
                                     <i class="bi bi-x-circle-fill"></i> Cancel Order
@@ -1437,6 +1415,10 @@
     @Html.AntiForgeryToken()
     <input type="hidden" name="orderId" value="@Model.OrderId" />
 </form>
+<form id="cancelForm" method="post" asp-page-handler="CancelOrder" style="display:none">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="orderId" value="@Model.OrderId" />
+</form>
 
 @section Scripts {
     <script>
@@ -1449,7 +1431,7 @@
         }
         function cancelOrder() {
             if (confirm('Cancel Order #@Model.OrderId?\n\nThis cannot be undone. Only cancel if the customer has requested it.'))
-                alert('Cancel feature — implement OnPostCancelAsync in DetailsModel');
+                document.getElementById('cancelForm').submit();
         }
         var alOk = document.querySelector('.al-ok');
         if (alOk) setTimeout(() => { alOk.style.transition='opacity .5s'; alOk.style.opacity='0'; }, 4000);

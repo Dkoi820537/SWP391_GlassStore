@@ -45,9 +45,8 @@
             padding: 28px 20px 80px
         }
 
-        /* ── Header ── */
         .ops-hdr {
-            background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+            background: linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);
             border-radius: 16px;
             padding: 24px 28px;
             margin-bottom: 22px;
@@ -55,7 +54,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 16px;
-            flex-wrap: wrap;
+            flex-wrap: wrap
         }
 
         .ops-hdr-left h1 {
@@ -79,28 +78,6 @@
             flex-wrap: wrap
         }
 
-        .btn-svc-jobs {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: linear-gradient(135deg, var(--teal), var(--teal2));
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 700;
-            text-decoration: none;
-            box-shadow: 0 4px 14px rgba(15,118,110,.35);
-            transition: all .22s;
-            white-space: nowrap;
-        }
-
-            .btn-svc-jobs:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(15,118,110,.45);
-                color: #fff
-            }
-
         .btn-refresh {
             display: inline-flex;
             align-items: center;
@@ -113,7 +90,7 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all .22s;
+            transition: all .22s
         }
 
             .btn-refresh:hover {
@@ -121,7 +98,6 @@
                 color: #fff
             }
 
-        /* ── Alerts ── */
         .al {
             display: flex;
             align-items: center;
@@ -158,10 +134,10 @@
             }
         }
 
-        /* ── Stats ── */
+        /* Stats — now 3 cards (removed ServiceCount) */
         .stats-row {
             display: grid;
-            grid-template-columns: repeat(4,1fr);
+            grid-template-columns: repeat(3,1fr);
             gap: 14px;
             margin-bottom: 22px
         }
@@ -176,7 +152,7 @@
             overflow: hidden;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 14px
         }
 
             .stat-card::before {
@@ -194,10 +170,6 @@
 
         .stat-c2::before {
             background: var(--teal)
-        }
-
-        .stat-c3::before {
-            background: var(--purp)
         }
 
         .stat-c4::before {
@@ -223,11 +195,6 @@
         .ico-teal {
             background: var(--ok-s);
             color: var(--teal)
-        }
-
-        .ico-purp {
-            background: rgba(124,58,237,.1);
-            color: var(--purp)
         }
 
         .ico-ok {
@@ -257,7 +224,6 @@
             margin-top: 3px
         }
 
-        /* ── Filter ── */
         .filter-card {
             background: var(--surf);
             border: 1px solid var(--bdr);
@@ -293,7 +259,7 @@
             font-family: inherit;
             transition: border-color .2s;
             flex: 1;
-            min-width: 150px;
+            min-width: 150px
         }
 
             .fi:focus {
@@ -314,7 +280,7 @@
 
         .btn-filter {
             padding: 9px 20px;
-            background: linear-gradient(135deg, var(--navy), var(--navy2));
+            background: linear-gradient(135deg,var(--navy),var(--navy2));
             color: #fff;
             border: none;
             border-radius: 8px;
@@ -325,7 +291,7 @@
             transition: all .2s;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 6px
         }
 
             .btn-filter:hover {
@@ -333,7 +299,6 @@
                 box-shadow: 0 4px 12px rgba(13,27,42,.25)
             }
 
-        /* Quick filter tags */
         .qf-row {
             display: flex;
             gap: 7px;
@@ -374,16 +339,6 @@
                 color: #fff
             }
 
-        .qf-purp {
-            color: var(--purp);
-            border-color: var(--purp)
-        }
-
-            .qf-purp:hover {
-                background: var(--purp);
-                color: #fff
-            }
-
         .qf-warn {
             color: var(--warn);
             border-color: var(--warn)
@@ -394,7 +349,6 @@
                 color: #fff
             }
 
-        /* ── Table ── */
         .tbl-card {
             background: var(--surf);
             border: 1px solid var(--bdr);
@@ -405,12 +359,12 @@
 
         .tbl-top {
             padding: 14px 20px;
-            background: linear-gradient(135deg, var(--navy), var(--navy2));
+            background: linear-gradient(135deg,var(--navy),var(--navy2));
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 8px
         }
 
             .tbl-top h5 {
@@ -455,7 +409,7 @@
                 background: var(--bg2);
                 border-bottom: 1px solid var(--bdr);
                 text-align: left;
-                white-space: nowrap;
+                white-space: nowrap
             }
 
             .ops-tbl td {
@@ -478,7 +432,6 @@
                 background: rgba(220,38,38,.018)
             }
 
-        /* Cell styles */
         .cell-id {
             font-weight: 800;
             color: var(--navy);
@@ -508,7 +461,6 @@
             color: var(--red)
         }
 
-        /* Pills */
         .pill {
             display: inline-flex;
             align-items: center;
@@ -567,12 +519,6 @@
             border: 1px solid rgba(13,27,42,.12)
         }
 
-        .p-svc {
-            background: rgba(124,58,237,.08);
-            color: #6d28d9;
-            border: 1px solid rgba(124,58,237,.18)
-        }
-
         .p-pre {
             background: var(--bg2);
             color: var(--txt2);
@@ -591,20 +537,19 @@
             border: 1px solid rgba(220,38,38,.2)
         }
 
-        /* Actions */
         .btn-process {
             display: inline-flex;
             align-items: center;
             gap: 5px;
             padding: 7px 16px;
-            background: linear-gradient(135deg, var(--teal), var(--teal2));
+            background: linear-gradient(135deg,var(--teal),var(--teal2));
             color: #fff;
             border-radius: 8px;
             font-size: 12px;
             font-weight: 700;
             text-decoration: none;
             transition: all .2s;
-            white-space: nowrap;
+            white-space: nowrap
         }
 
             .btn-process:hover {
@@ -613,29 +558,6 @@
                 color: #fff
             }
 
-        .btn-svc-mini {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            background: rgba(124,58,237,.08);
-            border: 1.5px solid rgba(124,58,237,.2);
-            color: #6d28d9;
-            border-radius: 7px;
-            font-size: 13px;
-            text-decoration: none;
-            transition: all .15s;
-            margin-left: 4px;
-        }
-
-            .btn-svc-mini:hover {
-                background: #6d28d9;
-                color: #fff;
-                border-color: #6d28d9
-            }
-
-        /* Empty */
         .empty {
             text-align: center;
             padding: 60px 20px
@@ -661,7 +583,6 @@
             margin: 0
         }
 
-        /* Pagination */
         .pag-row {
             display: flex;
             justify-content: space-between;
@@ -699,7 +620,7 @@
             border: 1.5px solid var(--bdr);
             color: var(--txt2);
             background: var(--surf);
-            transition: all .15s;
+            transition: all .15s
         }
 
             .pag-item a:hover {
@@ -738,16 +659,12 @@
 
 <div class="ops-pg">
 
-    <!-- ── Header ── -->
     <div class="ops-hdr">
         <div class="ops-hdr-left">
             <h1><i class="bi bi-box-seam me-2"></i>Operations Dashboard</h1>
             <p>Đóng gói · Vận chuyển · Cập nhật tracking · Xử lý đơn kính thuốc</p>
         </div>
         <div class="hdr-actions">
-            <a asp-page="/Staff/ServiceOrders/Index" class="btn-svc-jobs">
-                <i class="bi bi-nut"></i> Service Jobs <i class="bi bi-arrow-right"></i>
-            </a>
             <button class="btn-refresh" onclick="window.location.reload()">
                 <i class="bi bi-arrow-clockwise"></i> Refresh
             </button>
@@ -763,7 +680,7 @@
         <div class="al al-err"><i class="bi bi-exclamation-circle-fill"></i> @err</div>
     }
 
-    <!-- ── Stats ── -->
+    <!-- Stats: 3 cards — ServiceCount removed -->
     <div class="stats-row">
         <div class="stat-card stat-c1">
             <div class="stat-ico ico-warn"><i class="bi bi-hourglass-split"></i></div>
@@ -781,14 +698,6 @@
                 <div class="stat-sub">Đã giao hôm nay</div>
             </div>
         </div>
-        <div class="stat-card stat-c3">
-            <div class="stat-ico ico-purp"><i class="bi bi-nut"></i></div>
-            <div>
-                <div class="stat-lbl">Service Orders</div>
-                <div class="stat-val">@Model.Stats.ServiceCount</div>
-                <div class="stat-sub">Đang xử lý service</div>
-            </div>
-        </div>
         <div class="stat-card stat-c4">
             <div class="stat-ico ico-ok"><i class="bi bi-eyeglasses"></i></div>
             <div>
@@ -799,7 +708,6 @@
         </div>
     </div>
 
-    <!-- ── Filter ── -->
     <div class="filter-card">
         <h6><i class="bi bi-funnel me-1"></i>Tìm kiếm & Lọc</h6>
         <form method="get" class="filter-row">
@@ -814,7 +722,6 @@
             <select class="fi" name="TypeFilter">
                 <option value="">Tất cả loại</option>
                 <option value="Prescription" selected="@(Model.TypeFilter == "Prescription")">Prescription (Rx)</option>
-                <option value="Service" selected="@(Model.TypeFilter == "Service")">Service / Fitting</option>
                 <option value="PreOrder" selected="@(Model.TypeFilter == "PreOrder")">Pre-Order</option>
                 <option value="Standard" selected="@(Model.TypeFilter == "Standard")">Standard</option>
             </select>
@@ -834,21 +741,17 @@
         <div class="qf-row">
             <a href="?StatusFilter=Processing" class="qf qf-warn"><i class="bi bi-hourglass-split"></i> Processing</a>
             <a href="?StatusFilter=Shipped" class="qf qf-teal"><i class="bi bi-truck"></i> Shipped</a>
-            <a href="?TypeFilter=Service" class="qf qf-purp"><i class="bi bi-nut"></i> Service</a>
             <a href="?TypeFilter=Prescription" class="qf qf-navy"><i class="bi bi-eyeglasses"></i> Prescription</a>
         </div>
     </div>
 
-    <!-- ── Table ── -->
     <div class="tbl-card">
         <div class="tbl-top">
             <h5>
                 <i class="bi bi-list-check"></i> Hàng đợi Operations
                 <span class="tbl-badge">@Model.TotalOrders đơn</span>
             </h5>
-            <div class="tbl-info">
-                Hiển thị <strong>@Model.FirstItemIndex–@Model.LastItemIndex</strong> / <strong>@Model.TotalOrders</strong>
-            </div>
+            <div class="tbl-info">Hiển thị <strong>@Model.FirstItemIndex–@Model.LastItemIndex</strong> / <strong>@Model.TotalOrders</strong></div>
         </div>
 
         @if (!Model.Orders.Any())
@@ -878,9 +781,8 @@
                     <tbody>
                         @foreach (var o in Model.Orders)
                         {
-                            bool isUrgent = o.HasPrescription || o.HasService || o.CreatedAt < DateTime.UtcNow.AddDays(-2);
-
-                            string statusCss = o.Status switch
+                            bool isUrgent = o.HasPrescription || o.CreatedAt < DateTime.UtcNow.AddDays(-2);
+                            string sCss = o.Status switch
                             {
                                 "Pending Confirmation" => "p-pending",
                                 "Confirmed" => "p-confirmed",
@@ -891,20 +793,13 @@
                                 "Cancelled" => "p-cancelled",
                                 _ => ""
                             };
-
                             <tr class="@(isUrgent ? "urgent-row" : "")">
                                 <td>
                                     <div class="cell-id">#@o.OrderId</div>
-                                    <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:3px">
-                                        @if (isUrgent)
-                                        {
-                                            <span class="pill p-urgent" style="font-size:10px"><i class="bi bi-exclamation-triangle"></i> Urgent</span>
-                                        }
-                                        @if (o.HasService)
-                                        {
-                                            <span class="pill p-svc" style="font-size:10px"><i class="bi bi-nut"></i> Service</span>
-                                        }
-                                    </div>
+                                    @if (isUrgent)
+                                    {
+                                        <span class="pill p-urgent" style="font-size:10px;margin-top:3px"><i class="bi bi-exclamation-triangle"></i> Urgent</span>
+                                    }
                                 </td>
                                 <td>
                                     <div class="cust-name">@o.UserFullName</div>
@@ -914,16 +809,11 @@
                                     <div style="font-size:13px;color:var(--txt)">@o.CreatedAt.ToString("dd/MM/yyyy")</div>
                                     <div class="cell-sub">@o.CreatedAt.ToString("HH:mm")</div>
                                 </td>
-                                <td><span class="pill @statusCss">@o.Status</span></td>
+                                <td><span class="pill @sCss">@o.Status</span></td>
                                 <td>
                                     @if (o.HasPrescription)
                                     {
                                         <span class="pill p-rx"><i class="bi bi-eyeglasses"></i> Rx</span>
-                                    }
-                                    else if (o.HasService)
-                                    {
-
-                                        <span class="pill p-svc"><i class="bi bi-nut"></i> Service</span>
                                     }
                                     else if (o.IsPreOrder)
                                     {
@@ -946,6 +836,7 @@
                                     }
                                     else
                                     {
+
                                         <span style="color:var(--muted);font-size:12px">Chưa có</span>
                                     }
                                 </td>
@@ -953,38 +844,20 @@
                                     <span class="price-val">@o.TotalAmount.ToString("N0") ₫</span>
                                 </td>
                                 <td style="text-align:center">
-                                    <div style="display:flex;gap:5px;justify-content:center;align-items:center">
-                                        <a asp-page="./Details" asp-route-id="@o.OrderId" class="btn-process">
-                                            <i class="bi bi-arrow-right-circle"></i> Xử lý
-                                        </a>
-                                        @if (o.HasService)
-                                        {
-                                            <a asp-page="/Staff/ServiceOrders/Detail" asp-route-orderId="@o.OrderId"
-                                               class="btn-svc-mini" title="Xem Service Job">
-                                                <i class="bi bi-nut"></i>
-                                            </a>
-                                        }
-                                    </div>
+                                    <a asp-page="./Details" asp-route-id="@o.OrderId" class="btn-process">
+                                        <i class="bi bi-arrow-right-circle"></i> Xử lý
+                                    </a>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
-
             <div class="pag-row">
                 <div class="pag-info">Trang @Model.PageNumber / @Model.TotalPages</div>
                 <ul class="pag">
-                    <li class="pag-item @(Model.PageNumber == 1 ? "disabled" : "")">
-                        <a asp-page="./Index" asp-route-pageNumber="1" asp-route-pageSize="@Model.PageSize"
-                           asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
-                           asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">«</a>
-                    </li>
-                    <li class="pag-item @(Model.PageNumber == 1 ? "disabled" : "")">
-                        <a asp-page="./Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize"
-                           asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
-                           asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">‹</a>
-                    </li>
+                    <li class="pag-item @(Model.PageNumber == 1 ? "disabled" : "")"><a asp-page="./Index" asp-route-pageNumber="1" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">«</a></li>
+                    <li class="pag-item @(Model.PageNumber == 1 ? "disabled" : "")"><a asp-page="./Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">‹</a></li>
                     @foreach (var p in Model.DisplayPageNumbers)
                     {
                         <li class="pag-item @(p == Model.PageNumber ? "active" : "")">
@@ -994,22 +867,13 @@
                             }
                             else
                             {
-                                <a asp-page="./Index" asp-route-pageNumber="@p" asp-route-pageSize="@Model.PageSize"
-                                   asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
-                                   asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">@p</a>
+
+                                <a asp-page="./Index" asp-route-pageNumber="@p" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">@p</a>
                             }
                         </li>
                     }
-                    <li class="pag-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
-                        <a asp-page="./Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize"
-                           asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
-                           asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">›</a>
-                    </li>
-                    <li class="pag-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
-                        <a asp-page="./Index" asp-route-pageNumber="@Model.TotalPages" asp-route-pageSize="@Model.PageSize"
-                           asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
-                           asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">»</a>
-                    </li>
+                    <li class="pag-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")"><a asp-page="./Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">›</a></li>
+                    <li class="pag-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")"><a asp-page="./Index" asp-route-pageNumber="@Model.TotalPages" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">»</a></li>
                 </ul>
             </div>
         }

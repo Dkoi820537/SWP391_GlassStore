@@ -1,0 +1,906 @@
+﻿@page "{orderId:int}"
+@model EyewearStore_SWP391.Pages.Support.ServiceOrders.DetailModel
+@using EyewearStore_SWP391.Pages.Support.ServiceOrders
+@{
+    ViewData["Title"] = $"Service Job — Order #{Model.Order?.OrderId}";
+    Layout = "_Layout";
+
+    var snap = Model.Snap;
+    var order = Model.Order;
+    var item = Model.Item;
+    var curStatus = snap?.ServiceStatus ?? "Pending";
+
+    string StatusBg(string s) => s switch
+    {
+        "Pending" => "#fef3c7",
+        "Processing" => "#dbeafe",
+        "Ready" => "#d1fae5",
+        "Done" => "#f0fdf4",
+        "Cancelled" => "#fee2e2",
+        _ => "#f3f4f6"
+    };
+    string StatusFg(string s) => s switch
+    {
+        "Pending" => "#92400e",
+        "Processing" => "#1e40af",
+        "Ready" => "#065f46",
+        "Done" => "#14532d",
+        "Cancelled" => "#991b1b",
+        _ => "#374151"
+    };
+    string StatusBdr(string s) => s switch
+    {
+        "Pending" => "#fcd34d",
+        "Processing" => "#93c5fd",
+        "Ready" => "#6ee7b7",
+        "Done" => "#86efac",
+        "Cancelled" => "#fca5a5",
+        _ => "#d1d5db"
+    };
+    string StatusIcon(string s) => s switch
+    {
+        "Pending" => "bi-hourglass-split",
+        "Processing" => "bi-gear-wide-connected",
+        "Ready" => "bi-check-circle-fill",
+        "Done" => "bi-bag-check-fill",
+        "Cancelled" => "bi-x-circle-fill",
+        _ => "bi-hourglass-split"
+    };
+    string StatusEmoji(string s) => s switch
+    {
+        "Pending" => "⏳",
+        "Processing" => "⊛",
+        "Ready" => "●",
+        "Done" => "★",
+        "Cancelled" => "✕",
+        _ => "•"
+    };
+
+    string[] steps = { "Pending", "Processing", "Ready", "Done" };
+    int stepIdx = curStatus switch { "Processing" => 1, "Ready" => 2, "Done" => 3, _ => 0 };
+    bool isCancelled = curStatus == "Cancelled";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --navy: #0d1b2a;
+            --navy2: #1a2f54;
+            --teal: #0f766e;
+            --teal2: #0d9488;
+            --acc: #2563eb;
+            --gold: #b8862a;
+            --ok: #059669;
+            --warn: #d97706;
+            --err: #dc2626;
+            --txt: #0f172a;
+            --txt2: #475569;
+            --muted: #94a3b8;
+            --surf: #fff;
+            --bg: #f1f5f9;
+            --bg2: #e8edf4;
+            --bdr: #e2e8f0;
+            --sh: 0 2px 12px rgba(0,0,0,.07);
+            --sh-md: 0 4px 20px rgba(0,0,0,.1);
+            --r: 14px
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box
+        }
+
+        body {
+            background: var(--bg)
+        }
+
+        .wrap {
+            max-width: 1050px;
+            margin: 0 auto;
+            padding: 28px 20px 80px
+        }
+
+        .bc {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+            .bc a {
+                color: var(--muted);
+                text-decoration: none;
+                font-weight: 600
+            }
+
+                .bc a:hover {
+                    color: var(--teal)
+                }
+
+        .pg-hdr {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 24px
+        }
+
+            .pg-hdr h1 {
+                font-size: 1.55rem;
+                font-weight: 900;
+                color: var(--navy);
+                margin: 0 0 4px;
+                letter-spacing: -.5px
+            }
+
+            .pg-hdr p {
+                font-size: 13px;
+                color: var(--muted);
+                margin: 0
+            }
+
+        .spill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 18px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 800;
+            flex-shrink: 0
+        }
+
+        .al-ok {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(5,150,105,.08);
+            border: 1px solid rgba(5,150,105,.22);
+            color: #059669;
+            border-radius: 10px;
+            padding: 11px 15px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 18px;
+            animation: sIn .3s ease
+        }
+
+        .al-err {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(220,38,38,.08);
+            border: 1px solid rgba(220,38,38,.22);
+            color: #dc2626;
+            border-radius: 10px;
+            padding: 11px 15px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 18px
+        }
+
+        @@keyframes sIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 370px;
+            gap: 18px
+        }
+
+        .dc {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r);
+            overflow: hidden;
+            box-shadow: var(--sh);
+            margin-bottom: 16px
+        }
+
+            .dc:last-child {
+                margin-bottom: 0
+            }
+
+        .dc-hdr {
+            background: linear-gradient(135deg,var(--navy),var(--navy2));
+            padding: 13px 18px;
+            display: flex;
+            align-items: center;
+            gap: 9px
+        }
+
+            .dc-hdr h3 {
+                font-size: 13px;
+                font-weight: 800;
+                color: #fff;
+                margin: 0
+            }
+
+            .dc-hdr i {
+                font-size: 15px;
+                color: rgba(255,255,255,.7)
+            }
+
+        .dc-body {
+            padding: 18px
+        }
+
+        .bd-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 0;
+            border-bottom: 1px solid var(--bdr)
+        }
+
+            .bd-row:last-child {
+                border-bottom: none
+            }
+
+        .bd-left {
+            display: flex;
+            align-items: center;
+            gap: 11px
+        }
+
+        .bd-ico {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            background: var(--bg2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0
+        }
+
+        .bd-lbl {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            margin-bottom: 2px
+        }
+
+        .bd-val {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--txt)
+        }
+
+        .bd-prc {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--navy);
+            white-space: nowrap
+        }
+
+        .bd-tot {
+            padding: 13px 0 2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .bd-tot-lbl {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--txt2)
+        }
+
+        .bd-tot-val {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--gold)
+        }
+
+        /* TIMELINE */
+        .tl {
+            display: flex;
+            align-items: center;
+            padding: 4px 0
+        }
+
+        .tl-s {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1
+        }
+
+            .tl-s:not(:last-child)::after {
+                content: '';
+                position: absolute;
+                top: 15px;
+                left: 50%;
+                width: 100%;
+                height: 2px;
+                background: #e0e2f0;
+                z-index: 0
+            }
+
+            .tl-s.done:not(:last-child)::after {
+                background: #059669
+            }
+
+            .tl-s.active:not(:last-child)::after {
+                background: linear-gradient(90deg,#059669,#e0e2f0)
+            }
+
+        .tl-c {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            border: 2px solid #dde1f0;
+            background: #fff;
+            position: relative;
+            z-index: 2;
+            transition: all .3s
+        }
+
+        .tl-s.done .tl-c {
+            background: #059669;
+            border-color: #059669;
+            color: #fff
+        }
+
+        .tl-s.active .tl-c {
+            background: var(--teal);
+            border-color: var(--teal);
+            color: #fff;
+            box-shadow: 0 0 0 4px rgba(15,118,110,.15)
+        }
+
+        .tl-l {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--muted);
+            margin-top: 6px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: .5px
+        }
+
+        .tl-s.done .tl-l {
+            color: #059669
+        }
+
+        .tl-s.active .tl-l {
+            color: var(--teal)
+        }
+
+        .info-g {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px
+        }
+
+        .ii {
+            background: var(--bg);
+            border-radius: 9px;
+            padding: 11px 13px
+        }
+
+        .ii-l {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            margin-bottom: 3px
+        }
+
+        .ii-v {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--txt);
+            line-height: 1.4
+        }
+
+        .ii-s {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        /* RADIO STATUS */
+        .form-lbl {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            margin-bottom: 7px;
+            display: block
+        }
+
+        .fi-inp {
+            width: 100%;
+            background: var(--bg);
+            border: 1.5px solid var(--bdr);
+            border-radius: 9px;
+            padding: 9px 12px;
+            font-size: 13px;
+            color: var(--txt);
+            font-family: inherit;
+            transition: border-color .2s
+        }
+
+            .fi-inp:focus {
+                outline: none;
+                border-color: var(--teal);
+                box-shadow: 0 0 0 3px rgba(15,118,110,.1)
+            }
+
+        .st-g {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 18px
+        }
+
+        .st-wrap {
+            position: relative
+        }
+
+            .st-wrap input[type="radio"] {
+                position: absolute;
+                opacity: 0;
+                width: 0;
+                height: 0
+            }
+
+        .st-lbl {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 13px;
+            border-radius: 9px;
+            cursor: pointer;
+            border: 2px solid var(--bdr);
+            background: var(--surf);
+            transition: all .18s;
+            user-select: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--txt)
+        }
+
+            .st-lbl:hover {
+                border-color: #94a3b8;
+                background: var(--bg)
+            }
+
+        .st-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            transition: transform .2s
+        }
+
+        .st-chk {
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+            border: 2px solid #d1d5db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all .2s;
+            font-size: 9px;
+            color: transparent;
+            margin-left: auto
+        }
+
+        .st-wrap input:checked + .st-lbl {
+            font-weight: 800
+        }
+
+            .st-wrap input:checked + .st-lbl .st-dot {
+                transform: scale(1.4)
+            }
+
+            .st-wrap input:checked + .st-lbl .st-chk {
+                color: #fff
+            }
+
+        [data-s="Pending"] input:checked + .st-lbl {
+            background: #fef3c7;
+            border-color: #fcd34d;
+            color: #92400e
+        }
+
+            [data-s="Pending"] input:checked + .st-lbl .st-chk {
+                background: #d97706;
+                border-color: #d97706
+            }
+
+        [data-s="Processing"] input:checked + .st-lbl {
+            background: #dbeafe;
+            border-color: #93c5fd;
+            color: #1e40af
+        }
+
+            [data-s="Processing"] input:checked + .st-lbl .st-chk {
+                background: #2563eb;
+                border-color: #2563eb
+            }
+
+        [data-s="Ready"] input:checked + .st-lbl {
+            background: #d1fae5;
+            border-color: #6ee7b7;
+            color: #065f46
+        }
+
+            [data-s="Ready"] input:checked + .st-lbl .st-chk {
+                background: #059669;
+                border-color: #059669
+            }
+
+        [data-s="Done"] input:checked + .st-lbl {
+            background: #f0fdf4;
+            border-color: #86efac;
+            color: #14532d
+        }
+
+            [data-s="Done"] input:checked + .st-lbl .st-chk {
+                background: #16a34a;
+                border-color: #16a34a
+            }
+
+        [data-s="Cancelled"] input:checked + .st-lbl {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: #991b1b
+        }
+
+            [data-s="Cancelled"] input:checked + .st-lbl .st-chk {
+                background: #dc2626;
+                border-color: #dc2626
+            }
+
+        .btn-save {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            border-radius: 9px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg,var(--teal),var(--teal2));
+            color: #fff;
+            letter-spacing: .3px;
+            transition: all .2s
+        }
+
+            .btn-save:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 5px 16px rgba(15,118,110,.3)
+            }
+
+        .back-l {
+            display: block;
+            text-align: center;
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--teal);
+            text-decoration: none
+        }
+
+            .back-l:hover {
+                text-decoration: underline
+            }
+
+        .note-box {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            border-radius: 0 10px 10px 0;
+            padding: 12px 15px;
+            margin-top: 13px
+        }
+
+            .note-box p {
+                margin: 0;
+                font-size: 13px;
+                color: #78350f;
+                line-height: 1.6
+            }
+
+        /* Done banner — highlight when service is Done to show order can advance */
+        .done-banner {
+            background: rgba(5,150,105,.08);
+            border: 1.5px solid rgba(5,150,105,.25);
+            border-radius: 10px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px
+        }
+
+            .done-banner i {
+                color: #059669;
+                font-size: 18px;
+                flex-shrink: 0
+            }
+
+        .done-banner-txt {
+            font-size: 13px;
+            font-weight: 600;
+            color: #065f46
+        }
+
+            .done-banner-txt strong {
+                font-weight: 800
+            }
+
+        @@media(max-width:860px) {
+            .grid {
+                grid-template-columns: 1fr
+            }
+
+            .info-g {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @@media(max-width:600px) {
+            .wrap {
+                padding: 14px 12px 60px
+            }
+        }
+    </style>
+}
+
+<div class="wrap">
+    <!-- Breadcrumb -->
+    <div class="bc">
+        <a asp-page="/Index">Home</a>
+        <span style="opacity:.4">›</span>
+        <a asp-page="/Support/Orders/Index">Support Dashboard</a>
+        <span style="opacity:.4">›</span>
+        <a asp-page="/Support/ServiceOrders/Index">Service Jobs</a>
+        <span style="opacity:.4">›</span>
+        <span>Order #@Model.Order?.OrderId</span>
+    </div>
+
+    @if (TempData["Success"] is string ok)
+    {
+        <div class="al-ok"><i class="bi bi-check-circle-fill"></i> @ok</div>
+    }
+    @if (TempData["Error"] is string err)
+    {
+        <div class="al-err"><i class="bi bi-exclamation-circle-fill"></i> @err</div>
+    }
+
+    @if (order == null || snap == null || item == null)
+    {
+        <div class="al-err"><i class="bi bi-exclamation-circle-fill"></i> Service order not found.</div>
+    }
+    else
+    {
+        <div class="pg-hdr">
+            <div>
+                <h1><i class="bi bi-wrench me-2"></i>Service Job #@order.OrderId</h1>
+                <p>@order.CreatedAt.ToString("MMMM dd, yyyy 'at' HH:mm")</p>
+            </div>
+            <span class="spill"
+                  style="background:@StatusBg(curStatus);color:@StatusFg(curStatus);border:1.5px solid @StatusBdr(curStatus)">
+                <i class="bi @StatusIcon(curStatus)"></i> @curStatus
+            </span>
+        </div>
+
+        @* Show banner when Done — lets support know they can now advance the order to Processing *@
+        @if (curStatus == "Done")
+        {
+            <div class="done-banner">
+                <i class="bi bi-check-circle-fill"></i>
+                <div class="done-banner-txt">
+                    Service hoàn thành! Bạn có thể quay lại
+                    <a asp-page="/Support/Orders/Details" asp-route-id="@order.OrderId"
+                       style="color:var(--teal);font-weight:800">Order #@order.OrderId</a>
+                    và <strong>Advance to Processing</strong>.
+                </div>
+            </div>
+        }
+
+        <div class="grid">
+            <!-- LEFT -->
+            <div>
+                <!-- Service Breakdown -->
+                <div class="dc">
+                    <div class="dc-hdr"><i class="bi bi-tools"></i><h3>Service Breakdown</h3></div>
+                    <div class="dc-body">
+                        <div class="bd-row">
+                            <div class="bd-left">
+                                <div class="bd-ico"><i class="bi bi-eyeglasses"></i></div>
+                                <div><div class="bd-lbl">Frame</div><div class="bd-val">@(snap.FrameName ?? snap.ProductName ?? "N/A")</div></div>
+                            </div>
+                            <div class="bd-prc">@snap.FramePrice.ToString("N0") ₫</div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(snap.LensProductName))
+                        {
+                            <div class="bd-row">
+                                <div class="bd-left">
+                                    <div class="bd-ico">⭕</div>
+                                    <div><div class="bd-lbl">Lens</div><div class="bd-val">@snap.LensProductName</div></div>
+                                </div>
+                                <div class="bd-prc">@snap.LensPrice.ToString("N0") ₫</div>
+                            </div>
+                        }
+                        <div class="bd-row">
+                            <div class="bd-left">
+                                <div class="bd-ico"><i class="bi bi-gear"></i></div>
+                                <div><div class="bd-lbl">Service</div><div class="bd-val">@(snap.ServiceName ?? "N/A")</div></div>
+                            </div>
+                            <div class="bd-prc">@snap.ServicePrice.ToString("N0") ₫</div>
+                        </div>
+                        <div class="bd-tot">
+                            <div class="bd-tot-lbl">Total</div>
+                            <div class="bd-tot-val">@((item.UnitPrice * item.Quantity).ToString("N0")) ₫</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Timeline -->
+                <div class="dc">
+                    <div class="dc-hdr"><i class="bi bi-map"></i><h3>Progress</h3></div>
+                    <div class="dc-body">
+                        @if (isCancelled)
+                        {
+                            <div style="display:flex;align-items:center;gap:10px;color:#dc2626">
+                                <i class="bi bi-x-circle" style="font-size:1.4rem"></i>
+                                <strong>Service order này đã bị huỷ.</strong>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="tl">
+                                @for (int i = 0; i < steps.Length; i++)
+                                {
+                                    string cls = i < stepIdx ? "done" : i == stepIdx ? "active" : "";
+                                    string ic = i < stepIdx ? "✓" : i == stepIdx ? "●" : (i + 1).ToString();
+                                    <div class="tl-s @cls">
+                                        <div class="tl-c">@ic</div>
+                                        <div class="tl-l">@steps[i]</div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Customer Info -->
+                <div class="dc">
+                    <div class="dc-hdr"><i class="bi bi-person-fill"></i><h3>Customer Info</h3></div>
+                    <div class="dc-body">
+                        <div class="info-g">
+                            <div class="ii">
+                                <div class="ii-l">Customer</div>
+                                <div class="ii-v">@(order.User?.FullName ?? "N/A")</div>
+                                <div class="ii-s">@(order.User?.Email ?? "")</div>
+                            </div>
+                            <div class="ii">
+                                <div class="ii-l">Order Status</div>
+                                <div class="ii-v">@order.Status</div>
+                                <div class="ii-s">@order.PaymentMethod</div>
+                            </div>
+                            <div class="ii">
+                                <div class="ii-l">Date</div>
+                                <div class="ii-v">@order.CreatedAt.ToString("dd/MM/yyyy")</div>
+                                <div class="ii-s">@order.CreatedAt.ToString("HH:mm")</div>
+                            </div>
+                            <div class="ii">
+                                <div class="ii-l">Total Paid</div>
+                                <div class="ii-v" style="color:var(--gold)">@order.TotalAmount.ToString("N0") ₫</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Update Form -->
+            <div>
+                <div class="dc" style="position:sticky;top:80px">
+                    <div class="dc-hdr"><i class="bi bi-pencil-fill"></i><h3>Update Service Job</h3></div>
+                    <div class="dc-body">
+                        <form method="post" asp-page-handler="Update" asp-route-orderId="@order.OrderId">
+                            <input type="hidden" name="OrderItemId" value="@item.OrderItemId" />
+
+                            <div style="margin-bottom:18px">
+                                <span class="form-lbl"><i class="bi bi-bar-chart me-1"></i> Trạng thái Service</span>
+                                <div class="st-g">
+                                    @foreach (var s in DetailModel.Statuses)
+                                    {
+                                        bool isCur = curStatus == s;
+                                        <div class="st-wrap" data-s="@s">
+                                            <input type="radio" id="s_@s" name="ServiceStatus"
+                                                   value="@s" @(isCur ? "checked" : "") />
+                                            <label class="st-lbl" for="s_@s">
+                                                <span class="st-dot" style="background:@StatusFg(s)"></span>
+                                                <span style="font-size:14px">@StatusEmoji(s)</span>
+                                                <span>@s</span>
+                                                <span class="st-chk">✓</span>
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom:13px">
+                                <label class="form-lbl" for="at"><i class="bi bi-person me-1"></i> Assign Technician</label>
+                                <input type="text" id="at" name="AssignedTo"
+                                       value="@snap.AssignedTo" class="fi-inp"
+                                       placeholder="Tên kỹ thuật viên hoặc mã nhân viên…" />
+                            </div>
+
+                            <div style="margin-bottom:18px">
+                                <label class="form-lbl" for="note">
+                                    <i class="bi bi-pencil me-1"></i> Ghi chú
+                                </label>
+                                <textarea id="note" name="InternalNote" rows="4"
+                                      class="fi-inp" style="resize:vertical"
+                                      placeholder="e.g. Lens đang cắt, dự kiến 2 giờ…">@snap.InternalNote</textarea>
+                            </div>
+
+                            <button type="submit" class="btn-save">
+                                <i class="bi bi-save me-1"></i> Lưu thay đổi
+                            </button>
+                        </form>
+
+                        <a asp-page="/Support/Orders/Details" asp-route-id="@order.OrderId" class="back-l" style="margin-top:14px">
+                            ← Quay lại Order #@order.OrderId
+                        </a>
+                        <a asp-page="/Support/ServiceOrders/Index" class="back-l">
+                            ← Danh sách Service Jobs
+                        </a>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(snap.InternalNote))
+                {
+                    <div class="note-box">
+                        <div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px">Current Note</div>
+                        <p>@snap.InternalNote</p>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Make radio labels clickable
+        document.querySelectorAll('.st-lbl').forEach(lbl => {
+            lbl.addEventListener('click', function() {
+                const radio = this.previousElementSibling;
+                if (radio) radio.checked = true;
+            });
+        });
+    </script>
+}

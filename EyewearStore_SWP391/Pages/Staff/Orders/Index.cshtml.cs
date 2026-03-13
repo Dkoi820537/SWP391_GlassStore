@@ -10,18 +10,12 @@ using System;
 
 namespace EyewearStore_SWP391.Pages.Staff.Orders
 {
-    /// <summary>
-    /// Operations Staff Order Management — Linear Workflow
-    /// Pipeline scope: Processing → Shipped → Delivered
-    /// No dropdown. Each order has one "Process" button → Details page.
-    /// </summary>
     [Authorize(Roles = "staff,operations,admin,Administrator")]
     public class IndexModel : PageModel
     {
         private readonly EyewearStoreContext _context;
         public IndexModel(EyewearStoreContext context) => _context = context;
 
-        // ── Lightweight DTO ───────────────────────────────────────────────
         public class OrderSummaryDto
         {
             public int OrderId { get; set; }
@@ -31,7 +25,6 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             public string Status { get; set; } = "";
             public decimal TotalAmount { get; set; }
             public bool HasPrescription { get; set; }
-            public bool HasService { get; set; }
             public bool IsPreOrder { get; set; }
             public string? TrackingNumber { get; set; }
             public string? Carrier { get; set; }
@@ -59,15 +52,14 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             "Processing", "Shipped", "Delivered", "Completed", "Cancelled"
         };
 
+        // ServiceCount removed — service jobs moved to Support role
         public class OpsStats
         {
             public int ProcessingCount { get; set; }
             public int PrescriptionCount { get; set; }
             public int ShippedTodayCount { get; set; }
-            public int ServiceCount { get; set; }
         }
 
-        // ── GET ───────────────────────────────────────────────────────────
         public async Task OnGetAsync()
         {
             if (PageSize <= 0) PageSize = 10;
@@ -86,80 +78,55 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                     Status = o.Status,
                     TotalAmount = o.TotalAmount,
                     HasPrescription = o.OrderItems.Any(oi => oi.PrescriptionId != null),
-                    HasService = o.OrderItems.Any(oi =>
-                                         oi.SnapshotJson != null &&
-                                         (oi.SnapshotJson.Contains("\"isServiceOrder\":true") ||
-                                          oi.SnapshotJson.Contains("\"lensProductId\":"))),
                     IsPreOrder = o.OrderItems.Any(oi =>
-                                         oi.Product != null &&
-                                         oi.Product.InventoryQty < oi.Quantity),
-
-                    // Shipment.CreatedAt does not exist in your model,
-                    // so use ShipmentId to get the latest shipment record.
+                        oi.Product != null && oi.Product.InventoryQty < oi.Quantity),
                     TrackingNumber = o.Shipments.Any()
-                        ? o.Shipments
-                            .OrderByDescending(s => s.ShipmentId)
-                            .Select(s => s.TrackingNumber)
-                            .FirstOrDefault()
+                        ? o.Shipments.OrderByDescending(s => s.ShipmentId).Select(s => s.TrackingNumber).FirstOrDefault()
                         : null,
-
                     Carrier = o.Shipments.Any()
-                        ? o.Shipments
-                            .OrderByDescending(s => s.ShipmentId)
-                            .Select(s => s.Carrier)
-                            .FirstOrDefault()
+                        ? o.Shipments.OrderByDescending(s => s.ShipmentId).Select(s => s.Carrier).FirstOrDefault()
                         : null,
                 })
                 .AsQueryable();
 
-            // Status filter — default shows ops-relevant statuses
             if (string.IsNullOrWhiteSpace(StatusFilter))
                 query = query.Where(o => o.Status == "Processing" || o.Status == "Shipped");
             else
                 query = query.Where(o => o.Status == StatusFilter);
 
-            // Search
             if (!string.IsNullOrWhiteSpace(Search))
             {
                 var term = Search.Trim();
                 if (int.TryParse(term, out var oid))
                     query = query.Where(o => o.OrderId == oid ||
-                                (o.UserEmail != null && o.UserEmail.Contains(term)) ||
-                                (o.UserFullName != null && o.UserFullName.Contains(term)));
+                        (o.UserEmail != null && o.UserEmail.Contains(term)) ||
+                        (o.UserFullName != null && o.UserFullName.Contains(term)));
                 else
                     query = query.Where(o =>
-                                (o.UserEmail != null && o.UserEmail.Contains(term)) ||
-                                (o.UserFullName != null && o.UserFullName.Contains(term)));
+                        (o.UserEmail != null && o.UserEmail.Contains(term)) ||
+                        (o.UserFullName != null && o.UserFullName.Contains(term)));
             }
 
-            // Type filter
             if (!string.IsNullOrWhiteSpace(TypeFilter))
             {
                 switch (TypeFilter)
                 {
                     case "Prescription":
-                        query = query.Where(o => o.HasPrescription);
-                        break;
-                    case "Service":
-                        query = query.Where(o => o.HasService);
-                        break;
+                        query = query.Where(o => o.HasPrescription); break;
                     case "PreOrder":
-                        query = query.Where(o => o.IsPreOrder);
-                        break;
+                        query = query.Where(o => o.IsPreOrder); break;
                     case "Standard":
-                        query = query.Where(o => !o.HasPrescription && !o.HasService && !o.IsPreOrder);
-                        break;
+                        query = query.Where(o => !o.HasPrescription && !o.IsPreOrder); break;
                 }
             }
 
-            // Priority filter
             if (!string.IsNullOrWhiteSpace(PriorityFilter))
             {
                 var twoDaysAgo = DateTime.UtcNow.AddDays(-2);
                 if (PriorityFilter == "High")
-                    query = query.Where(o => o.HasPrescription || o.HasService || o.CreatedAt < twoDaysAgo);
+                    query = query.Where(o => o.HasPrescription || o.CreatedAt < twoDaysAgo);
                 else if (PriorityFilter == "Normal")
-                    query = query.Where(o => !o.HasPrescription && !o.HasService && o.CreatedAt >= twoDaysAgo);
+                    query = query.Where(o => !o.HasPrescription && o.CreatedAt >= twoDaysAgo);
             }
 
             TotalOrders = await query.CountAsync();
@@ -188,40 +155,25 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                 .CountAsync(o => (o.Status == "Processing" || o.Status == "Shipped")
                               && o.OrderItems.Any(oi => oi.PrescriptionId != null));
 
-            // Order does not have UpdatedAt in your model,
-            // so use CreatedAt as a fallback for this stat.
             Stats.ShippedTodayCount = await _context.Orders
                 .CountAsync(o => o.Status == "Shipped"
                               && o.CreatedAt >= today && o.CreatedAt < tomorrow);
-
-            Stats.ServiceCount = await _context.Orders
-                .CountAsync(o => (o.Status == "Processing" || o.Status == "Shipped")
-                              && o.OrderItems.Any(oi =>
-                                     oi.SnapshotJson != null &&
-                                     (oi.SnapshotJson.Contains("\"isServiceOrder\":true") ||
-                                      oi.SnapshotJson.Contains("\"lensProductId\":"))));
+            // ServiceCount removed — service orders belong to Support role
         }
 
         private void BuildDisplayPageNumbers()
         {
             DisplayPageNumbers = new List<int>();
             int total = TotalPages, current = PageNumber;
-
             if (total <= PageWindow)
             {
-                for (int i = 1; i <= total; i++)
-                    DisplayPageNumbers.Add(i);
+                for (int i = 1; i <= total; i++) DisplayPageNumbers.Add(i);
                 return;
             }
-
             int left = Math.Max(1, current - PageWindow / 2);
             int right = Math.Min(total, left + PageWindow - 1);
-
-            if (right - left + 1 < PageWindow)
-                left = Math.Max(1, right - PageWindow + 1);
-
-            for (int i = left; i <= right; i++)
-                DisplayPageNumbers.Add(i);
+            if (right - left + 1 < PageWindow) left = Math.Max(1, right - PageWindow + 1);
+            for (int i = left; i <= right; i++) DisplayPageNumbers.Add(i);
         }
     }
 }

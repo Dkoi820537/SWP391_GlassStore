@@ -609,6 +609,27 @@
             opacity: .4;
             pointer-events: none
         }
+        /* ADDED */
+        .btn-svc-jobs {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg,var(--navy),var(--navy2));
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all .2s;
+            white-space: nowrap
+        }
+
+            .btn-svc-jobs:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(13,27,42,.3);
+                color: #fff
+            }
 
         .btn-returns {
             display: inline-flex;
@@ -697,6 +718,9 @@
             <button class="btn-refresh" onclick="window.location.reload()">
                 <i class="bi bi-arrow-clockwise"></i> Refresh
             </button>
+            <a asp-page="/Support/ServiceOrders/Index" class="btn-svc-jobs">
+                <i class="bi bi-wrench"></i> Service Jobs <i class="bi bi-arrow-right"></i>
+            </a>
             <a asp-page="/Support/Returns/Index" class="btn-returns">
                 <i class="bi bi-arrow-return-left"></i> Returns Queue
             </a>
@@ -754,35 +778,22 @@
                 <option value="50" selected="@(Model.PageSize == 50)">50</option>
             </select>
             <input type="hidden" name="pageNumber" value="1" />
-            <button type="submit" class="btn-apply">
-                <i class="bi bi-funnel-fill"></i> Filter
-            </button>
+            <button type="submit" class="btn-apply"><i class="bi bi-funnel-fill"></i> Filter</button>
         </form>
         <div class="quick-links">
-            <a href="?StatusFilter=Pending+Confirmation" class="ql ql-navy">
-                <i class="bi bi-exclamation-circle"></i> Pending
-            </a>
-            <a href="?StatusFilter=Confirmed" class="ql ql-teal">
-                <i class="bi bi-check-circle"></i> Confirmed
-            </a>
-            <a href="?TypeFilter=Prescription" class="ql ql-teal">
-                <i class="bi bi-eyeglasses"></i> Prescription
-            </a>
-            <a href="?TypeFilter=PreOrder" class="ql ql-navy">
-                <i class="bi bi-hourglass"></i> Pre-Orders
-            </a>
-            <a asp-page="/Support/Returns/Index" class="ql ql-red">
-                <i class="bi bi-arrow-return-left"></i> Returns
-            </a>
+            <a href="?StatusFilter=Pending+Confirmation" class="ql ql-navy"><i class="bi bi-exclamation-circle"></i> Pending</a>
+            <a href="?StatusFilter=Confirmed" class="ql ql-teal"><i class="bi bi-check-circle"></i> Confirmed</a>
+            <a href="?TypeFilter=Prescription" class="ql ql-teal"><i class="bi bi-eyeglasses"></i> Prescription</a>
+            <a href="?TypeFilter=PreOrder" class="ql ql-navy"><i class="bi bi-hourglass"></i> Pre-Orders</a>
+            <a asp-page="/Support/Returns/Index" class="ql ql-red"><i class="bi bi-arrow-return-left"></i> Returns</a>
+            <a asp-page="/Support/ServiceOrders/Index" class="ql ql-navy"><i class="bi bi-wrench"></i> Service Jobs</a>
         </div>
     </div>
 
     <div class="tbl-card">
         <div class="tbl-hdr">
             <h5><i class="bi bi-list-check"></i> Support Queue (@Model.TotalOrders orders)</h5>
-            <div class="tbl-hdr-info">
-                Showing <strong>@Model.FirstItemIndex–@Model.LastItemIndex</strong> of <strong>@Model.TotalOrders</strong>
-            </div>
+            <div class="tbl-hdr-info">Showing <strong>@Model.FirstItemIndex–@Model.LastItemIndex</strong> of <strong>@Model.TotalOrders</strong></div>
         </div>
 
         @if (!Model.Orders.Any())
@@ -811,11 +822,8 @@
                     <tbody>
                         @foreach (var order in Model.Orders)
                         {
-                            bool isHighPriority = order.HasPrescription
-                            || order.CreatedAt < DateTime.UtcNow.AddDays(-2)
-                            || order.HasReturn;
-
-                            string statusPill = order.Status switch
+                            bool isHigh = order.HasPrescription || order.CreatedAt < DateTime.UtcNow.AddDays(-2) || order.HasReturn;
+                            string sPill = order.Status switch
                             {
                                 "Pending Confirmation" => "pill-pending",
                                 "Confirmed" => "pill-confirmed",
@@ -826,21 +834,16 @@
                                 "Cancelled" => "pill-cancelled",
                                 _ => ""
                             };
-
-                            <tr class="@(isHighPriority ? "high-priority" : "")">
+                            <tr class="@(isHigh ? "high-priority" : "")">
                                 <td>
                                     <div class="order-id">#@order.OrderId</div>
-                                    @if (isHighPriority)
+                                    @if (isHigh)
                                     {
-                                        <span class="pill pill-urgent" style="margin-top:3px">
-                                            <i class="bi bi-exclamation-triangle"></i> Urgent
-                                        </span>
+                                        <span class="pill pill-urgent" style="margin-top:3px"><i class="bi bi-exclamation-triangle"></i> Urgent</span>
                                     }
                                     @if (order.HasReturn)
                                     {
-                                        <span class="pill pill-return" style="margin-top:3px">
-                                            <i class="bi bi-arrow-return-left"></i> Return
-                                        </span>
+                                        <span class="pill pill-return" style="margin-top:3px"><i class="bi bi-arrow-return-left"></i> Return</span>
                                     }
                                 </td>
                                 <td>
@@ -851,9 +854,7 @@
                                     <div class="date-main">@order.CreatedAt.ToString("MMM dd, yyyy")</div>
                                     <div class="date-sub">@order.CreatedAt.ToString("HH:mm")</div>
                                 </td>
-                                <td>
-                                    <span class="pill @statusPill">@order.Status</span>
-                                </td>
+                                <td><span class="pill @sPill">@order.Status</span></td>
                                 <td>
                                     @if (order.HasPrescription)
                                     {
@@ -861,10 +862,12 @@
                                     }
                                     else if (order.IsLowStock)
                                     {
+
                                         <span class="pill pill-preorder"><i class="bi bi-hourglass-split"></i> Pre-Order</span>
                                     }
                                     else
                                     {
+
                                         <span class="pill pill-ready"><i class="bi bi-check-circle"></i> Ready</span>
                                     }
                                 </td>
@@ -887,20 +890,11 @@
                     </tbody>
                 </table>
             </div>
-
             <div class="pag-row">
                 <div class="pag-info">Page @Model.PageNumber of @Model.TotalPages</div>
                 <ul class="pag">
-                    <li class="pag-item @(Model.PageNumber == 1 ? "disabled" : "")">
-                        <a asp-page="./Index" asp-route-pageNumber="1" asp-route-pageSize="@Model.PageSize"
-                           asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
-                           asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">«</a>
-                    </li>
-                    <li class="pag-item @(Model.PageNumber == 1 ? "disabled" : "")">
-                        <a asp-page="./Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize"
-                           asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
-                           asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">‹</a>
-                    </li>
+                    <li class="pag-item @(Model.PageNumber == 1 ? "disabled" : "")"><a asp-page="./Index" asp-route-pageNumber="1" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">«</a></li>
+                    <li class="pag-item @(Model.PageNumber == 1 ? "disabled" : "")"><a asp-page="./Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">‹</a></li>
                     @foreach (var p in Model.DisplayPageNumbers)
                     {
                         <li class="pag-item @(p == Model.PageNumber ? "active" : "")">
@@ -910,22 +904,13 @@
                             }
                             else
                             {
-                                <a asp-page="./Index" asp-route-pageNumber="@p" asp-route-pageSize="@Model.PageSize"
-                                   asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
-                                   asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">@p</a>
+
+                                <a asp-page="./Index" asp-route-pageNumber="@p" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">@p</a>
                             }
                         </li>
                     }
-                    <li class="pag-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
-                        <a asp-page="./Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize"
-                           asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
-                           asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">›</a>
-                    </li>
-                    <li class="pag-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
-                        <a asp-page="./Index" asp-route-pageNumber="@Model.TotalPages" asp-route-pageSize="@Model.PageSize"
-                           asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
-                           asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">»</a>
-                    </li>
+                    <li class="pag-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")"><a asp-page="./Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">›</a></li>
+                    <li class="pag-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")"><a asp-page="./Index" asp-route-pageNumber="@Model.TotalPages" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">»</a></li>
                 </ul>
             </div>
         }
@@ -944,7 +929,6 @@
             document.getElementById('quickConfirmOrderId').value = orderId;
             document.getElementById('quickConfirmForm').submit();
         }
-
         setTimeout(() => location.reload(), 120000);
     </script>
 }

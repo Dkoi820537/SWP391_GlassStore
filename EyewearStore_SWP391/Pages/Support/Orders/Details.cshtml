@@ -8,6 +8,25 @@
     bool serviceDone = Model.ServiceStatus == "Done";
     bool serviceCancelled = Model.ServiceStatus == "Cancelled";
     var blockedStatuses = new[] { "Shipped", "Delivered", "Completed" };
+
+    // ── Workflow definition ──────────────────────────────────────
+    // Sale/Support can only advance:  Pending Confirmation → Confirmed → Processing
+    // After Processing it hands off to Operations (they see it in their queue)
+    // Sale/Support CANNOT go beyond Processing
+    string? nextStatus = Model.Order?.Status switch
+    {
+        "Pending Confirmation" => "Confirmed",
+        "Confirmed" => "Processing",
+        _ => null   // nothing left for Sale/Support to advance
+    };
+    bool canAdvance = nextStatus != null;
+
+    // If the order has a service item AND it is not done, block advancing to "Processing"
+    bool serviceBlocked = nextStatus == "Processing"
+                          && Model.HasServiceItem
+                          && !serviceDone
+                          && !serviceCancelled;
+    if (serviceBlocked) canAdvance = false;
 }
 
 @section Styles {
@@ -49,7 +68,6 @@
             padding: 28px 20px 80px
         }
 
-        /* Breadcrumb */
         .bc {
             display: flex;
             gap: 6px;
@@ -69,7 +87,6 @@
                     color: var(--teal)
                 }
 
-        /* Alerts */
         .al {
             display: flex;
             align-items: center;
@@ -106,7 +123,6 @@
             }
         }
 
-        /* Header */
         .pg-hdr {
             display: flex;
             justify-content: space-between;
@@ -159,6 +175,275 @@
             font-weight: 800
         }
 
+        /* ── WORKFLOW TRACKER ── */
+        .wf-track {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r);
+            padding: 18px 22px;
+            margin-bottom: 18px;
+            box-shadow: var(--sh);
+        }
+
+        .wf-track-title {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .9px;
+            color: var(--muted);
+            margin-bottom: 14px;
+        }
+
+        .wf-steps {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .wf-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .wf-circle {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            border: 2px solid var(--bdr);
+            background: var(--surf);
+            color: var(--muted);
+            transition: all .3s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .wf-node.done .wf-circle {
+            background: var(--ok);
+            border-color: var(--ok);
+            color: #fff
+        }
+
+        .wf-node.active .wf-circle {
+            background: var(--navy);
+            border-color: var(--navy);
+            color: #fff;
+            box-shadow: 0 0 0 4px rgba(13,27,42,.12)
+        }
+
+        .wf-node.next .wf-circle {
+            background: var(--surf);
+            border-color: var(--teal);
+            color: var(--teal);
+            border-style: dashed
+        }
+
+        .wf-label {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--muted);
+            margin-top: 6px;
+            text-align: center;
+            max-width: 70px;
+            line-height: 1.3;
+        }
+
+        .wf-node.done .wf-label {
+            color: var(--ok)
+        }
+
+        .wf-node.active .wf-label {
+            color: var(--navy);
+            font-weight: 900
+        }
+
+        .wf-node.next .wf-label {
+            color: var(--teal)
+        }
+
+        .wf-line {
+            flex: 1;
+            height: 2px;
+            background: var(--bdr);
+            min-width: 24px;
+            max-width: 60px;
+            margin-bottom: 22px;
+        }
+
+            .wf-line.done {
+                background: var(--ok)
+            }
+
+        .wf-role-badge {
+            font-size: 8px;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 4px;
+            margin-top: 3px;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+
+        .rb-sale {
+            background: rgba(37,99,235,.1);
+            color: #1d4ed8
+        }
+
+        .rb-ops {
+            background: rgba(5,150,105,.1);
+            color: var(--ok)
+        }
+
+        .rb-manager {
+            background: rgba(13,27,42,.1);
+            color: var(--navy2)
+        }
+
+        /* ── ADVANCE BUTTON ── */
+        .advance-card {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r);
+            overflow: hidden;
+            box-shadow: var(--sh);
+            margin-bottom: 14px;
+        }
+
+        .advance-hdr {
+            padding: 12px 16px;
+            background: linear-gradient(135deg, var(--teal), var(--teal2));
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .advance-hdr h3 {
+                font-size: 12px;
+                font-weight: 800;
+                color: #fff;
+                margin: 0;
+                flex: 1;
+                text-transform: uppercase;
+                letter-spacing: .5px;
+            }
+
+        .advance-body {
+            padding: 16px
+        }
+
+        .btn-advance {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--navy), var(--navy2));
+            color: #fff;
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: .3px;
+            transition: all .22s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+            .btn-advance:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(13,27,42,.3);
+            }
+
+            .btn-advance:disabled {
+                opacity: .45;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            .btn-advance .arrow-icon {
+                width: 30px;
+                height: 30px;
+                background: rgba(255,255,255,.18);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+            }
+
+        .next-status-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+            .next-status-label strong {
+                color: var(--teal)
+            }
+
+        /* Locked hint */
+        .lock-hint {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            background: var(--red-s);
+            border: 1px solid rgba(220,38,38,.18);
+            border-radius: 9px;
+            padding: 11px 14px;
+            font-size: 12px;
+            color: var(--red);
+            line-height: 1.5;
+        }
+
+            .lock-hint i {
+                flex-shrink: 0;
+                margin-top: 1px
+            }
+
+        /* Handed-off card */
+        .handoff-card {
+            background: var(--ok-s);
+            border: 1px solid rgba(5,150,105,.2);
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+            .handoff-card i {
+                font-size: 22px;
+                color: var(--ok);
+                flex-shrink: 0
+            }
+
+        .handoff-card-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--ok);
+            margin-bottom: 2px
+        }
+
+        .handoff-card-sub {
+            font-size: 12px;
+            color: var(--txt2)
+        }
+
         /* Service Banner */
         .svc-banner {
             border-radius: var(--r);
@@ -207,11 +492,6 @@
             color: var(--ok)
         }
 
-        .cancelled.svc-icon-wrap .svc-icon {
-            background: var(--bg2);
-            color: var(--muted)
-        }
-
         .svc-body {
             flex: 1;
             min-width: 0
@@ -221,18 +501,6 @@
             font-size: 13px;
             font-weight: 800;
             margin: 0 0 4px
-        }
-
-        .locked .svc-title {
-            color: var(--red)
-        }
-
-        .done .svc-title {
-            color: var(--ok)
-        }
-
-        .cancelled.svc-title {
-            color: var(--txt2)
         }
 
         .svc-desc {
@@ -301,14 +569,13 @@
                 color: var(--ok)
             }
 
-        /* Grid */
+        /* Grid & Card */
         .det-grid {
             display: grid;
             grid-template-columns: 1fr 340px;
             gap: 16px
         }
 
-        /* Card */
         .dc {
             background: var(--surf);
             border: 1px solid var(--bdr);
@@ -355,7 +622,6 @@
             padding: 16px
         }
 
-        /* Info grid */
         .info-g {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -390,7 +656,6 @@
             margin-top: 2px
         }
 
-        /* Pills */
         .pill {
             display: inline-flex;
             align-items: center;
@@ -445,7 +710,6 @@
             margin-top: 3px
         }
 
-        /* Items table */
         .item-tbl {
             width: 100%;
             border-collapse: collapse
@@ -488,7 +752,6 @@
             color: var(--red)
         }
 
-        /* Rx */
         .rx-section {
             background: var(--bg);
             border-top: 1px solid var(--bdr)
@@ -550,83 +813,6 @@
             .rx-row span:last-child {
                 color: var(--txt);
                 font-weight: 700
-            }
-
-        /* Status form */
-        .form-lbl {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: .7px;
-            margin-bottom: 6px;
-            display: block
-        }
-
-        .fi {
-            width: 100%;
-            background: var(--bg);
-            border: 1.5px solid var(--bdr);
-            border-radius: 8px;
-            padding: 9px 12px;
-            font-size: 13px;
-            color: var(--txt);
-            font-family: inherit;
-            transition: border-color .2s
-        }
-
-            .fi:focus {
-                outline: none;
-                border-color: var(--teal);
-                box-shadow: 0 0 0 3px rgba(15,118,110,.1)
-            }
-
-            .fi:disabled {
-                opacity: .5;
-                cursor: not-allowed
-            }
-
-        .lock-hint {
-            font-size: 11px;
-            color: var(--red);
-            background: var(--red-s);
-            border: 1px solid rgba(220,38,38,.15);
-            border-radius: 7px;
-            padding: 8px 12px;
-            margin-top: 7px;
-            display: flex;
-            align-items: flex-start;
-            gap: 6px;
-            line-height: 1.5
-        }
-
-        .btn-update {
-            width: 100%;
-            padding: 10px;
-            font-size: 13px;
-            font-weight: 800;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            background: linear-gradient(135deg,var(--navy),var(--navy2));
-            color: #fff;
-            transition: all .2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 11px
-        }
-
-            .btn-update:hover:not(:disabled) {
-                transform: translateY(-1px);
-                box-shadow: 0 5px 14px rgba(13,27,42,.25)
-            }
-
-            .btn-update:disabled {
-                opacity: .4;
-                cursor: not-allowed;
-                transform: none
             }
 
         /* Action buttons */
@@ -741,7 +927,6 @@
                 margin-left: auto
             }
 
-        /* Verify badge */
         .verify-badge {
             background: #ff9800;
             color: #fff;
@@ -827,6 +1012,44 @@
         </span>
     </div>
 
+    <!-- ── WORKFLOW TRACKER ── -->
+    <div class="wf-track">
+        <div class="wf-track-title"><i class="bi bi-signpost-2 me-1"></i>Order Workflow Pipeline</div>
+        <div class="wf-steps">
+            @{
+                // Full pipeline definition: (status, label, role-badge-text, role-badge-css)
+                var pipeline = new (string Status, string Label, string Role, string RoleCss)[]
+                {
+                        ("Pending Confirmation", "Pending",    "Sale/Support", "rb-sale"),
+                        ("Confirmed",           "Confirmed",  "Sale/Support", "rb-sale"),
+                        ("Processing",          "Processing", "Sale/Support", "rb-sale"),
+                        ("Shipped",             "Shipped",    "Operations",   "rb-ops"),
+                        ("Delivered",           "Delivered",  "Operations",   "rb-ops"),
+                        ("Completed",           "Completed",  "Manager",      "rb-manager"),
+                };
+
+                int curIdx = Array.FindIndex(pipeline, p => p.Status == Model.Order.Status);
+            }
+            @for (int i = 0; i < pipeline.Length; i++)
+            {
+                var (pStatus, pLabel, pRole, pRoleCss) = pipeline[i];
+                string cls = i < curIdx ? "done" : i == curIdx ? "active" : i == curIdx + 1 ? "next" : "";
+                string icon = i < curIdx ? "✓" : i == curIdx ? "●" : (i + 1).ToString();
+
+                <div class="wf-node @cls">
+                    <div class="wf-circle">@icon</div>
+                    <div class="wf-label">@pLabel</div>
+                    <span class="wf-role-badge @pRoleCss">@pRole</span>
+                </div>
+
+                if (i < pipeline.Length - 1)
+                {
+                    <div class="wf-line @(i < curIdx ? "done" : "")"></div>
+                }
+            }
+        </div>
+    </div>
+
     <!-- Service Banner -->
     @if (Model.HasServiceItem)
     {
@@ -838,11 +1061,11 @@
             <div class="svc-body">
                 @if (serviceDone)
                 {
-                    <p class="svc-title done svc-title" style="color:var(--ok)">Service Completed — Order ready to fulfil</p>
+                    <p class="svc-title" style="color:var(--ok)">Service Completed — Order ready to fulfil</p>
                     <p class="svc-desc">
-                        The service job for <strong>@Model.FrameName</strong>
+                        Service job for <strong>@Model.FrameName</strong>
                         (@(string.IsNullOrEmpty(Model.ServiceName) ? "eyewear service" : Model.ServiceName))
-                        is marked <strong>Done</strong>. You may now set Shipped / Delivered / Completed.
+                        marked <strong>Done</strong>. Sale/Support can advance to Processing.
                     </p>
                 }
                 else if (serviceCancelled)
@@ -852,22 +1075,23 @@
                 }
                 else
                 {
-                    <p class="svc-title locked" style="color:var(--red)">Waiting for Service Completion</p>
+                    <p class="svc-title" style="color:var(--red)">Waiting for Service Completion</p>
                     <p class="svc-desc">
-                        Order contains a <strong>custom eyewear service</strong>
+                        Order contains a custom eyewear service
                         (@(string.IsNullOrEmpty(Model.ServiceName) ? "fitting/customization" : Model.ServiceName)
                         @(string.IsNullOrEmpty(Model.FrameName) ? "" : $"for \"{Model.FrameName}\"")).
-                        <strong>Shipped, Delivered</strong> and <strong>Completed</strong> are locked until the technician marks the job <strong>Done</strong>.
+                        <strong>Cannot advance to Processing</strong> until the technician marks the job <strong>Done</strong>.
                     </p>
                     <div class="svc-steps">
                         @{
-                            string[] steps = { "Pending", "Processing", "Ready", "Done" }; int curIdx = Array.IndexOf(steps, Model.ServiceStatus);
+                            string[] svcSteps = { "Pending", "Processing", "Ready", "Done" };
+                            int svcIdx = Array.IndexOf(svcSteps, Model.ServiceStatus);
                         }
-                        @for (int i = 0; i < steps.Length; i++)
+                        @for (int i = 0; i < svcSteps.Length; i++)
                         {
-                            string cls = i < curIdx ? "done-s" : i == curIdx ? "active-s" : "idle-s";
-                            <span class="svc-step @cls">@steps[i]</span>
-                            if (i < steps.Length - 1)
+                            string sc = i < svcIdx ? "done-s" : i == svcIdx ? "active-s" : "idle-s";
+                            <span class="svc-step @sc">@svcSteps[i]</span>
+                            if (i < svcSteps.Length - 1)
                             {
 
                                 <span style="color:var(--muted);font-size:9px">›</span>
@@ -878,18 +1102,18 @@
             </div>
             @if (serviceDone)
             {
-                <div class="svc-badge ready"><i class="bi bi-check-circle-fill"></i> Ready to Ship</div>
+                <div class="svc-badge ready"><i class="bi bi-check-circle-fill"></i> Ready to Process</div>
             }
             else if (!serviceCancelled)
             {
-
-                <div class="svc-badge lock"><i class="bi bi-lock-fill"></i> Partially Locked</div>
+                <div class="svc-badge lock"><i class="bi bi-lock-fill"></i> Locked</div>
             }
         </div>
     }
 
     <div class="det-grid">
-        <!-- ── LEFT ── -->
+
+        <!-- LEFT COLUMN -->
         <div>
             <!-- Customer & Shipping -->
             <div class="dc">
@@ -962,9 +1186,7 @@
                 <div class="dc-hdr navy">
                     <i class="bi bi-cart3" style="color:rgba(255,255,255,.7)"></i>
                     <h3>Order Items</h3>
-                    <span style="background:rgba(255,255,255,.15);border-radius:5px;padding:2px 8px;font-size:10px;font-weight:700;color:rgba(255,255,255,.9)">
-                        @Model.OrderItems.Count
-                    </span>
+                    <span style="background:rgba(255,255,255,.15);border-radius:5px;padding:2px 8px;font-size:10px;font-weight:700;color:rgba(255,255,255,.9)">@Model.OrderItems.Count</span>
                 </div>
                 <div class="dc-body" style="padding:0">
                     <table class="item-tbl">
@@ -984,8 +1206,6 @@
                                 bool isSvc = !string.IsNullOrEmpty(item.SnapshotJson) &&
                                 (item.SnapshotJson.Contains("\"isServiceOrder\":true") ||
                                 item.SnapshotJson.Contains("\"lensProductId\":"));
-                                string svcSt = Model.ServiceStatus;
-
                                 <tr class="@(isSvc ? "svc-row" : "")">
                                     <td>
                                         <div style="font-weight:700;color:var(--txt);font-size:13px">@item.ProductName</div>
@@ -995,7 +1215,7 @@
                                         }
                                         @if (isSvc)
                                         {
-                                            <div class="svc-ind"><i class="bi bi-nut"></i> Service — @svcSt</div>
+                                            <div class="svc-ind"><i class="bi bi-nut"></i> Service — @Model.ServiceStatus</div>
                                         }
                                         @if (item.HasReturn)
                                         {
@@ -1062,13 +1282,13 @@
                                                     <div style="display:flex;gap:7px;flex-wrap:wrap">
                                                         <form method="post" asp-page-handler="VerifyPrescription" style="display:inline">
                                                             <input type="hidden" name="orderItemId" value="@item.OrderItemId" />
-                                                            <button type="submit" class="act-btn" style="background:linear-gradient(135deg,#15803d,#16a34a);color:#fff;padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;border:none;cursor:pointer">
+                                                            <button type="submit" style="background:linear-gradient(135deg,#15803d,#16a34a);color:#fff;padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;border:none;cursor:pointer">
                                                                 ✓ Verify Prescription
                                                             </button>
                                                         </form>
-                                                        <button type="button" class="act-btn contact"
-                                                                onclick="contactCustomerAboutPrescription(@item.OrderItemId)"
-                                                                style="padding:7px 14px;border-radius:7px;font-size:12px">
+                                                        <button type="button"
+                                                                onclick="window.location.href='mailto:@Model.CustomerEmail?subject=Prescription Correction Needed — Order %23@Model.OrderId'"
+                                                                style="background:rgba(15,118,110,.08);border:1.5px solid rgba(15,118,110,.2);color:var(--teal);padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">
                                                             <i class="bi bi-envelope"></i> Request Correction
                                                         </button>
                                                     </div>
@@ -1092,99 +1312,127 @@
             </div>
         </div>
 
-        <!-- ── RIGHT ── -->
+        <!-- RIGHT COLUMN: Actions -->
         <div>
-            <div class="dc" style="position:sticky;top:80px">
-                <div class="dc-hdr dark"><i class="bi bi-tools" style="color:rgba(255,255,255,.7)"></i><h3>Support Actions</h3></div>
-                <div class="dc-body">
-                    <!-- Status Update -->
-                    <form method="post" asp-page-handler="UpdateStatus" id="statusForm">
-                        <input type="hidden" name="orderId" value="@Model.OrderId" />
-                        <span class="form-lbl">Update Status</span>
+            <div style="position:sticky;top:80px">
 
-                        @if (Model.HasServiceItem && !serviceDone && !serviceCancelled)
+                <!-- ── ADVANCE STATUS CARD ── -->
+                <div class="advance-card">
+                    <div class="advance-hdr">
+                        <i class="bi bi-arrow-right-circle-fill" style="color:rgba(255,255,255,.8)"></i>
+                        <h3>Advance Order</h3>
+                    </div>
+                    <div class="advance-body">
+                        @if (Model.Order.Status == "Cancelled")
                         {
-                            <select name="newStatus" class="fi" id="statusSelect" onchange="checkLock(this)" style="margin-bottom:7px">
-                                @foreach (var s in Model.AllStatuses)
-                                {
-                                    <option value="@s" selected="@(s == Model.Order.Status)"
-                                            data-locked="@(blockedStatuses.Contains(s) ? "true" : "false")">
-                                        @(blockedStatuses.Contains(s) ? "[Locked] " : "")@s
-                                    </option>
-                                }
-                            </select>
-                            <div class="lock-hint" id="lockHint" style="display:none">
-                                <i class="bi bi-lock-fill" style="flex-shrink:0;margin-top:1px"></i>
-                                <span>This status requires the service job to be <strong>Done</strong> first.</span>
+                            <div class="handoff-card" style="background:var(--red-s);border-color:rgba(220,38,38,.2)">
+                                <i class="bi bi-x-circle-fill" style="color:var(--red)"></i>
+                                <div>
+                                    <div class="handoff-card-title" style="color:var(--red)">Order Cancelled</div>
+                                    <div class="handoff-card-sub">This order has been cancelled and cannot be advanced.</div>
+                                </div>
                             </div>
-                            <button type="submit" class="btn-update" id="submitBtn">
-                                <i class="bi bi-arrow-repeat"></i> Update Status
-                            </button>
+                        }
+                        else if (Model.Order.Status is "Shipped" or "Delivered" or "Completed")
+                        {
+                            <!-- Already past Sale/Support scope -->
+                            <div class="handoff-card">
+                                <i class="bi bi-check-circle-fill"></i>
+                                <div>
+                                    <div class="handoff-card-title">Handed Off to Operations</div>
+                                    <div class="handoff-card-sub">This order is now in the <strong>@Model.Order.Status</strong> stage. Operations / Manager team is handling it.</div>
+                                </div>
+                            </div>
+                        }
+                        else if (Model.Order.Status == "Processing")
+                        {
+                            <div class="handoff-card">
+                                <i class="bi bi-arrow-right-circle-fill"></i>
+                                <div>
+                                    <div class="handoff-card-title">Passed to Operations</div>
+                                    <div class="handoff-card-sub">Order is <strong>Processing</strong>. Operations Staff will handle packing, shipment and tracking from here.</div>
+                                </div>
+                            </div>
+                        }
+                        else if (serviceBlocked)
+                        {
+                            <div class="lock-hint">
+                                <i class="bi bi-lock-fill"></i>
+                                <div>
+                                    Cannot advance to <strong>Processing</strong> — the service job is
+                                    <strong>@Model.ServiceStatus</strong>.
+                                    Please wait for the technician to mark it <strong>Done</strong> first.
+                                </div>
+                            </div>
+                        }
+                        else if (canAdvance && nextStatus != null)
+                        {
+                            <form method="post" asp-page-handler="AdvanceStatus">
+                                <input type="hidden" name="orderId" value="@Model.OrderId" />
+                                <button type="submit" class="btn-advance">
+                                    <span>Advance to <strong>@nextStatus</strong></span>
+                                    <div class="arrow-icon"><i class="bi bi-arrow-right"></i></div>
+                                </button>
+                            </form>
+                            <div class="next-status-label">
+                                <i class="bi bi-arrow-right-circle" style="color:var(--teal);font-size:14px"></i>
+                                Current: <span style="color:var(--txt2);font-weight:700">@Model.Order.Status</span>
+                                &nbsp;→&nbsp;
+                                Next: <strong>@nextStatus</strong>
+                            </div>
                         }
                         else
                         {
-                            <select name="newStatus" class="fi" style="margin-bottom:11px">
-                                @foreach (var s in Model.AllStatuses)
-                                {
-                                    <option value="@s" selected="@(s == Model.Order.Status)">@s</option>
-                                }
-                            </select>
-                            <button type="submit" class="btn-update">
-                                <i class="bi bi-arrow-repeat"></i> Update Status
-                            </button>
-                        }
-                    </form>
-
-                    <div class="divider"></div>
-
-                    <!-- Actions -->
-                    <div class="act-grid">
-                        @if (Model.Order.Status == "Pending Confirmation")
-                        {
-                            <button type="button" class="act-btn confirm" onclick="confirmOrder()">
-                                <i class="bi bi-check-circle-fill"></i> Confirm Order
-                            </button>
-                        }
-                        @if (Model.HasServiceItem)
-                        {
-                            <a asp-page="/Staff/ServiceOrders/Detail" asp-route-orderId="@Model.OrderId" class="act-btn svc">
-                                <i class="bi bi-tools"></i> View Service Job
-                                <i class="bi bi-arrow-right" style="margin-left:auto"></i>
-                            </a>
-                        }
-                        <button type="button" class="act-btn contact" onclick="contactCustomer()">
-                            <i class="bi bi-envelope-fill"></i> Contact
-                        </button>
-                        <button type="button" class="act-btn escalate" onclick="escalateToManager()">
-                            <i class="bi bi-arrow-up-circle-fill"></i> Escalate
-                        </button>
-                        @if (Model.Order.Status != "Cancelled")
-                        {
-                            <button type="button" class="act-btn cancel" onclick="cancelOrder()">
-                                <i class="bi bi-x-circle-fill"></i> Cancel Order
-                            </button>
+                            <div class="lock-hint" style="background:var(--bg2);border-color:var(--bdr);color:var(--txt2)">
+                                <i class="bi bi-info-circle"></i>
+                                <span>No further actions available for Sale/Support at this stage.</span>
+                            </div>
                         }
                     </div>
-
-                    <a asp-page="/Support/Customers/OrderHistory" asp-route-userId="@Model.Order.UserId" class="hist-link">
-                        <i class="bi bi-clock-history"></i> Customer Order History
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
                 </div>
-            </div>
 
-            <a asp-page="./Index" class="back-l">
-                <i class="bi bi-arrow-left"></i> Back to Support Queue
-            </a>
+                <!-- Other Actions -->
+                <div class="dc">
+                    <div class="dc-hdr dark"><i class="bi bi-tools" style="color:rgba(255,255,255,.7)"></i><h3>Support Actions</h3></div>
+                    <div class="dc-body">
+                        <div class="act-grid">
+                            @if (Model.HasServiceItem)
+                            {
+                                <a asp-page="/Staff/ServiceOrders/Detail" asp-route-orderId="@Model.OrderId" class="act-btn svc">
+                                    <i class="bi bi-tools"></i> View Service Job
+                                    <i class="bi bi-arrow-right" style="margin-left:auto"></i>
+                                </a>
+                            }
+                            <button type="button" class="act-btn contact" onclick="contactCustomer()">
+                                <i class="bi bi-envelope-fill"></i> Contact
+                            </button>
+                            <button type="button" class="act-btn escalate" onclick="escalateToManager()">
+                                <i class="bi bi-arrow-up-circle-fill"></i> Escalate
+                            </button>
+                            @if (Model.Order.Status != "Cancelled" && Model.Order.Status == "Pending Confirmation")
+                            {
+                                <button type="button" class="act-btn cancel" onclick="cancelOrder()">
+                                    <i class="bi bi-x-circle-fill"></i> Cancel Order
+                                </button>
+                            }
+                        </div>
+
+                        <a asp-page="/Support/Customers/OrderHistory" asp-route-userId="@Model.Order.UserId" class="hist-link">
+                            <i class="bi bi-clock-history"></i> Customer Order History
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <a asp-page="./Index" class="back-l">
+                    <i class="bi bi-arrow-left"></i> Back to Support Queue
+                </a>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- Hidden Forms -->
-<form id="confirmForm" method="post" asp-page-handler="Confirm" style="display:none">
-    @Html.AntiForgeryToken()
-    <input type="hidden" name="orderId" value="@Model.OrderId" />
-</form>
 <form id="escalateForm" method="post" asp-page-handler="Escalate" style="display:none">
     @Html.AntiForgeryToken()
     <input type="hidden" name="orderId" value="@Model.OrderId" />
@@ -1192,49 +1440,17 @@
 
 @section Scripts {
     <script>
-        var BLOCKED      = @Json.Serialize(new[] { "Shipped", "Delivered", "Completed" });
-        var SERVICE_DONE = @Json.Serialize(serviceDone);
-        var HAS_SERVICE  = @Json.Serialize(Model.HasServiceItem);
-
-        function checkLock(sel) {
-            if (!HAS_SERVICE || SERVICE_DONE) return;
-            var locked = BLOCKED.indexOf(sel.value) !== -1;
-            var hint   = document.getElementById('lockHint');
-            var btn    = document.getElementById('submitBtn');
-            if (hint) hint.style.display = locked ? 'flex' : 'none';
-            if (btn) {
-                btn.disabled = locked;
-                btn.innerHTML = locked
-                    ? '<i class="bi bi-lock-fill"></i> Locked — Service Not Done'
-                    : '<i class="bi bi-arrow-repeat"></i> Update Status';
-            }
-            sel.style.borderColor = locked ? '#dc2626' : '';
-            sel.style.background  = locked ? 'rgba(220,38,38,.04)' : '';
-        }
-        var sel = document.getElementById('statusSelect');
-        if (sel) checkLock(sel);
-
-        function confirmOrder() {
-            if (confirm('Confirm this order?\n\nThis will notify the customer and send to Operations team.'))
-                document.getElementById('confirmForm').submit();
-        }
         function contactCustomer() {
             window.location.href = 'mailto:@Model.CustomerEmail?subject=Regarding Order #@Model.OrderId';
         }
-        function contactCustomerAboutPrescription(itemId) {
-            var sub  = encodeURIComponent('Prescription Correction Needed — Order #@Model.OrderId');
-            var body = encodeURIComponent('Dear Customer,\n\nWe need clarification on your prescription values for Order #@Model.OrderId.\n\nPlease reply with the correct prescription.\n\nThank you!');
-            window.location.href = 'mailto:@Model.CustomerEmail?subject=' + sub + '&body=' + body;
-        }
         function escalateToManager() {
-            if (confirm('Escalate to Manager?\n\nThis order will be flagged for manager review.'))
+            if (confirm('Escalate Order #@Model.OrderId to Manager for review?'))
                 document.getElementById('escalateForm').submit();
         }
         function cancelOrder() {
-            if (confirm('Cancel Order #@Model.OrderId?\n\nThis action cannot be undone!'))
-                alert('Cancel order feature — To be implemented');
+            if (confirm('Cancel Order #@Model.OrderId?\n\nThis cannot be undone. Only cancel if the customer has requested it.'))
+                alert('Cancel feature — implement OnPostCancelAsync in DetailsModel');
         }
-
         var alOk = document.querySelector('.al-ok');
         if (alOk) setTimeout(() => { alOk.style.transition='opacity .5s'; alOk.style.opacity='0'; }, 4000);
     </script>

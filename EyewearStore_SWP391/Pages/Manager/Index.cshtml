@@ -41,11 +41,11 @@
                     <p class="text-sm text-slate-500 mt-1 italic">Business overview, analytics, and system management</p>
                 </div>
                 <div class="flex space-x-3">
-                    <button class="text-xs text-slate-500 flex items-center hover:text-teal-600" onclick="window.location.reload()">
-                        <span class="mr-1">↺</span> REFRESH
+                    <button class="border border-slate-300 bg-white text-slate-700 hover:text-teal-700 hover:border-teal-600 px-4 py-2 rounded text-sm font-semibold flex items-center uppercase tracking-wider transition-colors shadow-sm" onclick="window.location.reload()">
+                        REFRESH
                     </button>
-                    <button class="bg-slate-800 text-white px-6 py-2 rounded text-sm font-semibold flex items-center uppercase tracking-wider hover:bg-slate-700" onclick="window.print()">
-                        <span class="material-symbols-outlined mr-2 text-sm">print</span> Print Report
+                    <button class="border border-slate-300 bg-white text-slate-700 hover:text-teal-700 hover:border-teal-600 px-4 py-2 rounded text-sm font-semibold flex items-center uppercase tracking-wider transition-colors shadow-sm" onclick="window.print()">
+                        PRINT REPORT
                     </button>
                 </div>
             </div>
@@ -53,92 +53,77 @@
         <!-- END: Breadcrumbs & Header -->
 
         <!-- BEGIN: Summary Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
             <!-- Total Revenue -->
-            <div class="bg-teal-700 text-white p-6 rounded-lg shadow-sm relative overflow-hidden">
+            <div class="bg-white border-t-4 border-[#0d9488] text-slate-900 p-6 rounded-lg shadow-sm relative overflow-hidden">
                 <div class="relative z-10">
-                    <h3 class="text-sm font-medium opacity-80 uppercase">Total Revenue</h3>
+                    <h3 class="text-sm font-medium text-slate-500 uppercase">Total Revenue</h3>
                     <p class="text-4xl font-bold mt-2">@Model.Stats.TotalRevenue.ToString("N0")</p>
-                    <p class="text-xs mt-1 opacity-70">VND this month</p>
+                    <p class="text-xs mt-1 text-slate-500">VND this month</p>
                 </div>
-                <span class="absolute bottom-4 right-4 text-white opacity-20 text-5xl">
-                    <span class="material-symbols-outlined text-5xl opacity-20">payments</span>
-                </span>
             </div>
             
             <!-- Total Orders -->
-            <div class="bg-teal-600 text-white p-6 rounded-lg shadow-sm relative overflow-hidden">
+            <div class="bg-white border-t-4 border-[#2563eb] text-slate-900 p-6 rounded-lg shadow-sm relative overflow-hidden">
                 <div class="relative z-10">
-                    <h3 class="text-sm font-medium opacity-80 uppercase">Total Orders</h3>
+                    <h3 class="text-sm font-medium text-slate-500 uppercase">Total Orders</h3>
                     <p class="text-4xl font-bold mt-2">@Model.Stats.TotalOrders</p>
-                    <p class="text-xs mt-1 text-teal-100 font-semibold">
+                    <p class="text-xs mt-1 font-semibold">
                         @if (Model.Stats.OrderGrowth >= 0)
                         {
-                            <span>📈 +@Model.Stats.OrderGrowth% growth</span>
+                            <span class="text-emerald-600">📈 +@Model.Stats.OrderGrowth% growth</span>
                         }
                         else
                         {
-                            <span class="text-red-300">📉 @Model.Stats.OrderGrowth% change</span>
+                            <span class="text-red-500">📉 @Model.Stats.OrderGrowth% change</span>
                         }
                     </p>
                 </div>
-                <span class="absolute bottom-4 right-4 text-white opacity-20 text-5xl">
-                    <span class="material-symbols-outlined text-5xl opacity-20">inventory_2</span>
-                </span>
             </div>
             
             <!-- Active Products -->
-            <div class="bg-slate-700 text-white p-6 rounded-lg shadow-sm relative overflow-hidden">
+            <div class="bg-white border-t-4 border-[#7c3aed] text-slate-900 p-6 rounded-lg shadow-sm relative overflow-hidden">
                 <div class="relative z-10">
-                    <h3 class="text-sm font-medium opacity-80 uppercase">Active Products</h3>
+                    <h3 class="text-sm font-medium text-slate-500 uppercase">Active Products</h3>
                     <p class="text-4xl font-bold mt-2">@Model.Stats.ActiveProducts</p>
-                    <p class="text-xs mt-1 text-teal-400 font-semibold">
+                    <p class="text-xs mt-1 font-semibold">
                         @if (Model.Stats.LowStockCount > 0)
                         {
-                            <span class="text-amber-400 text-sm">⚠️ @Model.Stats.LowStockCount low stock</span>
+                            <span class="text-amber-500 text-sm">⚠️ @Model.Stats.LowStockCount low stock</span>
                         }
                         else
                         {
-                            <span>✓ All stocked well</span>
+                            <span class="text-emerald-600">✓ All stocked well</span>
                         }
                     </p>
                 </div>
-                <span class="absolute bottom-4 right-4 text-white opacity-20 text-5xl">
-                    <span class="material-symbols-outlined text-5xl opacity-20">bar_chart</span>
-                </span>
             </div>
             
             <!-- Staff Members -->
-            <div class="bg-slate-600 text-white p-6 rounded-lg shadow-sm relative overflow-hidden">
+            <div class="bg-white border-t-4 border-[#475569] text-slate-900 p-6 rounded-lg shadow-sm relative overflow-hidden">
                 <div class="relative z-10">
-                    <h3 class="text-sm font-medium opacity-80 uppercase">Staff Members</h3>
+                    <h3 class="text-sm font-medium text-slate-500 uppercase">Staff Members</h3>
                     <p class="text-4xl font-bold mt-2">@Model.Stats.TotalStaff</p>
-                    <p class="text-xs mt-1 opacity-70">@Model.Stats.ActiveStaff active today</p>
+                    <p class="text-xs mt-1 text-slate-500">@Model.Stats.ActiveStaff active today</p>
                 </div>
-                <span class="absolute bottom-4 right-4 text-white opacity-20 text-5xl">
-                    <span class="material-symbols-outlined text-5xl opacity-20">groups</span>
-                </span>
             </div>
             
-            <!-- Pending Returns (Second Row Start) -->
-            <div class="bg-teal-800 text-white p-6 rounded-lg shadow-sm relative overflow-hidden md:col-span-1">
+            <!-- Pending Returns -->
+            <div class="bg-white border-t-4 border-[#f59e0b] text-slate-900 p-6 rounded-lg shadow-sm relative overflow-hidden">
                 <div class="relative z-10">
-                    <h3 class="text-sm font-medium opacity-80 uppercase">Pending Returns</h3>
+                    <h3 class="text-sm font-medium text-slate-500 uppercase">Pending Returns</h3>
                     <p class="text-4xl font-bold mt-2">@Model.Stats.PendingReturns</p>
-                    <p class="text-xs mt-1 text-teal-300 font-semibold">
+                    <p class="text-xs mt-1 font-semibold">
                         @if (Model.Stats.PendingReturns > 0)
                         {
-                            <span class="text-amber-400 text-sm">⚠️ Awaiting review</span>
+                            <span class="text-amber-500 text-sm">⚠️ Awaiting review</span>
                         }
                         else
                         {
-                            <span>✓ All processed</span>
+                            <span class="text-emerald-600">✓ All processed</span>
                         }
                     </p>
                 </div>
-                <span class="absolute bottom-4 right-4 text-white opacity-20 text-5xl">
-                    <span class="material-symbols-outlined text-5xl opacity-20">keyboard_return</span>
-                </span>
             </div>
         </div>
         <!-- END: Summary Cards Grid -->
@@ -148,7 +133,7 @@
             <h2 class="text-sm font-bold flex items-center mb-4 uppercase text-slate-700">
                 Quick Actions
             </h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
                 <a asp-page="/Frames/Index" class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
                     <span>MANAGE FRAMES</span>
                 </a>
@@ -161,17 +146,19 @@
                 <a asp-page="/Manager/Reports" class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
                     <span>REVENUE REPORTS</span>
                 </a>
-                <a asp-page="/Sale/Refunds/Index" class="text-teal-600 text-[10px] font-bold uppercase p-3 hover:underline">
-                    ↺ Manage Returns
+                <a asp-page="/Sale/Refunds/Index" class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
+                    <span>MANAGE RETURNS</span>
                     @if (Model.Stats.PendingReturns > 0)
                     {
                         <span class="bg-red-500 text-white rounded-full px-2 py-0.5 ml-1">@Model.Stats.PendingReturns</span>
                     }
                 </a>
-                <div class="col-span-1 flex items-center space-x-6 ml-auto">
-                    <a asp-page="/Manager/Policies" class="text-slate-500 text-[10px] font-bold uppercase flex items-center hover:text-slate-800">Business Policies</a>
-                    <a asp-page="/Manager/Settings" class="text-slate-500 text-[10px] font-bold uppercase flex items-center hover:text-slate-800">System Settings</a>
-                </div>
+                <a asp-page="/Manager/Policies" class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
+                    <span>BUSINESS POLICIES</span>
+                </a>
+                <a asp-page="/Manager/Settings" class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
+                    <span>SYSTEM SETTINGS</span>
+                </a>
             </div>
         </section>
         <!-- END: Quick Actions -->
@@ -199,7 +186,6 @@
                         @if (!Model.RecentOrders.Any())
                         {
                             <div class="text-center p-10">
-                                <span class="material-symbols-outlined text-4xl text-slate-300">inbox</span>
                                 <p class="text-slate-500 mt-2">No recent orders</p>
                             </div>
                         }
@@ -253,9 +239,18 @@
             <div class="lg:col-span-4 space-y-6">
                 <!-- System Alerts -->
                 <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
-                    <div class="bg-red-500 text-white p-3 flex items-center text-sm font-semibold">
-                        System Alerts
-                    </div>
+                    @if (Model.Stats.LowStockCount > 0 || Model.Stats.PendingReturns > 0)
+                    {
+                        <div class="bg-red-500 text-white p-3 flex items-center text-sm font-semibold">
+                            System Alerts
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="bg-emerald-600 text-white p-3 flex items-center text-sm font-semibold">
+                            System Alerts
+                        </div>
+                    }
                     
                     @if (Model.Stats.LowStockCount > 0 || Model.Stats.PendingReturns > 0)
                     {
@@ -264,7 +259,7 @@
                             {
                                 <div class="bg-amber-50 border border-amber-200 rounded p-3 text-amber-900 text-sm">
                                     <div class="font-bold flex items-center">
-                                        <span class="material-symbols-outlined text-amber-500 mr-2 text-sm">inventory_2</span> Low Stock Alert
+                                        Low Stock Alert
                                     </div>
                                     <p class="mt-1 text-amber-700">@Model.Stats.LowStockCount products need restocking</p>
                                     <a asp-page="/Manager/Inventory" class="text-amber-600 font-semibold text-xs mt-2 inline-block hover:underline">View Details →</a>
@@ -274,7 +269,7 @@
                             {
                                 <div class="bg-blue-50 border border-blue-200 rounded p-3 text-blue-900 text-sm">
                                     <div class="font-bold flex items-center">
-                                        <span class="material-symbols-outlined text-blue-500 mr-2 text-sm">assignment_return</span> Pending Returns
+                                        Pending Returns
                                     </div>
                                     <p class="mt-1 text-blue-700">@Model.Stats.PendingReturns returns awaiting approval</p>
                                     <a asp-page="/Sale/Refunds/Index" class="text-blue-600 font-semibold text-xs mt-2 inline-block hover:underline">Review Returns →</a>
@@ -301,7 +296,6 @@
                         @if (!Model.TopProducts.Any())
                         {
                             <div class="text-center p-6">
-                                <span class="material-symbols-outlined text-2xl text-slate-300">category</span>
                                 <p class="text-slate-500 mt-2 text-xs">No sales data available</p>
                             </div>
                         }

@@ -6,19 +6,11 @@ using EyewearStore_SWP391.Models.ViewModels.Lens;
 
 namespace EyewearStore_SWP391.Pages.Lenses;
 
-/// <summary>
-/// Page model for creating a new lens product.
-/// Handles form display and submission with SKU uniqueness validation and image upload.
-/// </summary>
 public class CreateModel : PageModel
 {
     private readonly EyewearStoreContext _context;
     private readonly IWebHostEnvironment _environment;
-
-    // Allowed file extensions
     private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
-
-    // Maximum file size (5 MB)
     private const long MaxFileSize = 5 * 1024 * 1024;
 
     public CreateModel(EyewearStoreContext context, IWebHostEnvironment environment)
@@ -27,68 +19,40 @@ public class CreateModel : PageModel
         _environment = environment;
     }
 
-    /// <summary>
-    /// The input view model bound to the form
-    /// </summary>
     [BindProperty]
     public CreateLensViewModel Input { get; set; } = new();
 
-    /// <summary>
-    /// Handles GET request - initializes the form with default values
-    /// </summary>
     public IActionResult OnGet()
     {
-        // Initialize Input with default values
-        Input = new CreateLensViewModel
-        {
-            Currency = "VND",
-            IsActive = true
-        };
-
+        Input = new CreateLensViewModel { Currency = "VND", IsActive = true };
         return Page();
     }
 
-    /// <summary>
-    /// Handles POST request - validates and saves the new lens with optional image
-    /// </summary>
     public async Task<IActionResult> OnPostAsync()
     {
-        // Validate image file if provided
-        if (Input.ImageFile != null)
-        {
-            // Validate file size
-            if (Input.ImageFile.Length > MaxFileSize)
-            {
-                ModelState.AddModelError("Input.ImageFile", 
-                    $"Image file size exceeds maximum allowed size of {MaxFileSize / (1024 * 1024)} MB");
-            }
+        var files = new List<IFormFile>();
+        if (Input.ImageFiles != null && Input.ImageFiles.Any(f => f?.Length > 0))
+            files.AddRange(Input.ImageFiles.Where(f => f != null && f.Length > 0));
+        else if (Input.ImageFile != null && Input.ImageFile.Length > 0)
+            files.Add(Input.ImageFile);
 
-            // Validate file extension
-            var extension = Path.GetExtension(Input.ImageFile.FileName).ToLowerInvariant();
-            if (!_allowedExtensions.Contains(extension))
-            {
-                ModelState.AddModelError("Input.ImageFile", 
-                    $"Invalid file type. Allowed types: {string.Join(", ", _allowedExtensions)}");
-            }
+        foreach (var file in files)
+        {
+            if (file.Length > MaxFileSize)
+                ModelState.AddModelError("Input.ImageFiles", $"'{file.FileName}' exceeds 5 MB limit.");
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!_allowedExtensions.Contains(ext))
+                ModelState.AddModelError("Input.ImageFiles", $"'{file.FileName}' is not a valid image type.");
         }
 
-        // Check ModelState validity
-        if (!ModelState.IsValid)
+        if (!ModelState.IsValid) return Page();
+
+        if (await _context.Products.AnyAsync(p => p.Sku == Input.Sku))
         {
+            ModelState.AddModelError("Input.Sku", "This SKU already exists.");
             return Page();
         }
 
-        // Check if SKU already exists in database
-        var skuExists = await _context.Products
-            .AnyAsync(p => p.Sku == Input.Sku);
-
-        if (skuExists)
-        {
-            ModelState.AddModelError("Input.Sku", "This SKU already exists. Please use a different SKU.");
-            return Page();
-        }
-
-        // Create new Lens entity from Input
         var lens = new Lens
         {
             Sku = Input.Sku,
@@ -102,69 +66,52 @@ public class CreateModel : PageModel
             IsActive = true,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            // Lens-specific properties
             LensType = Input.LensType,
             LensIndex = Input.LensIndex,
-            IsPrescription = Input.IsPrescription
+            IsPrescription = Input.IsPrescription,
+            Brand = Input.Brand,
+            Origin = Input.Origin,
+            LensMaterial = Input.LensMaterial,
+            LensThickness = Input.LensThickness,
+            LensCoating = Input.LensCoating,
+            UVProtection = Input.UVProtection,
         };
 
-        // Add lens to DbContext
         _context.Lenses.Add(lens);
-
-        // Save changes to get the ProductId
         await _context.SaveChangesAsync();
 
-        // Handle image upload if provided
-        if (Input.ImageFile != null && Input.ImageFile.Length > 0)
-        {
-            await SaveProductImageAsync(lens.ProductId, Input.ImageFile, Input.ImageAltText);
-        }
+        if (files.Any())
+            await SaveProductImagesAsync(lens.ProductId, files, Input.ImageAltText);
 
-        // Redirect to Index page
+        TempData["Success"] = $"Lens '{lens.Name}' created successfully.";
         return RedirectToPage("./Index");
     }
 
-    /// <summary>
-    /// Saves the uploaded image to disk and creates a ProductImage record
-    /// </summary>
-    private async Task SaveProductImageAsync(int productId, IFormFile file, string? altText)
+    private async Task SaveProductImagesAsync(int productId, List<IFormFile> files, string? altText)
     {
-        // Create upload directory if it doesn't exist
-        var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "products", productId.ToString());
-        if (!Directory.Exists(uploadFolder))
-        {
-            Directory.CreateDirectory(uploadFolder);
-        }
+        var folder = Path.Combine(_environment.WebRootPath, "uploads", "products", productId.ToString());
+        Directory.CreateDirectory(folder);
 
-        // Generate unique filename
-        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-        var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-        var uniqueId = Guid.NewGuid().ToString("N")[..8];
-        var fileName = $"{timestamp}_{uniqueId}{extension}";
-        var filePath = Path.Combine(uploadFolder, fileName);
-
-        // Save file to disk
-        using (var stream = new FileStream(filePath, FileMode.Create))
+        for (int i = 0; i < files.Count; i++)
         {
+            var file = files[i];
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            var name = $"{DateTime.UtcNow:yyyyMMddHHmmss}_{i}_{Guid.NewGuid().ToString("N")[..8]}{ext}";
+            var path = Path.Combine(folder, name);
+            using var stream = new FileStream(path, FileMode.Create);
             await file.CopyToAsync(stream);
+
+            _context.ProductImages.Add(new ProductImage
+            {
+                ProductId = productId,
+                ImageUrl = $"/uploads/products/{productId}/{name}",
+                AltText = altText ?? Input.Name,
+                IsPrimary = i == 0,
+                SortOrder = i,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+            });
         }
-
-        // Create image URL (relative path)
-        var imageUrl = $"/uploads/products/{productId}/{fileName}";
-
-        // Create ProductImage record in database
-        var productImage = new ProductImage
-        {
-            ProductId = productId,
-            ImageUrl = imageUrl,
-            AltText = altText ?? Input.Name, // Use product name as default alt text
-            IsPrimary = true, // First image is primary
-            SortOrder = 0,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        await _context.ProductImages.AddAsync(productImage);
         await _context.SaveChangesAsync();
     }
 }

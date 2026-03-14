@@ -4,140 +4,139 @@
     ViewData["Title"] = "Create Lens";
     Layout = "_Layout";
 }
-
 <style>
-    .create-container {
+    .lc-wrap {
         max-width: 900px;
         margin: 0 auto;
-        padding: 2rem;
+        padding: 2rem
     }
 
-    .page-header {
-        margin-bottom: 2rem;
+    .lc-header {
+        margin-bottom: 2rem
     }
 
-    .page-header h1 {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1a1a2e;
-        margin: 0 0 0.5rem 0;
-    }
+        .lc-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin: 0 0 .5rem
+        }
 
-    .page-header p {
-        color: #6c757d;
-        margin: 0;
-    }
+        .lc-header p {
+            color: #6c757d;
+            margin: 0
+        }
 
     .breadcrumb {
         display: flex;
-        gap: 0.5rem;
+        gap: .5rem;
         margin-bottom: 1rem;
-        font-size: 0.9rem;
+        font-size: .9rem
     }
 
-    .breadcrumb a {
-        color: #667eea;
-        text-decoration: none;
-    }
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none
+        }
 
-    .breadcrumb a:hover {
-        text-decoration: underline;
-    }
+            .breadcrumb a:hover {
+                text-decoration: underline
+            }
 
-    .breadcrumb .separator {
-        color: #adb5bd;
-    }
+        .breadcrumb .sep {
+            color: #adb5bd
+        }
 
-    .breadcrumb .current {
-        color: #6c757d;
-    }
+        .breadcrumb .cur {
+            color: #6c757d
+        }
 
     .form-card {
-        background: white;
+        background: #fff;
         border-radius: 12px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,.08);
+        overflow: hidden
     }
 
     .form-section {
         padding: 2rem;
-        border-bottom: 1px solid #f0f0f5;
+        border-bottom: 1px solid #f0f0f5
     }
 
-    .form-section:last-of-type {
-        border-bottom: none;
-    }
+        .form-section:last-of-type {
+            border-bottom: none
+        }
 
     .section-title {
         font-size: 1.1rem;
         font-weight: 600;
         color: #1a1a2e;
-        margin: 0 0 1.5rem 0;
-        padding-bottom: 0.75rem;
+        margin: 0 0 1.5rem;
+        padding-bottom: .75rem;
         border-bottom: 2px solid #667eea;
-        display: inline-block;
+        display: inline-block
     }
 
     .form-row {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2,1fr);
         gap: 1.5rem;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.5rem
     }
 
-    .form-row.single {
-        grid-template-columns: 1fr;
-    }
+        .form-row.single {
+            grid-template-columns: 1fr
+        }
+
+        .form-row.tri {
+            grid-template-columns: repeat(3,1fr)
+        }
 
     .form-group {
         display: flex;
-        flex-direction: column;
+        flex-direction: column
     }
 
-    .form-group label {
-        font-weight: 600;
-        font-size: 0.875rem;
-        color: #4a4a68;
-        margin-bottom: 0.5rem;
-    }
+        .form-group label {
+            font-weight: 600;
+            font-size: .875rem;
+            color: #4a4a68;
+            margin-bottom: .5rem
+        }
 
-    .form-group label .required {
-        color: #dc3545;
+    .req {
+        color: #dc3545
     }
 
     .form-control {
-        padding: 0.75rem 1rem;
+        padding: .75rem 1rem;
         border: 1px solid #e0e0e8;
         border-radius: 8px;
-        font-size: 0.95rem;
-        transition: border-color 0.2s, box-shadow 0.2s;
+        font-size: .95rem;
+        transition: border-color .2s,box-shadow .2s;
         width: 100%;
-        box-sizing: border-box;
+        box-sizing: border-box
     }
 
-    .form-control:focus {
-        outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-    }
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,.2)
+        }
 
-    .form-control.input-validation-error {
-        border-color: #dc3545;
-    }
-
-    .form-control.input-validation-error:focus {
-        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
-    }
+        .form-control.input-validation-error {
+            border-color: #dc3545
+        }
 
     textarea.form-control {
         resize: vertical;
-        min-height: 100px;
+        min-height: 100px
     }
 
     .field-validation-error {
         color: #dc3545;
-        font-size: 0.85rem;
-        margin-top: 0.35rem;
+        font-size: .85rem;
+        margin-top: .35rem
     }
 
     .validation-summary-errors {
@@ -146,129 +145,189 @@
         border-radius: 8px;
         padding: 1rem 1.5rem;
         margin-bottom: 1.5rem;
-        color: #721c24;
-    }
-
-    .validation-summary-errors ul {
-        margin: 0;
-        padding-left: 1.5rem;
+        color: #721c24
     }
 
     .helper-text {
-        font-size: 0.8rem;
+        font-size: .8rem;
         color: #6c757d;
-        margin-top: 0.35rem;
+        margin-top: .35rem
     }
 
-    /* Checkbox */
-    .checkbox-wrapper {
+    .check-wrap {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        margin-top: 0.5rem;
+        gap: .5rem;
+        margin-top: .5rem
     }
 
-    .checkbox-wrapper input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
+        .check-wrap input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #667eea
+        }
+
+        .check-wrap label {
+            margin-bottom: 0;
+            cursor: pointer;
+            font-weight: 500
+        }
+
+    .coating-tags {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 8px
+    }
+
+    .coating-tag {
+        padding: .25rem .7rem;
+        border-radius: 20px;
+        font-size: .78rem;
+        font-weight: 600;
+        background: #e8eaff;
+        color: #667eea;
+        border: 1.5px solid #667eea;
         cursor: pointer;
+        transition: all .15s
     }
 
-    .checkbox-wrapper label {
-        margin-bottom: 0;
-        cursor: pointer;
-    }
+        .coating-tag:hover {
+            background: #667eea;
+            color: #fff
+        }
 
-    /* Image Upload Styles */
-    .image-upload-area {
+    .image-drop-zone {
         border: 2px dashed #e0e0e8;
         border-radius: 12px;
-        padding: 2rem;
+        padding: 2.5rem 2rem;
         text-align: center;
-        transition: all 0.3s ease;
         background: #fafafa;
         cursor: pointer;
+        transition: border-color .25s,background .25s;
+        user-select: none
     }
 
-    .image-upload-area:hover,
-    .image-upload-area.drag-over {
-        border-color: #667eea;
-        background: rgba(102, 126, 234, 0.05);
+        .image-drop-zone:hover, .image-drop-zone.drag-over {
+            border-color: #667eea;
+            background: rgba(102,126,234,.04)
+        }
+
+        .image-drop-zone .dz-icon {
+            font-size: 2.8rem;
+            color: #adb5bd;
+            margin-bottom: .75rem
+        }
+
+        .image-drop-zone h4 {
+            margin: 0 0 .35rem;
+            font-size: 1rem;
+            color: #4a4a68
+        }
+
+        .image-drop-zone p {
+            margin: 0;
+            font-size: .85rem;
+            color: #6c757d
+        }
+
+    .thumb-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill,minmax(120px,1fr));
+        gap: 1rem;
+        margin-top: 1.25rem
     }
 
-    .image-upload-area .upload-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
+    .thumb-card {
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 2px solid #e0e0e8;
+        background: #f8f9fc;
+        aspect-ratio: 1;
+        transition: border-color .2s,box-shadow .2s
     }
 
-    .image-upload-area h4 {
-        margin: 0 0 0.5rem 0;
-        color: #4a4a68;
-        font-weight: 600;
-    }
+        .thumb-card.is-primary {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,.25)
+        }
 
-    .image-upload-area p {
-        margin: 0;
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
+        .thumb-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block
+        }
 
-    .image-upload-area input[type="file"] {
-        display: none;
-    }
+        .thumb-card .tc-actions {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top,rgba(0,0,0,.65),transparent);
+            padding: .5rem .4rem .4rem;
+            display: flex;
+            gap: .3rem;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity .18s
+        }
 
-    .image-preview-container {
-        display: none;
-        margin-top: 1.5rem;
-        text-align: center;
-    }
+        .thumb-card:hover .tc-actions {
+            opacity: 1
+        }
 
-    .image-preview-container.has-image {
-        display: block;
-    }
-
-    .image-preview {
-        max-width: 300px;
-        max-height: 200px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        object-fit: cover;
-    }
-
-    .image-preview-info {
-        margin-top: 0.75rem;
-        padding: 0.75rem;
-        background: #f0f0f5;
-        border-radius: 8px;
-        display: inline-block;
-    }
-
-    .image-preview-info .file-name {
-        font-weight: 600;
-        color: #4a4a68;
-    }
-
-    .image-preview-info .file-size {
-        color: #6c757d;
-        font-size: 0.85rem;
-        margin-left: 0.5rem;
-    }
-
-    .btn-remove-image {
-        margin-top: 0.75rem;
-        background: #dc3545;
-        color: white;
-        padding: 0.5rem 1rem;
+    .tc-btn {
+        padding: .25rem .55rem;
+        border-radius: 5px;
         border: none;
-        border-radius: 6px;
+        font-size: .72rem;
+        font-weight: 700;
         cursor: pointer;
-        font-size: 0.85rem;
-        transition: background 0.2s;
+        color: #fff
     }
 
-    .btn-remove-image:hover {
-        background: #c82333;
+    .tc-btn-primary {
+        background: #667eea
     }
+
+        .tc-btn-primary:hover {
+            background: #5a6fd6
+        }
+
+    .tc-btn-remove {
+        background: #dc3545
+    }
+
+        .tc-btn-remove:hover {
+            background: #c82333
+        }
+
+    .tc-primary-badge {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        background: #667eea;
+        color: #fff;
+        font-size: .65rem;
+        font-weight: 700;
+        padding: .2rem .45rem;
+        border-radius: 4px
+    }
+
+    .upload-count-info {
+        font-size: .85rem;
+        color: #6c757d;
+        margin-top: .75rem;
+        text-align: right
+    }
+
+        .upload-count-info span {
+            font-weight: 600;
+            color: #4a4a68
+        }
 
     .form-actions {
         display: flex;
@@ -276,263 +335,275 @@
         gap: 1rem;
         padding: 1.5rem 2rem;
         background: #f8f9fc;
-        border-top: 1px solid #f0f0f5;
+        border-top: 1px solid #f0f0f5
     }
 
     .btn {
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1.5rem;
+        gap: .5rem;
+        padding: .75rem 1.5rem;
         border-radius: 8px;
         font-weight: 600;
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: all .2s;
         border: none;
         cursor: pointer;
-        font-size: 0.95rem;
+        font-size: .95rem
     }
 
     .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+        color: #fff
     }
 
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-    }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102,126,234,.4)
+        }
 
     .btn-secondary {
         background: #f0f0f5;
-        color: #4a4a68;
+        color: #4a4a68
     }
 
-    .btn-secondary:hover {
-        background: #e0e0e8;
-    }
+        .btn-secondary:hover {
+            background: #e0e0e8
+        }
 
-    /* Responsive */
-    @@media (max-width: 768px) {
-        .create-container {
-            padding: 1rem;
+    @@media(max-width:768px) {
+        .lc-wrap {
+            padding: 1rem
         }
 
         .form-section {
-            padding: 1.5rem;
+            padding: 1.5rem
         }
 
-        .form-row {
-            grid-template-columns: 1fr;
+        .form-row, .form-row.tri {
+            grid-template-columns: 1fr
         }
 
         .form-actions {
-            flex-direction: column-reverse;
+            flex-direction: column-reverse
         }
 
         .btn {
             width: 100%;
-            justify-content: center;
+            justify-content: center
+        }
+
+        .thumb-grid {
+            grid-template-columns: repeat(auto-fill,minmax(90px,1fr))
         }
     }
 </style>
 
-<div class="create-container">
-    <!-- Breadcrumb -->
-    <nav class="breadcrumb" aria-label="breadcrumb">
-        <a href="/">Home</a>
-        <span class="separator">›</span>
-        <a asp-page="/Lenses/Index">Lenses</a>
-        <span class="separator">›</span>
-        <span class="current">Create</span>
+<div class="lc-wrap">
+    <nav class="breadcrumb">
+        <a href="/">Home</a><span class="sep">›</span>
+        <a asp-page="/Lenses/Index">Lenses</a><span class="sep">›</span>
+        <span class="cur">Create</span>
     </nav>
-
-    <!-- Page Header -->
-    <div class="page-header">
+    <div class="lc-header">
         <h1><i class="bi bi-plus-circle"></i> Create Lens</h1>
         <p>Add a new lens product to your inventory</p>
     </div>
-
-    <!-- Form Card -->
     <div class="form-card">
-        <form method="post" enctype="multipart/form-data">
-            <!-- Validation Summary -->
+        <form method="post" enctype="multipart/form-data" id="createForm">
             <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
 
-            <!-- Basic Information Section -->
+            <!-- Basic Information -->
             <div class="form-section">
                 <h2 class="section-title">Basic Information</h2>
-
                 <div class="form-row">
                     <div class="form-group">
-                        <label asp-for="Input.Sku">
-                            SKU <span class="required">*</span>
-                        </label>
-                        <input asp-for="Input.Sku" 
-                               class="form-control" 
-                               placeholder="e.g., LENS-PROG-001" />
+                        <label asp-for="Input.Sku">SKU <span class="req">*</span></label>
+                        <input asp-for="Input.Sku" class="form-control" placeholder="e.g., LENS-ESS-1.67-001" />
                         <span asp-validation-for="Input.Sku" class="field-validation-error"></span>
                     </div>
-
                     <div class="form-group">
-                        <label asp-for="Input.Name">
-                            Product Name <span class="required">*</span>
-                        </label>
-                        <input asp-for="Input.Name" 
-                               class="form-control" 
-                               placeholder="e.g., Progressive HD Lens" />
+                        <label asp-for="Input.Name">Product Name <span class="req">*</span></label>
+                        <input asp-for="Input.Name" class="form-control" placeholder="e.g., Essilor Crizal Easy 1.67" />
                         <span asp-validation-for="Input.Name" class="field-validation-error"></span>
                     </div>
                 </div>
-
                 <div class="form-row single">
                     <div class="form-group">
                         <label asp-for="Input.Description">Description</label>
-                        <textarea asp-for="Input.Description" 
-                                  class="form-control" 
-                                  rows="3"
-                                  placeholder="Enter lens description..."></textarea>
-                        <span asp-validation-for="Input.Description" class="field-validation-error"></span>
+                        <textarea asp-for="Input.Description" class="form-control" rows="3" placeholder="Describe the lens features..."></textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- Lens Details Section -->
+            <!-- Brand & Identity -->
             <div class="form-section">
-                <h2 class="section-title">Lens Details</h2>
+                <h2 class="section-title">Brand &amp; Identity</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Input.Brand">Brand</label>
+                        <select asp-for="Input.Brand" class="form-control">
+                            <option value="">-- Select Brand --</option>
+                            @foreach (var b in new[] { "Essilor", "Hoya", "Zeiss", "Nikon", "Rodenstock", "Shamir", "Seiko", "Kodak", "Other" })
+                            {
+                                <option value="@b">@b</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Input.Origin">Country of Origin</label>
+                        <input asp-for="Input.Origin" class="form-control" placeholder="e.g., France, Germany, Japan" />
+                    </div>
+                </div>
+            </div>
 
+            <!-- Lens Specifications -->
+            <div class="form-section">
+                <h2 class="section-title">Lens Specifications</h2>
                 <div class="form-row">
                     <div class="form-group">
                         <label asp-for="Input.LensType">Lens Type</label>
                         <select asp-for="Input.LensType" class="form-control">
-                            <option value="">— Select Lens Type —</option>
+                            <option value="">-- Select Type --</option>
                             @foreach (var lt in EyewearStore_SWP391.Models.LensTypes.All)
                             {
                                 <option value="@lt">@lt</option>
                             }
                         </select>
-                        <span asp-validation-for="Input.LensType" class="field-validation-error"></span>
                     </div>
-
                     <div class="form-group">
                         <label asp-for="Input.LensIndex">Lens Index</label>
-                        <input asp-for="Input.LensIndex" 
-                               type="number"
-                               step="0.01"
-                               min="0"
-                               class="form-control" 
-                               placeholder="e.g., 1.67" />
-                        <span class="helper-text">Refractive index (e.g., 1.50, 1.67, 1.74)</span>
-                        <span asp-validation-for="Input.LensIndex" class="field-validation-error"></span>
+                        <select asp-for="Input.LensIndex" class="form-control">
+                            <option value="">-- Select Index --</option>
+                            <option value="1.50">1.50 — Standard</option>
+                            <option value="1.56">1.56 — Mid-Index</option>
+                            <option value="1.60">1.60 — Mid-High</option>
+                            <option value="1.67">1.67 — High-Index</option>
+                            <option value="1.74">1.74 — Ultra High-Index</option>
+                            <option value="1.76">1.76 — Super Ultra</option>
+                        </select>
+                        <span class="helper-text">Higher index = thinner &amp; lighter lens</span>
                     </div>
                 </div>
-
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Input.LensMaterial">Lens Material</label>
+                        <select asp-for="Input.LensMaterial" class="form-control">
+                            <option value="">-- Select Material --</option>
+                            <option value="CR-39">CR-39 (Plastic)</option>
+                            <option value="Polycarbonate">Polycarbonate</option>
+                            <option value="Trivex">Trivex</option>
+                            <option value="MR-8">MR-8</option>
+                            <option value="Glass">Glass</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Input.LensThickness">Thickness Category</label>
+                        <select asp-for="Input.LensThickness" class="form-control">
+                            <option value="">-- Select Thickness --</option>
+                            <option value="Standard">Standard</option>
+                            <option value="Thin">Thin</option>
+                            <option value="Ultra-Thin">Ultra-Thin</option>
+                            <option value="Aspheric">Aspheric</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="form-row single">
                     <div class="form-group">
                         <label>Prescription Requirement</label>
-                        <div class="checkbox-wrapper">
-                            <input asp-for="Input.IsPrescription" 
-                                   type="checkbox" 
-                                   id="isPrescription" />
-                            <label for="isPrescription">This lens requires a prescription</label>
+                        <div class="check-wrap">
+                            <input asp-for="Input.IsPrescription" type="checkbox" id="isPrescription" />
+                            <label for="isPrescription">This lens requires a prescription (Rx)</label>
                         </div>
-                        <span asp-validation-for="Input.IsPrescription" class="field-validation-error"></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Pricing & Inventory Section -->
+            <!-- Coatings & Protection -->
             <div class="form-section">
-                <h2 class="section-title">Pricing & Inventory</h2>
-
+                <h2 class="section-title">Coatings &amp; Protection</h2>
+                <div class="form-row single">
+                    <div class="form-group">
+                        <label asp-for="Input.LensCoating">Coatings (comma-separated)</label>
+                        <input asp-for="Input.LensCoating" class="form-control" id="coatingInput"
+                               placeholder="e.g., Anti-Reflective, Anti-Scratch, Blue Light Filter"
+                               oninput="updateCoatingTags()" />
+                        <span class="helper-text">Each coating will appear as a badge on the product page.</span>
+                        <div class="coating-tags" id="coatingTagsPreview"></div>
+                    </div>
+                </div>
+                <div class="form-row single">
+                    <div class="form-group">
+                        <p class="helper-text" style="margin:0 0 6px;">Quick add:</p>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                            @foreach (var c in new[] { "Anti-Reflective", "Anti-Scratch", "Blue Light Filter", "Photochromic", "Polarized", "Oleophobic", "Hydrophobic", "UV Coating" })
+                            {
+                                <button type="button" class="coating-tag" onclick="addCoating('@c')">+ @c</button>
+                            }
+                        </div>
+                    </div>
+                </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label asp-for="Input.Price">
-                            Price <span class="required">*</span>
-                        </label>
-                        <input asp-for="Input.Price" 
-                               type="number"
-                               step="0.01"
-                               min="0.01"
-                               class="form-control" 
-                               placeholder="0.00" />
+                        <label asp-for="Input.UVProtection">UV Protection</label>
+                        <select asp-for="Input.UVProtection" class="form-control">
+                            <option value="">-- Select --</option>
+                            <option value="UV400">UV400 (Full protection)</option>
+                            <option value="UV380">UV380</option>
+                            <option value="None">None</option>
+                        </select>
+                    </div>
+                    <div class="form-group"></div>
+                </div>
+            </div>
+
+            <!-- Pricing & Inventory -->
+            <div class="form-section">
+                <h2 class="section-title">Pricing &amp; Inventory</h2>
+                <div class="form-row tri">
+                    <div class="form-group">
+                        <label asp-for="Input.Price">Price <span class="req">*</span></label>
+                        <input asp-for="Input.Price" type="number" step="1000" min="0" class="form-control" placeholder="0" />
                         <span asp-validation-for="Input.Price" class="field-validation-error"></span>
                     </div>
-
                     <div class="form-group">
                         <label asp-for="Input.Currency">Currency</label>
-                        <input asp-for="Input.Currency" 
-                               class="form-control" 
-                               maxlength="3"
-                               placeholder="VND" />
-                        <span class="helper-text">3-character currency code (e.g., USD, VND)</span>
-                        <span asp-validation-for="Input.Currency" class="field-validation-error"></span>
+                        <input asp-for="Input.Currency" class="form-control" maxlength="3" placeholder="VND" />
                     </div>
-                </div>
-
-                <div class="form-row">
                     <div class="form-group">
-                        <label asp-for="Input.InventoryQty">Inventory Quantity</label>
-                        <input asp-for="Input.InventoryQty" 
-                               type="number"
-                               min="0"
-                               class="form-control" 
-                               placeholder="0" />
-                        <span asp-validation-for="Input.InventoryQty" class="field-validation-error"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <!-- Empty cell for alignment -->
+                        <label asp-for="Input.InventoryQty">Inventory Qty</label>
+                        <input asp-for="Input.InventoryQty" type="number" min="0" class="form-control" placeholder="0" />
                     </div>
                 </div>
             </div>
 
-            <!-- Product Image Section -->
+            <!-- Product Images -->
             <div class="form-section">
-                <h2 class="section-title">Product Image</h2>
-
-                <div class="form-row single">
-                    <div class="form-group">
-                        <label id="imageUploadArea" class="image-upload-area" for="imageFileInput">
-                            <div class="upload-icon"><i class="bi bi-camera"></i></div>
-                            <h4>Upload Product Image</h4>
-                            <p>Drag and drop an image here, or click to select</p>
-                            <p class="helper-text">Supported formats: JPG, JPEG, PNG, WEBP (Max 5 MB)</p>
-                            <input type="file" 
-                                   id="imageFileInput" 
-                                   name="Input.ImageFile" 
-                                   accept=".jpg,.jpeg,.png,.webp" />
-                        </label>
-                        <span asp-validation-for="Input.ImageFile" class="field-validation-error"></span>
-
-                        <div id="imagePreviewContainer" class="image-preview-container">
-                            <img id="imagePreview" class="image-preview" src="" alt="Preview" />
-                            <div class="image-preview-info">
-                                <span id="fileName" class="file-name"></span>
-                                <span id="fileSize" class="file-size"></span>
-                            </div>
-                            <br />
-                            <button type="button" id="removeImageBtn" class="btn-remove-image">Remove Image</button>
-                        </div>
-                    </div>
+                <h2 class="section-title">Product Images</h2>
+                <input type="file" id="fileSubmit" name="Input.ImageFiles" accept=".jpg,.jpeg,.png,.webp" multiple style="display:none" />
+                <input type="file" id="filePicker" accept=".jpg,.jpeg,.png,.webp" multiple style="display:none" />
+                <div class="image-drop-zone" id="dropZone">
+                    <div class="dz-icon"><i class="bi bi-images"></i></div>
+                    <h4>Upload Product Images</h4>
+                    <p>Drag &amp; drop or click to select · Max 10 images</p>
+                    <p class="helper-text" style="margin-top:.4rem;">JPG, PNG, WEBP · Max 5 MB each · First image = primary</p>
                 </div>
-
-                <div class="form-row single">
+                <div class="thumb-grid" id="thumbGrid"></div>
+                <div class="upload-count-info" id="countInfo" style="display:none;">
+                    Selected <span id="countText">0</span> image(s) — first image will be the primary cover
+                </div>
+                <div class="form-row single" style="margin-top:1.2rem;">
                     <div class="form-group">
                         <label asp-for="Input.ImageAltText">Image Alt Text</label>
-                        <input asp-for="Input.ImageAltText" 
-                               class="form-control" 
-                               placeholder="Describe the image for accessibility" />
-                        <span class="helper-text">Optional. Used for accessibility and SEO.</span>
-                        <span asp-validation-for="Input.ImageAltText" class="field-validation-error"></span>
+                        <input asp-for="Input.ImageAltText" class="form-control" placeholder="Describe the image (used for all uploaded images)" />
+                        <span class="helper-text">Optional. Helps with SEO &amp; accessibility.</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Form Actions -->
             <div class="form-actions">
                 <a asp-page="/Lenses/Index" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Create Lens</button>
             </div>
         </form>
     </div>
@@ -540,86 +611,24 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const imageInput = document.getElementById('imageFileInput');
-            const uploadArea = document.getElementById('imageUploadArea');
-            const previewContainer = document.getElementById('imagePreviewContainer');
-            const imagePreview = document.getElementById('imagePreview');
-            const fileName = document.getElementById('fileName');
-            const fileSize = document.getElementById('fileSize');
-            const removeBtn = document.getElementById('removeImageBtn');
-
-            // Handle file selection
-            imageInput.addEventListener('change', function(e) {
-                handleFile(e.target.files[0]);
-            });
-
-            // Handle drag and drop
-            uploadArea.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                uploadArea.classList.add('drag-over');
-            });
-
-            uploadArea.addEventListener('dragleave', function(e) {
-                e.preventDefault();
-                uploadArea.classList.remove('drag-over');
-            });
-
-            uploadArea.addEventListener('drop', function(e) {
-                e.preventDefault();
-                uploadArea.classList.remove('drag-over');
-                const file = e.dataTransfer.files[0];
-                if (file && isValidImageFile(file)) {
-                    imageInput.files = e.dataTransfer.files;
-                    handleFile(file);
-                }
-            });
-
-            // Remove image button
-            removeBtn.addEventListener('click', function() {
-                imageInput.value = '';
-                previewContainer.classList.remove('has-image');
-                imagePreview.src = '';
-                fileName.textContent = '';
-                fileSize.textContent = '';
-            });
-
-            function handleFile(file) {
-                if (!file) return;
-
-                if (!isValidImageFile(file)) {
-                    alert('Invalid file type. Please select a JPG, JPEG, PNG, or WEBP image.');
-                    return;
-                }
-
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('File size exceeds 5 MB limit.');
-                    return;
-                }
-
-                // Show preview
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
-                    previewContainer.classList.add('has-image');
-                    fileName.textContent = file.name;
-                    fileSize.textContent = formatFileSize(file.size);
-                };
-                reader.readAsDataURL(file);
-            }
-
-            function isValidImageFile(file) {
-                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-                return allowedTypes.includes(file.type);
-            }
-
-            function formatFileSize(bytes) {
-                if (bytes < 1024) return bytes + ' B';
-                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-                return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-            }
-        });
+        var fileSubmit=document.getElementById('fileSubmit'),filePicker=document.getElementById('filePicker'),
+            dropZone=document.getElementById('dropZone'),thumbGrid=document.getElementById('thumbGrid'),
+            countInfo=document.getElementById('countInfo'),countText=document.getElementById('countText');
+        var MAX_FILES=10,MAX_BYTES=5*1024*1024,ALLOWED=['image/jpeg','image/jpg','image/png','image/webp'],fileList=[];
+        dropZone.addEventListener('click',function(){filePicker.click();});
+        dropZone.addEventListener('dragover',function(e){e.preventDefault();dropZone.classList.add('drag-over');});
+        dropZone.addEventListener('dragleave',function(){dropZone.classList.remove('drag-over');});
+        dropZone.addEventListener('drop',function(e){e.preventDefault();dropZone.classList.remove('drag-over');handleFiles(Array.from(e.dataTransfer.files));});
+        filePicker.addEventListener('change',function(e){handleFiles(Array.from(e.target.files));e.target.value='';});
+        function handleFiles(incoming){for(var i=0;i<incoming.length;i++){var file=incoming[i];if(fileList.length>=MAX_FILES){alert('Max '+MAX_FILES+' images.');break;}if(ALLOWED.indexOf(file.type)===-1){alert('"'+file.name+'" is not a valid image.');continue;}if(file.size>MAX_BYTES){alert('"'+file.name+'" exceeds 5 MB.');continue;}addFile(file);}syncToSubmitInput();updateCount();}
+        function addFile(file){var idx=fileList.length;fileList.push({file:file,dataUrl:null});var reader=new FileReader();reader.onload=(function(i){return function(ev){fileList[i].dataUrl=ev.target.result;renderThumbs();};})(idx);reader.readAsDataURL(file);}
+        function renderThumbs(){thumbGrid.innerHTML='';fileList.forEach(function(item,idx){if(!item.dataUrl)return;var card=document.createElement('div');card.className='thumb-card'+(idx===0?' is-primary':'');var badge=idx===0?'<span class="tc-primary-badge">\u2605 Primary</span>':'';var setBtn=idx!==0?'<button type="button" class="tc-btn tc-btn-primary" onclick="setPrimary('+idx+')">Set Primary</button>':'';card.innerHTML=badge+'<img src="'+item.dataUrl+'" alt="Preview '+(idx+1)+'">'+'<div class="tc-actions">'+setBtn+'<button type="button" class="tc-btn tc-btn-remove" onclick="removeImg('+idx+')">Remove</button></div>';thumbGrid.appendChild(card);});}
+        function setPrimary(idx){var item=fileList.splice(idx,1)[0];fileList.unshift(item);renderThumbs();syncToSubmitInput();}
+        function removeImg(idx){fileList.splice(idx,1);renderThumbs();syncToSubmitInput();updateCount();}
+        function syncToSubmitInput(){try{var dt=new DataTransfer();fileList.forEach(function(i){dt.items.add(i.file);});fileSubmit.files=dt.files;}catch(e){console.warn('DataTransfer not supported',e);}}
+        function updateCount(){if(fileList.length>0){countInfo.style.display='block';countText.textContent=fileList.length;}else{countInfo.style.display='none';}}
+        function updateCoatingTags(){var val=document.getElementById('coatingInput').value,container=document.getElementById('coatingTagsPreview');container.innerHTML='';val.split(',').forEach(function(c){c=c.trim();if(!c)return;var tag=document.createElement('span');tag.className='coating-tag';tag.style.cursor='default';tag.textContent=c;container.appendChild(tag);});}
+        function addCoating(coating){var inp=document.getElementById('coatingInput'),existing=inp.value.split(',').map(function(s){return s.trim();}).filter(Boolean);if(existing.indexOf(coating)===-1){inp.value=existing.length?existing.join(', ')+', '+coating:coating;updateCoatingTags();}}
     </script>
 }

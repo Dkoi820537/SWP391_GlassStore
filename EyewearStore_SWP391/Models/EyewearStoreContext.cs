@@ -248,6 +248,24 @@ public partial class EyewearStoreContext : DbContext
             entity.Property(e => e.PrescriptionFee)
                 .HasColumnType("decimal(18,2)")
                 .HasColumnName("prescription_fee");
+            entity.Property(e => e.Brand)
+    .HasMaxLength(100)
+    .HasColumnName("brand");
+            entity.Property(e => e.Origin)
+                .HasMaxLength(100)
+                .HasColumnName("origin");
+            entity.Property(e => e.LensMaterial)
+                .HasMaxLength(100)
+                .HasColumnName("lens_material");
+            entity.Property(e => e.LensThickness)
+                .HasMaxLength(100)
+                .HasColumnName("lens_thickness");
+            entity.Property(e => e.LensCoating)
+                .HasMaxLength(500)
+                .HasColumnName("lens_coating");
+            entity.Property(e => e.UVProtection)
+                .HasMaxLength(50)
+                .HasColumnName("uv_protection");
         });
 
         // =========================

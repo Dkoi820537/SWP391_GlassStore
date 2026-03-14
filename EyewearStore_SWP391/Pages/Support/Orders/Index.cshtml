@@ -609,7 +609,7 @@
             opacity: .4;
             pointer-events: none
         }
-        /* ADDED */
+
         .btn-svc-jobs {
             display: inline-flex;
             align-items: center;
@@ -862,17 +862,15 @@
                                     }
                                     else if (order.IsLowStock)
                                     {
-
                                         <span class="pill pill-preorder"><i class="bi bi-hourglass-split"></i> Pre-Order</span>
                                     }
                                     else
                                     {
-
                                         <span class="pill pill-ready"><i class="bi bi-check-circle"></i> Ready</span>
                                     }
                                 </td>
                                 <td style="text-align:right">
-                                    <span class="total-val">@order.TotalAmount.ToString("C", new System.Globalization.CultureInfo("en-US"))</span>
+                                    <span class="total-val">@order.TotalAmount.ToString("N0") ₫</span>
                                 </td>
                                 <td style="text-align:center">
                                     <a asp-page="./Details" asp-route-id="@order.OrderId" class="act-process">
@@ -904,7 +902,6 @@
                             }
                             else
                             {
-
                                 <a asp-page="./Index" asp-route-pageNumber="@p" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">@p</a>
                             }
                         </li>

@@ -662,7 +662,7 @@
     <div class="ops-hdr">
         <div class="ops-hdr-left">
             <h1><i class="bi bi-box-seam me-2"></i>Operations Dashboard</h1>
-            <p>Đóng gói · Vận chuyển · Cập nhật tracking · Xử lý đơn kính thuốc</p>
+            <p>Packaging · Shipping · Tracking Updates · Prescription Order Processing</p>
         </div>
         <div class="hdr-actions">
             <button class="btn-refresh" onclick="window.location.reload()">
@@ -687,7 +687,7 @@
             <div>
                 <div class="stat-lbl">Processing</div>
                 <div class="stat-val">@Model.Stats.ProcessingCount</div>
-                <div class="stat-sub">Chờ đóng gói</div>
+                <div class="stat-sub">Awaiting packaging</div>
             </div>
         </div>
         <div class="stat-card stat-c2">
@@ -695,7 +695,7 @@
             <div>
                 <div class="stat-lbl">Shipped Today</div>
                 <div class="stat-val">@Model.Stats.ShippedTodayCount</div>
-                <div class="stat-sub">Đã giao hôm nay</div>
+                <div class="stat-sub">Dispatched today</div>
             </div>
         </div>
         <div class="stat-card stat-c4">
@@ -703,32 +703,32 @@
             <div>
                 <div class="stat-lbl">Prescription</div>
                 <div class="stat-val">@Model.Stats.PrescriptionCount</div>
-                <div class="stat-sub">Đơn kính thuốc</div>
+                <div class="stat-sub">Prescription orders</div>
             </div>
         </div>
     </div>
 
     <div class="filter-card">
-        <h6><i class="bi bi-funnel me-1"></i>Tìm kiếm & Lọc</h6>
+        <h6><i class="bi bi-funnel me-1"></i>Search & Filter</h6>
         <form method="get" class="filter-row">
-            <input type="text" class="fi fi-search" name="Search" value="@Model.Search" placeholder="Order ID, email, tên khách hàng…" />
+            <input type="text" class="fi fi-search" name="Search" value="@Model.Search" placeholder="Order ID, email, customer name…" />
             <select class="fi" name="StatusFilter">
-                <option value="">Tất cả trạng thái</option>
+                <option value="">All statuses</option>
                 @foreach (var s in Model.Statuses)
                 {
                     <option value="@s" selected="@(Model.StatusFilter == s)">@s</option>
                 }
             </select>
             <select class="fi" name="TypeFilter">
-                <option value="">Tất cả loại</option>
+                <option value="">All types</option>
                 <option value="Prescription" selected="@(Model.TypeFilter == "Prescription")">Prescription (Rx)</option>
                 <option value="PreOrder" selected="@(Model.TypeFilter == "PreOrder")">Pre-Order</option>
                 <option value="Standard" selected="@(Model.TypeFilter == "Standard")">Standard</option>
             </select>
             <select class="fi" name="PriorityFilter">
-                <option value="">Tất cả ưu tiên</option>
-                <option value="High" selected="@(Model.PriorityFilter == "High")">Ưu tiên cao</option>
-                <option value="Normal" selected="@(Model.PriorityFilter == "Normal")">Bình thường</option>
+                <option value="">All priorities</option>
+                <option value="High" selected="@(Model.PriorityFilter == "High")">High priority</option>
+                <option value="Normal" selected="@(Model.PriorityFilter == "Normal")">Normal</option>
             </select>
             <select class="fi fi-sm" name="pageSize">
                 <option value="10" selected="@(Model.PageSize == 10)">10</option>
@@ -736,7 +736,7 @@
                 <option value="50" selected="@(Model.PageSize == 50)">50</option>
             </select>
             <input type="hidden" name="pageNumber" value="1" />
-            <button type="submit" class="btn-filter"><i class="bi bi-funnel-fill"></i> Lọc</button>
+            <button type="submit" class="btn-filter"><i class="bi bi-funnel-fill"></i> Filter</button>
         </form>
         <div class="qf-row">
             <a href="?StatusFilter=Processing" class="qf qf-warn"><i class="bi bi-hourglass-split"></i> Processing</a>
@@ -748,18 +748,18 @@
     <div class="tbl-card">
         <div class="tbl-top">
             <h5>
-                <i class="bi bi-list-check"></i> Hàng đợi Operations
-                <span class="tbl-badge">@Model.TotalOrders đơn</span>
+                <i class="bi bi-list-check"></i> Operations Queue
+                <span class="tbl-badge">@Model.TotalOrders orders</span>
             </h5>
-            <div class="tbl-info">Hiển thị <strong>@Model.FirstItemIndex–@Model.LastItemIndex</strong> / <strong>@Model.TotalOrders</strong></div>
+            <div class="tbl-info">Showing <strong>@Model.FirstItemIndex–@Model.LastItemIndex</strong> / <strong>@Model.TotalOrders</strong></div>
         </div>
 
         @if (!Model.Orders.Any())
         {
             <div class="empty">
                 <div class="empty-icon"><i class="bi bi-inbox"></i></div>
-                <h4>Không có đơn hàng</h4>
-                <p>Không có đơn nào khớp với bộ lọc hiện tại.</p>
+                <h4>No orders found</h4>
+                <p>No orders match the current filters.</p>
             </div>
         }
         else
@@ -768,14 +768,14 @@
                 <table class="ops-tbl">
                     <thead>
                         <tr>
-                            <th>Đơn hàng</th>
-                            <th>Khách hàng</th>
-                            <th>Ngày tạo</th>
-                            <th>Trạng thái</th>
-                            <th>Loại đơn</th>
-                            <th>Vận chuyển</th>
-                            <th style="text-align:right">Tổng tiền</th>
-                            <th style="text-align:center">Thao tác</th>
+                            <th>Order</th>
+                            <th>Customer</th>
+                            <th>Created Date</th>
+                            <th>Status</th>
+                            <th>Order Type</th>
+                            <th>Shipping</th>
+                            <th style="text-align:right">Total</th>
+                            <th style="text-align:center">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -817,12 +817,10 @@
                                     }
                                     else if (o.IsPreOrder)
                                     {
-
                                         <span class="pill p-pre"><i class="bi bi-hourglass-split"></i> Pre-Order</span>
                                     }
                                     else
                                     {
-
                                         <span class="pill p-std"><i class="bi bi-check-circle"></i> Standard</span>
                                     }
                                 </td>
@@ -836,8 +834,7 @@
                                     }
                                     else
                                     {
-
-                                        <span style="color:var(--muted);font-size:12px">Chưa có</span>
+                                        <span style="color:var(--muted);font-size:12px">Not available</span>
                                     }
                                 </td>
                                 <td style="text-align:right">
@@ -845,7 +842,7 @@
                                 </td>
                                 <td style="text-align:center">
                                     <a asp-page="./Details" asp-route-id="@o.OrderId" class="btn-process">
-                                        <i class="bi bi-arrow-right-circle"></i> Xử lý
+                                        <i class="bi bi-arrow-right-circle"></i> Process
                                     </a>
                                 </td>
                             </tr>
@@ -854,7 +851,7 @@
                 </table>
             </div>
             <div class="pag-row">
-                <div class="pag-info">Trang @Model.PageNumber / @Model.TotalPages</div>
+                <div class="pag-info">Page @Model.PageNumber / @Model.TotalPages</div>
                 <ul class="pag">
                     <li class="pag-item @(Model.PageNumber == 1 ? "disabled" : "")"><a asp-page="./Index" asp-route-pageNumber="1" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">«</a></li>
                     <li class="pag-item @(Model.PageNumber == 1 ? "disabled" : "")"><a asp-page="./Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">‹</a></li>
@@ -867,7 +864,6 @@
                             }
                             else
                             {
-
                                 <a asp-page="./Index" asp-route-pageNumber="@p" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">@p</a>
                             }
                         </li>

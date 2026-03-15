@@ -442,13 +442,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label asp-for="Input.Brand">Brand</label>
-                        <select asp-for="Input.Brand" class="form-control">
-                            <option value="">-- Select Brand --</option>
-                            @foreach (var b in new[] { "Essilor", "Hoya", "Zeiss", "Nikon", "Rodenstock", "Shamir", "Seiko", "Kodak", "Other" })
-                            {
-                                <option value="@b">@b</option>
-                            }
-                        </select>
+                        <input asp-for="Input.Brand" class="form-control" placeholder="e.g., Essilor, Hoya, Zeiss, Nikon" />
                     </div>
                     <div class="form-group">
                         <label asp-for="Input.Origin">Country of Origin</label>
@@ -463,49 +457,22 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label asp-for="Input.LensType">Lens Type</label>
-                        <select asp-for="Input.LensType" class="form-control">
-                            <option value="">-- Select Type --</option>
-                            @foreach (var lt in EyewearStore_SWP391.Models.LensTypes.All)
-                            {
-                                <option value="@lt">@lt</option>
-                            }
-                        </select>
+                        <input asp-for="Input.LensType" class="form-control" placeholder="e.g., Single Vision, Progressive, Bifocal, Reading" />
                     </div>
                     <div class="form-group">
                         <label asp-for="Input.LensIndex">Lens Index</label>
-                        <select asp-for="Input.LensIndex" class="form-control">
-                            <option value="">-- Select Index --</option>
-                            <option value="1.50">1.50 — Standard</option>
-                            <option value="1.56">1.56 — Mid-Index</option>
-                            <option value="1.60">1.60 — Mid-High</option>
-                            <option value="1.67">1.67 — High-Index</option>
-                            <option value="1.74">1.74 — Ultra High-Index</option>
-                            <option value="1.76">1.76 — Super Ultra</option>
-                        </select>
+                        <input asp-for="Input.LensIndex" type="number" step="0.01" min="1.0" max="2.0" class="form-control" placeholder="e.g., 1.50, 1.67, 1.74" />
                         <span class="helper-text">Higher index = thinner &amp; lighter lens</span>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label asp-for="Input.LensMaterial">Lens Material</label>
-                        <select asp-for="Input.LensMaterial" class="form-control">
-                            <option value="">-- Select Material --</option>
-                            <option value="CR-39">CR-39 (Plastic)</option>
-                            <option value="Polycarbonate">Polycarbonate</option>
-                            <option value="Trivex">Trivex</option>
-                            <option value="MR-8">MR-8</option>
-                            <option value="Glass">Glass</option>
-                        </select>
+                        <input asp-for="Input.LensMaterial" class="form-control" placeholder="e.g., CR-39, Polycarbonate, Trivex, MR-8" />
                     </div>
                     <div class="form-group">
                         <label asp-for="Input.LensThickness">Thickness Category</label>
-                        <select asp-for="Input.LensThickness" class="form-control">
-                            <option value="">-- Select Thickness --</option>
-                            <option value="Standard">Standard</option>
-                            <option value="Thin">Thin</option>
-                            <option value="Ultra-Thin">Ultra-Thin</option>
-                            <option value="Aspheric">Aspheric</option>
-                        </select>
+                        <input asp-for="Input.LensThickness" class="form-control" placeholder="e.g., Standard, Thin, Ultra-Thin, Aspheric" />
                     </div>
                 </div>
                 <div class="form-row single">
@@ -546,12 +513,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label asp-for="Input.UVProtection">UV Protection</label>
-                        <select asp-for="Input.UVProtection" class="form-control">
-                            <option value="">-- Select --</option>
-                            <option value="UV400">UV400 (Full protection)</option>
-                            <option value="UV380">UV380</option>
-                            <option value="None">None</option>
-                        </select>
+                        <input asp-for="Input.UVProtection" class="form-control" placeholder="e.g., UV400, UV380, None" />
                     </div>
                     <div class="form-group"></div>
                 </div>

@@ -6,473 +6,655 @@
 }
 
 @section Styles {
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* ==========================================
-                   LENS DETAILS PAGE STYLES
-                   ========================================== */
-
-        .lens-breadcrumb-section {
-            background: #F8F9FA;
-            padding: 16px 0;
+        :root {
+            --teal: #00756A;
+            --teal-dk: #005a51;
+            --teal-lt: #e8f5f4;
+            --red: #e53935;
+            --gold: #c9a96e;
+            --text: #1a1a1a;
+            --sub: #6b7280;
+            --border: #e5e7eb;
+            --bg: #f9fafb;
         }
 
-        .lens-breadcrumb {
-            display: flex;
-            align-items: center;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            font-size: 14px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
         }
 
-            .lens-breadcrumb li {
+        .bc {
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
+            font-size: 13px;
+        }
+
+            .bc ol {
                 display: flex;
                 align-items: center;
+                list-style: none;
+                margin: 0 auto;
+                padding: 0 24px;
+                max-width: 1280px;
+                gap: 5px;
+                flex-wrap: wrap;
             }
 
-            .lens-breadcrumb a {
-                color: #666666;
+            .bc a {
+                color: var(--sub);
                 text-decoration: none;
-                transition: color 0.3s ease;
             }
 
-                .lens-breadcrumb a:hover {
-                    color: var(--shop-primary-teal);
+                .bc a:hover {
+                    color: var(--teal);
                 }
 
-            .lens-breadcrumb .separator {
-                margin: 0 8px;
-                color: #999999;
-                font-size: 12px;
+            .bc .sep {
+                color: #ccc;
+                font-size: 10px;
             }
 
-            .lens-breadcrumb .current {
-                color: var(--shop-primary-teal);
-                font-weight: 500;
+            .bc .cur {
+                color: var(--text);
+                font-weight: 600;
             }
 
-        .lens-details-container {
-            max-width: 1200px;
+        .fd {
+            max-width: 1280px;
             margin: 0 auto;
-            padding: 40px 24px;
-            background: var(--shop-white);
+            padding: 32px 24px 80px;
         }
 
-        .lens-details-grid {
+        .fd-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 48px;
+            grid-template-columns: 55% 1fr;
+            gap: 56px;
+            align-items: start;
         }
 
-        .lens-gallery {
-            position: relative;
+        /* Gallery */
+        .gal {
+            position: sticky;
+            top: 78px;
         }
 
-        .main-image-container {
-            aspect-ratio: 1;
-            background: var(--shop-white);
-            border-radius: 12px;
-            border: 1px solid #E0E0E0;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-            .main-image-container img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                transition: opacity 0.3s ease;
-            }
-
-        .main-image-placeholder {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-        }
-
-            .main-image-placeholder i {
-                font-size: 120px;
-                color: var(--shop-primary-teal);
-                opacity: 0.3;
-            }
-
-        .thumbnail-gallery {
+        .gal-inner {
             display: flex;
             gap: 12px;
-            margin-top: 16px;
-            flex-wrap: wrap;
+            align-items: flex-start;
         }
 
-        .thumbnail-item {
-            width: 80px;
-            height: 80px;
+        .gal-thumbs {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 72px;
+            flex-shrink: 0;
+            max-height: 480px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #e0e0e0 transparent;
+        }
+
+            .gal-thumbs::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            .gal-thumbs::-webkit-scrollbar-thumb {
+                background: #e0e0e0;
+                border-radius: 4px;
+            }
+
+        .thumb {
+            width: 72px;
+            height: 72px;
             border-radius: 8px;
             overflow: hidden;
             cursor: pointer;
             border: 2px solid transparent;
-            transition: all 0.3s ease;
+            transition: border-color .18s, box-shadow .18s;
+            flex-shrink: 0;
+            background: #f5f5f5;
         }
 
-            .thumbnail-item:hover, .thumbnail-item.active {
-                border-color: var(--shop-primary-teal);
+            .thumb:hover {
+                border-color: var(--teal);
             }
 
-            .thumbnail-item img {
+            .thumb.active {
+                border-color: var(--teal);
+                box-shadow: 0 0 0 3px rgba(0,117,106,.15);
+            }
+
+            .thumb img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
+                display: block;
             }
 
-        .lens-info {
-            padding-top: 16px;
+        .gal-main {
+            flex: 1;
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #fff;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 24px rgba(0,0,0,.06);
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
         }
 
-        .lens-name {
-            font-size: 32px;
-            font-weight: 700;
-            color: #333333;
-            margin: 0 0 12px;
+            .gal-main img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: opacity .22s;
+            }
+
+        .gal-ph {
+            font-size: 90px;
+            color: #ddd;
+        }
+
+        .brand-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: rgba(255,255,255,.95);
+            border: 1px solid rgba(0,0,0,.08);
+            border-radius: 8px;
+            padding: 6px 18px;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--teal);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            backdrop-filter: blur(6px);
+            text-decoration: none;
+            box-shadow: 0 2px 12px rgba(0,0,0,.12);
+            transition: box-shadow .2s, background .2s;
+        }
+
+            .brand-badge:hover {
+                background: #fff;
+                box-shadow: 0 4px 20px rgba(0,0,0,.2);
+                color: var(--teal);
+            }
+
+        /* Info panel */
+        .info {
+            padding-top: 2px;
+        }
+
+        .brand-link {
+            display: inline-block;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--teal);
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--teal);
+            padding-bottom: 1px;
+        }
+
+            .brand-link:hover {
+                color: var(--teal-dk);
+            }
+
+        .prod-name {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text);
+            margin: 0 0 10px;
             line-height: 1.3;
         }
 
-        .lens-sku {
-            font-size: 14px;
-            color: #666666;
-            margin-bottom: 16px;
+        .status-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--sub);
+            margin-bottom: 14px;
+            flex-wrap: wrap;
         }
 
-        .lens-price {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--shop-primary-teal);
-            margin-bottom: 24px;
+            .status-row strong {
+                color: var(--text);
+            }
+
+        .sep-dot {
+            color: #ccc;
+        }
+
+        .badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--teal-lt);
+            color: var(--teal);
+        }
+
+        .badge-rx {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-material {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-coating {
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .badge-uv {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .price-row {
             display: flex;
             align-items: baseline;
             gap: 8px;
+            margin-bottom: 16px;
         }
 
-            .lens-price .currency {
-                font-size: 24px;
+        .price-lbl {
+            font-size: 14px;
+            color: var(--sub);
+        }
+
+        .price-val {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--red);
+            line-height: 1;
+        }
+
+        .price-cur {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--red);
+        }
+
+        .sold-txt {
+            font-size: 13px;
+            color: var(--sub);
+            margin-left: auto;
+        }
+
+            .sold-txt strong {
+                color: var(--text);
             }
+
+        .stock-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
 
         .stock-badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 16px;
-            border-radius: 16px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 24px;
+            gap: 7px;
+            padding: 7px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
         }
 
-            .stock-badge.in-stock {
-                background: #28A745;
-                color: white;
+            .stock-badge.in {
+                background: #e8f5e9;
+                color: #2e7d32;
             }
 
-            .stock-badge.low-stock {
-                background: #FFA500;
-                color: white;
+            .stock-badge.low {
+                background: #fff8e1;
+                color: #f57f17;
             }
 
-            .stock-badge.out-of-stock {
-                background: #DC3545;
-                color: white;
+            .stock-badge.out {
+                background: #ffebee;
+                color: #c62828;
             }
 
-        .prescription-info {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 16px;
-            border-radius: 16px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 24px;
-            margin-left: 8px;
+        /* Specs table */
+        .specs {
+            margin-bottom: 20px;
         }
 
-            .prescription-info.required {
-                background: #d1ecf1;
-                color: #0c5460;
-            }
-
-            .prescription-info.not-required {
-                background: #f0f0f5;
-                color: #6c757d;
-            }
-
-        .lens-description-box {
-            margin: 24px 0;
-            padding: 24px;
-            background: #F5E6D3;
-            border-radius: 12px;
-        }
-
-            .lens-description-box p {
-                font-size: 16px;
-                line-height: 1.6;
-                color: #333333;
-                margin: 0;
-            }
-
-        .specs-section {
-            margin: 24px 0;
-        }
-
-        .specs-heading {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--shop-primary-teal);
-            margin: 0 0 16px;
-        }
-
-        .specs-table {
-            width: 100%;
-        }
-
-        .specs-row {
+        .spec-row {
             display: flex;
-            padding: 12px 0;
-            border-bottom: 1px solid #E0E0E0;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
         }
 
-            .specs-row:last-child {
+            .spec-row:last-child {
                 border-bottom: none;
             }
 
-        .specs-label {
-            width: 140px;
-            font-weight: 600;
-            color: #333333;
+        .spec-k {
+            width: 160px;
             flex-shrink: 0;
-        }
-
-        .specs-value {
-            color: #666666;
-            flex: 1;
-        }
-
-        .quantity-section {
-            margin-top: 32px;
-        }
-
-        .quantity-label {
             font-weight: 600;
-            color: #333333;
-            margin-bottom: 8px;
-            display: block;
+            color: var(--text);
         }
 
-        .quantity-input-wrapper {
+        .spec-v {
+            color: var(--sub);
+        }
+
+        /* Coating pills */
+        .coating-pills {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .coating-pill {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .promo {
+            background: #fff9f0;
+            border: 1px dashed #f59e0b;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+
+        .promo-ttl {
+            font-size: 14px;
+            font-weight: 700;
+            color: #d97706;
             display: flex;
             align-items: center;
             gap: 8px;
+            margin-bottom: 10px;
         }
 
-        .quantity-btn {
-            width: 40px;
-            height: 48px;
-            border: 2px solid #E0E0E0;
-            background: var(--shop-white);
-            border-radius: 8px;
-            font-size: 20px;
+        .promo ul {
+            margin: 0;
+            padding: 0 0 0 16px;
+            font-size: 13px;
+            color: var(--sub);
+            line-height: 1.9;
+        }
+
+            .promo ul li strong {
+                color: var(--text);
+            }
+
+        .qty-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .qty-lbl {
+            font-size: 14px;
             font-weight: 600;
-            color: var(--shop-primary-teal);
+            color: var(--text);
+        }
+
+        .qty-ctrl {
+            display: flex;
+            align-items: center;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .qty-btn {
+            width: 44px;
+            height: 46px;
+            background: #fff;
+            border: none;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--teal);
             cursor: pointer;
-            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background .15s;
         }
 
-            .quantity-btn:hover:not(:disabled) {
-                border-color: var(--shop-primary-teal);
-                background: var(--shop-warm-peach-light);
+            .qty-btn:hover:not(:disabled) {
+                background: var(--teal-lt);
             }
 
-            .quantity-btn:disabled {
-                opacity: 0.5;
+            .qty-btn:disabled {
+                opacity: .35;
                 cursor: not-allowed;
             }
 
-        .quantity-input {
-            width: 80px;
-            height: 48px;
-            border: 2px solid #E0E0E0;
-            border-radius: 8px;
-            font-size: 16px;
+        .qty-inp {
+            width: 56px;
             text-align: center;
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-left: 2px solid var(--border);
+            border-right: 2px solid var(--border);
+            height: 46px;
+            outline: none;
+            font-family: inherit;
         }
 
-            .quantity-input:focus {
-                outline: none;
-                border-color: var(--shop-primary-teal);
-            }
+        .cta-row {
+            display: flex;
+            gap: 12px;
+        }
 
-        .btn-add-to-cart {
-            margin-top: 24px;
-            width: 100%;
-            background: #0066CC;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            padding: 16px 32px;
-            border-radius: 8px;
+        .btn-buy {
+            flex: 1;
+            padding: 16px;
+            background: var(--red);
+            color: #fff;
             border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
             cursor: pointer;
-            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
+            transition: background .2s, transform .15s;
         }
 
-            .btn-add-to-cart:hover:not(:disabled) {
-                background: #0052A3;
+            .btn-buy:hover:not(:disabled) {
+                background: #c62828;
                 transform: translateY(-2px);
             }
 
-            .btn-add-to-cart:active:not(:disabled) {
-                transform: translateY(0);
-                background: #003d7a;
+        .btn-cart {
+            flex: 1;
+            padding: 16px;
+            background: #fff;
+            color: var(--teal);
+            border: 2px solid var(--teal);
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background .2s, transform .15s;
+        }
+
+            .btn-cart:hover:not(:disabled) {
+                background: var(--teal-lt);
+                transform: translateY(-2px);
             }
 
-            .btn-add-to-cart:disabled {
-                background: #CCCCCC;
+            .btn-buy:disabled, .btn-cart:disabled {
+                background: #e5e7eb;
+                color: #9ca3af;
+                border-color: #e5e7eb;
                 cursor: not-allowed;
                 transform: none;
             }
 
-        .btn-add-wishlist {
-            margin-top: 12px;
+        .btn-notify {
             width: 100%;
-            background: white;
-            color: var(--shop-primary-teal);
-            font-size: 16px;
+            padding: 13px;
+            margin-top: 10px;
+            background: #fff;
+            color: var(--sub);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
             font-weight: 600;
-            padding: 14px 32px;
-            border-radius: 8px;
-            border: 2px solid var(--shop-primary-teal);
+            font-family: inherit;
             cursor: pointer;
-            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
+            transition: border-color .2s, color .2s, background .2s;
         }
 
-            .btn-add-wishlist:hover:not(:disabled) {
-                background: #F5E6D3;
+            .btn-notify:hover {
+                border-color: var(--gold);
+                color: var(--gold);
             }
 
-            .btn-add-wishlist:disabled {
-                opacity: 0.7;
-                cursor: not-allowed;
+            .btn-notify.active {
+                border-color: var(--gold);
+                color: var(--gold);
+                background: #fffbf5;
             }
 
-        .error-alert {
-            background: #FFF5F5;
-            border: 1px solid #DC3545;
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 16px;
-            color: #DC3545;
+        .alert {
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .success-alert {
-            background: #F0FFF4;
-            border: 1px solid #28A745;
             border-radius: 8px;
             padding: 12px 16px;
-            margin-bottom: 16px;
-            color: #28A745;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 14px;
+            font-size: 14px;
         }
 
-        .details-tabs-section {
-            margin-top: 48px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
+            .alert.ok {
+                background: #f0fff4;
+                border: 1px solid #28a745;
+                color: #28a745;
+            }
+
+            .alert.err {
+                background: #fff5f5;
+                border: 1px solid var(--red);
+                color: var(--red);
+            }
+
+        /* Tabs */
+        .tabs-wrap {
+            max-width: 1280px;
+            margin: 0 auto 64px;
             padding: 0 24px;
         }
 
-        .tabs-header {
+        .tabs-hdr {
             display: flex;
-            border-bottom: 1px solid #E0E0E0;
-            gap: 4px;
+            border-bottom: 2px solid var(--border);
         }
 
-        .tab-button {
-            padding: 16px 24px;
+        .tab-btn {
+            padding: 14px 24px;
             background: transparent;
             border: none;
-            font-size: 16px;
-            font-weight: 500;
-            color: var(--shop-primary-teal);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--sub);
             cursor: pointer;
             position: relative;
-            transition: all 0.3s ease;
+            transition: color .18s;
         }
 
-            .tab-button:hover {
-                background: var(--shop-warm-peach-light);
+            .tab-btn:hover {
+                color: var(--teal);
             }
 
-            .tab-button.active {
-                font-weight: 600;
+            .tab-btn.on {
+                color: var(--teal);
             }
 
-                .tab-button.active::after {
+                .tab-btn.on::after {
                     content: '';
                     position: absolute;
-                    bottom: 0;
+                    bottom: -2px;
                     left: 0;
                     right: 0;
-                    height: 3px;
-                    background: var(--shop-primary-teal);
+                    height: 2px;
+                    background: var(--teal);
                 }
 
-        .tab-content {
+        .tab-panel {
             display: none;
-            background: var(--shop-white);
-            padding: 32px;
-            border-radius: 0 0 12px 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            background: #fff;
+            padding: 28px 32px;
+            border-radius: 0 0 14px 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.05);
         }
 
-            .tab-content.active {
+            .tab-panel.on {
                 display: block;
             }
 
-            .tab-content h3 {
-                font-size: 18px;
-                font-weight: 600;
-                color: var(--shop-primary-teal);
+            .tab-panel h3 {
+                font-size: 17px;
+                font-weight: 700;
+                color: var(--teal);
                 margin: 0 0 16px;
             }
 
-            .tab-content p {
-                color: #666666;
-                line-height: 1.8;
-                margin: 0;
+        .spec-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+            .spec-grid .spec-row:nth-child(odd) {
+                padding-right: 24px;
             }
 
         .care-list {
@@ -482,11 +664,11 @@
         }
 
             .care-list li {
-                padding: 12px 0;
-                padding-left: 32px;
+                padding: 11px 0 11px 28px;
                 position: relative;
-                color: #666666;
-                border-bottom: 1px solid #E0E0E0;
+                color: var(--sub);
+                border-bottom: 1px solid var(--border);
+                font-size: 14px;
             }
 
                 .care-list li:last-child {
@@ -498,389 +680,461 @@
                     font-family: 'bootstrap-icons';
                     position: absolute;
                     left: 0;
-                    color: var(--shop-primary-teal);
+                    color: var(--teal);
                 }
 
-        .related-products-section {
-            margin-top: 64px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 0 24px 48px;
+        /* Related */
+        .related {
+            max-width: 1280px;
+            margin: 0 auto 64px;
+            padding: 0 24px;
         }
 
-        .related-heading {
-            text-align: center;
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--shop-primary-teal);
-            margin: 0 0 32px;
-        }
-
-        .related-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
-        }
-
-        .related-card {
-            background: var(--shop-white);
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-            .related-card:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            .related h2 {
+                text-align: center;
+                font-size: 24px;
+                font-weight: 800;
+                color: var(--text);
+                margin: 0 0 28px;
             }
 
-        .related-card-image {
-            aspect-ratio: 1;
-            background: var(--shop-light-gray);
-            overflow: hidden;
+        .rel-grid {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 20px;
         }
 
-            .related-card-image img {
+        .rel-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.07);
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+            .rel-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 24px rgba(0,0,0,.13);
+            }
+
+        .rel-img {
+            aspect-ratio: 1;
+            overflow: hidden;
+            background: #f5f5f5;
+        }
+
+            .rel-img img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                transition: transform 0.3s ease;
+                transition: transform .35s;
             }
 
-        .related-card:hover .related-card-image img {
-            transform: scale(1.05);
+        .rel-card:hover .rel-img img {
+            transform: scale(1.06);
         }
 
-        .related-card-image-placeholder {
+        .rel-ph {
             width: 100%;
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 38px;
+            color: #ccc;
         }
 
-            .related-card-image-placeholder i {
-                font-size: 40px;
-                color: var(--shop-text-muted);
-                opacity: 0.5;
+        .rel-info {
+            padding: 14px 16px 16px;
+        }
+
+            .rel-info h4 {
+                font-size: 13px;
+                font-weight: 600;
+                margin: 0 0 6px;
+                color: var(--text);
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
             }
 
-        .related-card-info {
-            padding: 16px;
-        }
+            .rel-info p {
+                font-size: 15px;
+                font-weight: 800;
+                color: var(--red);
+                margin: 0;
+            }
 
-        .related-card-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333333;
-            margin: 0 0 8px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .related-card-price {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--shop-primary-teal);
-        }
-
-        .related-card-link {
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-
-        .mobile-sticky-bar {
+        /* Sticky */
+        .sticky-bar {
             display: none;
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: white;
-            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            box-shadow: 0 -4px 20px rgba(0,0,0,.1);
             padding: 12px 16px;
-            z-index: 1000;
+            z-index: 999;
         }
 
-        .mobile-sticky-content {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            max-width: 1200px;
+        .sticky-inner {
+            max-width: 1280px;
             margin: 0 auto;
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
 
-        .mobile-price {
+        .sticky-price {
             font-size: 18px;
-            font-weight: 700;
-            color: var(--shop-primary-teal);
+            font-weight: 800;
+            color: var(--red);
+            white-space: nowrap;
         }
 
-        .mobile-add-btn {
+        .sticky-btn {
             flex: 1;
-            background: #0066CC;
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 12px 20px;
+            background: var(--red);
+            color: #fff;
             border: none;
             border-radius: 8px;
+            padding: 13px;
+            font-size: 14px;
+            font-weight: 700;
             cursor: pointer;
+            font-family: inherit;
         }
 
-        @@media (max-width: 991px) {
-            .lens-details-grid {
+        @@media(max-width:991px) {
+            .fd-grid {
                 grid-template-columns: 1fr;
                 gap: 32px;
             }
 
-            .related-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .gal {
+                position: static;
             }
 
-            .mobile-sticky-bar {
+            .gal-inner {
+                flex-direction: column;
+            }
+
+            .gal-thumbs {
+                flex-direction: row;
+                width: 100%;
+                max-height: none;
+                overflow-x: auto;
+                overflow-y: visible;
+            }
+
+            .thumb {
+                width: 64px;
+                height: 64px;
+                flex-shrink: 0;
+            }
+
+            .rel-grid {
+                grid-template-columns: repeat(2,1fr);
+            }
+
+            .sticky-bar {
                 display: block;
             }
 
-            .lens-details-container {
-                padding-bottom: 100px;
+            .fd {
+                padding-bottom: 90px;
+            }
+
+            .spec-grid {
+                grid-template-columns: 1fr;
             }
         }
 
-        @@media (max-width: 576px) {
-            .lens-name {
-                font-size: 24px;
+        @@media(max-width:576px) {
+            .prod-name {
+                font-size: 20px;
             }
 
-            .lens-price {
+            .price-val {
                 font-size: 28px;
             }
 
-                .lens-price .currency {
-                    font-size: 18px;
-                }
-
-            .related-grid {
-                grid-template-columns: 1fr;
+            .rel-grid {
+                grid-template-columns: repeat(2,1fr);
+                gap: 12px;
             }
 
-            .tabs-header {
-                flex-wrap: wrap;
+            .cta-row {
+                flex-direction: column;
             }
 
-            .tab-button {
-                flex: 1;
-                min-width: 100px;
-                text-align: center;
-                padding: 12px 16px;
-                font-size: 14px;
+            .tab-btn {
+                font-size: 13px;
+                padding: 12px 14px;
             }
         }
     </style>
 }
 
 <!-- Breadcrumb -->
-<div class="lens-breadcrumb-section">
-    <ol class="lens-breadcrumb">
+<div class="bc">
+    <ol>
         <li><a asp-page="/Index">Home</a></li>
-        <li><span class="separator"><i class="bi bi-chevron-right"></i></span></li>
+        <li><span class="sep"><i class="bi bi-chevron-right"></i></span></li>
         <li><a asp-page="/Products/Index">Shop</a></li>
-        <li><span class="separator"><i class="bi bi-chevron-right"></i></span></li>
+        <li><span class="sep"><i class="bi bi-chevron-right"></i></span></li>
         <li><a asp-page="/Products/Index" asp-route-productType="Lenses">Lenses</a></li>
-        <li><span class="separator"><i class="bi bi-chevron-right"></i></span></li>
-        <li><span class="current">@Model.Lens?.Name</span></li>
+        @if (!string.IsNullOrEmpty(Model.Lens?.Brand))
+        {
+            <li><span class="sep"><i class="bi bi-chevron-right"></i></span></li>
+            <li><a asp-page="/Products/Index" asp-route-BrandFilter="@Model.Lens.Brand">@Model.Lens.Brand</a></li>
+        }
+        <li><span class="sep"><i class="bi bi-chevron-right"></i></span></li>
+        <li><span class="cur">@Model.Lens?.Name</span></li>
     </ol>
 </div>
 
 @if (Model.Lens != null)
 {
-    <div class="lens-details-container">
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="success-alert">
-                <i class="bi bi-check-circle"></i>
-                <span>@TempData["SuccessMessage"]</span>
-            </div>
-        }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="fd" style="padding-bottom:0;padding-top:16px;">
+            <div class="alert ok"><i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]</div>
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="fd" style="padding-bottom:0;padding-top:16px;">
+            <div class="alert err"><i class="bi bi-exclamation-circle-fill"></i> @Model.ErrorMessage</div>
+        </div>
+    }
 
-        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-        {
-            <div class="error-alert">
-                <i class="bi bi-exclamation-circle"></i>
-                <span>@Model.ErrorMessage</span>
-            </div>
-        }
+    <div class="fd">
+        <div class="fd-grid">
 
-        @if (TempData["ErrorMessage"] != null)
-        {
-            <div class="error-alert">
-                <i class="bi bi-exclamation-circle"></i>
-                <span>@TempData["ErrorMessage"]</span>
-            </div>
-        }
-
-        <div class="lens-details-grid">
-            <!-- Left Column - Images -->
-            <div class="lens-gallery">
-                <div class="main-image-container">
-                    @if (!string.IsNullOrEmpty(Model.Lens.PrimaryImageUrl))
+            <!-- LEFT: Gallery -->
+            <div class="gal">
+                <div class="gal-inner">
+                    @if (Model.Lens.Images.Count > 1)
                     {
-                        <img id="mainProductImage" src="@Model.Lens.PrimaryImageUrl" alt="@Model.Lens.Name" />
-                    }
-                    else
-                    {
-                        <div class="main-image-placeholder">
-                            <i class="bi bi-eyeglasses"></i>
+                        <div class="gal-thumbs" id="thumbStrip">
+                            @foreach (var (img, i) in Model.Lens.Images.Select((x, i) => (x, i)))
+                            {
+                                <div class="thumb @(img.IsPrimary ? "active" : "")"
+                                     onclick="changeImg('@img.ImageUrl', this)"
+                                     title="@(img.AltText ?? Model.Lens.Name)">
+                                    <img src="@img.ImageUrl" alt="@(img.AltText ?? Model.Lens.Name)" loading="lazy" />
+                                </div>
+                            }
                         </div>
+                    }
+                    <div class="gal-main">
+                        @if (!string.IsNullOrEmpty(Model.Lens.Brand))
+                        {
+                            <span class="brand-badge">@Model.Lens.Brand.ToUpper()</span>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Lens.PrimaryImageUrl))
+                        {
+                            <img id="mainImg" src="@Model.Lens.PrimaryImageUrl" alt="@Model.Lens.Name" />
+                        }
+                        else
+                        {
+                            <div class="gal-ph"><i class="bi bi-circle-half"></i></div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Info -->
+            <div class="info">
+                @if (!string.IsNullOrEmpty(Model.Lens.Brand))
+                {
+                    <a class="brand-link" asp-page="/Products/Index" asp-route-BrandFilter="@Model.Lens.Brand">@Model.Lens.Brand.ToUpper()</a>
+                }
+                <h1 class="prod-name">@Model.Lens.Name</h1>
+
+                <div class="status-row">
+                    <span>Status: <strong>@(Model.Lens.IsInStock ? "In Stock" : "Out of Stock")</strong></span>
+                    <span class="sep-dot">·</span>
+                    <span>SKU: <strong>@Model.Lens.Sku</strong></span>
+                    @if (!string.IsNullOrEmpty(Model.Lens.Origin))
+                    {
+                        <span class="sep-dot">·</span>
+                        <span>Origin: <strong>@Model.Lens.Origin</strong></span>
                     }
                 </div>
 
-                @if (Model.Lens.Images.Count > 1)
-                {
-                    <div class="thumbnail-gallery">
-                        @foreach (var image in Model.Lens.Images)
-                        {
-                            <div class="thumbnail-item @(image.IsPrimary ? "active" : "")"
-                                 onclick="changeMainImage('@image.ImageUrl', this)">
-                                <img src="@image.ImageUrl" alt="@(image.AltText ?? Model.Lens.Name)" />
-                            </div>
-                        }
-                    </div>
-                }
-            </div>
+                <!-- Badges row -->
+                <div class="badges">
+                    @if (Model.Lens.IsPrescription)
+                    {
+                        <span class="badge badge-rx"><i class="bi bi-file-earmark-medical"></i> Prescription Required</span>
+                    }
+                    else
+                    {
+                        <span class="badge"><i class="bi bi-check2-circle"></i> No Rx Needed</span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Lens.LensType))
+                    {
+                        <span class="badge"><i class="bi bi-circle-half"></i> @Model.Lens.LensType</span>
+                    }
+                    @if (Model.Lens.LensIndex.HasValue)
+                    {
+                        <span class="badge badge-material"><i class="bi bi-layers"></i> Index @Model.Lens.LensIndex.Value.ToString("F2")</span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Lens.UVProtection) && Model.Lens.UVProtection != "None")
+                    {
+                        <span class="badge badge-uv"><i class="bi bi-shield-check"></i> @Model.Lens.UVProtection</span>
+                    }
+                </div>
 
-            <!-- Right Column - Product Information -->
-            <div class="lens-info">
-                <h1 class="lens-name">@Model.Lens.Name</h1>
-
-                <p class="lens-sku">SKU: @Model.Lens.Sku</p>
-
-                <div class="lens-price">
-                    <span class="currency">@Model.Lens.Currency</span>
-                    <span>@Model.Lens.Price.ToString("N0")</span>
+                <div class="price-row">
+                    <span class="price-lbl">Price:</span>
+                    <span class="price-cur">@Model.Lens.Currency</span>
+                    <span class="price-val">@Model.Lens.Price.ToString("N0")</span>
+                    @if (Model.Lens.SoldCount > 0)
+                    {
+                        <span class="sold-txt"><strong>@Model.Lens.SoldCount</strong> sold</span>
+                    }
                 </div>
 
                 @if (Model.Lens.IsPrescription && Model.Lens.PrescriptionFee > 0)
                 {
-                    <p class="lens-price-with-rx" style="font-size: 16px; color: #666; margin: -8px 0 24px 0;">
-                        From @Model.Lens.Price.ToString("N0") VND · <strong>+ @Model.Lens.PrescriptionFee.ToString("N0") VND</strong> with prescription
+                    <p style="font-size:13px;color:var(--sub);margin:-10px 0 16px;">
+                        + <strong style="color:var(--text);">@Model.Lens.PrescriptionFee.ToString("N0") @Model.Lens.Currency</strong> prescription processing fee
                     </p>
                 }
 
-                <!-- Stock Status Badge -->
-                <div class="stock-badge @Model.Lens.StockStatus.ToLower().Replace("stock", "-stock")">
-                    @switch (Model.Lens.StockStatus)
-                    {
-                        case "InStock":
-                            <i class="bi bi-check-circle-fill"></i>
-                            <span>In Stock</span>
-                            break;
-                        case "LowStock":
-                            <i class="bi bi-exclamation-circle-fill"></i>
-                            <span>@Model.Lens.StockMessage</span>
-                            break;
-                        case "OutOfStock":
-                            <i class="bi bi-x-circle-fill"></i>
-                            <span>Out of Stock</span>
-                            break;
-                    }
-                </div>
-
-                <!-- Prescription Badge -->
-                @if (Model.Lens.IsPrescription)
-                {
-                    <div class="prescription-info required">
-                        <i class="bi bi-file-earmark-medical"></i>
-                        <span>Prescription Required</span>
-                    </div>
+                @{
+                    var sc = Model.Lens.StockStatus == "OutOfStock" ? "out" : Model.Lens.StockStatus == "LowStock" ? "low" : "in";
+                    var stockMsg = Model.Lens.StockStatus == "OutOfStock" ? "Out of Stock"
+                    : Model.Lens.StockStatus == "LowStock" ? $"Low Stock ({Model.Lens.InventoryQty} left)"
+                    : $"In Stock ({Model.Lens.InventoryQty} available)";
                 }
-                else
-                {
-                    <div class="prescription-info not-required">
-                        <i class="bi bi-check2-circle"></i>
-                        <span>No Prescription Needed</span>
-                    </div>
-                }
-
-                <!-- Description Box -->
-                @if (!string.IsNullOrEmpty(Model.Lens.Description))
-                {
-                    <div class="lens-description-box">
-                        <p>@Model.Lens.Description</p>
-                    </div>
-                }
-
-                <!-- Specifications -->
-                <div class="specs-section">
-                    <h3 class="specs-heading">Specifications</h3>
-                    <div class="specs-table">
-                        <div class="specs-row">
-                            <span class="specs-label">Lens Type:</span>
-                            <span class="specs-value">@(Model.Lens.LensType ?? "—")</span>
-                        </div>
-                        <div class="specs-row">
-                            <span class="specs-label">Lens Index:</span>
-                            <span class="specs-value">@(Model.Lens.LensIndex.HasValue? Model.Lens.LensIndex.Value.ToString("F2") : "—")</span>
-                        </div>
-                        <div class="specs-row">
-                            <span class="specs-label">Prescription:</span>
-                            <span class="specs-value">@(Model.Lens.IsPrescription ? "Required" : "Not Required")</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Add to Cart Form -->
-                <form method="post" asp-page-handler="AddToCart" id="addToCartForm">
-                    <input type="hidden" asp-for="AddToCartInput.ProductId" />
-                    <input type="hidden" asp-for="AddToCartInput.PrescriptionId" id="selectedPrescriptionId" />
-
-                    <div class="quantity-section">
-                        <label class="quantity-label">Quantity</label>
-                        <div class="quantity-input-wrapper">
-                            <button type="button" class="quantity-btn" id="decreaseQty" onclick="decreaseQuantity()">
-                                <i class="bi bi-dash"></i>
-                            </button>
-                            <input type="number" asp-for="AddToCartInput.Quantity"
-                                   class="quantity-input" id="quantityInput"
-                                   min="1" max="@(Model.Lens.InventoryQty ?? 10)"
-                                   value="1" />
-                            <button type="button" class="quantity-btn" id="increaseQty" onclick="increaseQuantity()">
-                                <i class="bi bi-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <button type="button" class="btn-add-to-cart" id="btnAddToCart" @(Model.Lens.IsInStock ? "" : "disabled")>
-                        @if (Model.Lens.IsInStock)
+                <div class="stock-row">
+                    <div class="stock-badge @sc">
+                        @if (sc == "in")
                         {
-                            <i class="bi bi-cart-plus"></i>
-                            <span>Add to Cart</span>
+                            <i class="bi bi-check-circle-fill"></i>
+                        }
+                        else if (sc == "low")
+                        {
+
+                            <i class="bi bi-exclamation-circle-fill"></i>
                         }
                         else
                         {
-                            <i class="bi bi-cart-x"></i>
-                            <span>Out of Stock</span>
+
+                            <i class="bi bi-x-circle-fill"></i>
                         }
+                        <span>@stockMsg</span>
+                    </div>
+                </div>
+
+                <!-- Specs -->
+                <div class="specs">
+                    @if (!string.IsNullOrEmpty(Model.Lens.LensMaterial))
+                    {
+                        <div class="spec-row"><span class="spec-k">Material</span><span class="spec-v">@Model.Lens.LensMaterial</span></div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Lens.LensThickness))
+                    {
+                        <div class="spec-row"><span class="spec-k">Thickness</span><span class="spec-v">@Model.Lens.LensThickness</span></div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Lens.LensCoating))
+                    {
+                        <div class="spec-row">
+                            <span class="spec-k">Coatings</span>
+                            <span class="spec-v">
+                                <div class="coating-pills">
+                                    @foreach (var coat in Model.Lens.LensCoating.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                                    {
+                                        <span class="coating-pill">@coat</span>
+                                    }
+                                </div>
+                            </span>
+                        </div>
+                    }
+                </div>
+
+                <div class="promo">
+                    <div class="promo-ttl"><i class="bi bi-gift-fill"></i> PROMOTIONS</div>
+                    <ul>
+                        <li><strong>100% refund</strong> if product is not authentic</li>
+                        <li>Free shipping on orders over <strong>500,000 VND</strong></li>
+                        <li>Official manufacturer warranty <strong>12 months</strong></li>
+                    </ul>
+                </div>
+
+                @if (Model.Lens.IsInStock)
+                {
+                    <form method="post" asp-page-handler="AddToCart" id="cartForm">
+                        <input type="hidden" asp-for="AddToCartInput.ProductId" />
+                        <input type="hidden" asp-for="AddToCartInput.PrescriptionId" id="selectedPrescriptionId" />
+                        <div class="qty-row">
+                            <span class="qty-lbl">Quantity:</span>
+                            <div class="qty-ctrl">
+                                <button type="button" class="qty-btn" id="qMinus" onclick="chQty(-1)">&#8722;</button>
+                                <input type="number" asp-for="AddToCartInput.Quantity" class="qty-inp" id="qInput"
+                                       min="1" max="@(Model.Lens.InventoryQty ?? 99)" value="1" />
+                                <button type="button" class="qty-btn" id="qPlus" onclick="chQty(1)">+</button>
+                            </div>
+                        </div>
+                        <div class="cta-row">
+                            <button type="button" id="btnBuyNow" class="btn-buy">
+                                <i class="bi bi-lightning-fill"></i> BUY NOW
+                            </button>
+                            <button type="button" id="btnAddToCart" class="btn-cart">
+                                <i class="bi bi-cart-plus"></i> ADD TO CART
+                            </button>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <div class="qty-row">
+                        <span class="qty-lbl">Quantity:</span>
+                        <div class="qty-ctrl">
+                            <button type="button" class="qty-btn" disabled>&#8722;</button>
+                            <input type="number" class="qty-inp" value="1" disabled />
+                            <button type="button" class="qty-btn" disabled>+</button>
+                        </div>
+                    </div>
+                    <div class="cta-row">
+                        <button class="btn-buy" disabled><i class="bi bi-lightning-fill"></i> BUY NOW</button>
+                        <button class="btn-cart" disabled><i class="bi bi-cart-plus"></i> ADD TO CART</button>
+                    </div>
+                    <button type="button" class="btn-notify" id="notifyBtn"
+                            data-product-id="@Model.Lens.ProductId" data-in="false">
+                        <i class="bi bi-bell" id="notifyIcon"></i>
+                        <span id="notifyLabel">Notify When Available</span>
                     </button>
-                </form>
+                }
 
                 @if (Model.Lens.IsPrescription)
                 {
-                    <div class="modal fade" id="addToCartPrescriptionModal" tabindex="-1" aria-labelledby="prescriptionModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="prescriptionModal" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="prescriptionModalLabel">Add prescription to this lens?</h5>
+                                    <h5 class="modal-title">Add prescription to this lens?</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <p class="text-muted small">Select a saved prescription or skip. +@Model.Lens.PrescriptionFee.ToString("N0") VND will be added for prescription.</p>
+                                    <p class="text-muted small">
+                                        Select a saved prescription or skip.
+                                        @if (Model.Lens.PrescriptionFee > 0)
+                                        {
+                                            <text>+@Model.Lens.PrescriptionFee.ToString("N0") VND will be added.</text>
+                                        }
+                                    </p>
                                     <label class="form-label">Prescription</label>
-                                    <select class="form-select" id="modalPrescriptionSelect">
+                                    <select class="form-select" id="rxSelect">
                                         <option value="">No prescription</option>
                                         @foreach (var p in Model.Prescriptions)
                                         {
@@ -890,7 +1144,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="button" class="btn btn-primary" id="modalAddToCartConfirm">
+                                    <button type="button" class="btn btn-primary" id="rxConfirm">
                                         <i class="bi bi-cart-plus"></i> Add to Cart
                                     </button>
                                 </div>
@@ -898,114 +1152,97 @@
                         </div>
                     </div>
                 }
-
-                @* ── Add to Wishlist: CHỈ hiện khi hết hàng ── *@
-                @if (!Model.Lens.IsInStock)
-                {
-                    <button type="button"
-                            class="btn-add-wishlist"
-                            id="wishlistBtn"
-                            data-product-id="@Model.Lens.ProductId"
-                            data-in-wishlist="false">
-                        <i class="bi bi-heart"></i>
-                        <span>Save to Wishlist — Notify me when back</span>
-                    </button>
-                }
-            </div>
         </div>
     </div>
+</div>
 
-    <!-- Tabs Section -->
-    <div class="details-tabs-section">
-        <div class="tabs-header">
-            <button class="tab-button active" onclick="showTab('description')">Full Description</button>
-            <button class="tab-button" onclick="showTab('specifications')">Specifications</button>
-            <button class="tab-button" onclick="showTab('care')">Care Instructions</button>
-        </div>
-
-        <div id="tab-description" class="tab-content active">
-            <h3>About This Lens</h3>
-            <p>
-                @if (!string.IsNullOrEmpty(Model.Lens.Description))
+<!-- Tabs -->
+<div class="tabs-wrap">
+    <div class="tabs-hdr">
+        <button class="tab-btn on" onclick="switchTab('desc',this)">Description</button>
+        <button class="tab-btn" onclick="switchTab('specs',this)">Specifications</button>
+        <button class="tab-btn" onclick="switchTab('care',this)">Care Instructions</button>
+    </div>
+    <div id="tab-desc" class="tab-panel on">
+        <h3>Product Description</h3>
+        <p style="color:var(--sub);line-height:1.8;font-size:15px;">
+            @(string.IsNullOrEmpty(Model.Lens.Description)
+                        ? "Premium quality lens designed for exceptional clarity, comfort and durability."
+                        : Model.Lens.Description)
+        </p>
+    </div>
+    <div id="tab-specs" class="tab-panel">
+        <h3>Technical Specifications</h3>
+        <div class="spec-grid">
+            <div class="spec-row"><span class="spec-k">SKU</span><span class="spec-v">@Model.Lens.Sku</span></div>
+            @if (!string.IsNullOrEmpty(Model.Lens.Brand))
                 {
-                    @Model.Lens.Description
+                    <div class="spec-row"><span class="spec-k">Brand</span><span class="spec-v">@Model.Lens.Brand</span></div>
                 }
-                else
+                @if (!string.IsNullOrEmpty(Model.Lens.Origin))
                 {
-                    <text>Discover exceptional clarity and comfort with this premium eyewear lens.</text>
+                    <div class="spec-row"><span class="spec-k">Origin</span><span class="spec-v">@Model.Lens.Origin</span></div>
                 }
-            </p>
-        </div>
-
-        <div id="tab-specifications" class="tab-content">
-            <h3>Technical Specifications</h3>
-            <div class="specs-table">
-                <div class="specs-row">
-                    <span class="specs-label">SKU:</span>
-                    <span class="specs-value">@Model.Lens.Sku</span>
-                </div>
-                <div class="specs-row">
-                    <span class="specs-label">Lens Type:</span>
-                    <span class="specs-value">@(Model.Lens.LensType ?? "—")</span>
-                </div>
-                <div class="specs-row">
-                    <span class="specs-label">Lens Index:</span>
-                    <span class="specs-value">@(Model.Lens.LensIndex.HasValue? Model.Lens.LensIndex.Value.ToString("F2") : "—")</span>
-                </div>
-                <div class="specs-row">
-                    <span class="specs-label">Prescription:</span>
-                    <span class="specs-value">@(Model.Lens.IsPrescription ? "Required" : "Not Required")</span>
-                </div>
+                @if (!string.IsNullOrEmpty(Model.Lens.LensType))
+                {
+                    <div class="spec-row"><span class="spec-k">Lens Type</span><span class="spec-v">@Model.Lens.LensType</span></div>
+                }
+                @if (Model.Lens.LensIndex.HasValue)
+                {
+                    <div class="spec-row"><span class="spec-k">Lens Index</span><span class="spec-v">@Model.Lens.LensIndex.Value.ToString("F2")</span></div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Lens.LensMaterial))
+                {
+                    <div class="spec-row"><span class="spec-k">Material</span><span class="spec-v">@Model.Lens.LensMaterial</span></div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Lens.LensThickness))
+                {
+                    <div class="spec-row"><span class="spec-k">Thickness</span><span class="spec-v">@Model.Lens.LensThickness</span></div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Lens.LensCoating))
+                {
+                    <div class="spec-row"><span class="spec-k">Coatings</span><span class="spec-v">@Model.Lens.LensCoating</span></div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Lens.UVProtection))
+                {
+                    <div class="spec-row"><span class="spec-k">UV Protection</span><span class="spec-v">@Model.Lens.UVProtection</span></div>
+                }
+                <div class="spec-row"><span class="spec-k">Prescription</span><span class="spec-v">@(Model.Lens.IsPrescription ? "Required" : "Not Required")</span></div>
             </div>
         </div>
-
-        <div id="tab-care" class="tab-content">
-            <h3>Care & Maintenance</h3>
+        <div id="tab-care" class="tab-panel">
+            <h3>Care &amp; Maintenance</h3>
             <ul class="care-list">
-                @if (!string.IsNullOrEmpty(Model.Lens.CareInstructions))
+                @foreach (var line in (Model.Lens.CareInstructions ?? "Clean gently with a microfiber cloth. Store in the provided case when not in use. Avoid touching the lens surface with fingers.").Split('.').Where(s => !string.IsNullOrWhiteSpace(s)))
                 {
-                    @foreach (var instruction in Model.Lens.CareInstructions.Split('.').Where(s => !string.IsNullOrWhiteSpace(s)))
-                    {
-                        <li>@instruction.Trim().</li>
-                    }
-                }
-                else
-                {
-                    <li>Clean gently with a microfiber cloth and lens cleaning solution.</li>
-                    <li>Store in the provided case when not in use.</li>
-                    <li>Avoid touching the lens surface with fingers.</li>
-                    <li>Keep away from harsh chemicals and extreme temperatures.</li>
+                    <li>@line.Trim().</li>
                 }
             </ul>
         </div>
     </div>
 
-    <!-- Related Products Section -->
     @if (Model.Lens.RelatedProducts.Any())
     {
-        <div class="related-products-section">
-            <h2 class="related-heading">You May Also Like</h2>
-            <div class="related-grid">
-                @foreach (var related in Model.Lens.RelatedProducts)
+        <div class="related">
+            <h2>You May Also Like</h2>
+            <div class="rel-grid">
+                @foreach (var r in Model.Lens.RelatedProducts)
                 {
-                    <a asp-page="/Products/LensDetails" asp-route-id="@related.ProductId" class="related-card-link">
-                        <div class="related-card">
-                            <div class="related-card-image">
-                                @if (!string.IsNullOrEmpty(related.PrimaryImageUrl))
-                                {
-                                    <img src="@related.PrimaryImageUrl" alt="@related.Name" />
-                                }
-                                else
-                                {
-                                    <div class="related-card-image-placeholder">
-                                        <i class="bi bi-eyeglasses"></i>
-                                    </div>
-                                }
-                            </div>
-                            <div class="related-card-info">
-                                <h4 class="related-card-name">@related.Name</h4>
-                                <p class="related-card-price">@related.Currency @related.Price.ToString("N0")</p>
-                            </div>
+                    <a asp-page="/Products/LensDetails" asp-route-id="@r.ProductId" class="rel-card">
+                        <div class="rel-img">
+                            @if (!string.IsNullOrEmpty(r.PrimaryImageUrl))
+                            {
+                                <img src="@r.PrimaryImageUrl" alt="@r.Name" />
+                            }
+                            else
+                            {
+
+                                <div class="rel-ph"><i class="bi bi-circle-half"></i></div>
+                            }
+                        </div>
+                        <div class="rel-info">
+                            <h4>@r.Name</h4>
+                            <p>@r.Currency @r.Price.ToString("N0")</p>
                         </div>
                     </a>
                 }
@@ -1013,271 +1250,142 @@
         </div>
     }
 
-    <!-- Recently Viewed Section -->
-    <section class="favorites-section" id="recently-viewed" style="display:none;">
-        <div class="favorites-container">
-            <div class="favorites-header">
-                <p class="favorites-eyebrow">Your History</p>
-                <h2>Recently Viewed Products</h2>
-            </div>
-            <div class="favorites-grid" id="recently-viewed-container">
-            </div>
-        </div>
-    </section>
+    <!-- Mobile sticky -->
+    <div class="sticky-bar" id="stickyBar">
+        <div class="sticky-inner">
+            <div class="sticky-price">@Model.Lens.Currency @Model.Lens.Price.ToString("N0")</div>
+            @if (Model.Lens.IsInStock)
+            {
+                <button class="sticky-btn" onclick="triggerAddToCart()"><i class="bi bi-cart-plus"></i> Add to Cart</button>
+            }
+            else
+            {
 
-    <!-- Mobile Sticky Bar -->
-    <div class="mobile-sticky-bar" id="mobileStickyBar">
-        <div class="mobile-sticky-content">
-            <div class="mobile-price">@Model.Lens.Currency @Model.Lens.Price.ToString("N0")</div>
-            <button type="button" class="mobile-add-btn" onclick="submitAddToCart()" @(Model.Lens.IsInStock ? "" : "disabled")>
-                @if (Model.Lens.IsInStock)
-                {
-                    <text><i class="bi bi-cart-plus"></i> Add to Cart</text>
-                }
-                else
-                {
-                    <text>Out of Stock</text>
-                }
-            </button>
+                <button class="sticky-btn" style="background:#6b7280;" onclick="document.getElementById('notifyBtn')?.click()"><i class="bi bi-bell"></i> Notify Me</button>
+            }
         </div>
     </div>
 }
 else
 {
-    <div class="lens-details-container">
-        <div class="empty-state" style="margin-top: 48px;">
-            <div class="empty-state-icon"><i class="bi bi-exclamation-circle"></i></div>
-            <h2>Product Not Found</h2>
-            <p>The lens you're looking for doesn't exist or has been removed.</p>
-            <a asp-page="/Products/Index" class="btn-clear-filters">
-                <i class="bi bi-arrow-left"></i> Back to Shop
-            </a>
-        </div>
+    <div style="text-align:center;padding:80px 24px;">
+        <i class="bi bi-exclamation-circle" style="font-size:60px;color:#e53935;"></i>
+        <h2 style="margin-top:16px;">Product Not Found</h2>
+        <a asp-page="/Products/Index" style="color:#00756A;">&#8592; Back to Shop</a>
     </div>
 }
 
 @section Scripts {
     <script>
-        window.recentlyViewedProduct = {
-            id: @Model.Lens.ProductId,
-            name: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Lens.Name)),
-            imageUrl: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Lens.PrimaryImageUrl ?? "")),
-            categoryLink: "/Products?ProductTypeFilter=Lenses",
-            price: '@Model.Lens.Price.ToString("N0")',
-            currency: '@Model.Lens.Currency',
-            productUrl: '/Products/LensDetails/@Model.Lens.ProductId'
-        };
-    </script>
-    <script>
-        // ── Image Gallery ────────────────────────────────────────────────────────
-        function changeMainImage(imageUrl, thumbnailElement) {
-            const mainImage = document.getElementById('mainProductImage');
-            if (mainImage) {
-                mainImage.style.opacity = '0';
-                setTimeout(() => { mainImage.src = imageUrl; mainImage.style.opacity = '1'; }, 150);
-            }
-            document.querySelectorAll('.thumbnail-item').forEach(t => t.classList.remove('active'));
-            thumbnailElement.classList.add('active');
+        // Gallery
+        function changeImg(url, el) {
+            var img = document.getElementById('mainImg');
+            if (img) { img.style.opacity='0'; setTimeout(function(){ img.src=url; img.style.opacity='1'; }, 200); }
+            document.querySelectorAll('.thumb').forEach(function(t){ t.classList.remove('active'); });
+            if (el) el.classList.add('active');
         }
-
-        // ── Quantity Selector ────────────────────────────────────────────────────
-        function decreaseQuantity() {
-            const input = document.getElementById('quantityInput');
-            const v = parseInt(input.value) || 1;
-            if (v > 1) { input.value = v - 1; updateQuantityButtons(); }
+        // Qty
+        function chQty(d) {
+            var inp=document.getElementById('qInput'); if(!inp) return;
+            var max=parseInt(inp.max)||99;
+            var v=Math.max(1, Math.min(max, (parseInt(inp.value)||1)+d));
+            inp.value=v;
+            document.getElementById('qMinus').disabled=v<=1;
+            document.getElementById('qPlus').disabled=v>=max;
         }
-
-        function increaseQuantity() {
-            const input = document.getElementById('quantityInput');
-            const max = parseInt(input.max) || 10;
-            const v = parseInt(input.value) || 1;
-            if (v < max) { input.value = v + 1; updateQuantityButtons(); }
+        // Tabs
+        function switchTab(name, btn) {
+            document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('on'); });
+            document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('on'); });
+            var panel=document.getElementById('tab-'+name);
+            if(panel) panel.classList.add('on');
+            btn.classList.add('on');
         }
+        // Sticky
+        var sb=document.getElementById('stickyBar'), cf=document.getElementById('cartForm');
+        if(sb&&cf){ window.addEventListener('scroll', function(){ if(window.innerWidth<=991) sb.style.display=cf.getBoundingClientRect().bottom<0?'block':'none'; }); }
 
-        function updateQuantityButtons() {
-            const input = document.getElementById('quantityInput');
-            const v = parseInt(input.value) || 1;
-            const max = parseInt(input.max) || 10;
-            const dec = document.getElementById('decreaseQty');
-            const inc = document.getElementById('increaseQty');
-            if (dec) dec.disabled = v <= 1;
-            if (inc) inc.disabled = v >= max;
-        }
-
-        document.getElementById('quantityInput')?.addEventListener('change', function () {
-            const max = parseInt(this.max) || 10;
-            let v = parseInt(this.value) || 1;
-            if (v < 1) v = 1;
-            if (v > max) v = max;
-            this.value = v;
-            updateQuantityButtons();
-        });
-
-        // ── Tab Navigation ───────────────────────────────────────────────────────
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-' + tabName)?.classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        // ── Mobile Sticky Bar ────────────────────────────────────────────────────
-        const stickyBar = document.getElementById('mobileStickyBar');
-        window.addEventListener('scroll', function () {
-            const formBottom = document.getElementById('addToCartForm')?.getBoundingClientRect().bottom || 0;
-            if (window.innerWidth <= 991) {
-                stickyBar.style.display = formBottom < 0 ? 'block' : 'none';
-            }
-        });
-
-        function submitAddToCart() {
+        // Cart / prescription modal
+        var prescriptionModal = document.getElementById('prescriptionModal');
+        function triggerAddToCart() { doAddToCart(false); }
+        function doAddToCart(isBuyNow) {
             if (prescriptionModal) {
-                new bootstrap.Modal(prescriptionModal).show();
+                var modal = new bootstrap.Modal(prescriptionModal);
+                document.getElementById('rxConfirm').onclick = function() {
+                    var sel = document.getElementById('rxSelect');
+                    var hidden = document.getElementById('selectedPrescriptionId');
+                    if (hidden) hidden.value = sel ? (sel.value || '') : '';
+                    if (isBuyNow) {
+                        var form = document.getElementById('cartForm');
+                        var inp = document.createElement('input');
+                        inp.type='hidden'; inp.name='handler'; inp.value='BuyNow';
+                        form.appendChild(inp);
+                    }
+                    document.getElementById('cartForm').submit();
+                };
+                modal.show();
             } else {
-                document.getElementById('addToCartForm').submit();
+                if (isBuyNow) {
+                    var form = document.getElementById('cartForm');
+                    var inp = document.createElement('input');
+                    inp.type='hidden'; inp.name='handler'; inp.value='BuyNow';
+                    form.appendChild(inp);
+                }
+                document.getElementById('cartForm').submit();
             }
         }
+        var btnBuyNow = document.getElementById('btnBuyNow');
+        var btnAddToCart = document.getElementById('btnAddToCart');
+        if (btnBuyNow)    btnBuyNow.addEventListener('click', function(){ doAddToCart(true); });
+        if (btnAddToCart) btnAddToCart.addEventListener('click', function(){ doAddToCart(false); });
 
-        // ── Prescription Modal ───────────────────────────────────────────────────
-        const prescriptionModal = document.getElementById('addToCartPrescriptionModal');
-        const addToCartForm = document.getElementById('addToCartForm');
-        const btnAddToCart = document.getElementById('btnAddToCart');
-
-        if (btnAddToCart) {
-            btnAddToCart.addEventListener('click', function () {
-                if (prescriptionModal) {
-                    new bootstrap.Modal(prescriptionModal).show();
-                } else {
-                    addToCartForm.submit();
-                }
-            });
-        }
-
-        const modalConfirm = document.getElementById('modalAddToCartConfirm');
-        if (modalConfirm && prescriptionModal) {
-            modalConfirm.addEventListener('click', function () {
-                const sel = document.getElementById('modalPrescriptionSelect');
-                const hidden = document.getElementById('selectedPrescriptionId');
-                if (hidden) hidden.value = sel ? (sel.value || '') : '';
-                addToCartForm.submit();
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            updateQuantityButtons();
+        document.addEventListener('DOMContentLoaded', function(){
+            if(document.getElementById('qInput')) chQty(0);
+            initNotifyBtn();
         });
 
-        // ── Wishlist Logic ───────────────────────────────────────────────────────
-        (async function initWishlist() {
-            const btn = document.getElementById('wishlistBtn');
-            if (!btn) return; // sản phẩm còn hàng → không render nút → thoát
-
-            const productId = parseInt(btn.dataset.productId);
-
-            // Nếu đã đăng nhập, check xem đã wishlist chưa để highlight đúng trạng thái
-            @if (User.Identity?.IsAuthenticated == true)
+        // Notify / wishlist
+        function initNotifyBtn() {
+            var btn=document.getElementById('notifyBtn'); if(!btn) return;
+            var pid=parseInt(btn.dataset.productId);
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
             {
                     <text>
-                    try {
-                        const res = await fetch('/api/wishlist/my');
-                        if (res.ok) {
-                            const items = await res.json();
-                            if (items.some(i => i.productId === productId)) {
-                                setWishlistActive(btn, true);
-                            }
-                        }
-                    } catch {}
+                    fetch('/api/wishlist/my').then(function(r){ if(r.ok) return r.json(); }).then(function(d){
+                        if(d&&d.some(function(i){ return i.productId===pid; })) setNotifyState(true);
+                    }).catch(function(){});
                     </text>
             }
-
-            btn.addEventListener('click', async function () {
-                @if (User.Identity?.IsAuthenticated != true)
+            btn.addEventListener('click', function(){
+                @if (User.Identity == null || !User.Identity.IsAuthenticated)
                 {
-                        <text>
-                        window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
-                        return;
-                        </text>
+                        <text>window.location.href='/Account/Login?returnUrl='+encodeURIComponent(window.location.pathname); return;</text>
                 }
-
-                const isIn = btn.dataset.inWishlist === 'true';
-                btn.disabled = true;
-
-                try {
-                    if (isIn) {
-                        const res = await fetch('/api/wishlist/remove', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ productId })
-                        });
-                        if (res.ok) {
-                            setWishlistActive(btn, false);
-                            showWishlistToast('Removed from wishlist', '');
-                        }
-                    } else {
-                        const res = await fetch('/api/wishlist/add', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ productId })
-                        });
-                        const data = await res.json();
-                        if (res.ok) {
-                            setWishlistActive(btn, true);
-                            showWishlistToast("Saved! We'll email you when it's back", '');
-                        } else {
-                            showWishlistToast(data.message || 'Something went wrong', '');
-                        }
-                    }
-                } catch {
-                    showWishlistToast('Network error. Please try again.', '');
-                } finally {
-                    btn.disabled = false;
-                }
+                var isIn=btn.dataset.in==='true'; btn.disabled=true;
+                var url=isIn?'/api/wishlist/remove':'/api/wishlist/add';
+                fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productId:pid})})
+                .then(function(r){ return r.json().then(function(d){ return {ok:r.ok,data:d}; }); })
+                .then(function(res){
+                    if(res.ok){ setNotifyState(!isIn); showToast(isIn?'Removed from wishlist.':'Added! We\'ll notify you when back in stock.'); }
+                    else { showToast(res.data.message||'Something went wrong.'); }
+                })
+                .catch(function(){ showToast('Network error.'); })
+                .finally(function(){ btn.disabled=false; });
             });
-        })();
-
-        function setWishlistActive(btn, active) {
-            btn.dataset.inWishlist = active ? 'true' : 'false';
-            const icon = btn.querySelector('i');
-            const text = btn.querySelector('span');
-            if (active) {
-                icon.className = 'bi bi-heart-fill';
-                text.textContent = 'Saved to Wishlist';
-                btn.style.background = '#fffbf5';
-                btn.style.borderColor = '#c9a96e';
-                btn.style.color = '#a07840';
-            } else {
-                icon.className = 'bi bi-heart';
-                text.textContent = 'Save to Wishlist — Notify me when back';
-                btn.style.background = '';
-                btn.style.borderColor = '';
-                btn.style.color = '';
-            }
         }
-
-        let _wlToastTimer;
-        function showWishlistToast(msg, icon = '<i class="bi bi-heart"></i>') {
-            let toast = document.getElementById('wl-toast-detail');
-            if (!toast) {
-                toast = document.createElement('div');
-                toast.id = 'wl-toast-detail';
-                toast.style.cssText = [
-                    'position:fixed', 'bottom:28px', 'left:50%',
-                    'transform:translateX(-50%) translateY(100px)',
-                    'background:#0f0f0f', 'color:#fff', 'border-radius:12px',
-                    'padding:12px 22px', 'font-size:13px', 'font-weight:500',
-                    'display:flex', 'align-items:center', 'gap:8px',
-                    'box-shadow:0 8px 28px rgba(0,0,0,0.22)', 'z-index:9999',
-                    'white-space:nowrap',
-                    'transition:transform .35s cubic-bezier(0.34,1.56,0.64,1)'
-                ].join(';');
-                document.body.appendChild(toast);
-            }
-            toast.innerHTML = `<span style="font-size:16px">${icon}</span>${msg}`;
-            toast.style.transform = 'translateX(-50%) translateY(0)';
-            clearTimeout(_wlToastTimer);
-            _wlToastTimer = setTimeout(() => {
-                toast.style.transform = 'translateX(-50%) translateY(100px)';
-            }, 3000);
+        function setNotifyState(isIn) {
+            var btn=document.getElementById('notifyBtn'), lbl=document.getElementById('notifyLabel'), ico=document.getElementById('notifyIcon');
+            if(!btn||!lbl||!ico) return;
+            btn.dataset.in=isIn?'true':'false';
+            if(isIn){ btn.classList.add('active'); ico.className='bi bi-bell-fill'; lbl.textContent='Added to Wishlist'; }
+            else { btn.classList.remove('active'); ico.className='bi bi-bell'; lbl.textContent='Notify When Available'; }
+        }
+        var _toastTimer;
+        function showToast(msg) {
+            var t=document.getElementById('_toast');
+            if(!t){ t=document.createElement('div'); t.id='_toast'; t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;border-radius:10px;padding:12px 22px;font-size:13px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.25);z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);max-width:90vw;text-align:center;'; document.body.appendChild(t); }
+            t.textContent=msg; t.style.transform='translateX(-50%) translateY(0)';
+            clearTimeout(_toastTimer); _toastTimer=setTimeout(function(){ t.style.transform='translateX(-50%) translateY(80px)'; }, 4000);
         }
     </script>
 }

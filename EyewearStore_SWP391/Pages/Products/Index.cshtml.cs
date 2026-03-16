@@ -69,8 +69,9 @@ public class IndexModel : PageModel
         if (CurrentPage < 1) CurrentPage = 1;
         if (PageSize < 1 || PageSize > 48) PageSize = DefaultPageSize;
 
-        if (!string.IsNullOrWhiteSpace(BrandFilter))
-            ProductTypeFilter = "Frame";
+        // *** FIX: Đã XÓA dòng force ProductTypeFilter = "Frame" khi có BrandFilter ***
+        // Bây giờ nếu không truyền ProductTypeFilter thì mặc định là "All"
+        // => cả Frame lẫn Lens có brand đó đều hiện ra
 
         var productList = new List<ProductCatalogItemViewModel>();
 
@@ -135,6 +136,10 @@ public class IndexModel : PageModel
                 .Include(l => l.ProductImages)
                 .AsNoTracking()
                 .Where(l => l.IsActive);
+
+            // *** FIX: Thêm BrandFilter cho Lenses ***
+            if (!string.IsNullOrWhiteSpace(BrandFilter))
+                lensesQuery = lensesQuery.Where(l => l.Brand != null && l.Brand.ToLower() == BrandFilter.ToLower());
 
             if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
@@ -227,20 +232,32 @@ public class IndexModel : PageModel
         };
 
         // ── Brand mega bar data ───────────────────────────────────────────────
-        AllBrands = await _context.Frames
+        // *** FIX: Lấy brand từ cả Frames lẫn Lenses, merge lại ***
+        var frameBrands = await _context.Frames
             .Where(f => f.IsActive && f.Brand != null)
             .GroupBy(f => f.Brand)
             .Select(g => new { Brand = g.Key!, Count = g.Count() })
-            .OrderBy(b => b.Brand)
             .AsNoTracking()
-            .ToListAsync()
-            .ContinueWith(t => t.Result.Select(x => new BrandItem(x.Brand, x.Count)).ToList());
+            .ToListAsync();
+
+        var lensBrands = await _context.Lenses
+            .Where(l => l.IsActive && l.Brand != null)
+            .GroupBy(l => l.Brand)
+            .Select(g => new { Brand = g.Key!, Count = g.Count() })
+            .AsNoTracking()
+            .ToListAsync();
+
+        AllBrands = frameBrands
+            .Concat(lensBrands)
+            .GroupBy(b => b.Brand, StringComparer.OrdinalIgnoreCase)
+            .Select(g => new BrandItem(g.Key, g.Sum(x => x.Count)))
+            .OrderBy(b => b.Brand)
+            .ToList();
 
         return Page();
     }
 
     // ── Smart Search API ──────────────────────────────────────────────────────
-    // GET /Products?handler=Search&q=molsion&limit=6
     public async Task<IActionResult> OnGetSearchAsync(string? q, int limit = 8)
     {
         if (string.IsNullOrWhiteSpace(q) || q.Length < 1)
@@ -273,14 +290,28 @@ public class IndexModel : PageModel
             .AsNoTracking()
             .ToListAsync();
 
-        var brands = await _context.Frames
+        // *** FIX: Lấy brand từ cả Frames lẫn Lenses ***
+        var frameBrandsSearch = await _context.Frames
             .Where(f => f.IsActive && f.Brand != null && f.Brand.ToLower().Contains(term))
             .GroupBy(f => f.Brand)
             .Select(g => new { brand = g.Key, count = g.Count() })
-            .OrderBy(b => b.brand)
-            .Take(5)
             .AsNoTracking()
             .ToListAsync();
+
+        var lensBrandsSearch = await _context.Lenses
+            .Where(l => l.IsActive && l.Brand != null && l.Brand.ToLower().Contains(term))
+            .GroupBy(l => l.Brand)
+            .Select(g => new { brand = g.Key, count = g.Count() })
+            .AsNoTracking()
+            .ToListAsync();
+
+        var brands = frameBrandsSearch
+            .Concat(lensBrandsSearch)
+            .GroupBy(b => b.brand, StringComparer.OrdinalIgnoreCase)
+            .Select(g => new { brand = g.Key, count = g.Sum(x => x.count) })
+            .OrderBy(b => b.brand)
+            .Take(5)
+            .ToList();
 
         return new JsonResult(new { frames, brands });
     }

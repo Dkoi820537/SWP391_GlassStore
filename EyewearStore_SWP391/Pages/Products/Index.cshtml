@@ -999,7 +999,7 @@
                             @foreach (var b in Model.AllBrands)
                             {
                                 <a class="bmd-item @(Model.BrandFilter?.ToLower() == b.Brand.ToLower() ? "active" : "")"
-                                   href="/Products?BrandFilter=@Uri.EscapeDataString(b.Brand)&ProductTypeFilter=Frame">
+                                   href="/Products?BrandFilter=@Uri.EscapeDataString(b.Brand)">
                                     <span class="bmd-dot"></span>
                                     <span class="bmd-name">@b.Brand</span>
                                     <span class="bmd-count">@b.Count</span>
@@ -1334,7 +1334,6 @@
                                         }
                                         else
                                         {
-
                                             <a asp-page="/Products/LensDetails" asp-route-id="@product.ProductId" class="btn-view-details-outline" style="flex:1;">View Details</a>
                                         }
                                     }
@@ -1382,7 +1381,6 @@
                                 }
                                 else
                                 {
-
                                     <span class="page-link prev disabled"><i class="bi bi-chevron-left"></i></span>
                                 }
                             </li>
@@ -1443,7 +1441,6 @@
                                 }
                                 else
                                 {
-
                                     <span class="page-link next disabled"><i class="bi bi-chevron-right"></i></span>
                                 }
                             </li>
@@ -1501,7 +1498,7 @@
         async function toggleWishlist(btn) {
             @if (!User.Identity.IsAuthenticated)
             {
-                    <text>showWlToast('Please login to save items',''); setTimeout(()=>window.location.href='/Account/Login',1200); return;</text>
+                        <text>showWlToast('Please login to save items',''); setTimeout(()=>window.location.href='/Account/Login',1200); return;</text>
             }
             const productId = parseInt(btn.dataset.productId);
             const isIn = btn.dataset.inWishlist === 'true';
@@ -1522,20 +1519,20 @@
         document.addEventListener('DOMContentLoaded', async () => {
             @if (User.Identity.IsAuthenticated)
             {
-                    <text>
-                    try {
-                        const res = await fetch('/api/wishlist/my'); if (!res.ok) return;
-                        const items = await res.json();
-                        const ids = new Set(items.map(i => i.productId));
-                        document.querySelectorAll('.btn-wishlist').forEach(btn => {
-                            if (ids.has(parseInt(btn.dataset.productId))) {
-                                btn.dataset.inWishlist='true';
-                                btn.querySelector('i').className='bi bi-heart-fill';
-                                btn.classList.add('active');
-                            }
-                        });
-                    } catch {}
-                    </text>
+                        <text>
+                        try {
+                            const res = await fetch('/api/wishlist/my'); if (!res.ok) return;
+                            const items = await res.json();
+                            const ids = new Set(items.map(i => i.productId));
+                            document.querySelectorAll('.btn-wishlist').forEach(btn => {
+                                if (ids.has(parseInt(btn.dataset.productId))) {
+                                    btn.dataset.inWishlist='true';
+                                    btn.querySelector('i').className='bi bi-heart-fill';
+                                    btn.classList.add('active');
+                                }
+                            });
+                        } catch {}
+                        </text>
             }
         });
 
@@ -1549,7 +1546,6 @@
             const hid  = document.getElementById('ssHidden');
             if (!inp || !dd) return;
 
-            // Restore nếu đang có SearchTerm từ filter
             const cur = '@Html.Raw(Model.SearchTerm?.Replace("'", "\'") ?? "")';
             if (cur) { inp.value = cur; clr.classList.add('show'); }
 
@@ -1604,7 +1600,7 @@
                 if (brands.length) {
                     h += `<div class="ss-group-title"><i class="bi bi-building"></i> Thương hiệu</div>`;
                     brands.forEach(b => {
-                        h += `<a class="ss-brand" href="/Products?BrandFilter=${encodeURIComponent(b.brand)}&ProductTypeFilter=Frame">
+                        h += `<a class="ss-brand" href="/Products?BrandFilter=${encodeURIComponent(b.brand)}">
                             <div class="ss-brand-icon">${x((b.brand||'?')[0])}</div>
                             <span class="ss-brand-name">${x(b.brand)}</span>
                             <span class="ss-brand-count">${b.count} sản phẩm</span>

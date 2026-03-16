@@ -7,179 +7,220 @@
 @section Styles {
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <style data-purpose="custom-colors">
-        /* Using teal-600/700 for primary actions and highlights to match user request */
-        .bg-primary-teal { background-color: #134e4a; } /* Very dark teal for nav */
-        .bg-active-teal { background-color: #0d9488; } /* Standard teal */
-        .text-teal-accent { color: #0d9488; }
-        .border-teal-accent { border-color: #0d9488; }
-        
-        /* Stop tailwind from ruining Bootstrap tables / body styling that leaks */
+        .bg-primary-teal {
+            background-color: #134e4a;
+        }
+
+        .bg-active-teal {
+            background-color: #0d9488;
+        }
+
+        .text-teal-accent {
+            color: #0d9488;
+        }
+
+        .border-teal-accent {
+            border-color: #0d9488;
+        }
+
         .tw-root {
             font-family: 'Inter', sans-serif;
             background-color: #f9fafb;
             color: #1e293b;
         }
-        
-        .tw-root h1, .tw-root h2, .tw-root h3, .tw-root p, .tw-root span {
-            font-family: 'Inter', sans-serif;
+
+            .tw-root h1, .tw-root h2, .tw-root h3, .tw-root p, .tw-root span {
+                font-family: 'Inter', sans-serif;
+            }
+
+        /* ── Service quick-action card highlight ── */
+        .qa-services {
+            border-color: #0d9488 !important;
+            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%) !important;
+            color: #0f766e !important;
+            position: relative;
+            overflow: hidden;
         }
+
+            .qa-services::before {
+                content: '';
+                position: absolute;
+                top: -8px;
+                right: -8px;
+                width: 32px;
+                height: 32px;
+                background: #0d9488;
+                border-radius: 50%;
+                opacity: .12;
+            }
+
+            .qa-services:hover {
+                background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%) !important;
+                border-color: #0f766e !important;
+                color: #0f766e !important;
+            }
+
+            .qa-services .qa-icon {
+                font-size: 14px;
+                margin-right: 4px;
+            }
     </style>
 }
 
 <div class="tw-root py-8">
     <main class="max-w-[1400px] mx-auto p-6">
-        <!-- BEGIN: Breadcrumbs & Header -->
+
+        <!-- Breadcrumbs & Header -->
         <div class="mb-6">
             <nav class="text-xs text-slate-500 mb-2">
-                <a asp-page="/Index" class="hover:text-teal-700">Home</a> &gt; <span class="text-slate-800">Manager Dashboard</span>
+                <a asp-page="/Index" class="hover:text-teal-700">Home</a>
+                &gt; <span class="text-slate-800">Manager Dashboard</span>
             </nav>
             <div class="flex justify-between items-end">
                 <div>
-                    <h1 class="text-3xl font-serif font-bold text-slate-900 flex items-center">
-                        Manager Dashboard
-                    </h1>
+                    <h1 class="text-3xl font-serif font-bold text-slate-900">Manager Dashboard</h1>
                     <p class="text-sm text-slate-500 mt-1 italic">Business overview, analytics, and system management</p>
                 </div>
                 <div class="flex space-x-3">
-                    <button class="border border-slate-300 bg-white text-slate-700 hover:text-teal-700 hover:border-teal-600 px-4 py-2 rounded text-sm font-semibold flex items-center uppercase tracking-wider transition-colors shadow-sm" onclick="window.location.reload()">
+                    <button class="border border-slate-300 bg-white text-slate-700 hover:text-teal-700 hover:border-teal-600 px-4 py-2 rounded text-sm font-semibold uppercase tracking-wider transition-colors shadow-sm"
+                            onclick="window.location.reload()">
                         REFRESH
                     </button>
-                    <button class="border border-slate-300 bg-white text-slate-700 hover:text-teal-700 hover:border-teal-600 px-4 py-2 rounded text-sm font-semibold flex items-center uppercase tracking-wider transition-colors shadow-sm" onclick="window.print()">
+                    <button class="border border-slate-300 bg-white text-slate-700 hover:text-teal-700 hover:border-teal-600 px-4 py-2 rounded text-sm font-semibold uppercase tracking-wider transition-colors shadow-sm"
+                            onclick="window.print()">
                         PRINT REPORT
                     </button>
                 </div>
             </div>
         </div>
-        <!-- END: Breadcrumbs & Header -->
 
-        <!-- BEGIN: Summary Cards Grid -->
+        <!-- Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
-            <!-- Total Revenue -->
-            <div class="bg-white border-t-4 border-[#0d9488] text-slate-900 p-6 rounded-lg shadow-sm relative overflow-hidden">
-                <div class="relative z-10">
-                    <h3 class="text-sm font-medium text-slate-500 uppercase">Total Revenue</h3>
-                    <p class="text-4xl font-bold mt-2">@Model.Stats.TotalRevenue.ToString("N0")</p>
-                    <p class="text-xs mt-1 text-slate-500">VND this month</p>
-                </div>
+            <div class="bg-white border-t-4 border-[#0d9488] text-slate-900 p-6 rounded-lg shadow-sm">
+                <h3 class="text-sm font-medium text-slate-500 uppercase">Total Revenue</h3>
+                <p class="text-4xl font-bold mt-2">@Model.Stats.TotalRevenue.ToString("N0")</p>
+                <p class="text-xs mt-1 text-slate-500">VND this month</p>
             </div>
-            
-            <!-- Total Orders -->
-            <div class="bg-white border-t-4 border-[#2563eb] text-slate-900 p-6 rounded-lg shadow-sm relative overflow-hidden">
-                <div class="relative z-10">
-                    <h3 class="text-sm font-medium text-slate-500 uppercase">Total Orders</h3>
-                    <p class="text-4xl font-bold mt-2">@Model.Stats.TotalOrders</p>
-                    <p class="text-xs mt-1 font-semibold">
-                        @if (Model.Stats.OrderGrowth >= 0)
-                        {
-                            <span class="text-emerald-600">📈 +@Model.Stats.OrderGrowth% growth</span>
-                        }
-                        else
-                        {
-                            <span class="text-red-500">📉 @Model.Stats.OrderGrowth% change</span>
-                        }
-                    </p>
-                </div>
+            <div class="bg-white border-t-4 border-[#2563eb] text-slate-900 p-6 rounded-lg shadow-sm">
+                <h3 class="text-sm font-medium text-slate-500 uppercase">Total Orders</h3>
+                <p class="text-4xl font-bold mt-2">@Model.Stats.TotalOrders</p>
+                <p class="text-xs mt-1 font-semibold">
+                    @if (Model.Stats.OrderGrowth >= 0)
+                    {
+                        <span class="text-emerald-600">📈 +@Model.Stats.OrderGrowth% growth</span>
+                    }
+                    else
+                    {
+                        <span class="text-red-500">📉 @Model.Stats.OrderGrowth% change</span>
+                    }
+                </p>
             </div>
-            
-            <!-- Active Products -->
-            <div class="bg-white border-t-4 border-[#7c3aed] text-slate-900 p-6 rounded-lg shadow-sm relative overflow-hidden">
-                <div class="relative z-10">
-                    <h3 class="text-sm font-medium text-slate-500 uppercase">Active Products</h3>
-                    <p class="text-4xl font-bold mt-2">@Model.Stats.ActiveProducts</p>
-                    <p class="text-xs mt-1 font-semibold">
-                        @if (Model.Stats.LowStockCount > 0)
-                        {
-                            <span class="text-amber-500 text-sm">⚠️ @Model.Stats.LowStockCount low stock</span>
-                        }
-                        else
-                        {
-                            <span class="text-emerald-600">✓ All stocked well</span>
-                        }
-                    </p>
-                </div>
+            <div class="bg-white border-t-4 border-[#7c3aed] text-slate-900 p-6 rounded-lg shadow-sm">
+                <h3 class="text-sm font-medium text-slate-500 uppercase">Active Products</h3>
+                <p class="text-4xl font-bold mt-2">@Model.Stats.ActiveProducts</p>
+                <p class="text-xs mt-1 font-semibold">
+                    @if (Model.Stats.LowStockCount > 0)
+                    {
+                        <span class="text-amber-500">⚠️ @Model.Stats.LowStockCount low stock</span>
+                    }
+                    else
+                    {
+                        <span class="text-emerald-600">✓ All stocked well</span>
+                    }
+                </p>
             </div>
-            
-            <!-- Staff Members -->
-            <div class="bg-white border-t-4 border-[#475569] text-slate-900 p-6 rounded-lg shadow-sm relative overflow-hidden">
-                <div class="relative z-10">
-                    <h3 class="text-sm font-medium text-slate-500 uppercase">Staff Members</h3>
-                    <p class="text-4xl font-bold mt-2">@Model.Stats.TotalStaff</p>
-                    <p class="text-xs mt-1 text-slate-500">@Model.Stats.ActiveStaff active today</p>
-                </div>
+            <div class="bg-white border-t-4 border-[#475569] text-slate-900 p-6 rounded-lg shadow-sm">
+                <h3 class="text-sm font-medium text-slate-500 uppercase">Staff Members</h3>
+                <p class="text-4xl font-bold mt-2">@Model.Stats.TotalStaff</p>
+                <p class="text-xs mt-1 text-slate-500">@Model.Stats.ActiveStaff active today</p>
             </div>
-            
-            <!-- Pending Returns -->
-            <div class="bg-white border-t-4 border-[#f59e0b] text-slate-900 p-6 rounded-lg shadow-sm relative overflow-hidden">
-                <div class="relative z-10">
-                    <h3 class="text-sm font-medium text-slate-500 uppercase">Pending Returns</h3>
-                    <p class="text-4xl font-bold mt-2">@Model.Stats.PendingReturns</p>
-                    <p class="text-xs mt-1 font-semibold">
-                        @if (Model.Stats.PendingReturns > 0)
-                        {
-                            <span class="text-amber-500 text-sm">⚠️ Awaiting review</span>
-                        }
-                        else
-                        {
-                            <span class="text-emerald-600">✓ All processed</span>
-                        }
-                    </p>
-                </div>
+            <div class="bg-white border-t-4 border-[#f59e0b] text-slate-900 p-6 rounded-lg shadow-sm">
+                <h3 class="text-sm font-medium text-slate-500 uppercase">Pending Returns</h3>
+                <p class="text-4xl font-bold mt-2">@Model.Stats.PendingReturns</p>
+                <p class="text-xs mt-1 font-semibold">
+                    @if (Model.Stats.PendingReturns > 0)
+                    {
+                        <span class="text-amber-500">⚠️ Awaiting review</span>
+                    }
+                    else
+                    {
+                        <span class="text-emerald-600">✓ All processed</span>
+                    }
+                </p>
             </div>
         </div>
-        <!-- END: Summary Cards Grid -->
 
-        <!-- BEGIN: Quick Actions -->
+        <!-- Quick Actions -->
         <section class="mb-8">
-            <h2 class="text-sm font-bold flex items-center mb-4 uppercase text-slate-700">
+            <h2 class="text-sm font-bold mb-4 uppercase text-slate-700 flex items-center gap-2">
+                <span class="inline-block w-1 h-4 bg-teal-600 rounded"></span>
                 Quick Actions
             </h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-                <a asp-page="/Frames/Index" class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+
+                <a asp-page="/Frames/Index"
+                   class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
                     <span>MANAGE FRAMES</span>
                 </a>
-                <a asp-page="/Lenses/Index" class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
+
+                <a asp-page="/Lenses/Index"
+                   class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
                     <span>MANAGE LENSES</span>
                 </a>
-                <a asp-page="/Manager/Staff" class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
+
+                <a asp-page="/Manager/Services/Index"
+                   class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
+                    <span>MANAGE SERVICES</span>
+                </a>
+
+                <a asp-page="/Manager/Staff"
+                   class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
                     <span>MANAGE STAFF</span>
                 </a>
-                <a asp-page="/Manager/Reports" class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
+
+                <a asp-page="/Manager/Reports"
+                   class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
                     <span>REVENUE REPORTS</span>
                 </a>
-                <a asp-page="/Sale/Refunds/Index" class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
+
+                <a asp-page="/Sale/Refunds/Index"
+                   class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
                     <span>MANAGE RETURNS</span>
                     @if (Model.Stats.PendingReturns > 0)
                     {
-                        <span class="bg-red-500 text-white rounded-full px-2 py-0.5 ml-1">@Model.Stats.PendingReturns</span>
+                        <span class="bg-red-500 text-white rounded-full px-2 py-0.5 ml-1 text-[9px]">@Model.Stats.PendingReturns</span>
                     }
                 </a>
-                <a asp-page="/Manager/Policies" class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
+
+                <a asp-page="/Manager/Policies"
+                   class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
                     <span>BUSINESS POLICIES</span>
                 </a>
-                <a asp-page="/Manager/Settings" class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
+
+                <a asp-page="/Manager/Settings"
+                   class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
                     <span>SYSTEM SETTINGS</span>
                 </a>
+
             </div>
         </section>
-        <!-- END: Quick Actions -->
 
-        <!-- BEGIN: Data Visualization & Sidebars -->
+        <!-- Data Visualization & Sidebars -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Left Column: Chart & Table -->
+
+            <!-- Left: Chart & Orders -->
             <div class="lg:col-span-8 space-y-6">
-                <!-- Revenue Overview Chart -->
                 <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
-                    <div class="bg-slate-800 text-white p-3 flex items-center text-sm font-semibold">
+                    <div class="bg-slate-800 text-white p-3 text-sm font-semibold">
                         Revenue Overview (Last 7 Days)
                     </div>
                     <div class="p-6 h-64 bg-white relative">
-                        <canvas class="w-full h-full" id="revenueChart"></canvas>
+                        <canvas id="revenueChart" class="w-full h-full"></canvas>
                     </div>
                 </div>
-                
-                <!-- Recent Orders Table -->
+
                 <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
-                    <div class="bg-amber-100 text-amber-900 p-3 flex items-center text-sm font-semibold">
+                    <div class="bg-amber-100 text-amber-900 p-3 text-sm font-semibold">
                         Recent Orders
                     </div>
                     <div class="overflow-x-auto">
@@ -204,23 +245,20 @@
                                 <tbody class="divide-y divide-slate-100" id="recentOrdersBody">
                                     @foreach (var order in Model.RecentOrders)
                                     {
+                                        var sc = order.Status switch
+                                        {
+                                            "Completed" => "bg-emerald-100 text-emerald-800",
+                                            "Shipped" => "bg-blue-100 text-blue-800",
+                                            "Processing" => "bg-amber-100 text-amber-800",
+                                            "Confirmed" => "bg-cyan-100 text-cyan-800",
+                                            _ => "bg-slate-200 text-slate-600"
+                                        };
                                         <tr class="hover:bg-slate-50 transition-colors order-row">
                                             <td class="p-4 font-bold text-slate-800">#@order.OrderId</td>
                                             <td class="p-4 text-slate-700">@order.CustomerName</td>
                                             <td class="p-4 text-slate-500">@order.CreatedAt.ToString("MMM dd, yyyy")</td>
                                             <td class="p-4">
-                                                @{
-                                                    var statusClass = order.Status switch
-                                                    {
-                                                        "Completed" => "bg-emerald-100 text-emerald-800",
-                                                        "Shipped" => "bg-blue-100 text-blue-800",
-                                                        "Processing" => "bg-amber-100 text-amber-800",
-                                                        "Confirmed" => "bg-cyan-100 text-cyan-800",
-                                                        "Pending" => "bg-slate-200 text-slate-600",
-                                                        _ => "bg-slate-200 text-slate-600"
-                                                    };
-                                                }
-                                                <span class="@statusClass px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">
+                                                <span class="@sc px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">
                                                     @order.Status
                                                 </span>
                                             </td>
@@ -229,48 +267,26 @@
                                     }
                                 </tbody>
                             </table>
-                            
-                            <!-- Pagination Controls -->
-                            <div id="paginationControls" class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between transition-opacity duration-300">
-                                <div class="text-slate-500 text-[10px] font-medium" id="paginationStatus">
-                                    Showing items...
-                                </div>
-                                <div class="flex items-center space-x-1" id="paginationButtons">
-                                    <!-- Buttons will be injected by JS -->
-                                </div>
+                            <div id="paginationControls" class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+                                <div class="text-slate-500 text-[10px] font-medium" id="paginationStatus">Showing items...</div>
+                                <div class="flex items-center space-x-1" id="paginationButtons"></div>
                             </div>
                         }
                     </div>
                 </div>
             </div>
-            <!-- END: Left Column -->
 
-            <!-- Right Column: Alerts & Top Products -->
+            <!-- Right: Alerts & Top Products -->
             <div class="lg:col-span-4 space-y-6">
-                <!-- System Alerts -->
                 <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
                     @if (Model.Stats.LowStockCount > 0 || Model.Stats.PendingReturns > 0)
                     {
-                        <div class="bg-red-500 text-white p-3 flex items-center text-sm font-semibold">
-                            System Alerts
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="bg-emerald-600 text-white p-3 flex items-center text-sm font-semibold">
-                            System Alerts
-                        </div>
-                    }
-                    
-                    @if (Model.Stats.LowStockCount > 0 || Model.Stats.PendingReturns > 0)
-                    {
+                        <div class="bg-red-500 text-white p-3 text-sm font-semibold">System Alerts</div>
                         <div class="p-4 space-y-3">
                             @if (Model.Stats.LowStockCount > 0)
                             {
                                 <div class="bg-amber-50 border border-amber-200 rounded p-3 text-amber-900 text-sm">
-                                    <div class="font-bold flex items-center">
-                                        Low Stock Alert
-                                    </div>
+                                    <div class="font-bold">Low Stock Alert</div>
                                     <p class="mt-1 text-amber-700">@Model.Stats.LowStockCount products need restocking</p>
                                     <a asp-page="/Manager/Inventory" class="text-amber-600 font-semibold text-xs mt-2 inline-block hover:underline">View Details →</a>
                                 </div>
@@ -278,9 +294,7 @@
                             @if (Model.Stats.PendingReturns > 0)
                             {
                                 <div class="bg-blue-50 border border-blue-200 rounded p-3 text-blue-900 text-sm">
-                                    <div class="font-bold flex items-center">
-                                        Pending Returns
-                                    </div>
+                                    <div class="font-bold">Pending Returns</div>
                                     <p class="mt-1 text-blue-700">@Model.Stats.PendingReturns returns awaiting approval</p>
                                     <a asp-page="/Sale/Refunds/Index" class="text-blue-600 font-semibold text-xs mt-2 inline-block hover:underline">Review Returns →</a>
                                 </div>
@@ -289,19 +303,15 @@
                     }
                     else
                     {
+                        <div class="bg-emerald-600 text-white p-3 text-sm font-semibold">System Alerts</div>
                         <div class="p-10 flex flex-col items-center justify-center text-center">
-                            <div class="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-4 border border-emerald-100">
-                            </div>
                             <p class="text-xs text-slate-500 font-semibold">All systems operational</p>
                         </div>
                     }
                 </div>
 
-                <!-- Top Selling Products -->
                 <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
-                    <div class="bg-teal-700 text-white p-3 flex items-center text-sm font-semibold">
-                        Top Selling Products
-                    </div>
+                    <div class="bg-teal-700 text-white p-3 text-sm font-semibold">Top Selling Products</div>
                     <div class="p-4 space-y-3">
                         @if (!Model.TopProducts.Any())
                         {
@@ -318,18 +328,15 @@
                                         <p class="text-xs font-bold text-slate-800">@product.Name</p>
                                         <p class="text-[10px] text-slate-500 mt-1">@product.SoldCount sold</p>
                                     </div>
-                                    <div class="text-xs font-bold text-teal-700">
-                                        @product.Revenue.ToString("N0") VND
-                                    </div>
+                                    <div class="text-xs font-bold text-teal-700">@product.Revenue.ToString("N0") VND</div>
                                 </div>
                             }
                         }
                     </div>
                 </div>
             </div>
-            <!-- END: Right Column -->
+
         </div>
-        <!-- END: Data Visualization & Sidebars -->
     </main>
 </div>
 
@@ -337,156 +344,98 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // ── Revenue Chart ──────────────────────────────────────
             const canvas = document.getElementById('revenueChart');
-            if (!canvas) return;
-
-            const labelsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartData.Labels));
-            const valuesData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartData.Values));
-
-            // Setup ChartJS instead of the static canvas drawing
-            new Chart(canvas.getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: labelsData,
-                    datasets: [{
-                        label: 'Revenue (VND)',
-                        data: valuesData,
-                        borderColor: '#0d9488', // teal-600 to match design
-                        backgroundColor: 'rgba(13, 148, 136, 0.1)',
-                        tension: 0.4,
-                        fill: true,
-                        borderWidth: 2,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#0d9488',
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                            padding: 10,
-                            titleFont: { family: 'Inter', size: 13 },
-                            bodyFont: { family: 'Inter', size: 12 },
-                            callbacks: {
-                                label: function(context) {
-                                    return 'Revenue: ' + context.parsed.y.toLocaleString() + ' VND';
+            if (canvas) {
+                const labelsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartData.Labels));
+                const valuesData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartData.Values));
+                new Chart(canvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: labelsData,
+                        datasets: [{
+                            label: 'Revenue (VND)',
+                            data: valuesData,
+                            borderColor: '#0d9488',
+                            backgroundColor: 'rgba(13,148,136,0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 2,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: '#0d9488',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15,23,42,0.9)',
+                                padding: 10,
+                                callbacks: {
+                                    label: ctx => 'Revenue: ' + ctx.parsed.y.toLocaleString() + ' VND'
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
+                            y: {
+                                border: { display: false },
+                                grid: { color: '#f1f5f9' },
+                                beginAtZero: true,
+                                ticks: {
+                                    color: '#64748b',
+                                    font: { size: 10 },
+                                    callback: v => (v / 1000).toLocaleString() + 'K'
                                 }
                             }
                         }
-                    },
-                    scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: { 
-                                font: { family: 'Inter', size: 10 },
-                                color: '#64748b'
-                            }
-                        },
-                        y: {
-                            border: { display: false },
-                            grid: { color: '#f1f5f9' },
-                            beginAtZero: true,
-                            ticks: {
-                                font: { family: 'Inter', size: 10 },
-                                color: '#64748b',
-                                callback: function(value) { return (value / 1000).toLocaleString() + 'K'; }
-                            }
-                        }
                     }
-                }
-            });
+                });
+            }
 
-            // --- RECENT ORDERS PAGINATION LOGIC ---
+            // ── Orders Pagination ──────────────────────────────────
             const rowsPerPage = 5;
-            let currentPage = 1;
-            const rows = document.querySelectorAll('.order-row');
-            const totalRows = rows.length;
-            const paginationControls = document.getElementById('paginationControls');
-            const paginationStatus = document.getElementById('paginationStatus');
-            const paginationButtons = document.getElementById('paginationButtons');
+            let currentPage  = 1;
+            const rows       = document.querySelectorAll('.order-row');
+            const totalRows  = rows.length;
+            const ctrl       = document.getElementById('paginationControls');
+            const status     = document.getElementById('paginationStatus');
+            const buttons    = document.getElementById('paginationButtons');
 
-            function updatePagination() {
-                if (totalRows <= rowsPerPage) {
-                    if (paginationControls) paginationControls.classList.add('hidden');
-                    return;
-                }
-
+            function renderPagination() {
+                if (totalRows <= rowsPerPage) { if (ctrl) ctrl.classList.add('hidden'); return; }
                 const totalPages = Math.ceil(totalRows / rowsPerPage);
-                const startIdx = (currentPage - 1) * rowsPerPage;
-                const endIdx = Math.min(startIdx + rowsPerPage, totalRows);
+                const start = (currentPage - 1) * rowsPerPage;
+                const end   = Math.min(start + rowsPerPage, totalRows);
+                rows.forEach((r, i) => r.classList.toggle('hidden', i < start || i >= end));
+                status.innerText = `Showing ${start + 1}–${end} of ${totalRows} orders`;
+                buttons.innerHTML = '';
 
-                // Update row visibility
-                rows.forEach((row, index) => {
-                    if (index >= startIdx && index < endIdx) {
-                        row.classList.remove('hidden');
-                    } else {
-                        row.classList.add('hidden');
-                    }
-                });
+                const mkBtn = (label, enabled, onClick, active = false) => {
+                    const b = document.createElement('button');
+                    b.innerText = label;
+                    b.className = `px-3 py-1 text-[10px] font-bold rounded border transition-colors ${
+                        active ? 'bg-[#0d9488] text-white border-[#0d9488]'
+                               : 'bg-white text-slate-600 border-slate-300 hover:border-[#0d9488] hover:text-[#0d9488]'}`;
+                    if (!enabled) { b.disabled = true; b.classList.add('opacity-40','cursor-not-allowed'); }
+                    else b.onclick = e => { e.preventDefault(); onClick(); };
+                    return b;
+                };
 
-                // Update status text
-                paginationStatus.innerText = `Showing ${startIdx + 1}–${endIdx} of ${totalRows} orders`;
-
-                // Render buttons
-                paginationButtons.innerHTML = '';
-
-                // Previous Button
-                const prevBtn = createPageButton('Previous', currentPage > 1, () => {
-                    if (currentPage > 1) {
-                        currentPage--;
-                        updatePagination();
-                    }
-                });
-                paginationButtons.appendChild(prevBtn);
-
-                // Numbered Buttons
+                buttons.appendChild(mkBtn('Previous', currentPage > 1, () => { currentPage--; renderPagination(); }));
                 for (let i = 1; i <= totalPages; i++) {
-                    const pageBtn = createPageButton(i.toString(), true, () => {
-                        currentPage = i;
-                        updatePagination();
-                    }, i === currentPage);
-                    paginationButtons.appendChild(pageBtn);
+                    const pg = i;
+                    buttons.appendChild(mkBtn(String(i), true, () => { currentPage = pg; renderPagination(); }, i === currentPage));
                 }
-
-                // Next Button
-                const nextBtn = createPageButton('Next', currentPage < totalPages, () => {
-                    if (currentPage < totalPages) {
-                        currentPage++;
-                        updatePagination();
-                    }
-                });
-                paginationButtons.appendChild(nextBtn);
+                buttons.appendChild(mkBtn('Next', currentPage < totalPages, () => { currentPage++; renderPagination(); }));
             }
 
-            function createPageButton(label, enabled, onClick, isActive = false) {
-                const btn = document.createElement('button');
-                btn.innerText = label;
-                btn.className = `px-3 py-1 text-[10px] font-bold rounded transition-colors border ${
-                    isActive 
-                        ? 'bg-[#0d9488] text-white border-[#0d9488]' 
-                        : 'bg-white text-slate-600 border-slate-300 hover:border-[#0d9488] hover:text-[#0d9488]'
-                }`;
-                
-                if (!enabled) {
-                    btn.disabled = true;
-                    btn.classList.add('opacity-40', 'cursor-not-allowed');
-                } else {
-                    btn.onclick = (e) => {
-                        e.preventDefault();
-                        onClick();
-                    };
-                }
-                return btn;
-            }
-
-            // Initialize pagination
-            updatePagination();
+            renderPagination();
         });
     </script>
 }

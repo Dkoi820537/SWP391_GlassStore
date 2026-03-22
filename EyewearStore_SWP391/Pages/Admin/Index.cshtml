@@ -5,395 +5,635 @@
     Layout = "_Layout";
 }
 
-<link rel="stylesheet" href="~/css/lenses-admin.css" asp-append-version="true" />
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
 
-<style>
-    /* === ADMIN DASHBOARD STYLES === */
-    .admin-dashboard {
-        min-height: calc(100vh - 200px);
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        padding: 2rem 0;
-    }
-
-    .dashboard-header {
-        text-align: center;
-        margin-bottom: 3rem;
-        padding: 2rem;
-    }
-
-    .dashboard-header h1 {
-        font-family: var(--font-secondary, 'Playfair Display', serif);
-        font-size: 2.5rem;
-        color: var(--primary-navy, #1a365d);
-        margin-bottom: 0.5rem;
-    }
-
-    .dashboard-header p {
-        color: var(--secondary-warm-gray, #6b7280);
-        font-size: 1.1rem;
-        max-width: 600px;
-        margin: 0 auto;
-    }
-
-    .dashboard-welcome {
-        background: linear-gradient(135deg, var(--primary-navy, #1a365d) 0%, #2d4a6f 100%);
-        color: white;
-        padding: 1.5rem 2rem;
-        border-radius: 12px;
-        margin-bottom: 2rem;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        box-shadow: 0 4px 15px rgba(26, 54, 93, 0.3);
-    }
-
-    .dashboard-welcome .welcome-icon {
-        font-size: 2.5rem;
-    }
-
-    .dashboard-welcome .welcome-text h2 {
-        margin: 0 0 0.25rem 0;
-        font-size: 1.5rem;
-    }
-
-    .dashboard-welcome .welcome-text p {
-        margin: 0;
-        opacity: 0.9;
-    }
-
-    /* === ADMIN CARDS GRID === */
-    .admin-cards-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 1.5rem;
-        padding: 0 1rem;
-    }
-
-    .admin-card {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        overflow: hidden;
-        transition: all 0.3s ease;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .admin-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    }
-
-    .admin-card-icon {
-        height: 120px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, var(--primary-gold, #d4a574) 0%, #c49660 100%);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .admin-card-icon::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-    }
-
-    .admin-card-icon svg {
-        width: 50px;
-        height: 50px;
-        stroke: white;
-        stroke-width: 1.5;
-        fill: none;
-        position: relative;
-        z-index: 1;
-    }
-
-    .admin-card-body {
-        padding: 1.5rem;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .admin-card-title {
-        font-family: var(--font-secondary, 'Playfair Display', serif);
-        font-size: 1.25rem;
-        color: var(--primary-navy, #1a365d);
-        margin: 0 0 0.5rem 0;
-    }
-
-    .admin-card-description {
-        color: var(--secondary-warm-gray, #6b7280);
-        font-size: 0.9rem;
-        line-height: 1.5;
-        margin-bottom: 1.5rem;
-        flex: 1;
-    }
-
-    .admin-card-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1.5rem;
-        background: var(--primary-navy, #1a365d);
-        color: white;
-        text-decoration: none;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
-        text-align: center;
-    }
-
-    .admin-card-btn:hover {
-        background: #2d4a6f;
-        color: white;
-        transform: translateX(4px);
-    }
-
-    .admin-card-btn svg {
-        width: 16px;
-        height: 16px;
-        stroke: currentColor;
-        stroke-width: 2;
-        fill: none;
-        transition: transform 0.3s ease;
-    }
-
-    .admin-card-btn:hover svg {
-        transform: translateX(4px);
-    }
-
-    /* === CARD VARIANTS === */
-    .admin-card.lenses .admin-card-icon {
-        background: linear-gradient(135deg, #4f9dde 0%, #3b82c4 100%);
-    }
-
-    .admin-card.frames .admin-card-icon {
-        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-    }
-
-    .admin-card.orders .admin-card-icon {
-        background: linear-gradient(135deg, #27ae60 0%, #219a52 100%);
-    }
-
-    .admin-card.users .admin-card-icon {
-        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-    }
-
-    .admin-card.reports .admin-card-icon {
-        background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
-    }
-
-    .admin-card.settings .admin-card-icon {
-        background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
-    }
-
-    /* === BADGE === */
-    .card-badge {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        background: white;
-        color: var(--primary-navy, #1a365d);
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    /* === QUICK STATS === */
-    .quick-stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
-        padding: 0 1rem;
-    }
-
-    .stat-item {
-        background: white;
-        padding: 1.25rem;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        text-align: center;
-    }
-
-    .stat-value {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: var(--primary-navy, #1a365d);
-    }
-
-    .stat-label {
-        font-size: 0.85rem;
-        color: var(--secondary-warm-gray, #6b7280);
-        margin-top: 0.25rem;
-    }
-
-    /* === RESPONSIVE === */
-    @@media (max-width: 768px) {
-        .dashboard-header h1 {
-            font-size: 1.75rem;
+        body {
+            background: #ffffff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: #0f172a;
         }
 
-        .admin-cards-grid {
-            grid-template-columns: 1fr;
+        /* ── PAGE WRAPPER ── */
+        .adm-wrap {
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 28px 28px 80px;
         }
 
-        .dashboard-welcome {
-            flex-direction: column;
+        /* ── BREADCRUMB ── */
+        .adm-bc {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        .adm-bc a {
+            color: #64748b;
+            text-decoration: none;
+            transition: color .18s;
+        }
+        .adm-bc a:hover { color: #0f172a; }
+        .adm-bc .bc-sep { color: #94a3b8; font-size: 14px; }
+        .adm-bc .bc-cur { color: #0f172a; font-weight: 600; }
+
+        /* ── WELCOME BANNER ── */
+        .adm-banner {
+            background: #0d1b3e;
+            border-radius: 16px;
+            padding: 22px 32px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 20px rgba(13,27,62,.22);
+        }
+        .adm-banner .wave-emoji { font-size: 32px; line-height: 1; flex-shrink: 0; }
+        .adm-banner .banner-text h2 {
+            margin: 0 0 4px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -.01em;
+        }
+        .adm-banner .banner-text p {
+            margin: 0;
+            font-size: 13.5px;
+            color: rgba(255,255,255,.65);
+            font-weight: 400;
+        }
+
+        /* ── PAGE TITLE ── */
+        .adm-page-title {
             text-align: center;
+            font-size: 26px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -.02em;
+            margin: 0 0 28px;
         }
 
-        .quick-stats {
+        /* ── FEATURE CARD GRID (2×2) ── */
+        .feat-grid {
+            display: grid;
             grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
         }
-    }
-</style>
 
-<div class="admin-dashboard">
-    <div class="admin-container">
-        <!-- Breadcrumb -->
-        <nav class="admin-breadcrumb" aria-label="breadcrumb">
-            <a href="/">Home</a>
-            <span class="separator">›</span>
-            <span>Admin Dashboard</span>
-        </nav>
+        .feat-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 22px 24px 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 1px 8px rgba(0,0,0,.06);
+            transition: box-shadow .22s, transform .22s;
+            text-decoration: none;
+            color: inherit;
+        }
+        .feat-card:hover {
+            box-shadow: 0 6px 24px rgba(0,0,0,.1);
+            transform: translateY(-2px);
+        }
 
-        <!-- Welcome Banner -->
-        <div class="dashboard-welcome">
-            <span class="welcome-icon">👋</span>
-            <div class="welcome-text">
-                <h2>Welcome, @User.Identity?.Name!</h2>
-                <p>Manage your OptiPlus eyewear store from this central dashboard.</p>
-            </div>
-        </div>
+        /* card top row: icon + title + badge */
+        .feat-card-top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 10px;
+        }
 
-        <!-- Dashboard Header -->
-        <div class="dashboard-header">
-            <h1>Admin Dashboard</h1>
-            <p>Access all administrative functions to manage your eyewear store products, orders, and more.</p>
-        </div>
+        .feat-icon {
+            width: 46px; height: 46px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .feat-icon.teal    { background: #e6f7f5; }
+        .feat-icon.navy    { background: #e8edf6; }
+        .feat-icon.dkgreen { background: #e8f5ee; }
+        .feat-icon.blue    { background: #e8f0fb; }
 
-        <!-- Admin Cards Grid -->
-        <div class="admin-cards-grid">
-            <!-- Lenses Card -->
-            <div class="admin-card lenses">
-                <div class="admin-card-icon">
-                    <span class="card-badge">CRUD</span>
-                    <svg viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10"/>
-                        <circle cx="12" cy="12" r="4"/>
-                        <line x1="12" y1="2" x2="12" y2="4"/>
-                        <line x1="12" y1="20" x2="12" y2="22"/>
-                        <line x1="2" y1="12" x2="4" y2="12"/>
-                        <line x1="20" y1="12" x2="22" y2="12"/>
-                    </svg>
-                </div>
-                <div class="admin-card-body">
-                    <h3 class="admin-card-title">Lens Management</h3>
-                    <p class="admin-card-description">
-                        Create, view, update, and manage lens products. Control stock status, pricing, 
-                        lens types, and specifications for all your optical lenses.
-                    </p>
-                    <a href="/Lenses" class="admin-card-btn">
-                        Manage Lenses
-                        <svg viewBox="0 0 24 24">
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                            <polyline points="12 5 19 12 12 19"/>
-                        </svg>
-                    </a>
-                </div>
-            </div>
+        .feat-card-top h3 {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+            letter-spacing: -.01em;
+        }
 
-            <!-- Frames Card -->
-            <div class="admin-card frames">
-                <div class="admin-card-icon">
-                    <span class="card-badge">CRUD</span>
-                    <svg viewBox="0 0 24 24">
-                        <rect x="2" y="8" width="8" height="6" rx="2"/>
-                        <rect x="14" y="8" width="8" height="6" rx="2"/>
-                        <path d="M10 11h4"/>
-                        <path d="M2 11H0"/>
-                        <path d="M24 11h-2"/>
-                    </svg>
-                </div>
-                <div class="admin-card-body">
-                    <h3 class="admin-card-title">Frame Management</h3>
-                    <p class="admin-card-description">
-                        Create, view, update, and manage frame products. Control stock status, pricing, 
-                        frame materials, dimensions, and specifications for all your eyeglass frames.
-                    </p>
-                    <a href="/Frames" class="admin-card-btn">
-                        Manage Frames
-                        <svg viewBox="0 0 24 24">
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                            <polyline points="12 5 19 12 12 19"/>
-                        </svg>
-                    </a>
-                </div>
-            </div>
+        .feat-badge {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            padding: 3px 9px;
+            border-radius: 6px;
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
 
-            <!-- Orders Card -->
-            <div class="admin-card orders">
-                <div class="admin-card-icon">
-                    <span class="card-badge">Orders</span>
-                    <svg viewBox="0 0 24 24">
-                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                        <line x1="3" y1="6" x2="21" y2="6"/>
-                        <path d="M16 10a4 4 0 0 1-8 0"/>
-                    </svg>
-                </div>
-                <div class="admin-card-body">
-                    <h3 class="admin-card-title">Order Management</h3>
-                    <p class="admin-card-description">
-                        View and process customer orders. Track order status, manage shipping, 
-                        and handle returns and refunds.
-                    </p>
-                    <a href="/Sale/Orders/Index" class="admin-card-btn">
-                        Manage Orders
-                        <svg viewBox="0 0 24 24">
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                            <polyline points="12 5 19 12 12 19"/>
-                        </svg>
-                    </a>
-                </div>
-            </div>
+        /* description */
+        .feat-desc {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.65;
+            margin: 0 0 14px;
+            flex: 1;
+        }
 
-            <!-- Users Card (Coming Soon) -->
-            <div class="admin-card users">
-                <div class="admin-card-icon">
-                    <span class="card-badge">Users</span>
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                    </svg>
-                </div>
-                <div class="admin-card-body">
-                    <h3 class="admin-card-title">User Management</h3>
-                    <p class="admin-card-description">
-                        Manage customer accounts, admin users, and roles. View customer details
-                        and handle account-related requests.
-                    </p>
+        /* sparkline + stat row */
+        .feat-spark-row {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .feat-spark { flex: 1; height: 40px; min-width: 0; }
+        .feat-spark svg { width: 100%; height: 100%; overflow: visible; }
 
-                    <a asp-page="/Admin/Users/Index" class="admin-card-btn">
-                        Manage Users
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-                    </a>
-                </div>
-            </div>
+        .feat-stat {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #0f172a;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .feat-stat .stat-arrow { font-size: 14px; color: #64748b; }
 
+        /* manage button */
+        .feat-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            width: 100%;
+            padding: 10px 0;
+            background: #0d1b3e;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background .18s;
+            letter-spacing: .01em;
+        }
+        .feat-btn:hover { background: #162045; color: #fff; }
+        .feat-btn .btn-arrow { font-size: 15px; line-height: 1; transition: transform .18s; }
+        .feat-card:hover .feat-btn .btn-arrow { transform: translateX(3px); }
+
+        /* ── SECTION LABEL ── */
+        .sec-lbl {
+            font-size: 10.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.6px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+        }
+
+        /* STATS GRID */
+        .stats-g {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .sc {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 1px 6px rgba(0,0,0,.05);
+            text-decoration: none;
+            transition: all .2s;
+            color: inherit;
+        }
+        .sc:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); transform: translateY(-1px); }
+        .sc-ico {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+        }
+        .i-navy  { background: rgba(13,27,62,.08);  color: #0d1b3e; }
+        .i-ok    { background: rgba(5,150,105,.08);  color: #059669; }
+        .i-warn  { background: rgba(217,119,6,.09);  color: #d97706; }
+        .i-info  { background: rgba(37,99,235,.08);  color: #2563eb; }
+        .i-gold  { background: rgba(184,134,42,.10); color: #b8862a; }
+        .sc-lbl  { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.1px; margin-bottom: 3px; }
+        .sc-val  { font-size: 22px; font-weight: 700; color: #0f172a; }
+        .sc-sub  { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+        /* ALERTS */
+        .alert-list { display: flex; flex-direction: column; gap: 9px; margin-bottom: 20px; }
+        .al {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; border-radius: 10px;
+            font-size: 13px; font-weight: 600; text-decoration: none;
+            transition: all .2s;
+        }
+        .al:hover { filter: brightness(.96); transform: translateX(3px); }
+        .al.ok   { background: rgba(5,150,105,.08);  border: 1px solid rgba(5,150,105,.22);  color: #059669; }
+        .al.warn { background: rgba(217,119,6,.09);  border: 1px solid rgba(217,119,6,.25);  color: #d97706; }
+        .al.info { background: rgba(37,99,235,.08);  border: 1px solid rgba(37,99,235,.22);  color: #2563eb; }
+        .al i { font-size: 16px; flex-shrink: 0; }
+        .al-arrow { margin-left: auto; font-size: 16px; opacity: .5; }
+
+        /* 2-COL LAYOUT */
+        .two-col { display: grid; grid-template-columns: 1.5fr 1fr; gap: 18px; margin-top: 20px; }
+
+        /* CARD */
+        .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.05); }
+        .card-hdr { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #e2e8f0; }
+        .card-hdr h3 { font-size: 14px; font-weight: 700; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px; }
+        .card-hdr a { font-size: 12px; font-weight: 600; color: #2563eb; text-decoration: none; }
+        .card-hdr a:hover { text-decoration: underline; }
+
+        /* ORDER LIST */
+        .ord-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #f1f5f9; }
+        .ord-row:last-child { border-bottom: none; }
+        .ord-id   { font-size: 12px; color: #94a3b8; width: 52px; }
+        .ord-name { font-size: 13px; font-weight: 600; color: #0f172a; flex: 1; margin: 0 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ord-amt  { font-size: 12px; font-weight: 600; color: #b8862a; white-space: nowrap; }
+        .bd { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 100px; font-size: 10px; font-weight: 700; margin-left: 8px; }
+        .bd-Pending    { background: rgba(217,119,6,.09); color: #d97706; border: 1px solid rgba(217,119,6,.25); }
+        .bd-Processing { background: rgba(37,99,235,.08); color: #2563eb; border: 1px solid rgba(37,99,235,.22); }
+        .bd-Completed,.bd-Done { background: rgba(15,23,42,.07); color: #0f172a; border: 1px solid rgba(15,23,42,.18); }
+        .bd-Cancelled  { background: rgba(220,38,38,.08); color: #dc2626; border: 1px solid rgba(220,38,38,.22); }
+        .bd-Confirmed,.bd-Ready { background: rgba(5,150,105,.08); color: #059669; border: 1px solid rgba(5,150,105,.22); }
+
+        /* APPT LIST */
+        .appt-row { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid #f1f5f9; }
+        .appt-row:last-child { border-bottom: none; }
+        .av { width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg,#e0e7ff,#c7d2fe); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #2563eb; flex-shrink: 0; }
+        .appt-name { font-size: 13px; font-weight: 700; color: #0f172a; }
+        .appt-dt   { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+        .appt-today{ font-size: 10px; font-weight: 700; color: #059669; background: rgba(5,150,105,.08); border: 1px solid rgba(5,150,105,.22); border-radius: 4px; padding: 1px 5px; margin-left: 4px; }
+
+        /* SVC PENDING */
+        .svc-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #f1f5f9; }
+        .svc-row:last-child { border-bottom: none; }
+        .svc-name { font-size: 13px; font-weight: 700; color: #0f172a; }
+        .svc-sub  { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+        .btn-sm { display: inline-flex; align-items: center; gap: 5px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 7px; padding: 5px 10px; font-size: 11px; font-weight: 700; color: #94a3b8; text-decoration: none; transition: all .2s; }
+        .btn-sm:hover { border-color: #2563eb; color: #2563eb; }
+        .empty-card { text-align: center; padding: 36px 20px; color: #94a3b8; font-size: 13px; }
+
+        /* RESPONSIVE */
+        @@media(max-width:900px) {
+            .feat-grid { grid-template-columns: 1fr; }
+            .stats-g   { grid-template-columns: repeat(2,1fr); }
+            .two-col   { grid-template-columns: 1fr; }
+        }
+        @@media(max-width:600px) {
+            .stats-g  { grid-template-columns: 1fr; }
+            .adm-wrap { padding: 16px 14px 60px; }
+        }
+    </style>
+}
+
+<div class="adm-wrap">
+
+    <!-- BREADCRUMB -->
+    <nav class="adm-bc">
+        <a href="/">Home</a>
+        <span class="bc-sep">›</span>
+        <span class="bc-cur">Admin Dashboard</span>
+    </nav>
+
+    <!-- WELCOME BANNER -->
+    <div class="adm-banner">
+        <span class="wave-emoji">👋</span>
+        <div class="banner-text">
+            <h2>Welcome, admin!</h2>
+            <p>Manage your OptiPlus eyewear store from this central dashboard.</p>
         </div>
     </div>
+
+    <!-- PAGE TITLE -->
+    <h1 class="adm-page-title">Admin Dashboard</h1>
+
+    <!-- 2×2 FEATURE CARD GRID -->
+    <div class="feat-grid">
+
+        <!-- ① Lens Management -->
+        <div class="feat-card">
+            <div class="feat-card-top">
+                <div class="feat-icon teal">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="8"/>
+                        <circle cx="12" cy="12" r="3"/>
+                        <line x1="12" y1="2"  x2="12" y2="6"/>
+                        <line x1="12" y1="18" x2="12" y2="22"/>
+                        <line x1="2"  y1="12" x2="6"  y2="12"/>
+                        <line x1="18" y1="12" x2="22" y2="12"/>
+                    </svg>
+                </div>
+                <h3>Lens Management</h3>
+                <span class="feat-badge">CRUD</span>
+            </div>
+            <p class="feat-desc">Create, view, update, and manage lens products, types, and stock levels.</p>
+            <div class="feat-spark-row">
+                <div class="feat-spark">
+                    <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                        <polyline points="0,35 15,28 30,31 45,22 60,26 75,16 90,20 105,12 120,8"
+                                  fill="none" stroke="#0d9488" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <span class="feat-stat">+15 today <span class="stat-arrow">↗</span></span>
+            </div>
+            <a href="/Lenses" class="feat-btn">
+                Manage Lenses <span class="btn-arrow">→</span>
+            </a>
+        </div>
+
+        <!-- ② Frame Management -->
+        <div class="feat-card">
+            <div class="feat-card-top">
+                <div class="feat-icon navy">
+                    <svg width="28" height="26" viewBox="0 0 28 18" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="1"  y="4" width="10" height="9" rx="4.5"/>
+                        <rect x="17" y="4" width="10" height="9" rx="4.5"/>
+                        <line x1="11" y1="8.5" x2="17" y2="8.5"/>
+                        <line x1="1"  y1="8.5" x2="0"  y2="5"/>
+                        <line x1="27" y1="8.5" x2="28" y2="5"/>
+                    </svg>
+                </div>
+                <h3>Frame Management</h3>
+                <span class="feat-badge">CRUD</span>
+            </div>
+            <p class="feat-desc">Manage your extensive frame collections, styles, and color options.</p>
+            <div class="feat-spark-row">
+                <div class="feat-spark">
+                    <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                        <polyline points="0,32 15,25 30,28 45,18 60,22 75,15 90,18 105,10 120,14"
+                                  fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <span class="feat-stat">12 new frames added <span class="stat-arrow">↗</span></span>
+            </div>
+            <a href="/Frames" class="feat-btn">
+                Manage Frames <span class="btn-arrow">→</span>
+            </a>
+        </div>
+
+        <!-- ③ Order Management -->
+        <div class="feat-card">
+            <div class="feat-card-top">
+                <div class="feat-icon dkgreen">
+                    <svg width="24" height="26" viewBox="0 0 24 26" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 7h16l-2 15H6L4 7z"/>
+                        <path d="M9 7V5a3 3 0 0 1 6 0v2"/>
+                    </svg>
+                </div>
+                <h3>Order Management</h3>
+                <span class="feat-badge">Orders</span>
+            </div>
+            <p class="feat-desc">Track, process, and fulfill customer orders efficiently for today and beyond.</p>
+            <div class="feat-spark-row">
+                <div class="feat-spark">
+                    <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                        <polyline points="0,30 15,24 30,27 45,16 60,20 75,12 90,15 105,7 120,10"
+                                  fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <span class="feat-stat">15 New Orders Today <span class="stat-arrow">↗</span></span>
+            </div>
+            <a href="/Admin/Orders" class="feat-btn">
+                Manage Orders <span class="btn-arrow">→</span>
+            </a>
+        </div>
+
+        <!-- ④ User Management -->
+        <div class="feat-card">
+            <div class="feat-card-top">
+                <div class="feat-icon blue">
+                    <svg width="24" height="26" viewBox="0 0 24 26" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="8" r="4"/>
+                        <path d="M4 22c0-4 3.6-7 8-7s8 3 8 7"/>
+                    </svg>
+                </div>
+                <h3>User Management</h3>
+                <span class="feat-badge">Users</span>
+            </div>
+            <p class="feat-desc">Add and manage customer accounts, permissions, and roles.</p>
+            <div class="feat-spark-row">
+                <div class="feat-spark">
+                    <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                        <polyline points="0,34 15,27 30,30 45,21 60,25 75,17 90,21 105,13 120,16"
+                                  fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <span class="feat-stat">3 new registrations <span class="stat-arrow">↗</span></span>
+            </div>
+            <a href="/Admin/Users" class="feat-btn">
+                Manage Users <span class="btn-arrow">→</span>
+            </a>
+        </div>
+
+    </div><!-- /feat-grid -->
+
+    <!-- ALERTS -->
+    @if (Model.Alerts.Any())
+    {
+        <div class="alert-list">
+            @foreach (var a in Model.Alerts)
+            {
+                var (ico, cls) = a.Type switch
+                {
+                    "ok"   => ("bi-check-circle-fill", "ok"),
+                    "warn" => ("bi-exclamation-triangle-fill", "warn"),
+                    _      => ("bi-info-circle-fill", "info")
+                };
+                <a href="@a.Link" class="al @cls">
+                    <i class="bi @ico"></i>
+                    @a.Message
+                    <i class="bi bi-arrow-right al-arrow"></i>
+                </a>
+            }
+        </div>
+    }
+
+    <!-- STATS ROW 1: Orders -->
+    <div class="sec-lbl" style="margin-top:8px">📦 Orders</div>
+    <div class="stats-g">
+        <a class="sc" href="/Admin/Orders">
+            <div class="sc-ico i-navy"><i class="bi bi-bag-fill"></i></div>
+            <div>
+                <div class="sc-lbl">Total Orders</div>
+                <div class="sc-val">@Model.OrderTotal</div>
+                <div class="sc-sub">@Model.OrderToday new today</div>
+            </div>
+        </a>
+        <a class="sc" href="/Admin/Orders?StatusFilter=Pending">
+            <div class="sc-ico i-warn"><i class="bi bi-hourglass-split"></i></div>
+            <div>
+                <div class="sc-lbl">Pending</div>
+                <div class="sc-val">@Model.OrderPending</div>
+                <div class="sc-sub">Need fulfillment</div>
+            </div>
+        </a>
+        <a class="sc" href="/Admin/ServiceOrders">
+            <div class="sc-ico i-info"><i class="bi bi-tools"></i></div>
+            <div>
+                <div class="sc-lbl">Service Orders</div>
+                <div class="sc-val">@Model.SvcTotal</div>
+                <div class="sc-sub">@Model.SvcPending pending · @Model.SvcReady ready</div>
+            </div>
+        </a>
+        <a class="sc" href="/Admin/ServiceOrders?StatusFilter=Processing">
+            <div class="sc-ico i-gold"><i class="bi bi-wrench-adjustable"></i></div>
+            <div>
+                <div class="sc-lbl">In Progress</div>
+                <div class="sc-val">@Model.SvcProcessing</div>
+                <div class="sc-sub">Service orders active</div>
+            </div>
+        </a>
+    </div>
+
+    <!-- STATS ROW 2: Appointments -->
+    <div class="sec-lbl" style="margin-top:20px">📅 Eye Exam Appointments</div>
+    <div class="stats-g">
+        <a class="sc" href="/Admin/Appointments">
+            <div class="sc-ico i-info"><i class="bi bi-calendar2-week"></i></div>
+            <div>
+                <div class="sc-lbl">Total Bookings</div>
+                <div class="sc-val">@Model.ApptTotal</div>
+                <div class="sc-sub">All time</div>
+            </div>
+        </a>
+        <a class="sc" href="/Admin/Appointments?StatusFilter=Pending">
+            <div class="sc-ico i-warn"><i class="bi bi-hourglass-split"></i></div>
+            <div>
+                <div class="sc-lbl">Awaiting Confirm</div>
+                <div class="sc-val">@Model.ApptPending</div>
+                <div class="sc-sub">Need action</div>
+            </div>
+        </a>
+        <a class="sc" href="/Admin/Appointments?StatusFilter=Confirmed">
+            <div class="sc-ico i-ok"><i class="bi bi-check-circle-fill"></i></div>
+            <div>
+                <div class="sc-lbl">Confirmed</div>
+                <div class="sc-val">@Model.ApptConfirmed</div>
+                <div class="sc-sub">Upcoming confirmed</div>
+            </div>
+        </a>
+        <a class="sc" href="/Admin/Appointments?DateFilter=@DateTime.Today.ToString("yyyy-MM-dd")">
+            <div class="sc-ico i-navy"><i class="bi bi-calendar-day"></i></div>
+            <div>
+                <div class="sc-lbl">Today</div>
+                <div class="sc-val">@Model.ApptToday</div>
+                <div class="sc-sub">Appointments today</div>
+            </div>
+        </a>
+    </div>
+
+    <!-- LOWER 2-COL -->
+    <div class="two-col">
+        <!-- Recent orders -->
+        <div class="card">
+            <div class="card-hdr">
+                <h3><i class="bi bi-bag" style="color:#2563eb"></i> Recent Orders</h3>
+                <a href="/Admin/Orders">View all →</a>
+            </div>
+            @if (Model.RecentOrders.Any())
+            {
+                @foreach (var o in Model.RecentOrders)
+                {
+                    <div class="ord-row">
+                        <span class="ord-id">#@o.OrderId</span>
+                        <span class="ord-name">@(o.CustomerName ?? "Guest")</span>
+                        <span class="ord-amt">@o.Total.ToString("N0") ₫</span>
+                        <span class="bd bd-@o.Status">@o.Status</span>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-card">No orders yet</div>
+            }
+        </div>
+
+        <!-- Right col: upcoming appointments + pending service orders -->
+        <div style="display:flex;flex-direction:column;gap:18px">
+            <div class="card">
+                <div class="card-hdr">
+                    <h3><i class="bi bi-calendar-check" style="color:#059669"></i> Upcoming Appointments</h3>
+                    <a href="/Admin/Appointments">View all →</a>
+                </div>
+                @if (Model.UpcomingAppts.Any())
+                {
+                    @foreach (var a in Model.UpcomingAppts)
+                    {
+                        bool isToday = a.AppointmentDate == DateOnly.FromDateTime(DateTime.Today);
+                        var ini = string.Concat(a.FullName.Split(' ').Take(2)
+                        .Select(w => char.ToUpper(w.FirstOrDefault())));
+                        <div class="appt-row">
+                            <div class="av">@ini</div>
+                            <div>
+                                <div class="appt-name">
+                                    @a.FullName
+                                    @if (isToday)
+                                    {
+                                        <span class="appt-today">TODAY</span>
+                                    }
+                                </div>
+                                <div class="appt-dt">@a.AppointmentDate.ToString("dd/MM/yyyy") ⏰ @a.TimeSlot</div>
+                            </div>
+                            <span class="bd bd-@a.Status" style="margin-left:auto">@a.Status</span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-card">No upcoming appointments</div>
+                }
+            </div>
+
+            <div class="card">
+                <div class="card-hdr">
+                    <h3><i class="bi bi-tools" style="color:#d97706"></i> Pending Service Jobs</h3>
+                    <a href="/Admin/ServiceOrders">View all →</a>
+                </div>
+                @if (Model.PendingSvcOrders.Any())
+                {
+                    @foreach (var s in Model.PendingSvcOrders)
+                    {
+                        <div class="svc-row">
+                            <div>
+                                <div class="svc-name">@(string.IsNullOrEmpty(s.FrameName) ? $"Order #{s.OrderId}" : s.FrameName)</div>
+                                <div class="svc-sub">@s.ServiceName · #@s.OrderId</div>
+                            </div>
+                            <a href="/Admin/ServiceOrders/@s.OrderId" class="btn-sm">
+                                <i class="bi bi-arrow-right"></i> Assign
+                            </a>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-card">🎉 No pending service jobs</div>
+                }
+            </div>
+        </div>
+    </div>
+
 </div>

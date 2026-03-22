@@ -371,6 +371,16 @@
                             </a>
                         </li>
 
+                        @if (User.IsInRole("sale"))
+                        {
+                            <li>
+                                <a class="stitch-menu-link" asp-page="/Support/Orders/Index">
+                                    <span class="material-symbols-outlined icon">support_agent</span>
+                                    <span>Support</span>
+                                </a>
+                            </li>
+                        }
+
                         @if (User.IsInRole("admin") || User.IsInRole("manager"))
                         {
                             <li class="dropdown">

@@ -133,7 +133,7 @@ namespace EyewearStore_SWP391.Pages.Account
             }
             if (r == "sale" || r == "sale staff")
             {
-                return LocalRedirect("/Sale/Orders/Index");
+                return LocalRedirect("/Support/Orders/Index");
             }
             if (r == "staff" || r == "operational staff")
             {

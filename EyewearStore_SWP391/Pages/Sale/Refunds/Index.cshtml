@@ -12,7 +12,7 @@
             <ol>
                 <li><a asp-page="/Index">Home</a></li>
                 <li class="sep">›</li>
-                <li><a asp-page="/Sale/Orders/Index">Orders</a></li>
+                <li><a asp-page="/Support/Orders/Index">Orders</a></li>
                 <li class="sep">›</li>
                 <li class="current">Refund Requests</li>
             </ol>
@@ -143,7 +143,7 @@
                                     <span class="product-qty">Qty: @item.Quantity</span>
                                 </td>
                                 <td>
-                                    <a asp-page="/Sale/Orders/Details" asp-route-id="@item.OrderId" class="order-link">
+                                    <a asp-page="/Support/Orders/Details" asp-route-id="@item.OrderId" class="order-link">
                                         #@item.OrderId
                                     </a>
                                 </td>

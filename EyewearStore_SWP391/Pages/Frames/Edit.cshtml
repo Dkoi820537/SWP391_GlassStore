@@ -59,6 +59,14 @@
     .image-preview-info { margin-top:.75rem; padding:.75rem; background:#f0f0f5; border-radius:8px; display:inline-block; }
     .btn-remove-image { margin-top:.75rem; background:#dc3545; color:#fff; padding:.5rem 1rem; border:none; border-radius:6px; cursor:pointer; font-size:.85rem; }
     .btn-remove-image:hover { background:#c82333; }
+    .toggle-group { display:flex; gap:1rem; }
+    .toggle-opt { display:flex; align-items:center; gap:.5rem; padding:.6rem 1.2rem; border:2px solid #e0e0e8; border-radius:8px; cursor:pointer; font-size:.9rem; font-weight:600; color:#4a4a68; transition:all .18s; }
+    .toggle-opt input[type=radio] { accent-color:#667eea; width:16px; height:16px; }
+    .toggle-opt:has(input:checked) { border-color:#667eea; background:#f0f0ff; color:#667eea; }
+    .face-tags-wrap { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:.5rem; }
+    .face-tag { display:inline-flex; align-items:center; gap:.4rem; padding:.4rem .9rem; border:2px solid #e0e0e8; border-radius:20px; font-size:.82rem; font-weight:600; color:#4a4a68; cursor:pointer; transition:all .15s; }
+    .face-tag input[type=checkbox] { accent-color:#667eea; width:14px; height:14px; }
+    .face-tag:has(input:checked) { border-color:#667eea; background:#f0f0ff; color:#667eea; }
     .form-actions { display:flex; justify-content:flex-end; gap:1rem; padding:1.5rem 2rem; background:#f8f9fc; border-top:1px solid #f0f0f5; }
     .btn { display:inline-flex; align-items:center; gap:.5rem; padding:.75rem 1.5rem; border-radius:8px; font-weight:600; text-decoration:none; transition:all .2s; border:none; cursor:pointer; font-size:.95rem; }
     .btn-primary { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff; }
@@ -124,7 +132,7 @@
                     <div class="form-group">
                         <label asp-for="Input.Brand">Brand</label>
                         <input asp-for="Input.Brand" class="form-control" placeholder="e.g., Ray-Ban, Bolon, Oakley" />
-                        <span class="helper-text">Displays as a clickable link on the product page</span>
+                        <span class="helper-text">Displays as a clickable link on the product page.</span>
                     </div>
                     <div class="form-group">
                         <label asp-for="Input.Gender">Gender</label>
@@ -140,7 +148,7 @@
                     <div class="form-group">
                         <label asp-for="Input.Origin">Country of Origin</label>
                         <input asp-for="Input.Origin" class="form-control" placeholder="e.g., P.R.C, Japan, Italy" />
-                        <span class="helper-text">Shown in product status row</span>
+                        <span class="helper-text">Shown in the product status row.</span>
                     </div>
                     <div class="form-group">
                         <!-- spacer -->
@@ -188,12 +196,11 @@
                         </select>
                     </div>
                 </div>
-                <!-- ── Size measurements ── -->
                 <div class="form-row tri">
                     <div class="form-group">
                         <label asp-for="Input.LensWidth">Lens Width (mm)</label>
                         <input asp-for="Input.LensWidth" type="number" step="0.01" min="0" class="form-control" placeholder="e.g., 53.00" />
-                        <span class="helper-text">Horizontal lens diameter</span>
+                        <span class="helper-text">Horizontal lens diameter.</span>
                     </div>
                     <div class="form-group">
                         <label asp-for="Input.BridgeWidth">Bridge Width (mm)</label>
@@ -205,11 +212,13 @@
                     </div>
                 </div>
             </div>
-                 <div class="form-section">
+
+            <!-- ── Lens Details ────────────────────────────────────────── -->
+            <div class="form-section">
                 <h2 class="section-title">Lens Details</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label asp-for="Input.LensMaterial">Lens Material (Chất liệu tròng)</label>
+                        <label asp-for="Input.LensMaterial">Lens Material</label>
                         <input asp-for="Input.LensMaterial" class="form-control"
                                list="lensMaterialList"
                                placeholder="e.g., Nylon, Polycarbonate, CR-39" autocomplete="off" />
@@ -223,20 +232,20 @@
                         </datalist>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Input.LensColor">Lens Color (Màu tròng)</label>
+                        <label asp-for="Input.LensColor">Lens Color</label>
                         <input asp-for="Input.LensColor" class="form-control"
                                list="lensColorList"
-                               placeholder="e.g., Xám đậm, Nâu, Trong suốt" autocomplete="off" />
+                               placeholder="e.g., Dark Grey, Brown, Clear" autocomplete="off" />
                         <datalist id="lensColorList">
-                            <option value="Xám đậm"></option>
-                            <option value="Xám nhạt"></option>
-                            <option value="Nâu"></option>
-                            <option value="Xanh lá"></option>
-                            <option value="Xanh dương"></option>
-                            <option value="Vàng"></option>
-                            <option value="Hồng"></option>
-                            <option value="Đen"></option>
-                            <option value="Trong suốt"></option>
+                            <option value="Dark Grey"></option>
+                            <option value="Light Grey"></option>
+                            <option value="Brown"></option>
+                            <option value="Green"></option>
+                            <option value="Blue"></option>
+                            <option value="Yellow"></option>
+                            <option value="Pink"></option>
+                            <option value="Black"></option>
+                            <option value="Clear"></option>
                             <option value="Mirror Silver"></option>
                             <option value="Mirror Gold"></option>
                         </datalist>
@@ -244,64 +253,64 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label asp-for="Input.IsPolarized">Polarized (Phân cực)</label>
+                        <label asp-for="Input.IsPolarized">Polarized</label>
                         <div class="toggle-group">
                             <label class="toggle-opt">
-                                <input type="radio" asp-for="Input.IsPolarized" value="true" /> Có
+                                <input type="radio" asp-for="Input.IsPolarized" value="true" /> Yes
                             </label>
                             <label class="toggle-opt">
-                                <input type="radio" asp-for="Input.IsPolarized" value="false" /> Không
+                                <input type="radio" asp-for="Input.IsPolarized" value="false" /> No
                             </label>
                         </div>
-                        <span class="helper-text">Tròng phân cực giúp chống lóa, chống chói.</span>
+                        <span class="helper-text">Polarized lenses reduce glare and eye strain.</span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Input.HasUvProtection">UV Protection (Chống UV)</label>
+                        <label asp-for="Input.HasUvProtection">UV Protection</label>
                         <div class="toggle-group">
                             <label class="toggle-opt">
-                                <input type="radio" asp-for="Input.HasUvProtection" value="true" /> Có
+                                <input type="radio" asp-for="Input.HasUvProtection" value="true" /> Yes
                             </label>
                             <label class="toggle-opt">
-                                <input type="radio" asp-for="Input.HasUvProtection" value="false" /> Không
+                                <input type="radio" asp-for="Input.HasUvProtection" value="false" /> No
                             </label>
                         </div>
-                        <span class="helper-text">Tròng chống tia UV bảo vệ mắt.</span>
+                        <span class="helper-text">Lenses block harmful UV rays to protect your eyes.</span>
                     </div>
                 </div>
             </div>
 
-            <!-- ── Frame Color & Style Tags (v4) ─────────────────────── -->
+            <!-- ── Frame Color & Style Tags ───────────────────────────── -->
             <div class="form-section">
                 <h2 class="section-title">Frame Color &amp; Style</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label asp-for="Input.FrameColor">Frame Color (Màu gọng)</label>
+                        <label asp-for="Input.FrameColor">Frame Color</label>
                         <input asp-for="Input.FrameColor" class="form-control"
-                               placeholder="e.g., Vàng gold, Đen bóng, Bạc" />
-                        <span class="helper-text">Màu cụ thể của gọng kính.</span>
+                               placeholder="e.g., Gold, Matte Black, Silver" />
+                        <span class="helper-text">Specific color of the frame.</span>
                     </div>
                     <div class="form-group">
                         <label asp-for="Input.StyleTags">Style Tags (comma-separated)</label>
                         <input asp-for="Input.StyleTags" class="form-control"
                                placeholder="e.g., Vintage, Sporty, Elegant" />
-                        <span class="helper-text">Hiển thị trên trang sản phẩm.</span>
+                        <span class="helper-text">Displayed on the product page.</span>
                     </div>
                 </div>
             </div>
 
-            <!-- ── Suitable Face Shapes (v4) ──────────────────────────── -->
+            <!-- ── Suitable Face Shapes ───────────────────────────────── -->
             <div class="form-section">
-                <h2 class="section-title">Phù Hợp Với Khuôn Mặt</h2>
+                <h2 class="section-title">Suitable Face Shapes</h2>
                 <div class="form-row single">
                     <div class="form-group">
-                        <label>Suitable Face Shapes</label>
+                        <label>Face Shape Compatibility</label>
                         <div class="face-tags-wrap" id="faceTagsWrap">
                             @{
                                 var currentFaces = (Model.Input.SuitableFaceShapes ?? "")
                                     .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                                     .ToHashSet();
                             }
-                            @foreach (var face in new[] { "Mặt oval", "Mặt tròn", "Mặt vuông", "Mặt trái tim", "Mặt xoan", "Mặt tam giác", "Mặt kim cương", "Mặt dài" })
+                            @foreach (var face in new[] { "Oval", "Round", "Square", "Heart", "Oblong", "Triangle", "Diamond", "Rectangle" })
                             {
                                 <label class="face-tag">
                                     <input type="checkbox" class="face-cb" value="@face"
@@ -312,20 +321,21 @@
                             }
                         </div>
                         <input type="hidden" asp-for="Input.SuitableFaceShapes" id="suitableFaceShapesInput" />
-                        <span class="helper-text">Hiển thị mục "Phù hợp với" trên trang sản phẩm.</span>
+                        <span class="helper-text">Displayed in the "Suitable For" section on the product page.</span>
                     </div>
                 </div>
             </div>
-            <!-- ── Color ──────────────────────────────────────────────── -->
+
+            <!-- ── Color Options ──────────────────────────────────────── -->
             <div class="form-section">
                 <h2 class="section-title">Color Options</h2>
                 <div class="form-row single">
                     <div class="form-group">
-                        <label asp-for="Input.Color">Colors (comma-separated)</label>
+                        <label asp-for="Input.Color">Color Swatches (comma-separated)</label>
                         <input asp-for="Input.Color" class="form-control" id="colorInput"
                                placeholder="e.g., Black, Gold, Red"
                                oninput="updateColorPreview()" />
-                        <span class="helper-text">Each color becomes a swatch on the product page.</span>
+                        <span class="helper-text">Each color will appear as a swatch on the product page.</span>
                         <div class="color-preview" id="colorPreview"></div>
                     </div>
                 </div>
@@ -368,7 +378,7 @@
                 </div>
             </div>
 
-            <!-- ── Compatible Lens Types ────────────────────────────────── -->
+            <!-- ── Compatible Lens Types ───────────────────────────────── -->
             <div class="form-section">
                 <h2 class="section-title">Compatible Lens Types</h2>
                 <p class="helper-text" style="margin-bottom:1rem;">
@@ -416,7 +426,7 @@
                                         <a asp-page-handler="SetPrimaryImage"
                                            asp-route-imageId="@img.ImageId"
                                            asp-route-productId="@Model.Input.ProductId"
-                                           class="btn-sm btn-set-primary" style="text-decoration:none;">Primary</a>
+                                           class="btn-sm btn-set-primary" style="text-decoration:none;">Set Primary</a>
                                     }
                                     <a asp-page-handler="DeleteImage"
                                        asp-route-imageId="@img.ImageId"
@@ -494,7 +504,7 @@
     function handleFile(f) {
         if (!f) return;
         if (!['image/jpeg','image/jpg','image/png','image/webp'].includes(f.type)) { alert('Invalid file type.'); return; }
-        if (f.size > 5*1024*1024) { alert('File too large (max 5MB).'); return; }
+        if (f.size > 5*1024*1024) { alert('File too large (max 5 MB).'); return; }
         const reader = new FileReader();
         reader.onload = e => {
             imagePreview.src = e.target.result;
@@ -507,7 +517,8 @@
 
     const COLOR_MAP = {
         Black:'#1a1a1a', Red:'#cc2200', Gold:'#c9a96e', Silver:'#c0c0c0',
-        Tortoise:'#7b4f1e', Blue:'#1a4fa0', Pink:'#e879a0', Green:'#2d7a3a', Transparent:'rgba(180,220,255,.5)'
+        Tortoise:'#7b4f1e', Blue:'#1a4fa0', Pink:'#e879a0', Green:'#2d7a3a',
+        Transparent:'rgba(180,220,255,.5)'
     };
     function updateColorPreview() {
         const val = document.getElementById('colorInput').value;
@@ -529,14 +540,19 @@
             updateColorPreview();
         }
     }
-    // Lens-type compatibility: Select All / Deselect All
     function toggleAllLensTypes() {
         const cbs = document.querySelectorAll('.lens-type-cb');
         const allChecked = [...cbs].every(cb => cb.checked);
         cbs.forEach(cb => cb.checked = !allChecked);
         document.getElementById('toggleAllBtn').textContent = allChecked ? 'Select All' : 'Deselect All';
     }
-    // init preview on load
-    document.addEventListener('DOMContentLoaded', updateColorPreview);
+    function syncFaceShapes() {
+        const checked = Array.from(document.querySelectorAll('.face-cb:checked')).map(cb => cb.value);
+        document.getElementById('suitableFaceShapesInput').value = checked.join(', ');
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        updateColorPreview();
+        syncFaceShapes();
+    });
     </script>
 }

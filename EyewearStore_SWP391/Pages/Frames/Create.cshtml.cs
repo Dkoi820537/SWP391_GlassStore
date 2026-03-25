@@ -41,18 +41,18 @@ public class CreateModel : PageModel
         {
             if (file.Length > MaxFileSize)
                 ModelState.AddModelError("Input.ImageFiles",
-                    $"'{file.FileName}' vuot qua {MaxFileSize / (1024 * 1024)} MB.");
+                    $"'{file.FileName}' exceeds the maximum allowed size of {MaxFileSize / (1024 * 1024)} MB.");
             var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
             if (!_allowedExtensions.Contains(ext))
                 ModelState.AddModelError("Input.ImageFiles",
-                    $"'{file.FileName}' khong hop le. Chi chap nhan: jpg, jpeg, png, webp.");
+                    $"'{file.FileName}' is not a valid file type. Only jpg, jpeg, png, webp are accepted.");
         }
 
         if (!ModelState.IsValid) return Page();
 
         if (await _context.Products.AnyAsync(p => p.Sku == Input.Sku))
         {
-            ModelState.AddModelError("Input.Sku", "SKU nay da ton tai.");
+            ModelState.AddModelError("Input.Sku", "This SKU already exists.");
             return Page();
         }
 
@@ -66,28 +66,23 @@ public class CreateModel : PageModel
             InventoryQty = Input.InventoryQty,
             Attributes = Input.Attributes,
             ProductType = "Frame",
-            // FIX: lấy từ Input thay vì hardcode true
             IsActive = Input.IsActive,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-
             // Frame specs
             FrameMaterial = Input.FrameMaterial,
             FrameType = Input.FrameType,
             BridgeWidth = Input.BridgeWidth,
             TempleLength = Input.TempleLength,
-
             // v2
             Brand = Input.Brand,
             Color = Input.Color,
             Gender = Input.Gender,
             FrameShape = Input.FrameShape,
-
             // v3
             LensWidth = Input.LensWidth,
             Origin = Input.Origin,
-
-            // v4 — các field này cần cột trong bảng frames (chạy migration)
+            // v4
             FrameColor = Input.FrameColor,
             LensMaterial = Input.LensMaterial,
             LensColor = Input.LensColor,

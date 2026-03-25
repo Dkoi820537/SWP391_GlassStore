@@ -35,23 +35,19 @@
     .color-preview { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
     .color-dot { width:26px; height:26px; border-radius:50%; border:2px solid rgba(0,0,0,.15); cursor:pointer; transition:transform .15s; }
     .color-dot:hover { transform:scale(1.15); }
-    /* Toggle radio */
     .toggle-group { display:flex; gap:1rem; }
     .toggle-opt { display:flex; align-items:center; gap:.5rem; padding:.6rem 1.2rem; border:2px solid #e0e0e8; border-radius:8px; cursor:pointer; font-size:.9rem; font-weight:600; color:#4a4a68; transition:all .18s; }
     .toggle-opt input[type=radio] { accent-color:#667eea; width:16px; height:16px; }
     .toggle-opt:has(input:checked) { border-color:#667eea; background:#f0f0ff; color:#667eea; }
-    /* Face shape tags */
     .face-tags-wrap { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:.5rem; }
     .face-tag { display:inline-flex; align-items:center; gap:.4rem; padding:.4rem .9rem; border:2px solid #e0e0e8; border-radius:20px; font-size:.82rem; font-weight:600; color:#4a4a68; cursor:pointer; transition:all .15s; }
     .face-tag input[type=checkbox] { accent-color:#667eea; width:14px; height:14px; }
     .face-tag:has(input:checked) { border-color:#667eea; background:#f0f0ff; color:#667eea; }
-    /* Drop zone */
     .image-drop-zone { border:2px dashed #e0e0e8; border-radius:12px; padding:2.5rem 2rem; text-align:center; background:#fafafa; cursor:pointer; transition:border-color .25s, background .25s; user-select:none; }
     .image-drop-zone:hover, .image-drop-zone.drag-over { border-color:#667eea; background:rgba(102,126,234,.04); }
     .image-drop-zone .dz-icon { font-size:2.8rem; color:#adb5bd; margin-bottom:.75rem; }
     .image-drop-zone h4 { margin:0 0 .35rem; font-size:1rem; color:#4a4a68; }
     .image-drop-zone p { margin:0; font-size:.85rem; color:#6c757d; }
-    /* Thumbnail grid */
     .thumb-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:1rem; margin-top:1.25rem; }
     .thumb-card { position:relative; border-radius:10px; overflow:hidden; border:2px solid #e0e0e8; background:#f8f9fc; aspect-ratio:1; transition:border-color .2s, box-shadow .2s; }
     .thumb-card.is-primary { border-color:#667eea; box-shadow:0 0 0 3px rgba(102,126,234,.25); }
@@ -147,7 +143,7 @@
                     <div class="form-group">
                         <label asp-for="Input.StyleTags">Style Tags (comma-separated)</label>
                         <input asp-for="Input.StyleTags" class="form-control" placeholder="e.g., Vintage, Sporty, Elegant" />
-                        <span class="helper-text">Hiển thị trên trang sản phẩm.</span>
+                        <span class="helper-text">Displayed on the product page.</span>
                     </div>
                 </div>
             </div>
@@ -158,7 +154,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label asp-for="Input.FrameMaterial">Frame Material</label>
-                        <input asp-for="Input.FrameMaterial" class="form-control" placeholder="e.g., Titanium, Acetate, Tổng hợp" />
+                        <input asp-for="Input.FrameMaterial" class="form-control" placeholder="e.g., Titanium, Acetate, Mixed" />
                     </div>
                     <div class="form-group">
                         <label asp-for="Input.FrameType">Frame Type</label>
@@ -174,7 +170,7 @@
                     <div class="form-group">
                         <label asp-for="Input.FrameShape">Frame Shape</label>
                         <input asp-for="Input.FrameShape" class="form-control"
-                               list="shapeList" placeholder="Chọn hoặc nhập kiểu dáng..." autocomplete="off" />
+                               list="shapeList" placeholder="Select or enter a shape..." autocomplete="off" />
                         <datalist id="shapeList">
                             <option value="Round"></option>
                             <option value="Square"></option>
@@ -188,9 +184,9 @@
                         </datalist>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Input.FrameColor">Frame Color (Màu gọng)</label>
-                        <input asp-for="Input.FrameColor" class="form-control" placeholder="e.g., Vàng gold, Đen bóng, Bạc" />
-                        <span class="helper-text">Màu cụ thể của gọng kính.</span>
+                        <label asp-for="Input.FrameColor">Frame Color</label>
+                        <input asp-for="Input.FrameColor" class="form-control" placeholder="e.g., Gold, Matte Black, Silver" />
+                        <span class="helper-text">Specific color of the frame.</span>
                     </div>
                 </div>
                 <div class="form-row tri">
@@ -209,12 +205,12 @@
                 </div>
             </div>
 
-            <!-- ── Lens Details (v4) ──────────────────────────────────── -->
+            <!-- ── Lens Details ──────────────────────────────────────── -->
             <div class="form-section">
                 <h2 class="section-title">Lens Details</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label asp-for="Input.LensMaterial">Lens Material (Chất liệu tròng)</label>
+                        <label asp-for="Input.LensMaterial">Lens Material</label>
                         <input asp-for="Input.LensMaterial" class="form-control"
                                list="lensMaterialList" placeholder="e.g., Nylon, Polycarbonate, CR-39" autocomplete="off" />
                         <datalist id="lensMaterialList">
@@ -227,19 +223,19 @@
                         </datalist>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Input.LensColor">Lens Color (Màu tròng)</label>
+                        <label asp-for="Input.LensColor">Lens Color</label>
                         <input asp-for="Input.LensColor" class="form-control"
-                               list="lensColorList" placeholder="e.g., Xám đậm, Nâu, Trong suốt" autocomplete="off" />
+                               list="lensColorList" placeholder="e.g., Dark Grey, Brown, Clear" autocomplete="off" />
                         <datalist id="lensColorList">
-                            <option value="Xám đậm"></option>
-                            <option value="Xám nhạt"></option>
-                            <option value="Nâu"></option>
-                            <option value="Xanh lá"></option>
-                            <option value="Xanh dương"></option>
-                            <option value="Vàng"></option>
-                            <option value="Hồng"></option>
-                            <option value="Đen"></option>
-                            <option value="Trong suốt"></option>
+                            <option value="Dark Grey"></option>
+                            <option value="Light Grey"></option>
+                            <option value="Brown"></option>
+                            <option value="Green"></option>
+                            <option value="Blue"></option>
+                            <option value="Yellow"></option>
+                            <option value="Pink"></option>
+                            <option value="Black"></option>
+                            <option value="Clear"></option>
                             <option value="Mirror Silver"></option>
                             <option value="Mirror Gold"></option>
                         </datalist>
@@ -247,40 +243,40 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label asp-for="Input.IsPolarized">Polarized (Phân cực)</label>
+                        <label asp-for="Input.IsPolarized">Polarized</label>
                         <div class="toggle-group">
                             <label class="toggle-opt">
-                                <input type="radio" asp-for="Input.IsPolarized" value="true" /> Có
+                                <input type="radio" asp-for="Input.IsPolarized" value="true" /> Yes
                             </label>
                             <label class="toggle-opt">
-                                <input type="radio" asp-for="Input.IsPolarized" value="false" checked /> Không
+                                <input type="radio" asp-for="Input.IsPolarized" value="false" checked /> No
                             </label>
                         </div>
-                        <span class="helper-text">Tròng phân cực giúp chống lóa, chống chói.</span>
+                        <span class="helper-text">Polarized lenses reduce glare and eye strain.</span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Input.HasUvProtection">UV Protection (Chống UV)</label>
+                        <label asp-for="Input.HasUvProtection">UV Protection</label>
                         <div class="toggle-group">
                             <label class="toggle-opt">
-                                <input type="radio" asp-for="Input.HasUvProtection" value="true" checked /> Có
+                                <input type="radio" asp-for="Input.HasUvProtection" value="true" checked /> Yes
                             </label>
                             <label class="toggle-opt">
-                                <input type="radio" asp-for="Input.HasUvProtection" value="false" /> Không
+                                <input type="radio" asp-for="Input.HasUvProtection" value="false" /> No
                             </label>
                         </div>
-                        <span class="helper-text">Tròng chống tia UV bảo vệ mắt.</span>
+                        <span class="helper-text">Lenses block harmful UV rays to protect your eyes.</span>
                     </div>
                 </div>
             </div>
 
-            <!-- ── Suitable Face Shapes (v4) ──────────────────────────── -->
+            <!-- ── Suitable Face Shapes ───────────────────────────────── -->
             <div class="form-section">
-                <h2 class="section-title">Phù Hợp Với Khuôn Mặt</h2>
+                <h2 class="section-title">Suitable Face Shapes</h2>
                 <div class="form-row single">
                     <div class="form-group">
-                        <label>Suitable Face Shapes</label>
+                        <label>Face Shape Compatibility</label>
                         <div class="face-tags-wrap">
-                            @foreach (var face in new[] { "Mặt oval", "Mặt tròn", "Mặt vuông", "Mặt trái tim", "Mặt xoan", "Mặt tam giác", "Mặt kim cương", "Mặt dài" })
+                            @foreach (var face in new[] { "Oval", "Round", "Square", "Heart", "Oblong", "Triangle", "Diamond", "Rectangle" })
                             {
                                 <label class="face-tag">
                                     <input type="checkbox" class="face-cb" value="@face" onchange="syncFaceShapes()" />
@@ -289,7 +285,7 @@
                             }
                         </div>
                         <input type="hidden" asp-for="Input.SuitableFaceShapes" id="suitableFaceShapesInput" />
-                        <span class="helper-text">Hiển thị mục "Phù hợp với" trên trang sản phẩm.</span>
+                        <span class="helper-text">Displayed in the "Suitable For" section on the product page.</span>
                     </div>
                 </div>
             </div>
@@ -302,7 +298,7 @@
                         <label asp-for="Input.Color">Color Swatches (comma-separated)</label>
                         <input asp-for="Input.Color" class="form-control" id="colorInput"
                                placeholder="e.g., Black, Gold, Red" oninput="updateColorPreview()" />
-                        <span class="helper-text">Mỗi màu sẽ hiện thành swatch trên trang sản phẩm.</span>
+                        <span class="helper-text">Each color will appear as a swatch on the product page.</span>
                         <div class="color-preview" id="colorPreview"></div>
                     </div>
                 </div>
@@ -372,20 +368,20 @@
                 <div class="image-drop-zone" id="dropZone">
                     <div class="dz-icon"><i class="bi bi-images"></i></div>
                     <h4>Upload Product Images</h4>
-                    <p>Drag &amp; drop hoặc click để chọn · Tối đa 10 ảnh</p>
-                    <p class="helper-text" style="margin-top:.4rem;">JPG, PNG, WEBP · Max 5 MB · Ảnh đầu tiên = ảnh chính</p>
+                    <p>Drag &amp; drop or click to select · Max 10 images</p>
+                    <p class="helper-text" style="margin-top:.4rem;">JPG, PNG, WEBP · Max 5 MB · First image will be the primary (cover) image</p>
                 </div>
 
                 <div class="thumb-grid" id="thumbGrid"></div>
                 <div class="upload-count-info" id="countInfo" style="display:none;">
-                    Đã chọn <span id="countText">0</span> ảnh — ảnh đầu tiên sẽ là ảnh chính (cover)
+                    <span id="countText">0</span> image(s) selected — the first image will be the primary (cover) image
                 </div>
 
                 <div class="form-row single" style="margin-top:1.2rem;">
                     <div class="form-group">
                         <label asp-for="Input.ImageAltText">Image Alt Text</label>
-                        <input asp-for="Input.ImageAltText" class="form-control" placeholder="Mô tả ảnh (dùng cho tất cả ảnh)" />
-                        <span class="helper-text">Không bắt buộc. Hỗ trợ SEO &amp; accessibility.</span>
+                        <input asp-for="Input.ImageAltText" class="form-control" placeholder="Describe the image (applied to all uploaded images)" />
+                        <span class="helper-text">Optional. Helps with SEO &amp; accessibility.</span>
                     </div>
                 </div>
             </div>
@@ -428,9 +424,9 @@
     function handleFiles(incoming) {
         for (var i = 0; i < incoming.length; i++) {
             var file = incoming[i];
-            if (fileList.length >= MAX_FILES) { alert('Tối đa ' + MAX_FILES + ' ảnh.'); break; }
-            if (ALLOWED.indexOf(file.type) === -1) { alert('"' + file.name + '" không hợp lệ.'); continue; }
-            if (file.size > MAX_BYTES) { alert('"' + file.name + '" vượt 5 MB.'); continue; }
+            if (fileList.length >= MAX_FILES) { alert('Maximum ' + MAX_FILES + ' images allowed.'); break; }
+            if (ALLOWED.indexOf(file.type) === -1) { alert('"' + file.name + '" is not a valid file type.'); continue; }
+            if (file.size > MAX_BYTES) { alert('"' + file.name + '" exceeds 5 MB.'); continue; }
             addFile(file);
         }
         syncToSubmitInput();

@@ -121,12 +121,12 @@ namespace EyewearStore_SWP391.Pages.Frames
             {
                 if (Input.ImageFile.Length > MaxFileSize)
                     ModelState.AddModelError("Input.ImageFile",
-                        $"Image file size exceeds maximum allowed size of {MaxFileSize / (1024 * 1024)} MB");
+                        $"Image file exceeds the maximum allowed size of {MaxFileSize / (1024 * 1024)} MB.");
 
                 var extension = Path.GetExtension(Input.ImageFile.FileName).ToLowerInvariant();
                 if (!_allowedExtensions.Contains(extension))
                     ModelState.AddModelError("Input.ImageFile",
-                        $"Invalid file type. Allowed: {string.Join(", ", _allowedExtensions)}");
+                        $"Invalid file type. Allowed types: {string.Join(", ", _allowedExtensions)}");
             }
 
             if (!ModelState.IsValid)
@@ -166,7 +166,7 @@ namespace EyewearStore_SWP391.Pages.Frames
             var newQty = Input.InventoryQty ?? 0;
             var isNowInStock = newQty > 0;
 
-            // ── Update all fields ────────────────────────────────────────────
+            // Update all fields
             frame.Sku = Input.Sku;
             frame.Name = Input.Name;
             frame.Description = Input.Description;
@@ -205,7 +205,7 @@ namespace EyewearStore_SWP391.Pages.Frames
                 if (Input.ImageFile != null && Input.ImageFile.Length > 0)
                     await SaveProductImageAsync(frame.ProductId, Input.ImageFile, Input.ImageAltText);
 
-                // ── Save compatible lens types ───────────────────────────────
+                // Save compatible lens types
                 var existing = await _context.FrameCompatibleLensTypes
                     .Where(c => c.FrameProductId == frame.ProductId)
                     .ToListAsync();

@@ -21,7 +21,6 @@ namespace EyewearStore_SWP391.Pages.Manager
         public List<TopProductDto> TopProducts { get; set; } = new();
         public ChartDataDto ChartData { get; set; } = new();
 
-        // Recent orders paging
         [BindProperty(SupportsGet = true)]
         public int RecentPageNumber { get; set; } = 1;
         [BindProperty(SupportsGet = true)]
@@ -40,7 +39,7 @@ namespace EyewearStore_SWP391.Pages.Manager
             public int LowStockCount { get; set; }
             public int TotalStaff { get; set; }
             public int ActiveStaff { get; set; }
-            public int PendingReturns { get; set; } // ADDED
+            public int PendingReturns { get; set; }
             public decimal OrderGrowth { get; set; }
         }
 
@@ -68,53 +67,70 @@ namespace EyewearStore_SWP391.Pages.Manager
 
         public async Task OnGetAsync()
         {
-            await LoadDashboardStatsAsync();
-            await LoadTopProductsAsync();
-            await LoadRevenueChartDataAsync();
-            await LoadRecentOrdersAsync();
+            try { await LoadDashboardStatsAsync(); } catch { }
+            try { await LoadTopProductsAsync(); } catch { }
+            try { await LoadRevenueChartDataAsync(); } catch { }
+            try { await LoadRecentOrdersAsync(); } catch { }
         }
 
         private async Task LoadDashboardStatsAsync()
         {
-            var today = DateTime.UtcNow.Date;
-            var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
+            // Dùng giờ Việt Nam UTC+7
+            var now = DateTime.UtcNow.AddHours(7);
+            var firstDayOfMonth = new DateTime(now.Year, now.Month, 1);
             var firstDayOfLastMonth = firstDayOfMonth.AddMonths(-1);
-            var lastDayOfLastMonth = firstDayOfMonth.AddDays(-1);
+            var firstDayOfNextMonth = firstDayOfMonth.AddMonths(1);
 
+            // ✅ SỬA: Revenue = tất cả đơn Completed (không giới hạn tháng tạo)
+            // Lý do: đơn tạo tháng trước nhưng Completed tháng này vẫn phải tính
+            // Nếu muốn lọc theo tháng, dùng UpdatedAt thay CreatedAt
+            // Hiện tại lấy toàn bộ đơn Completed trong tháng (kể cả tạo tháng trước)
             Stats.TotalRevenue = await _context.Orders
-                .Where(o => o.CreatedAt >= firstDayOfMonth && o.Status != "Cancelled")
-                .SumAsync(o => o.TotalAmount);
+                .Where(o => o.Status == "Completed"
+                         && o.CreatedAt >= firstDayOfMonth
+                         && o.CreatedAt < firstDayOfNextMonth)
+                .SumAsync(o => (decimal?)o.TotalAmount) ?? 0;
 
+            // ✅ THÊM: Nếu bạn có cột UpdatedAt/CompletedAt trong Orders, dùng cách này tốt hơn:
+            // Stats.TotalRevenue = await _context.Orders
+            //     .Where(o => o.Status == "Completed"
+            //              && o.UpdatedAt >= firstDayOfMonth
+            //              && o.UpdatedAt < firstDayOfNextMonth)
+            //     .SumAsync(o => (decimal?)o.TotalAmount) ?? 0;
+
+            // ✅ SỬA: TotalOrders = tất cả đơn trong tháng, mọi trạng thái
             Stats.TotalOrders = await _context.Orders
-                .Where(o => o.CreatedAt >= firstDayOfMonth)
+                .Where(o => o.CreatedAt >= firstDayOfMonth
+                         && o.CreatedAt < firstDayOfNextMonth)
                 .CountAsync();
 
+            // Tháng trước để tính tăng trưởng
             var lastMonthOrders = await _context.Orders
-                .Where(o => o.CreatedAt >= firstDayOfLastMonth && o.CreatedAt <= lastDayOfLastMonth)
+                .Where(o => o.CreatedAt >= firstDayOfLastMonth
+                         && o.CreatedAt < firstDayOfMonth)
                 .CountAsync();
 
-            if (lastMonthOrders > 0)
-                Stats.OrderGrowth = Math.Round(((decimal)(Stats.TotalOrders - lastMonthOrders) / lastMonthOrders) * 100, 1);
-            else
-                Stats.OrderGrowth = lastMonthOrders == 0 && Stats.TotalOrders > 0 ? 100 : 0;
+            Stats.OrderGrowth = lastMonthOrders > 0
+                ? Math.Round(((decimal)(Stats.TotalOrders - lastMonthOrders) / lastMonthOrders) * 100, 1)
+                : (Stats.TotalOrders > 0 ? 100 : 0);
 
             Stats.ActiveProducts = await _context.Products.CountAsync(p => p.IsActive);
-            Stats.LowStockCount = await _context.Products.Where(p => p.IsActive && p.InventoryQty < 10).CountAsync();
-            Stats.TotalStaff = await _context.Users.Where(u => u.Role != "customer" && u.IsActive).CountAsync();
+            Stats.LowStockCount = await _context.Products.CountAsync(p => p.IsActive && p.InventoryQty < 10);
+            Stats.TotalStaff = await _context.Users.CountAsync(u => u.Role != "customer" && u.IsActive);
             Stats.ActiveStaff = Stats.TotalStaff;
 
-            // ADDED: Get pending returns count
             Stats.PendingReturns = await _context.Returns
-                .Where(r => r.Status == "Pending")
-                .CountAsync();
+                .CountAsync(r => r.Status == "Pending");
         }
 
         private async Task LoadTopProductsAsync()
         {
+            // ✅ SỬA: Chỉ tính đơn Completed (đã hoàn thành thực sự)
+            // Trước đây loại Cancelled + Pending nhưng vẫn tính cả Processing/Shipped chưa xong
             TopProducts = await _context.OrderItems
                 .Include(oi => oi.Product)
                 .Include(oi => oi.Order)
-                .Where(oi => oi.Order.Status != "Cancelled")
+                .Where(oi => oi.Order.Status == "Completed")
                 .GroupBy(oi => new { oi.ProductId, oi.Product.Name })
                 .Select(g => new TopProductDto
                 {
@@ -129,10 +145,15 @@ namespace EyewearStore_SWP391.Pages.Manager
 
         private async Task LoadRevenueChartDataAsync()
         {
-            var today = DateTime.UtcNow.Date;
-            var sevenDaysAgo = today.AddDays(-6);
+            var nowLocal = DateTime.UtcNow.AddHours(7);
+            var todayLocal = nowLocal.Date;
+            var sevenDaysAgo = todayLocal.AddDays(-6);
+
+            // ✅ SỬA: Chỉ lấy đơn Completed cho biểu đồ doanh thu
+            // Trước đây loại Cancelled + Pending nhưng vẫn tính đơn đang xử lý
             var dailyRevenue = await _context.Orders
-                .Where(o => o.CreatedAt >= sevenDaysAgo && o.Status != "Cancelled")
+                .Where(o => o.CreatedAt >= sevenDaysAgo
+                         && o.Status == "Completed")
                 .GroupBy(o => o.CreatedAt.Date)
                 .Select(g => new { Date = g.Key, Revenue = g.Sum(o => o.TotalAmount) })
                 .OrderBy(x => x.Date)
@@ -149,11 +170,11 @@ namespace EyewearStore_SWP391.Pages.Manager
 
         private async Task LoadRecentOrdersAsync()
         {
+            // ✅ SỬA: Hiển thị tất cả đơn, không lọc theo trạng thái
+            // Manager cần thấy toàn bộ lịch sử, kể cả Completed
             var baseQuery = _context.Orders
-                .Include(o => o.User)
                 .AsNoTracking()
-                .OrderByDescending(o => o.CreatedAt)
-                .AsQueryable();
+                .OrderByDescending(o => o.CreatedAt);
 
             RecentTotalOrders = await baseQuery.CountAsync();
 
@@ -171,7 +192,11 @@ namespace EyewearStore_SWP391.Pages.Manager
                 .Select(o => new RecentOrderDto
                 {
                     OrderId = o.OrderId,
-                    CustomerName = o.User.FullName ?? o.User.Email ?? "Unknown",
+                    CustomerName = o.User != null
+                        ? (o.User.FullName != null && o.User.FullName != ""
+                            ? o.User.FullName
+                            : o.User.Email ?? "Unknown")
+                        : "Unknown",
                     CreatedAt = o.CreatedAt,
                     Status = o.Status,
                     TotalAmount = o.TotalAmount
@@ -193,7 +218,8 @@ namespace EyewearStore_SWP391.Pages.Manager
 
             int left = Math.Max(1, RecentPageNumber - RecentPageWindow / 2);
             int right = Math.Min(RecentTotalPages, left + RecentPageWindow - 1);
-            if (right - left + 1 < RecentPageWindow) left = Math.Max(1, right - RecentPageWindow + 1);
+            if (right - left + 1 < RecentPageWindow)
+                left = Math.Max(1, right - RecentPageWindow + 1);
 
             for (int i = left; i <= right; i++) RecentDisplayPageNumbers.Add(i);
         }

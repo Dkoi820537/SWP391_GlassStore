@@ -1,12 +1,15 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
+
+namespace EyewearStore_SWP391.Models.ViewModels.Frame;
 
 public class CreateFrameViewModel
 {
-    // ── Single image (kept for backward compat, but multi-upload replaces it) ──
+    // ── Images ───────────────────────────────────────────────────────────────
     [Display(Name = "Product Image")]
     public IFormFile? ImageFile { get; set; }
 
-    // ── NEW: Multiple images ───────────────────────────────────────────────────
     [Display(Name = "Product Images")]
     public List<IFormFile>? ImageFiles { get; set; }
 
@@ -14,6 +17,7 @@ public class CreateFrameViewModel
     [Display(Name = "Image Alt Text")]
     public string? ImageAltText { get; set; }
 
+    // ── Basic Info ───────────────────────────────────────────────────────────
     [Required(ErrorMessage = "SKU is required")]
     [StringLength(50)]
     [Display(Name = "SKU")]
@@ -28,6 +32,7 @@ public class CreateFrameViewModel
     [Display(Name = "Description")]
     public string? Description { get; set; }
 
+    // ── Pricing & Inventory ──────────────────────────────────────────────────
     [Required]
     [Range(0.01, 999999999999.99)]
     [DataType(DataType.Currency)]
@@ -49,7 +54,24 @@ public class CreateFrameViewModel
     [Display(Name = "Is Active")]
     public bool IsActive { get; set; } = true;
 
-    // ── Frame specs ──────────────────────────────────────────────────────────
+    // ── Brand & Identity ─────────────────────────────────────────────────────
+    [StringLength(100)]
+    [Display(Name = "Brand")]
+    public string? Brand { get; set; }
+
+    [StringLength(20)]
+    [Display(Name = "Gender")]
+    public string? Gender { get; set; }
+
+    [StringLength(100)]
+    [Display(Name = "Country of Origin")]
+    public string? Origin { get; set; }
+
+    [StringLength(200)]
+    [Display(Name = "Style Tags (comma-separated)")]
+    public string? StyleTags { get; set; }
+
+    // ── Frame Specs ──────────────────────────────────────────────────────────
     [StringLength(100)]
     [Display(Name = "Frame Material")]
     public string? FrameMaterial { get; set; }
@@ -57,6 +79,22 @@ public class CreateFrameViewModel
     [StringLength(50)]
     [Display(Name = "Frame Type")]
     public string? FrameType { get; set; }
+
+    [StringLength(50)]
+    [Display(Name = "Frame Shape")]
+    public string? FrameShape { get; set; }
+
+    [StringLength(200)]
+    [Display(Name = "Frame Color (Màu gọng)")]
+    public string? FrameColor { get; set; }
+
+    [StringLength(200)]
+    [Display(Name = "Color Swatches (comma-separated)")]
+    public string? Color { get; set; }
+
+    [Range(0.01, 100)]
+    [Display(Name = "Lens Width (mm)")]
+    public decimal? LensWidth { get; set; }
 
     [Range(0.01, 100)]
     [Display(Name = "Bridge Width (mm)")]
@@ -66,29 +104,23 @@ public class CreateFrameViewModel
     [Display(Name = "Temple Length (mm)")]
     public decimal? TempleLength { get; set; }
 
-    // ── v2 fields ────────────────────────────────────────────────────────────
+    // ── Lens Details ─────────────────────────────────────────────────────────
     [StringLength(100)]
-    [Display(Name = "Brand")]
-    public string? Brand { get; set; }
-
-    [StringLength(200)]
-    [Display(Name = "Color(s) — comma separated")]
-    public string? Color { get; set; }
-
-    [StringLength(20)]
-    [Display(Name = "Gender")]
-    public string? Gender { get; set; }
-
-    [StringLength(50)]
-    [Display(Name = "Frame Shape")]
-    public string? FrameShape { get; set; }
-
-    // ── v3 fields ────────────────────────────────────────────────────────────
-    [Range(0.01, 100)]
-    [Display(Name = "Lens Width (mm)")]
-    public decimal? LensWidth { get; set; }
+    [Display(Name = "Lens Material")]
+    public string? LensMaterial { get; set; }
 
     [StringLength(100)]
-    [Display(Name = "Country of Origin")]
-    public string? Origin { get; set; }
+    [Display(Name = "Lens Color")]
+    public string? LensColor { get; set; }
+
+    [Display(Name = "Polarized")]
+    public bool? IsPolarized { get; set; }
+
+    [Display(Name = "UV Protection")]
+    public bool? HasUvProtection { get; set; }
+
+    // ── Face Shape Compatibility ─────────────────────────────────────────────
+    [StringLength(500)]
+    [Display(Name = "Suitable Face Shapes (comma-separated)")]
+    public string? SuitableFaceShapes { get; set; }
 }

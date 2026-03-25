@@ -206,7 +206,7 @@ public partial class EyewearStoreContext : DbContext
                 .HasColumnType("decimal(5,2)")
                 .HasColumnName("temple_length");
 
-            // ── v2 ──────────────────────────────────────────────────────────
+            // ── v2 ──────────────────────────────────────────────────────────────
             entity.Property(e => e.Brand)
                 .HasMaxLength(100)
                 .HasColumnName("brand");
@@ -220,13 +220,34 @@ public partial class EyewearStoreContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("frame_shape");
 
-            // ── v3 ──────────────────────────────────────────────────────────
+            // ── v3 ──────────────────────────────────────────────────────────────
             entity.Property(e => e.LensWidth)
                 .HasColumnType("decimal(5,2)")
                 .HasColumnName("lens_width");
             entity.Property(e => e.Origin)
                 .HasMaxLength(100)
                 .HasColumnName("origin");
+
+            // ── v4 ──────────────────────────────────────────────────────────────
+            entity.Property(e => e.FrameColor)
+                .HasMaxLength(200)
+                .HasColumnName("frame_color");
+            entity.Property(e => e.LensMaterial)
+                .HasMaxLength(100)
+                .HasColumnName("lens_material");
+            entity.Property(e => e.LensColor)
+                .HasMaxLength(100)
+                .HasColumnName("lens_color");
+            entity.Property(e => e.SuitableFaceShapes)
+                .HasMaxLength(500)
+                .HasColumnName("suitable_face_shapes");
+            entity.Property(e => e.IsPolarized)
+                .HasColumnName("is_polarized");
+            entity.Property(e => e.HasUvProtection)
+                .HasColumnName("has_uv_protection");
+            entity.Property(e => e.StyleTags)
+                .HasMaxLength(200)
+                .HasColumnName("style_tags");
         });
 
         // =========================

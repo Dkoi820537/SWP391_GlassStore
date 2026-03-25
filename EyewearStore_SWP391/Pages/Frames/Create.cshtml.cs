@@ -12,7 +12,7 @@ public class CreateModel : PageModel
     private readonly IWebHostEnvironment _environment;
 
     private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
-    private const long MaxFileSize = 5 * 1024 * 1024; // 5 MB
+    private const long MaxFileSize = 5 * 1024 * 1024;
 
     public CreateModel(EyewearStoreContext context, IWebHostEnvironment environment)
     {
@@ -31,14 +31,12 @@ public class CreateModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        // Collect files: prefer multi-upload, fallback to single
         var files = new List<IFormFile>();
         if (Input.ImageFiles != null && Input.ImageFiles.Any(f => f.Length > 0))
             files.AddRange(Input.ImageFiles.Where(f => f != null && f.Length > 0));
         else if (Input.ImageFile != null && Input.ImageFile.Length > 0)
             files.Add(Input.ImageFile);
 
-        // Validate
         foreach (var file in files)
         {
             if (file.Length > MaxFileSize)
@@ -68,23 +66,39 @@ public class CreateModel : PageModel
             InventoryQty = Input.InventoryQty,
             Attributes = Input.Attributes,
             ProductType = "Frame",
-            IsActive = true,
+            // FIX: lấy từ Input thay vì hardcode true
+            IsActive = Input.IsActive,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
+
+            // Frame specs
             FrameMaterial = Input.FrameMaterial,
             FrameType = Input.FrameType,
             BridgeWidth = Input.BridgeWidth,
             TempleLength = Input.TempleLength,
+
+            // v2
             Brand = Input.Brand,
             Color = Input.Color,
             Gender = Input.Gender,
             FrameShape = Input.FrameShape,
+
+            // v3
             LensWidth = Input.LensWidth,
             Origin = Input.Origin,
+
+            // v4 — các field này cần cột trong bảng frames (chạy migration)
+            FrameColor = Input.FrameColor,
+            LensMaterial = Input.LensMaterial,
+            LensColor = Input.LensColor,
+            SuitableFaceShapes = Input.SuitableFaceShapes,
+            IsPolarized = Input.IsPolarized,
+            HasUvProtection = Input.HasUvProtection,
+            StyleTags = Input.StyleTags,
         };
 
         _context.Frames.Add(frame);
-        await _context.SaveChangesAsync(); // ProductId set after this
+        await _context.SaveChangesAsync();
 
         if (files.Any())
             await SaveProductImagesAsync(frame.ProductId, files, Input.ImageAltText);
@@ -92,7 +106,6 @@ public class CreateModel : PageModel
         return RedirectToPage("./Index");
     }
 
-    // First file = primary
     private async Task SaveProductImagesAsync(int productId, List<IFormFile> files, string? altText)
     {
         var uploadFolder = Path.Combine(

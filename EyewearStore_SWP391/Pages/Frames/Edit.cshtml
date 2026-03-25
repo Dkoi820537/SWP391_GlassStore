@@ -205,7 +205,117 @@
                     </div>
                 </div>
             </div>
+                 <div class="form-section">
+                <h2 class="section-title">Lens Details</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Input.LensMaterial">Lens Material (Chất liệu tròng)</label>
+                        <input asp-for="Input.LensMaterial" class="form-control"
+                               list="lensMaterialList"
+                               placeholder="e.g., Nylon, Polycarbonate, CR-39" autocomplete="off" />
+                        <datalist id="lensMaterialList">
+                            <option value="Nylon"></option>
+                            <option value="Polycarbonate"></option>
+                            <option value="Glass"></option>
+                            <option value="CR-39"></option>
+                            <option value="Trivex"></option>
+                            <option value="Polarized Nylon"></option>
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Input.LensColor">Lens Color (Màu tròng)</label>
+                        <input asp-for="Input.LensColor" class="form-control"
+                               list="lensColorList"
+                               placeholder="e.g., Xám đậm, Nâu, Trong suốt" autocomplete="off" />
+                        <datalist id="lensColorList">
+                            <option value="Xám đậm"></option>
+                            <option value="Xám nhạt"></option>
+                            <option value="Nâu"></option>
+                            <option value="Xanh lá"></option>
+                            <option value="Xanh dương"></option>
+                            <option value="Vàng"></option>
+                            <option value="Hồng"></option>
+                            <option value="Đen"></option>
+                            <option value="Trong suốt"></option>
+                            <option value="Mirror Silver"></option>
+                            <option value="Mirror Gold"></option>
+                        </datalist>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Input.IsPolarized">Polarized (Phân cực)</label>
+                        <div class="toggle-group">
+                            <label class="toggle-opt">
+                                <input type="radio" asp-for="Input.IsPolarized" value="true" /> Có
+                            </label>
+                            <label class="toggle-opt">
+                                <input type="radio" asp-for="Input.IsPolarized" value="false" /> Không
+                            </label>
+                        </div>
+                        <span class="helper-text">Tròng phân cực giúp chống lóa, chống chói.</span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Input.HasUvProtection">UV Protection (Chống UV)</label>
+                        <div class="toggle-group">
+                            <label class="toggle-opt">
+                                <input type="radio" asp-for="Input.HasUvProtection" value="true" /> Có
+                            </label>
+                            <label class="toggle-opt">
+                                <input type="radio" asp-for="Input.HasUvProtection" value="false" /> Không
+                            </label>
+                        </div>
+                        <span class="helper-text">Tròng chống tia UV bảo vệ mắt.</span>
+                    </div>
+                </div>
+            </div>
 
+            <!-- ── Frame Color & Style Tags (v4) ─────────────────────── -->
+            <div class="form-section">
+                <h2 class="section-title">Frame Color &amp; Style</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Input.FrameColor">Frame Color (Màu gọng)</label>
+                        <input asp-for="Input.FrameColor" class="form-control"
+                               placeholder="e.g., Vàng gold, Đen bóng, Bạc" />
+                        <span class="helper-text">Màu cụ thể của gọng kính.</span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Input.StyleTags">Style Tags (comma-separated)</label>
+                        <input asp-for="Input.StyleTags" class="form-control"
+                               placeholder="e.g., Vintage, Sporty, Elegant" />
+                        <span class="helper-text">Hiển thị trên trang sản phẩm.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Suitable Face Shapes (v4) ──────────────────────────── -->
+            <div class="form-section">
+                <h2 class="section-title">Phù Hợp Với Khuôn Mặt</h2>
+                <div class="form-row single">
+                    <div class="form-group">
+                        <label>Suitable Face Shapes</label>
+                        <div class="face-tags-wrap" id="faceTagsWrap">
+                            @{
+                                var currentFaces = (Model.Input.SuitableFaceShapes ?? "")
+                                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                                    .ToHashSet();
+                            }
+                            @foreach (var face in new[] { "Mặt oval", "Mặt tròn", "Mặt vuông", "Mặt trái tim", "Mặt xoan", "Mặt tam giác", "Mặt kim cương", "Mặt dài" })
+                            {
+                                <label class="face-tag">
+                                    <input type="checkbox" class="face-cb" value="@face"
+                                           @(currentFaces.Contains(face) ? "checked" : "")
+                                           onchange="syncFaceShapes()" />
+                                    @face
+                                </label>
+                            }
+                        </div>
+                        <input type="hidden" asp-for="Input.SuitableFaceShapes" id="suitableFaceShapesInput" />
+                        <span class="helper-text">Hiển thị mục "Phù hợp với" trên trang sản phẩm.</span>
+                    </div>
+                </div>
+            </div>
             <!-- ── Color ──────────────────────────────────────────────── -->
             <div class="form-section">
                 <h2 class="section-title">Color Options</h2>

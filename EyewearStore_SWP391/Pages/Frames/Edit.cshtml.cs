@@ -44,20 +44,11 @@ namespace EyewearStore_SWP391.Pages.Frames
         [BindProperty]
         public EditFrameViewModel Input { get; set; } = new();
 
-        /// <summary>
-        /// Lens types selected as compatible with this frame (form-bound)
-        /// </summary>
         [BindProperty]
         public List<string> SelectedLensTypes { get; set; } = new();
 
-        /// <summary>
-        /// All available lens type categories (for the checkbox list)
-        /// </summary>
         public string[] AllLensTypes => Models.LensTypes.All;
 
-        /// <summary>
-        /// List of existing images for this product
-        /// </summary>
         public List<ProductImage> ExistingImages { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int? id)
@@ -81,7 +72,6 @@ namespace EyewearStore_SWP391.Pages.Frames
                 .ThenBy(pi => pi.SortOrder)
                 .ToListAsync();
 
-            // Load current compatible lens types
             SelectedLensTypes = await _context.FrameCompatibleLensTypes
                 .Where(c => c.FrameProductId == id)
                 .Select(c => c.LensType)
@@ -111,6 +101,14 @@ namespace EyewearStore_SWP391.Pages.Frames
                 // v3
                 LensWidth = frame.LensWidth,
                 Origin = frame.Origin,
+                // v4
+                FrameColor = frame.FrameColor,
+                LensMaterial = frame.LensMaterial,
+                LensColor = frame.LensColor,
+                SuitableFaceShapes = frame.SuitableFaceShapes,
+                IsPolarized = frame.IsPolarized,
+                HasUvProtection = frame.HasUvProtection,
+                StyleTags = frame.StyleTags,
                 ExistingImageUrl = primaryImage
             };
 
@@ -128,7 +126,7 @@ namespace EyewearStore_SWP391.Pages.Frames
                 var extension = Path.GetExtension(Input.ImageFile.FileName).ToLowerInvariant();
                 if (!_allowedExtensions.Contains(extension))
                     ModelState.AddModelError("Input.ImageFile",
-                        $"Invalid file type. Allowed types: {string.Join(", ", _allowedExtensions)}");
+                        $"Invalid file type. Allowed: {string.Join(", ", _allowedExtensions)}");
             }
 
             if (!ModelState.IsValid)
@@ -153,7 +151,7 @@ namespace EyewearStore_SWP391.Pages.Frames
 
                 if (skuExists)
                 {
-                    ModelState.AddModelError("Input.Sku", "This SKU already exists. Please use a different SKU.");
+                    ModelState.AddModelError("Input.Sku", "This SKU already exists.");
                     ExistingImages = await _context.ProductImages
                         .Where(pi => pi.ProductId == Input.ProductId && pi.IsActive)
                         .OrderByDescending(pi => pi.IsPrimary)
@@ -163,13 +161,12 @@ namespace EyewearStore_SWP391.Pages.Frames
                 }
             }
 
-            // Snapshot for restock detection
             var previousQty = frame.InventoryQty ?? 0;
             var wasOutOfStock = previousQty <= 0;
             var newQty = Input.InventoryQty ?? 0;
             var isNowInStock = newQty > 0;
 
-            // Update all fields
+            // ── Update all fields ────────────────────────────────────────────
             frame.Sku = Input.Sku;
             frame.Name = Input.Name;
             frame.Description = Input.Description;
@@ -191,6 +188,14 @@ namespace EyewearStore_SWP391.Pages.Frames
             // v3
             frame.LensWidth = Input.LensWidth;
             frame.Origin = Input.Origin;
+            // v4
+            frame.FrameColor = Input.FrameColor;
+            frame.LensMaterial = Input.LensMaterial;
+            frame.LensColor = Input.LensColor;
+            frame.SuitableFaceShapes = Input.SuitableFaceShapes;
+            frame.IsPolarized = Input.IsPolarized;
+            frame.HasUvProtection = Input.HasUvProtection;
+            frame.StyleTags = Input.StyleTags;
             frame.UpdatedAt = DateTime.UtcNow;
 
             try
@@ -199,6 +204,7 @@ namespace EyewearStore_SWP391.Pages.Frames
 
                 if (Input.ImageFile != null && Input.ImageFile.Length > 0)
                     await SaveProductImageAsync(frame.ProductId, Input.ImageFile, Input.ImageAltText);
+
                 // ── Save compatible lens types ───────────────────────────────
                 var existing = await _context.FrameCompatibleLensTypes
                     .Where(c => c.FrameProductId == frame.ProductId)
@@ -220,7 +226,6 @@ namespace EyewearStore_SWP391.Pages.Frames
                 else throw;
             }
 
-            // Restock notification
             if (wasOutOfStock && isNowInStock)
             {
                 var baseUrl = _configuration["BaseUrl"] ?? "https://localhost:7234";
@@ -280,29 +285,25 @@ namespace EyewearStore_SWP391.Pages.Frames
                 Directory.CreateDirectory(uploadFolder);
 
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-            var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-            var uniqueId = Guid.NewGuid().ToString("N")[..8];
-            var fileName = $"{timestamp}_{uniqueId}{extension}";
+            var fileName = $"{DateTime.UtcNow:yyyyMMddHHmmss}_{Guid.NewGuid().ToString("N")[..8]}{extension}";
             var filePath = Path.Combine(uploadFolder, fileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
                 await file.CopyToAsync(stream);
 
-            var hasPrimaryImage = await _context.ProductImages
+            var hasPrimary = await _context.ProductImages
                 .AnyAsync(pi => pi.ProductId == productId && pi.IsPrimary && pi.IsActive);
 
-            var productImage = new ProductImage
+            _context.ProductImages.Add(new ProductImage
             {
                 ProductId = productId,
                 ImageUrl = $"/uploads/products/{productId}/{fileName}",
                 AltText = altText ?? Input.Name,
-                IsPrimary = !hasPrimaryImage,
+                IsPrimary = !hasPrimary,
                 SortOrder = 0,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
-            };
-
-            await _context.ProductImages.AddAsync(productImage);
+            });
             await _context.SaveChangesAsync();
         }
 

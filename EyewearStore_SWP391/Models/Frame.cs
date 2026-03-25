@@ -3,10 +3,6 @@ using System.Collections.Generic;
 
 namespace EyewearStore_SWP391.Models;
 
-/// <summary>
-/// Frame entity - inherits from Product (TPT inheritance).
-/// Maps to the 'frames' table.
-/// </summary>
 public class Frame : Product
 {
     public string? FrameMaterial { get; set; }
@@ -14,23 +10,38 @@ public class Frame : Product
     public decimal? BridgeWidth { get; set; }
     public decimal? TempleLength { get; set; }
 
-    // ── Fields added in v2 ───────────────────────────────────────────────────
-    /// <summary>Brand / manufacturer (e.g. Ray-Ban, Bolon, Molsion)</summary>
+    // ── v2 ──────────────────────────────────────────────────────────────────
     public string? Brand { get; set; }
-    /// <summary>Frame colour(s), comma-separated (e.g. "Black, Gold, Red")</summary>
     public string? Color { get; set; }
-    /// <summary>Target gender: Unisex | Male | Female</summary>
     public string? Gender { get; set; }
-    /// <summary>Lens/frame shape: Round | Square | Rectangle | Aviator | Cat-eye | Oval</summary>
     public string? FrameShape { get; set; }
 
-    // ── Fields added in v3 ───────────────────────────────────────────────────
-    /// <summary>Lens width in mm (e.g. 53)</summary>
+    // ── v3 ──────────────────────────────────────────────────────────────────
     public decimal? LensWidth { get; set; }
-    /// <summary>Country of origin (e.g. P.R.C, Japan, Italy)</summary>
     public string? Origin { get; set; }
 
-    // ── Compatibility ────────────────────────────────────────────────────
-    /// <summary>Lens types this frame supports (category-based compatibility)</summary>
+    // ── v4 ──────────────────────────────────────────────────────────────────
+    /// <summary>Specific frame color e.g. "Vàng gold", "Đen bóng"</summary>
+    public string? FrameColor { get; set; }
+
+    /// <summary>Lens material e.g. Nylon, Polycarbonate, CR-39</summary>
+    public string? LensMaterial { get; set; }
+
+    /// <summary>Lens color e.g. "Xám đậm", "Nâu"</summary>
+    public string? LensColor { get; set; }
+
+    /// <summary>Suitable face shapes comma-separated e.g. "Mặt oval, Mặt tròn"</summary>
+    public string? SuitableFaceShapes { get; set; }
+
+    /// <summary>Whether lens is polarized</summary>
+    public bool? IsPolarized { get; set; }
+
+    /// <summary>Whether lens has UV protection</summary>
+    public bool? HasUvProtection { get; set; }
+
+    /// <summary>Style tags comma-separated e.g. "Vintage, Sporty"</summary>
+    public string? StyleTags { get; set; }
+
+    // ── Compatibility ────────────────────────────────────────────────────────
     public virtual ICollection<FrameCompatibleLensType> CompatibleLensTypes { get; set; } = new List<FrameCompatibleLensType>();
 }

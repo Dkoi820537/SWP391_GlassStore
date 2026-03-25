@@ -2,78 +2,81 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EyewearStore_SWP391.DTOs.Frame;
 
-/// <summary>
-/// Data Transfer Object for creating a new frame product
-/// </summary>
 public class CreateFrameDto
 {
-    /// <summary>
-    /// The SKU (Stock Keeping Unit) for the product
-    /// </summary>
     [Required(ErrorMessage = "SKU is required")]
-    [StringLength(50, ErrorMessage = "SKU cannot exceed 50 characters")]
+    [StringLength(50)]
     public string Sku { get; set; } = null!;
 
-    /// <summary>
-    /// The name of the frame product
-    /// </summary>
     [Required(ErrorMessage = "Name is required")]
-    [StringLength(255, ErrorMessage = "Name cannot exceed 255 characters")]
+    [StringLength(255)]
     public string Name { get; set; } = null!;
 
-    /// <summary>
-    /// The description of the frame product
-    /// </summary>
     public string? Description { get; set; }
 
-    /// <summary>
-    /// The price of the frame product
-    /// </summary>
-    [Required(ErrorMessage = "Price is required")]
-    [Range(0.01, 999999999999.99, ErrorMessage = "Price must be greater than 0")]
+    [Required]
+    [Range(0.01, 999999999999.99)]
     public decimal Price { get; set; }
 
-    /// <summary>
-    /// The currency code (e.g., VND, USD)
-    /// </summary>
-    [Required(ErrorMessage = "Currency is required")]
-    [StringLength(3, MinimumLength = 3, ErrorMessage = "Currency must be exactly 3 characters")]
+    [Required]
+    [StringLength(3, MinimumLength = 3)]
     public string Currency { get; set; } = "VND";
 
-    /// <summary>
-    /// The inventory quantity (optional)
-    /// </summary>
-    [Range(0, int.MaxValue, ErrorMessage = "Inventory quantity cannot be negative")]
+    [Range(0, int.MaxValue)]
     public int? InventoryQty { get; set; }
 
-    /// <summary>
-    /// Whether the product is active
-    /// </summary>
     public bool IsActive { get; set; } = true;
 
-    // Frame-specific properties
-
-    /// <summary>
-    /// The material of the frame (e.g., Titanium, Acetate, Metal)
-    /// </summary>
-    [StringLength(100, ErrorMessage = "Frame material cannot exceed 100 characters")]
+    // ── Frame specs ──────────────────────────────────────────────────────────
+    [StringLength(100)]
     public string? FrameMaterial { get; set; }
 
-    /// <summary>
-    /// The type of frame (e.g., Full-Rim, Half-Rim, Rimless)
-    /// </summary>
-    [StringLength(50, ErrorMessage = "Frame type cannot exceed 50 characters")]
+    [StringLength(50)]
     public string? FrameType { get; set; }
 
-    /// <summary>
-    /// The bridge width in millimeters
-    /// </summary>
-    [Range(0, 100, ErrorMessage = "Bridge width must be between 0 and 100mm")]
+    [Range(0, 100)]
     public decimal? BridgeWidth { get; set; }
 
-    /// <summary>
-    /// The temple length in millimeters
-    /// </summary>
-    [Range(0, 200, ErrorMessage = "Temple length must be between 0 and 200mm")]
+    [Range(0, 200)]
     public decimal? TempleLength { get; set; }
+
+    // ── v2 ──────────────────────────────────────────────────────────────────
+    [StringLength(100)]
+    public string? Brand { get; set; }
+
+    [StringLength(200)]
+    public string? Color { get; set; }
+
+    [StringLength(20)]
+    public string? Gender { get; set; }
+
+    [StringLength(50)]
+    public string? FrameShape { get; set; }
+
+    // ── v3 ──────────────────────────────────────────────────────────────────
+    [Range(0, 100)]
+    public decimal? LensWidth { get; set; }
+
+    [StringLength(100)]
+    public string? Origin { get; set; }
+
+    // ── v4 ──────────────────────────────────────────────────────────────────
+    [StringLength(200)]
+    public string? FrameColor { get; set; }
+
+    [StringLength(100)]
+    public string? LensMaterial { get; set; }
+
+    [StringLength(100)]
+    public string? LensColor { get; set; }
+
+    [StringLength(500)]
+    public string? SuitableFaceShapes { get; set; }
+
+    public bool? IsPolarized { get; set; }
+
+    public bool? HasUvProtection { get; set; }
+
+    [StringLength(200)]
+    public string? StyleTags { get; set; }
 }

@@ -30,7 +30,7 @@ public class FrameDetailsModel : PageModel
 
     public string? ErrorMessage { get; set; }
 
-    // ── GET ────────────────────────────────────────────────────────────────────
+    // ── GET ───────────────────────────────────────────────────────────────────
     public async Task<IActionResult> OnGetAsync(int? id)
     {
         if (id == null) return NotFound();
@@ -49,7 +49,7 @@ public class FrameDetailsModel : PageModel
         return Page();
     }
 
-    // ── POST: Add to cart ──────────────────────────────────────────────────────
+    // ── POST: Add to cart ─────────────────────────────────────────────────────
     public async Task<IActionResult> OnPostAddToCartAsync()
     {
         await ReloadAsync(AddToCartInput.ProductId);
@@ -57,16 +57,16 @@ public class FrameDetailsModel : PageModel
 
         if (!User.Identity?.IsAuthenticated ?? true)
         {
-            TempData["ErrorMessage"] = "Vui lòng đăng nhập để thêm vào giỏ hàng.";
+            TempData["ErrorMessage"] = "Please log in to add items to your cart.";
             return RedirectToPage("/Account/Login",
                 new { returnUrl = $"/Products/FrameDetails/{AddToCartInput.ProductId}" });
         }
 
-        if (AddToCartInput.Quantity < 1) { ErrorMessage = "Số lượng phải ít nhất là 1."; return Page(); }
-        if (!Frame.IsInStock) { ErrorMessage = "Sản phẩm đã hết hàng."; return Page(); }
+        if (AddToCartInput.Quantity < 1) { ErrorMessage = "Quantity must be at least 1."; return Page(); }
+        if (!Frame.IsInStock) { ErrorMessage = "This product is out of stock."; return Page(); }
         if (Frame.InventoryQty.HasValue && AddToCartInput.Quantity > Frame.InventoryQty)
         {
-            ErrorMessage = $"Chỉ còn {Frame.InventoryQty} sản phẩm.";
+            ErrorMessage = $"Only {Frame.InventoryQty} unit(s) available.";
             return Page();
         }
 
@@ -78,18 +78,17 @@ public class FrameDetailsModel : PageModel
             await _cartService.AddToCartAsync(int.Parse(userIdClaim.Value),
                 AddToCartInput.ProductId, AddToCartInput.Quantity);
 
-            TempData["SuccessMessage"] = "Đã thêm vào giỏ hàng!";
+            TempData["SuccessMessage"] = "Added to cart!";
             return RedirectToPage("/Products/FrameDetails", new { id = AddToCartInput.ProductId });
         }
         catch (InvalidOperationException ex) { ErrorMessage = ex.Message; return Page(); }
-        catch { ErrorMessage = "Có lỗi xảy ra. Vui lòng thử lại."; return Page(); }
+        catch { ErrorMessage = "An error occurred. Please try again."; return Page(); }
     }
 
-    // ── Helpers ────────────────────────────────────────────────────────────────
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
     private async Task<FrameDetailsViewModel> MapToViewModelAsync(Frame frame)
     {
-        // Real sold count from order_items
         var soldCount = await _context.OrderItems
             .Where(oi => oi.ProductId == frame.ProductId)
             .SumAsync(oi => (int?)oi.Quantity) ?? 0;
@@ -102,13 +101,14 @@ public class FrameDetailsModel : PageModel
             Description = frame.Description,
             Price = frame.Price,
             Currency = frame.Currency,
+            InventoryQty = frame.InventoryQty,
+            CreatedAt = frame.CreatedAt,
+            CareInstructions = GetCareInstructions(frame.FrameMaterial),
+            // Frame specs
             FrameMaterial = frame.FrameMaterial,
             FrameType = frame.FrameType,
             BridgeWidth = frame.BridgeWidth,
             TempleLength = frame.TempleLength,
-            InventoryQty = frame.InventoryQty,
-            CreatedAt = frame.CreatedAt,
-            CareInstructions = GetCareInstructions(frame.FrameMaterial),
             // v2
             Brand = frame.Brand,
             Color = frame.Color,
@@ -117,6 +117,14 @@ public class FrameDetailsModel : PageModel
             // v3
             LensWidth = frame.LensWidth,
             Origin = frame.Origin,
+            // v4
+            FrameColor = frame.FrameColor,
+            LensMaterial = frame.LensMaterial,
+            LensColor = frame.LensColor,
+            SuitableFaceShapes = frame.SuitableFaceShapes,
+            IsPolarized = frame.IsPolarized,
+            HasUvProtection = frame.HasUvProtection,
+            StyleTags = frame.StyleTags,
             SoldCount = soldCount,
             Images = frame.ProductImages
                 .OrderBy(i => i.SortOrder).ThenByDescending(i => i.IsPrimary)
@@ -170,7 +178,6 @@ public class FrameDetailsModel : PageModel
                 CreatedAt = f.CreatedAt
             }).ToListAsync();
 
-        // Backfill if fewer than 4
         if (related.Count < 4)
         {
             var existingIds = related.Select(r => r.ProductId).Append(current.ProductId).ToList();

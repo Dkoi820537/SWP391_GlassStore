@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace EyewearStore_SWP391.Models.ViewModels.Shop;
 
@@ -22,15 +23,24 @@ public class FrameDetailsViewModel
     public decimal? TempleLength { get; set; }
     public string? CareInstructions { get; set; }
 
-    // ── v2 fields ─────────────────────────────────────────────────────────────
+    // ── v2 ────────────────────────────────────────────────────────────────────
     public string? Brand { get; set; }
     public string? Color { get; set; }
     public string? Gender { get; set; }
     public string? FrameShape { get; set; }
 
-    // ── v3 fields ─────────────────────────────────────────────────────────────
+    // ── v3 ────────────────────────────────────────────────────────────────────
     public decimal? LensWidth { get; set; }
     public string? Origin { get; set; }
+
+    // ── v4 ────────────────────────────────────────────────────────────────────
+    public string? FrameColor { get; set; }
+    public string? LensMaterial { get; set; }
+    public string? LensColor { get; set; }
+    public string? SuitableFaceShapes { get; set; }
+    public bool? IsPolarized { get; set; }
+    public bool? HasUvProtection { get; set; }
+    public string? StyleTags { get; set; }
 
     /// <summary>Số lượng đã bán — tính từ order_items</summary>
     public int SoldCount { get; set; }
@@ -58,20 +68,13 @@ public class FrameDetailsViewModel
         }
     }
 
-    public string StockMessage
+    public string StockMessage => StockStatus switch
     {
-        get
-        {
-            return StockStatus switch
-            {
-                "OutOfStock" => "Hết hàng",
-                "LowStock" => $"Còn ít ({InventoryQty} sản phẩm)",
-                _ => $"Còn hàng ({InventoryQty} sản phẩm)"
-            };
-        }
-    }
+        "OutOfStock" => "Hết hàng",
+        "LowStock" => $"Còn ít ({InventoryQty} sản phẩm)",
+        _ => $"Còn hàng ({InventoryQty} sản phẩm)"
+    };
 
-    /// <summary>Formatted size string: LensWidth-Bridge-Temple</summary>
     public string SizeLabel
     {
         get

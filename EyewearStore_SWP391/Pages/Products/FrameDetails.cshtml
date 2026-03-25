@@ -17,13 +17,13 @@
             --text: #1a1a1a;
             --sub: #6b7280;
             --border: #e5e7eb;
-            --bg: #f9fafb;
         }
 
         body {
             font-family: 'Be Vietnam Pro', sans-serif;
         }
 
+        /* Breadcrumb */
         .bc {
             background: #fff;
             border-bottom: 1px solid var(--border);
@@ -67,7 +67,6 @@
             padding: 32px 24px 80px;
         }
 
-        /* ── Gallery: vertical thumbs left + main image right ── */
         .fd-grid {
             display: grid;
             grid-template-columns: 55% 1fr;
@@ -75,19 +74,18 @@
             align-items: start;
         }
 
+        /* Gallery */
         .gal {
             position: sticky;
             top: 78px;
         }
 
-        /* Gallery inner: thumbs column + main image */
         .gal-inner {
             display: flex;
             gap: 12px;
             align-items: flex-start;
         }
 
-        /* Vertical thumbnail strip */
         .gal-thumbs {
             display: flex;
             flex-direction: column;
@@ -97,41 +95,7 @@
             max-height: 480px;
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: #e0e0e0 transparent;
         }
-
-            .gal-thumbs::-webkit-scrollbar {
-                width: 4px;
-            }
-
-            .gal-thumbs::-webkit-scrollbar-track {
-                background: transparent;
-            }
-
-            .gal-thumbs::-webkit-scrollbar-thumb {
-                background: #e0e0e0;
-                border-radius: 4px;
-            }
-
-        /* Scroll buttons */
-        .gal-scroll-btn {
-            width: 100%;
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 4px 0;
-            cursor: pointer;
-            font-size: 14px;
-            color: var(--sub);
-            text-align: center;
-            transition: background .15s, color .15s;
-            flex-shrink: 0;
-        }
-
-            .gal-scroll-btn:hover {
-                background: var(--teal-lt);
-                color: var(--teal);
-            }
 
         .thumb {
             width: 72px;
@@ -140,17 +104,16 @@
             overflow: hidden;
             cursor: pointer;
             border: 2px solid transparent;
-            transition: border-color .18s, box-shadow .18s;
+            transition: border-color .18s;
             flex-shrink: 0;
             background: #f5f5f5;
         }
 
-            .thumb:hover {
+            .thumb:hover, .thumb.active {
                 border-color: var(--teal);
             }
 
             .thumb.active {
-                border-color: var(--teal);
                 box-shadow: 0 0 0 3px rgba(0,117,106,.15);
             }
 
@@ -161,7 +124,6 @@
                 display: block;
             }
 
-        /* Main image */
         .gal-main {
             flex: 1;
             position: relative;
@@ -202,17 +164,9 @@
             color: var(--teal);
             letter-spacing: 1px;
             text-transform: uppercase;
-            backdrop-filter: blur(6px);
             text-decoration: none;
             box-shadow: 0 2px 12px rgba(0,0,0,.12);
-            transition: box-shadow .2s, background .2s;
         }
-
-            .brand-badge:hover {
-                background: #fff;
-                box-shadow: 0 4px 20px rgba(0,0,0,.2);
-                color: var(--teal);
-            }
 
         /* Size strip */
         .sz-strip {
@@ -239,7 +193,6 @@
             font-weight: 800;
             color: var(--text);
             margin-top: 4px;
-            line-height: 1;
         }
 
         .sz-lbl {
@@ -248,7 +201,7 @@
             margin-top: 3px;
         }
 
-        /* ── Info panel ── */
+        /* Info */
         .info {
             padding-top: 2px;
         }
@@ -265,10 +218,6 @@
             border-bottom: 2px solid var(--teal);
             padding-bottom: 1px;
         }
-
-            .brand-link:hover {
-                color: var(--teal-dk);
-            }
 
         .prod-name {
             font-size: 26px;
@@ -355,7 +304,6 @@
             align-items: center;
             gap: 16px;
             margin-bottom: 22px;
-            flex-wrap: wrap;
         }
 
         .stock-badge {
@@ -417,16 +365,15 @@
             font-size: 13px;
             font-weight: 600;
             color: var(--text);
-            transition: border-color .18s, box-shadow .18s;
+            transition: border-color .18s;
             white-space: nowrap;
         }
 
-            .color-opt:hover {
+            .color-opt:hover, .color-opt.active {
                 border-color: var(--teal);
             }
 
             .color-opt.active {
-                border-color: var(--teal);
                 box-shadow: 0 0 0 3px rgba(0,117,106,.12);
             }
 
@@ -454,7 +401,6 @@
             font-weight: 700;
             color: var(--text);
             cursor: pointer;
-            transition: border-color .18s;
         }
 
             .size-opt.active {
@@ -463,11 +409,11 @@
                 color: var(--teal);
             }
 
-        .specs {
+        .quick-specs {
             margin-bottom: 20px;
         }
 
-        .spec-row {
+        .qs-row {
             display: flex;
             align-items: center;
             padding: 10px 0;
@@ -475,18 +421,18 @@
             font-size: 14px;
         }
 
-            .spec-row:last-child {
+            .qs-row:last-child {
                 border-bottom: none;
             }
 
-        .spec-k {
+        .qs-k {
             width: 160px;
             flex-shrink: 0;
             font-weight: 600;
             color: var(--text);
         }
 
-        .spec-v {
+        .qs-v {
             color: var(--sub);
         }
 
@@ -598,7 +544,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: background .2s, transform .15s;
+            transition: background .2s,transform .15s;
         }
 
             .btn-buy:hover:not(:disabled) {
@@ -621,7 +567,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: background .2s, transform .15s;
+            transition: background .2s,transform .15s;
         }
 
             .btn-cart:hover:not(:disabled) {
@@ -653,7 +599,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: border-color .2s, color .2s, background .2s;
+            transition: border-color .2s,color .2s;
         }
 
             .btn-notify:hover {
@@ -689,11 +635,28 @@
                 color: var(--red);
             }
 
-        /* Tabs */
-        .tabs-wrap {
+        /* Bottom layout */
+        .bottom-section {
             max-width: 1280px;
             margin: 0 auto 64px;
             padding: 0 24px;
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 32px;
+            align-items: start;
+        }
+
+        /* Description col */
+        .section-heading {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--teal);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--teal);
+            display: inline-block;
         }
 
         .tabs-hdr {
@@ -714,11 +677,7 @@
             transition: color .18s;
         }
 
-            .tab-btn:hover {
-                color: var(--teal);
-            }
-
-            .tab-btn.on {
+            .tab-btn:hover, .tab-btn.on {
                 color: var(--teal);
             }
 
@@ -751,15 +710,6 @@
                 margin: 0 0 16px;
             }
 
-        .spec-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-        }
-
-            .spec-grid .spec-row:nth-child(odd) {
-                padding-right: 24px;
-            }
-
         .care-list {
             list-style: none;
             padding: 0;
@@ -785,6 +735,105 @@
                     left: 0;
                     color: var(--teal);
                 }
+
+        /* PRODUCT SPECIFICATIONS sidebar — single table */
+        .specs-sidebar {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,.06);
+            position: sticky;
+            top: 78px;
+        }
+
+        .specs-sidebar-hdr {
+            background: #f8f9fa;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+        }
+
+            .specs-sidebar-hdr h3 {
+                font-size: 13px;
+                font-weight: 800;
+                color: var(--text);
+                letter-spacing: .8px;
+                text-transform: uppercase;
+                margin: 0;
+            }
+
+        .toggle-icon {
+            color: var(--sub);
+            transition: transform .25s;
+            font-size: 16px;
+        }
+
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .specs-table tr {
+                border-bottom: 1px solid var(--border);
+            }
+
+                .specs-table tr:last-child {
+                    border-bottom: none;
+                }
+
+            .specs-table td {
+                padding: 11px 20px;
+                font-size: 13px;
+                vertical-align: top;
+                line-height: 1.5;
+            }
+
+                .specs-table td:first-child {
+                    font-weight: 600;
+                    color: #374151;
+                    width: 46%;
+                }
+
+            .specs-table tr:nth-child(even) {
+                background: #fafafa;
+            }
+
+        .spec-yes {
+            color: #16a34a;
+            font-weight: 700;
+        }
+
+        .spec-no {
+            color: #9ca3af;
+        }
+
+        .spec-note {
+            font-size: 11.5px;
+            color: var(--sub);
+            margin-top: 4px;
+            line-height: 1.5;
+        }
+
+        .face-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .face-pill {
+            display: inline-block;
+            background: var(--teal-lt);
+            color: var(--teal);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
 
         /* Related */
         .related {
@@ -815,7 +864,7 @@
             text-decoration: none;
             color: inherit;
             display: block;
-            transition: transform .2s, box-shadow .2s;
+            transition: transform .2s,box-shadow .2s;
         }
 
             .rel-card:hover {
@@ -872,7 +921,7 @@
                 margin: 0;
             }
 
-        /* Sticky bar */
+        /* Sticky */
         .sticky-bar {
             display: none;
             position: fixed;
@@ -922,7 +971,7 @@
             .gal {
                 position: static;
             }
-            /* On mobile: thumbs go horizontal below main image */
+
             .gal-inner {
                 flex-direction: column;
             }
@@ -938,7 +987,14 @@
             .thumb {
                 width: 64px;
                 height: 64px;
-                flex-shrink: 0;
+            }
+
+            .bottom-section {
+                grid-template-columns: 1fr;
+            }
+
+            .specs-sidebar {
+                position: static;
             }
 
             .rel-grid {
@@ -951,10 +1007,6 @@
 
             .fd {
                 padding-bottom: 90px;
-            }
-
-            .spec-grid {
-                grid-template-columns: 1fr;
             }
         }
 
@@ -1023,32 +1075,23 @@
             <!-- LEFT: Gallery -->
             <div class="gal">
                 <div class="gal-inner">
-
-                    @* ── Vertical thumbnail strip (only if >1 image) ── *@
                     @if (Model.Frame.Images.Count > 1)
                     {
-                        <div class="gal-thumbs" id="thumbStrip">
+                        <div class="gal-thumbs">
                             @foreach (var (img, i) in Model.Frame.Images.Select((x, i) => (x, i)))
                             {
                                 <div class="thumb @(img.IsPrimary ? "active" : "")"
-                                     onclick="changeImg('@img.ImageUrl', this)"
+                                     onclick="changeImg('@img.ImageUrl',this)"
                                      title="@(img.AltText ?? Model.Frame.Name)">
                                     <img src="@img.ImageUrl" alt="@(img.AltText ?? Model.Frame.Name)" loading="lazy" />
                                 </div>
                             }
                         </div>
                     }
-
-                    @* ── Main image ── *@
                     <div class="gal-main">
                         @if (!string.IsNullOrEmpty(Model.Frame.Brand))
                         {
-                            <a class="brand-badge"
-                               asp-page="/Products/Index"
-                               asp-route-BrandFilter="@Model.Frame.Brand"
-                               title="View all @Model.Frame.Brand">
-                                @Model.Frame.Brand.ToUpper()
-                            </a>
+                            <a class="brand-badge" asp-page="/Products/Index" asp-route-BrandFilter="@Model.Frame.Brand">@Model.Frame.Brand.ToUpper()</a>
                         }
                         @if (!string.IsNullOrEmpty(Model.Frame.PrimaryImageUrl))
                         {
@@ -1059,24 +1102,22 @@
                             <div class="gal-ph"><i class="bi bi-eyeglasses"></i></div>
                         }
                     </div>
-
                 </div>
 
-                @* ── Size strip ── *@
                 @if (Model.Frame.LensWidth.HasValue || Model.Frame.BridgeWidth.HasValue || Model.Frame.TempleLength.HasValue)
                 {
-                    var lensColor = Model.Frame.LensWidth.HasValue ? "#00756A" : "#ccc";
-                    var bridgeColor = Model.Frame.BridgeWidth.HasValue ? "#00756A" : "#ccc";
-                    var templeColor = Model.Frame.TempleLength.HasValue ? "#00756A" : "#ccc";
+                    var lc = Model.Frame.LensWidth.HasValue ? "#00756A" : "#ccc";
+                    var bc = Model.Frame.BridgeWidth.HasValue ? "#00756A" : "#ccc";
+                    var tc = Model.Frame.TempleLength.HasValue ? "#00756A" : "#ccc";
                     <div class="sz-strip">
                         <div class="sz-card">
                             <svg viewBox="0 0 70 46" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="3" y="8" width="27" height="28" rx="6" stroke="@lensColor" stroke-width="2.5" />
-                                <rect x="40" y="8" width="27" height="28" rx="6" stroke="@lensColor" stroke-width="2.5" />
+                                <rect x="3" y="8" width="27" height="28" rx="6" stroke="@lc" stroke-width="2.5" />
+                                <rect x="40" y="8" width="27" height="28" rx="6" stroke="@lc" stroke-width="2.5" />
                                 <line x1="30" y1="22" x2="40" y2="22" stroke="#ccc" stroke-width="2" />
                                 <line x1="3" y1="42" x2="30" y2="42" stroke="#aaa" stroke-width="1.5" />
-                                <polygon points="2,42 6,40 6,44" fill="@lensColor" />
-                                <polygon points="31,42 27,40 27,44" fill="@lensColor" />
+                                <polygon points="2,42 6,40 6,44" fill="@lc" />
+                                <polygon points="31,42 27,40 27,44" fill="@lc" />
                             </svg>
                             <div class="sz-num">@(Model.Frame.LensWidth.HasValue? Model.Frame.LensWidth.Value.ToString("0") : "—")</div>
                             <div class="sz-lbl">Lens Width</div>
@@ -1085,10 +1126,10 @@
                             <svg viewBox="0 0 70 46" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <rect x="3" y="8" width="27" height="28" rx="6" stroke="#ccc" stroke-width="2" />
                                 <rect x="40" y="8" width="27" height="28" rx="6" stroke="#ccc" stroke-width="2" />
-                                <line x1="30" y1="22" x2="40" y2="22" stroke="@bridgeColor" stroke-width="2.5" />
+                                <line x1="30" y1="22" x2="40" y2="22" stroke="@bc" stroke-width="2.5" />
                                 <line x1="30" y1="42" x2="40" y2="42" stroke="#aaa" stroke-width="1.5" />
-                                <polygon points="29,42 33,40 33,44" fill="@bridgeColor" />
-                                <polygon points="41,42 37,40 37,44" fill="@bridgeColor" />
+                                <polygon points="29,42 33,40 33,44" fill="@bc" />
+                                <polygon points="41,42 37,40 37,44" fill="@bc" />
                             </svg>
                             <div class="sz-num">@(Model.Frame.BridgeWidth.HasValue? Model.Frame.BridgeWidth.Value.ToString("0") : "—")</div>
                             <div class="sz-lbl">Bridge (mm)</div>
@@ -1097,10 +1138,10 @@
                             <svg viewBox="0 0 70 46" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <rect x="3" y="12" width="22" height="20" rx="4" stroke="#ccc" stroke-width="2" />
                                 <rect x="30" y="12" width="22" height="20" rx="4" stroke="#ccc" stroke-width="2" />
-                                <line x1="52" y1="22" x2="68" y2="22" stroke="@templeColor" stroke-width="2.5" />
+                                <line x1="52" y1="22" x2="68" y2="22" stroke="@tc" stroke-width="2.5" />
                                 <line x1="52" y1="42" x2="68" y2="42" stroke="#aaa" stroke-width="1.5" />
-                                <polygon points="51,42 55,40 55,44" fill="@templeColor" />
-                                <polygon points="69,42 65,40 65,44" fill="@templeColor" />
+                                <polygon points="51,42 55,40 55,44" fill="@tc" />
+                                <polygon points="69,42 65,40 65,44" fill="@tc" />
                             </svg>
                             <div class="sz-num">@(Model.Frame.TempleLength.HasValue? Model.Frame.TempleLength.Value.ToString("0") : "—")</div>
                             <div class="sz-lbl">Temple (mm)</div>
@@ -1109,7 +1150,7 @@
                 }
             </div>
 
-            <!-- RIGHT: Info -->
+            <!-- RIGHT: Info panel -->
             <div class="info">
                 @if (!string.IsNullOrEmpty(Model.Frame.Brand))
                 {
@@ -1153,10 +1194,12 @@
                     }
                 </div>
                 @{
-                    var sc = Model.Frame.StockStatus == "OutOfStock" ? "out" : Model.Frame.StockStatus == "LowStock" ? "low" : "in";
+                    var sc = Model.Frame.StockStatus == "OutOfStock" ? "out"
+                    : Model.Frame.StockStatus == "LowStock" ? "low" : "in";
                     var stockMsg = Model.Frame.StockStatus == "OutOfStock" ? "Out of Stock"
-                    : Model.Frame.StockStatus == "LowStock" ? "Low Stock (" + Model.Frame.InventoryQty + " left)"
-                    : "In Stock (" + Model.Frame.InventoryQty + " available)";
+                    : Model.Frame.StockStatus == "LowStock"
+                    ? $"Low Stock ({Model.Frame.InventoryQty} left)"
+                    : $"In Stock ({Model.Frame.InventoryQty} available)";
                 }
                 <div class="stock-row">
                     <div class="stock-badge @sc">
@@ -1185,9 +1228,8 @@
                     <div class="color-opts">
                         @foreach (var c in cols)
                         {
-                            <button class="color-opt @(c == cols[0] ? "active" : "")" data-color="@c" onclick="selColor(this,'@c')">
-                                <span class="c-dot" style="@ColorStyle(c)"></span>
-                                @c.ToUpper()
+                            <button class="color-opt @(c == cols[0] ? "active" : "")" onclick="selColor(this,'@c')">
+                                <span class="c-dot" style="@ColorStyle(c)"></span> @c.ToUpper()
                             </button>
                         }
                     </div>
@@ -1199,26 +1241,26 @@
                     <div class="size-opts"><button class="size-opt active">@Model.Frame.SizeLabel</button></div>
                 }
 
-                <div class="specs">
+                <div class="quick-specs">
                     @if (!string.IsNullOrEmpty(Model.Frame.FrameMaterial))
                     {
-                        <div class="spec-row"><span class="spec-k">Material</span><span class="spec-v">@Model.Frame.FrameMaterial</span></div>
+                        <div class="qs-row"><span class="qs-k">Material</span><span class="qs-v">@Model.Frame.FrameMaterial</span></div>
                     }
                     @if (!string.IsNullOrEmpty(Model.Frame.FrameType))
                     {
-                        <div class="spec-row"><span class="spec-k">Frame Type</span><span class="spec-v">@Model.Frame.FrameType</span></div>
+                        <div class="qs-row"><span class="qs-k">Frame Type</span><span class="qs-v">@Model.Frame.FrameType</span></div>
                     }
                     @if (Model.Frame.LensWidth.HasValue)
                     {
-                        <div class="spec-row"><span class="spec-k">Lens Width</span><span class="spec-v">@Model.Frame.LensWidth.Value.ToString("0.#") mm</span></div>
+                        <div class="qs-row"><span class="qs-k">Lens Width</span><span class="qs-v">@Model.Frame.LensWidth.Value.ToString("0.#") mm</span></div>
                     }
                     @if (Model.Frame.BridgeWidth.HasValue)
                     {
-                        <div class="spec-row"><span class="spec-k">Bridge</span><span class="spec-v">@Model.Frame.BridgeWidth.Value.ToString("0.#") mm</span></div>
+                        <div class="qs-row"><span class="qs-k">Bridge</span><span class="qs-v">@Model.Frame.BridgeWidth.Value.ToString("0.#") mm</span></div>
                     }
                     @if (Model.Frame.TempleLength.HasValue)
                     {
-                        <div class="spec-row"><span class="spec-k">Temple Length</span><span class="spec-v">@Model.Frame.TempleLength.Value.ToString("0.#") mm</span></div>
+                        <div class="qs-row"><span class="qs-k">Temple Length</span><span class="qs-v">@Model.Frame.TempleLength.Value.ToString("0.#") mm</span></div>
                     }
                 </div>
 
@@ -1274,79 +1316,170 @@
                         <span id="notifyLabel">Notify When Available</span>
                     </button>
                 }
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Tabs -->
-<div class="tabs-wrap">
-    <div class="tabs-hdr">
-        <button class="tab-btn on" onclick="switchTab('desc',this)">Description</button>
-        <button class="tab-btn" onclick="switchTab('specs',this)">Specifications</button>
-        <button class="tab-btn" onclick="switchTab('care',this)">Care Instructions</button>
-    </div>
-    <div id="tab-desc" class="tab-panel on">
-        <h3>Product Description</h3>
-        <p style="color:var(--sub);line-height:1.8;font-size:15px;">
-            @(string.IsNullOrEmpty(Model.Frame.Description)
-                        ? "Meticulously designed eyeglass frames that blend modern style with all-day comfort."
-                        : Model.Frame.Description)
-        </p>
-    </div>
-    <div id="tab-specs" class="tab-panel">
-        <h3>Technical Specifications</h3>
-        <div class="spec-grid">
-            <div class="spec-row"><span class="spec-k">SKU</span><span class="spec-v">@Model.Frame.Sku</span></div>
+    <!-- Bottom: Description + unified Specs sidebar -->
+    <div class="bottom-section">
+
+        <!-- LEFT: Description + Care tabs -->
+        <div>
+            <div class="section-heading">PRODUCT DESCRIPTION</div>
             @if (!string.IsNullOrEmpty(Model.Frame.Brand))
-                {
-                    <div class="spec-row"><span class="spec-k">Brand</span><span class="spec-v">@Model.Frame.Brand</span></div>
-                }
-                @if (!string.IsNullOrEmpty(Model.Frame.Origin))
-                {
-                    <div class="spec-row"><span class="spec-k">Origin</span><span class="spec-v">@Model.Frame.Origin</span></div>
-                }
-                @if (!string.IsNullOrEmpty(Model.Frame.Gender))
-                {
-                    <div class="spec-row"><span class="spec-k">Gender</span><span class="spec-v">@Model.Frame.Gender</span></div>
-                }
-                @if (!string.IsNullOrEmpty(Model.Frame.FrameShape))
-                {
-                    <div class="spec-row"><span class="spec-k">Frame Shape</span><span class="spec-v">@Model.Frame.FrameShape</span></div>
-                }
-                @if (!string.IsNullOrEmpty(Model.Frame.FrameMaterial))
-                {
-                    <div class="spec-row"><span class="spec-k">Material</span><span class="spec-v">@Model.Frame.FrameMaterial</span></div>
-                }
-                @if (!string.IsNullOrEmpty(Model.Frame.FrameType))
-                {
-                    <div class="spec-row"><span class="spec-k">Frame Type</span><span class="spec-v">@Model.Frame.FrameType</span></div>
-                }
-                @if (Model.Frame.LensWidth.HasValue)
-                {
-                    <div class="spec-row"><span class="spec-k">Lens Width</span><span class="spec-v">@Model.Frame.LensWidth.Value.ToString("0.#") mm</span></div>
-                }
-                @if (Model.Frame.BridgeWidth.HasValue)
-                {
-                    <div class="spec-row"><span class="spec-k">Bridge</span><span class="spec-v">@Model.Frame.BridgeWidth.Value.ToString("0.#") mm</span></div>
-                }
-                @if (Model.Frame.TempleLength.HasValue)
-                {
-                    <div class="spec-row"><span class="spec-k">Temple Length</span><span class="spec-v">@Model.Frame.TempleLength.Value.ToString("0.#") mm</span></div>
-                }
-                @if (!string.IsNullOrEmpty(Model.Frame.Color))
-                {
-                    <div class="spec-row"><span class="spec-k">Colors</span><span class="spec-v">@Model.Frame.Color</span></div>
-                }
-            </div>
+            {
+                <h2 style="font-size:22px;font-weight:800;color:var(--text);margin:0 0 12px;">About @Model.Frame.Brand.ToUpper()</h2>
+            }
+        <div class="tabs-hdr">
+            <button class="tab-btn on" onclick="switchTab('desc',this)">Description</button>
+            <button class="tab-btn" onclick="switchTab('care',this)">Care Instructions</button>
+        </div>
+        <div id="tab-desc" class="tab-panel on">
+            <h3>Product Description</h3>
+            <p style="color:var(--sub);line-height:1.8;font-size:15px;">
+                @(string.IsNullOrEmpty(Model.Frame.Description)
+                                ? "Meticulously designed eyeglass frames that blend modern style with all-day comfort."
+                                : Model.Frame.Description)
+            </p>
         </div>
         <div id="tab-care" class="tab-panel">
             <h3>Care &amp; Cleaning</h3>
             <ul class="care-list">
                 @foreach (var line in (Model.Frame.CareInstructions ?? "Clean gently with a microfiber cloth. Avoid harsh chemicals. Store in the provided case when not in use.").Split('.').Where(s => !string.IsNullOrWhiteSpace(s)))
-                {
-                    <li>@line.Trim().</li>
-                }
-            </ul>
+                    {
+                        <li>@line.Trim().</li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <!-- RIGHT: Single unified PRODUCT SPECIFICATIONS sidebar -->
+        <div class="specs-sidebar">
+            <div class="specs-sidebar-hdr" onclick="toggleSidebar()">
+                <h3>PRODUCT SPECIFICATIONS</h3>
+                <i class="bi bi-chevron-up toggle-icon" id="specIcon"></i>
+            </div>
+            <div id="specsBody">
+                <table class="specs-table">
+                    <tbody>
+                        <tr><td>Name</td><td>@Model.Frame.Name</td></tr>
+                        <tr><td>SKU</td><td>@Model.Frame.Sku</td></tr>
+
+                        @if (!string.IsNullOrEmpty(Model.Frame.Origin))
+                        {
+                            <tr><td>Origin</td><td>@Model.Frame.Origin</td></tr>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.Frame.Gender))
+                        {
+                            <tr><td>Gender</td><td>@Model.Frame.Gender</td></tr>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.Frame.FrameShape))
+                        {
+                            <tr><td>Frame Shape</td><td>@Model.Frame.FrameShape</td></tr>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.Frame.FrameMaterial))
+                        {
+                            <tr><td>Frame Material</td><td>@Model.Frame.FrameMaterial</td></tr>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.Frame.FrameColor))
+                        {
+                            <tr><td>Frame Color</td><td>@Model.Frame.FrameColor</td></tr>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.Frame.LensMaterial))
+                        {
+                            <tr><td>Lens Material</td><td>@Model.Frame.LensMaterial</td></tr>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.Frame.LensColor))
+                        {
+                            <tr><td>Lens Color</td><td>@Model.Frame.LensColor</td></tr>
+                        }
+
+                        @if (Model.Frame.LensWidth.HasValue)
+                        {
+                            <tr><td>Lens Width</td><td>@Model.Frame.LensWidth.Value.ToString("0.#") mm</td></tr>
+                        }
+
+                        @if (Model.Frame.BridgeWidth.HasValue)
+                        {
+                            <tr><td>Bridge Width</td><td>@Model.Frame.BridgeWidth.Value.ToString("0.#") mm</td></tr>
+                        }
+
+                        @if (Model.Frame.TempleLength.HasValue)
+                        {
+                            <tr><td>Temple Length</td><td>@Model.Frame.TempleLength.Value.ToString("0.#") mm</td></tr>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.Frame.Color))
+                        {
+                            <tr><td>Color Options</td><td>@Model.Frame.Color</td></tr>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.Frame.StyleTags))
+                        {
+                            <tr><td>Style Tags</td><td>@Model.Frame.StyleTags</td></tr>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.Frame.SuitableFaceShapes))
+                        {
+                            <tr>
+                                <td>Suitable For</td>
+                                <td>
+                                    <div class="face-pills">
+                                        @foreach (var face in Model.Frame.SuitableFaceShapes.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                                        {
+                                            <span class="face-pill">@face</span>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+
+                        @if (Model.Frame.IsPolarized.HasValue)
+                        {
+                            <tr>
+                                <td>Polarized</td>
+                                <td>
+                                    @if (Model.Frame.IsPolarized.Value)
+                                    {
+                                        <span class="spec-yes">Yes</span>
+                                        <div class="spec-note">Polarized lenses reduce glare from reflective surfaces for clearer, more comfortable vision.</div>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="spec-no">No</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+
+                        @if (Model.Frame.HasUvProtection.HasValue)
+                        {
+                            <tr>
+                                <td>UV Protection</td>
+                                <td>
+                                    @if (Model.Frame.HasUvProtection.Value)
+                                    {
+                                        <span class="spec-yes">Yes</span>
+                                        <div class="spec-note">Lenses block harmful UV rays to protect your eyes from sun damage.</div>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="spec-no">No</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -1379,7 +1512,6 @@
         </div>
     }
 
-    <!-- Mobile sticky -->
     <div class="sticky-bar" id="stickyBar">
         <div class="sticky-inner">
             <div class="sticky-price">@Model.Frame.Currency @Model.Frame.Price.ToString("N0")</div>
@@ -1406,82 +1538,86 @@ else
 
 @section Scripts {
     <script>
-        function changeImg(url, el) {
-            var img = document.getElementById('mainImg');
-            if (img) { img.style.opacity='0'; setTimeout(function(){ img.src=url; img.style.opacity='1'; }, 200); }
-            document.querySelectorAll('.thumb').forEach(function(t){ t.classList.remove('active'); });
-            if (el) el.classList.add('active');
+        function changeImg(url,el){
+            var img=document.getElementById('mainImg');
+            if(img){img.style.opacity='0';setTimeout(function(){img.src=url;img.style.opacity='1';},200);}
+            document.querySelectorAll('.thumb').forEach(function(t){t.classList.remove('active');});
+            if(el) el.classList.add('active');
         }
-        function chQty(d) {
-            var inp=document.getElementById('qInput'); if(!inp) return;
+        function chQty(d){
+            var inp=document.getElementById('qInput');if(!inp)return;
             var max=parseInt(inp.max)||99;
-            var v=Math.max(1, Math.min(max, (parseInt(inp.value)||1)+d));
+            var v=Math.max(1,Math.min(max,(parseInt(inp.value)||1)+d));
             inp.value=v;
             document.getElementById('qMinus').disabled=v<=1;
             document.getElementById('qPlus').disabled=v>=max;
         }
-        document.addEventListener('DOMContentLoaded', function(){
-            if(document.getElementById('qInput')) chQty(0);
-            initNotifyBtn();
-        });
-        function selColor(btn, name) {
-            document.querySelectorAll('.color-opt').forEach(function(b){ b.classList.remove('active'); });
+        function selColor(btn,name){
+            document.querySelectorAll('.color-opt').forEach(function(b){b.classList.remove('active');});
             btn.classList.add('active');
-            var lbl=document.getElementById('colorLbl');
-            if(lbl) lbl.textContent=name;
+            var lbl=document.getElementById('colorLbl');if(lbl)lbl.textContent=name;
         }
-        function switchTab(name, btn) {
-            document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('on'); });
-            document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('on'); });
-            var panel=document.getElementById('tab-'+name);
-            if(panel) panel.classList.add('on');
+        function switchTab(name,btn){
+            document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('on');});
+            document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('on');});
+            var p=document.getElementById('tab-'+name);if(p)p.classList.add('on');
             btn.classList.add('on');
         }
-        var sb=document.getElementById('stickyBar'), cf=document.getElementById('cartForm');
-        if(sb&&cf){ window.addEventListener('scroll', function(){ if(window.innerWidth<=991) sb.style.display=cf.getBoundingClientRect().bottom<0?'block':'none'; }); }
-
-        function initNotifyBtn() {
-            var btn=document.getElementById('notifyBtn'); if(!btn) return;
+        function toggleSidebar(){
+            var body=document.getElementById('specsBody');
+            var icon=document.getElementById('specIcon');
+            var hidden=body.style.display==='none';
+            body.style.display=hidden?'':'none';
+            icon.style.transform=hidden?'':'rotate(180deg)';
+        }
+        var sb=document.getElementById('stickyBar'),cf=document.getElementById('cartForm');
+        if(sb&&cf){window.addEventListener('scroll',function(){if(window.innerWidth<=991)sb.style.display=cf.getBoundingClientRect().bottom<0?'block':'none';});}
+        document.addEventListener('DOMContentLoaded',function(){
+            if(document.getElementById('qInput'))chQty(0);
+            initNotifyBtn();
+        });
+        function initNotifyBtn(){
+            var btn=document.getElementById('notifyBtn');if(!btn)return;
             var pid=parseInt(btn.dataset.productId);
             @if (User.Identity != null && User.Identity.IsAuthenticated)
             {
                     <text>
-                    fetch('/api/wishlist/my').then(function(r){ if(r.ok) return r.json(); }).then(function(d){
-                        if(d&&d.some(function(i){ return i.productId===pid; })) setNotifyState(true);
+                    fetch('/api/wishlist/my').then(function(r){if(r.ok)return r.json();}).then(function(d){
+                        if(d&&d.some(function(i){return i.productId===pid;}))setNotifyState(true);
                     }).catch(function(){});
                     </text>
             }
-            btn.addEventListener('click', function(){
+            btn.addEventListener('click',function(){
                 @if (User.Identity == null || !User.Identity.IsAuthenticated)
                 {
-                        <text>window.location.href='/Account/Login?returnUrl='+encodeURIComponent(window.location.pathname); return;</text>
+                        <text>window.location.href='/Account/Login?returnUrl='+encodeURIComponent(window.location.pathname);return;</text>
                 }
-                var isIn=btn.dataset.in==='true'; btn.disabled=true;
+                var isIn=btn.dataset.in==='true';btn.disabled=true;
                 if(isIn){
                     fetch('/api/wishlist/remove',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productId:pid})})
-                    .then(function(r){ if(r.ok){ setNotifyState(false); showToast('Removed from wishlist.'); } else { showToast('Could not remove.'); } })
-                    .catch(function(){ showToast('Network error.'); }).finally(function(){ btn.disabled=false; });
-                } else {
+                    .then(function(r){if(r.ok){setNotifyState(false);showToast('Removed from wishlist.');}else{showToast('Could not remove.');}})
+                    .catch(function(){showToast('Network error.');}).finally(function(){btn.disabled=false;});
+                }else{
                     fetch('/api/wishlist/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productId:pid})})
-                    .then(function(r){ return r.json().then(function(d){ return {ok:r.ok,data:d}; }); })
-                    .then(function(res){ if(res.ok){ setNotifyState(true); showToast('Added! We\'ll notify you when back in stock.'); } else { showToast(res.data.message||'Could not add.'); } })
-                    .catch(function(){ showToast('Network error.'); }).finally(function(){ btn.disabled=false; });
+                    .then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d};});})
+                    .then(function(res){if(res.ok){setNotifyState(true);showToast('Added! We\'ll notify you when back in stock.');}else{showToast(res.data.message||'Could not add.');}})
+                    .catch(function(){showToast('Network error.');}).finally(function(){btn.disabled=false;});
                 }
             });
         }
-        function setNotifyState(isIn) {
-            var btn=document.getElementById('notifyBtn'), lbl=document.getElementById('notifyLabel'), ico=document.getElementById('notifyIcon');
-            if(!btn||!lbl||!ico) return;
+        function setNotifyState(isIn){
+            var btn=document.getElementById('notifyBtn'),lbl=document.getElementById('notifyLabel'),ico=document.getElementById('notifyIcon');
+            if(!btn||!lbl||!ico)return;
             btn.dataset.in=isIn?'true':'false';
-            if(isIn){ btn.classList.add('active'); ico.className='bi bi-bell-fill'; lbl.textContent='Added to Wishlist'; }
-            else { btn.classList.remove('active'); ico.className='bi bi-bell'; lbl.textContent='Notify When Available'; }
+            if(isIn){btn.classList.add('active');ico.className='bi bi-bell-fill';lbl.textContent='Added to Wishlist';}
+            else{btn.classList.remove('active');ico.className='bi bi-bell';lbl.textContent='Notify When Available';}
         }
-        var _toastTimer;
-        function showToast(msg) {
+        var _tt;
+        function showToast(msg){
             var t=document.getElementById('_toast');
-            if(!t){ t=document.createElement('div'); t.id='_toast'; t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;border-radius:10px;padding:12px 22px;font-size:13px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.25);z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);max-width:90vw;text-align:center;'; document.body.appendChild(t); }
-            t.textContent=msg; t.style.transform='translateX(-50%) translateY(0)';
-            clearTimeout(_toastTimer); _toastTimer=setTimeout(function(){ t.style.transform='translateX(-50%) translateY(80px)'; }, 4000);
+            if(!t){t=document.createElement('div');t.id='_toast';t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;border-radius:10px;padding:12px 22px;font-size:13px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.25);z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);max-width:90vw;text-align:center;';document.body.appendChild(t);}
+            t.textContent=msg;t.style.transform='translateX(-50%) translateY(0)';
+            clearTimeout(_tt);_tt=setTimeout(function(){t.style.transform='translateX(-50%) translateY(80px)';},4000);
         }
     </script>
 }
@@ -1489,16 +1625,16 @@ else
 @functions {
     string ColorStyle(string color)
     {
-        var m = new System.Collections.Generic.Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
+        var m = new System.Collections.Generic.Dictionary<string, string>(StringComparer.OrdinalIgnoreCase){
             {"Black","background:#1a1a1a"},{"Red","background:#cc2200"},{"Gold","background:#c9a96e"},
             {"Tortoise","background:linear-gradient(135deg,#7b4f1e,#c8892a,#1a0e00)"},
             {"Silver","background:linear-gradient(135deg,#d0d0d0,#f5f5f5,#b0b0b0)"},
             {"Blue","background:#1a4fa0"},{"Pink","background:#e879a0"},{"Green","background:#2d7a3a"},
             {"Transparent","background:linear-gradient(135deg,rgba(180,220,255,.5),rgba(255,255,255,.9));border:1px solid #ddd"},
             {"White","background:#f0f0f0;border:1px solid #ddd"},{"Brown","background:#8B4513"},
-            {"Olive","background:#808000"},{"Grey","background:#808080"},{"Gray","background:#808080"},
-            {"Purple","background:#6b21a8"},
-            {"Transparent Grey","background:linear-gradient(135deg,rgba(180,180,180,.5),rgba(240,240,240,.9));border:1px solid #ccc"}
+            {"Grey","background:#808080"},{"Gray","background:#808080"},{"Purple","background:#6b21a8"},
+            {"Orange","background:#e8621a"},{"Nude","background:#c9a882"},
+            {"Rose Gold","background:linear-gradient(135deg,#c47b6f,#e8b4a8)"},
         };
         return m.TryGetValue(color.Trim(), out var s) ? s : "background:#ccc";
     }

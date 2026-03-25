@@ -472,7 +472,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 240px
+            max-width: 200px
         }
 
         .cell-price {
@@ -495,6 +495,38 @@
             font-size: 11px;
             color: var(--muted)
         }
+
+        /* Category badge */
+        .cat-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 9px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+            .cat-badge.all {
+                background: rgba(99,102,141,.1);
+                color: var(--muted);
+            }
+
+            .cat-badge.cg {
+                background: rgba(37,99,235,.1);
+                color: #2563eb;
+            }
+
+            .cat-badge.fr {
+                background: rgba(217,119,6,.1);
+                color: #d97706;
+            }
+
+            .cat-badge.lr {
+                background: rgba(5,150,105,.1);
+                color: #059669;
+            }
 
         .badge {
             display: inline-flex;
@@ -792,6 +824,7 @@
                         <tr>
                             <th style="width:54px">ID</th>
                             <th>Service</th>
+                            <th>Applies To</th>
                             <th>Price</th>
                             <th>Duration</th>
                             <th>Status</th>
@@ -808,6 +841,15 @@
                             string badgeLabel = s.IsActive ? "Active" : "Inactive";
                             string desc = s.Description ?? "No description provided.";
                             string encodedName = System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.Name);
+
+                            // Category badge info
+                            var (catIcon, catLabel, catCss) = s.ServiceCategory switch
+                            {
+                                "CustomGlasses" => ("🔭", "Custom Glasses", "cg"),
+                                "FrameRepair" => ("🛠", "Frame Repair", "fr"),
+                                "LensReplacement" => ("⭕", "Lens Replace", "lr"),
+                                _ => ("🌐", "All Pages", "all")
+                            };
 
                             <tr>
                                 <td style="color:var(--muted);font-family:'DM Mono',monospace;font-size:12px">#@s.ServiceId</td>
@@ -826,6 +868,9 @@
                                             <div class="svc-desc">@desc</div>
                                         </div>
                                     </div>
+                                </td>
+                                <td>
+                                    <span class="cat-badge @catCss">@catIcon @catLabel</span>
                                 </td>
                                 <td class="cell-price">@s.Price.ToString("N0") ₫</td>
                                 <td class="cell-dur">
@@ -887,6 +932,7 @@
                         }
                         else
                         {
+
                             <span class="pg disabled"><i class="bi bi-chevron-left"></i></span>
                         }
 
@@ -916,6 +962,7 @@
                         }
                         else
                         {
+
                             <span class="pg disabled"><i class="bi bi-chevron-right"></i></span>
                         }
                     </div>
@@ -934,6 +981,7 @@
                     }
                     else
                     {
+
                         <text>No results match your search. Try adjusting the filters.</text>
                     }
                 </p>
@@ -962,7 +1010,7 @@
 
         function toggleTheme() {
             const current = document.documentElement.getAttribute('data-theme') || 'light';
-            const next = current === 'dark' ? 'light' : 'dark';
+            const next    = current === 'dark' ? 'light' : 'dark';
             localStorage.setItem('sv-theme', next);
             applyTheme(next, true);
         }

@@ -385,6 +385,9 @@ public partial class EyewearStoreContext : DbContext
                 .HasColumnName("created_at");
             entity.Property(e => e.UpdatedAt)
                 .HasColumnName("updated_at");
+            entity.Property(e => e.ServiceCategory)
+             .HasMaxLength(50)
+            .HasColumnName("service_category");
         });
         // =========================
         // PRODUCT IMAGES

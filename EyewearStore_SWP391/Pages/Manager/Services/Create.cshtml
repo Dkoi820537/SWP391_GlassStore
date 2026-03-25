@@ -230,6 +230,56 @@
             color: var(--muted);
         }
 
+        /* Category pill selector */
+        .cat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .cat-option {
+            display: none;
+        }
+
+        .cat-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 14px 10px;
+            border: 2px solid var(--bdr);
+            border-radius: var(--r-md);
+            cursor: pointer;
+            transition: all var(--tr);
+            background: var(--surf2);
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--txt2);
+        }
+
+            .cat-label .ci {
+                font-size: 26px;
+            }
+
+            .cat-label:hover {
+                border-color: var(--acc);
+                background: rgba(91,91,219,.05);
+                color: var(--acc);
+            }
+
+        .cat-option:checked + .cat-label {
+            border-color: var(--acc);
+            background: rgba(91,91,219,.08);
+            color: var(--acc);
+            box-shadow: 0 0 0 3px var(--acc-gl);
+        }
+
+            .cat-option:checked + .cat-label .ci {
+                transform: scale(1.15);
+            }
+
         .pw {
             position: relative;
         }
@@ -394,25 +444,6 @@
                 color: #fff;
             }
 
-        .tip {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            background: rgba(91,91,219,.05);
-            border: 1px solid rgba(91,91,219,.16);
-            border-radius: var(--r-sm);
-            padding: 10px 14px;
-            font-size: 12px;
-            color: var(--txt2);
-            margin-top: 16px;
-        }
-
-            .tip i {
-                color: var(--acc);
-                margin-top: 1px;
-                flex-shrink: 0;
-            }
-
         .validation-summary-errors {
             background: var(--err-bg);
             border: 1px solid var(--err-bd);
@@ -491,6 +522,10 @@
             .fa {
                 padding: 16px 18px;
             }
+
+            .cat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 }
@@ -516,19 +551,64 @@
             @* ── BASIC INFO ── *@
             <div class="fs">
                 <div class="sl"><i class="bi bi-info-circle-fill"></i> Basic Information</div>
-                <div class="fr one">
+
+                <div class="fr one" style="margin-bottom:18px">
                     <div class="fg">
                         <label asp-for="Input.Name">Service Name <span class="req">*</span></label>
                         <input asp-for="Input.Name" class="si" placeholder="e.g., Progressive Lens Fitting" />
                         <span asp-validation-for="Input.Name" class="field-validation-error"></span>
                     </div>
                 </div>
-                <div class="fr one">
+
+                <div class="fr one" style="margin-bottom:18px">
                     <div class="fg">
                         <label asp-for="Input.Description">Description</label>
                         <textarea asp-for="Input.Description" class="si" rows="3"
                                   placeholder="Describe what this service includes, how long it takes, and what customers can expect…"></textarea>
                     </div>
+                </div>
+
+                @* ── SERVICE CATEGORY ── *@
+                <div class="fg">
+                    <label>Applies To <span class="req">*</span></label>
+                    <div class="cat-grid">
+                        <div>
+                            <input type="radio" asp-for="Input.ServiceCategory"
+                                   value="" id="catAll" class="cat-option" />
+                            <label for="catAll" class="cat-label">
+                                <span class="ci">🌐</span>
+                                All Pages
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" asp-for="Input.ServiceCategory"
+                                   value="CustomGlasses" id="catCG" class="cat-option" />
+                            <label for="catCG" class="cat-label">
+                                <span class="ci">🔭</span>
+                                Custom Glasses
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" asp-for="Input.ServiceCategory"
+                                   value="FrameRepair" id="catFR" class="cat-option" />
+                            <label for="catFR" class="cat-label">
+                                <span class="ci">🛠</span>
+                                Frame Repair
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" asp-for="Input.ServiceCategory"
+                                   value="LensReplacement" id="catLR" class="cat-option" />
+                            <label for="catLR" class="cat-label">
+                                <span class="ci">⭕</span>
+                                Lens Replacement
+                            </label>
+                        </div>
+                    </div>
+                    <span class="hint" style="margin-top:6px">
+                        Controls which customer page this service appears on.
+                        <strong>All Pages</strong> = hiện ở mọi trang.
+                    </span>
                 </div>
             </div>
 
@@ -599,6 +679,7 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        // Image upload preview
         const zone = document.getElementById('upzone');
         const inp  = document.getElementById('imgIn');
         const prev = document.getElementById('prev');
@@ -621,5 +702,13 @@
             r.onload = e => { img.src = e.target.result; prev.classList.add('show'); };
             r.readAsDataURL(f);
         }
+
+        // Default select "All Pages" if nothing checked on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const anyChecked = document.querySelector('input[name="Input.ServiceCategory"]:checked');
+            if (!anyChecked) {
+                document.getElementById('catAll').checked = true;
+            }
+        });
     </script>
 }

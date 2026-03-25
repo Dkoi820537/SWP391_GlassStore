@@ -12,6 +12,7 @@ public partial class Service
     public int? DurationMin { get; set; }
     public string? ImageUrl { get; set; }
     public bool IsActive { get; set; } = true;
+    public string? ServiceCategory { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 

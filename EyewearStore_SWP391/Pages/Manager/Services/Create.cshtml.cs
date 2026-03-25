@@ -34,6 +34,7 @@ namespace EyewearStore_SWP391.Pages.Manager.Services
                 DurationMin = Input.DurationMin,
                 IsActive = Input.IsActive,
                 ImageFile = Input.ImageFile,
+                ServiceCategory = Input.ServiceCategory,  // NEW
             }, _env);
 
             TempData["Success"] = $"Service \"{Input.Name}\" created successfully!";
@@ -41,7 +42,7 @@ namespace EyewearStore_SWP391.Pages.Manager.Services
         }
     }
 
-    // ── Shared input model (used by both Create and Edit) ──────────────────────
+    // ── Shared input model (used by both Create and Edit) ─────────────────────
     public class ServiceFormInput
     {
         public int ServiceId { get; set; }
@@ -64,5 +65,10 @@ namespace EyewearStore_SWP391.Pages.Manager.Services
         public IFormFile? ImageFile { get; set; }
 
         public bool RemoveImage { get; set; } = false;
+
+        /// <summary>
+        /// "CustomGlasses" | "FrameRepair" | "LensReplacement" | null = All pages
+        /// </summary>
+        public string? ServiceCategory { get; set; }  // NEW
     }
 }

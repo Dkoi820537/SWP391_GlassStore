@@ -13,6 +13,7 @@ namespace EyewearStore_SWP391.Services
         public int? DurationMin { get; set; }
         public bool IsActive { get; set; } = true;
         public IFormFile? ImageFile { get; set; }
+        public string? ServiceCategory { get; set; }  // NEW
     }
 
     public class ServiceUpdateDto
@@ -24,6 +25,7 @@ namespace EyewearStore_SWP391.Services
         public bool IsActive { get; set; } = true;
         public IFormFile? ImageFile { get; set; }
         public bool RemoveImage { get; set; } = false;
+        public string? ServiceCategory { get; set; }  // NEW
     }
 
     public class ServiceListResult
@@ -110,6 +112,7 @@ namespace EyewearStore_SWP391.Services
                 Price = dto.Price,
                 DurationMin = dto.DurationMin,
                 IsActive = dto.IsActive,
+                ServiceCategory = dto.ServiceCategory,  // NEW
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -136,6 +139,7 @@ namespace EyewearStore_SWP391.Services
             svc.Price = dto.Price;
             svc.DurationMin = dto.DurationMin;
             svc.IsActive = dto.IsActive;
+            svc.ServiceCategory = dto.ServiceCategory;  // NEW
             svc.UpdatedAt = DateTime.UtcNow;
 
             if (dto.RemoveImage)

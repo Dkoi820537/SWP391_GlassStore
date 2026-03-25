@@ -18,15 +18,7 @@ namespace EyewearStore_SWP391.Pages.Customer.Services
         public List<Product> Frames { get; set; } = new();
         public List<Product> Lenses { get; set; } = new();
         public List<Service> Services { get; set; } = new();
-
-        /// <summary>
-        /// Maps each frameId to its list of compatible lens type strings.
-        /// </summary>
         public Dictionary<int, List<string>> CompatibilityMap { get; set; } = new();
-
-        /// <summary>
-        /// Maps lens ProductId → LensType string (needed because Lenses list uses Product base type).
-        /// </summary>
         public Dictionary<int, string> LensTypeMap { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync()
@@ -49,9 +41,10 @@ namespace EyewearStore_SWP391.Pages.Customer.Services
                 .OrderBy(p => p.Name)
                 .ToListAsync();
 
-            // Load active Services (loại gia công)
+            // Load Services — chỉ lấy CustomGlasses hoặc null (hiện ở tất cả)
             Services = await _context.Services
-                .Where(s => s.IsActive)
+                .Where(s => s.IsActive &&
+                       (s.ServiceCategory == "CustomGlasses" || s.ServiceCategory == null))
                 .OrderBy(s => s.Name)
                 .ToListAsync();
 

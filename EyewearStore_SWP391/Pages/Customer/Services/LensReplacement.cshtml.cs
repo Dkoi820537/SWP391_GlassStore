@@ -8,6 +8,7 @@ namespace EyewearStore_SWP391.Pages.Customer.Services
     public class LensReplacementModel : PageModel
     {
         private readonly EyewearStoreContext _context;
+
         public LensReplacementModel(EyewearStoreContext context) => _context = context;
 
         public List<Product> Lenses { get; set; } = new();
@@ -19,11 +20,15 @@ namespace EyewearStore_SWP391.Pages.Customer.Services
                 .Include(p => p.ProductImages)
                 .Where(p => p.IsActive && p.ProductType.ToLower() == "lens"
                          && (p.InventoryQty == null || p.InventoryQty > 0))
-                .OrderBy(p => p.Name).ToListAsync();
+                .OrderBy(p => p.Name)
+                .ToListAsync();
 
+            // Chỉ lấy service thuộc LensReplacement hoặc null (hiện ở tất cả)
             Services = await _context.Services
-                .Where(s => s.IsActive)
-                .OrderBy(s => s.Name).ToListAsync();
+                .Where(s => s.IsActive &&
+                       (s.ServiceCategory == "LensReplacement" || s.ServiceCategory == null))
+                .OrderBy(s => s.Name)
+                .ToListAsync();
 
             return Page();
         }

@@ -36,7 +36,7 @@
     .color-dot { width:26px; height:26px; border-radius:50%; border:2px solid rgba(0,0,0,.15); cursor:pointer; transition:transform .15s; }
     .color-dot:hover { transform:scale(1.15); }
 
-    /* ── Drop zone ── */
+    /* Drop zone */
     .image-drop-zone {
         border: 2px dashed #e0e0e8;
         border-radius: 12px;
@@ -55,7 +55,7 @@
     .image-drop-zone h4 { margin: 0 0 .35rem; font-size: 1rem; color: #4a4a68; }
     .image-drop-zone p { margin: 0; font-size: .85rem; color: #6c757d; }
 
-    /* ── Thumbnail grid ── */
+    /* Thumbnail grid */
     .thumb-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:1rem; margin-top:1.25rem; }
     .thumb-card {
         position: relative; border-radius: 10px; overflow: hidden;
@@ -198,6 +198,7 @@
                             <option value="Cat-eye">Cat-eye</option>
                             <option value="Oval">Oval</option>
                             <option value="Wayfarer">Wayfarer</option>
+                            <option value="Pillow">Pillow</option>
                         </select>
                     </div>
                     <div class="form-group"></div>
@@ -234,14 +235,30 @@
                     <div class="form-group">
                         <p class="helper-text">Quick add:</p>
                         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                            @foreach (var c in new[] { "Black","Gold","Red","Silver","Tortoise","Blue","Pink","Green","Transparent" })
+                            @foreach (var c in new[] {
+                                "Black","Gold","Red","Silver","Tortoise",
+                                "Blue","Pink","Green","Transparent",
+                                "Brown","Nude","Purple","Orange","White","Rose Gold"
+                            })
                             {
                                 <button type="button" class="color-dot" onclick="addColor('@c')" title="@c"
                                         style="background:@(c switch {
-                                            "Black"=>"#1a1a1a","Gold"=>"#c9a96e","Red"=>"#cc2200",
-                                            "Silver"=>"linear-gradient(135deg,#d0d0d0,#f5f5f5,#b0b0b0)",
-                                            "Tortoise"=>"#7b4f1e","Blue"=>"#1a4fa0","Pink"=>"#e879a0",
-                                            "Green"=>"#2d7a3a",_=>"rgba(180,220,255,.6)"})"></button>
+                                            "Black"     => "#1a1a1a",
+                                            "Gold"      => "#c9a96e",
+                                            "Red"       => "#cc2200",
+                                            "Silver"    => "linear-gradient(135deg,#d0d0d0,#f5f5f5,#b0b0b0)",
+                                            "Tortoise"  => "#7b4f1e",
+                                            "Blue"      => "#1a4fa0",
+                                            "Pink"      => "#e879a0",
+                                            "Green"     => "#2d7a3a",
+                                            "Brown"     => "#5c3a1e",
+                                            "Nude"      => "#c9a882",
+                                            "Purple"    => "#6b3fa0",
+                                            "Orange"    => "#e8621a",
+                                            "White"     => "#f0f0f0",
+                                            "Rose Gold" => "linear-gradient(135deg,#c47b6f,#e8b4a8,#b5736a)",
+                                            _           => "rgba(180,220,255,.6)"
+                                        });@(c == "White" ? "outline:1px solid #ccc;" : "")"></button>
                             }
                         </div>
                     </div>
@@ -268,14 +285,13 @@
                 </div>
             </div>
 
-            <!-- Product Images (multi-upload) -->
+            <!-- Product Images -->
             <div class="form-section">
                 <h2 class="section-title">Product Images</h2>
 
-                
                 <input type="file" id="fileSubmit" name="Input.ImageFiles"
                        accept=".jpg,.jpeg,.png,.webp" multiple style="display:none" />
-                
+
                 <input type="file" id="filePicker"
                        accept=".jpg,.jpeg,.png,.webp" multiple style="display:none" />
 
@@ -311,8 +327,8 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-    var fileSubmit = document.getElementById('fileSubmit'); // named → submits
-    var filePicker = document.getElementById('filePicker'); // unnamed → dialog only
+    var fileSubmit = document.getElementById('fileSubmit');
+    var filePicker = document.getElementById('filePicker');
     var dropZone   = document.getElementById('dropZone');
     var thumbGrid  = document.getElementById('thumbGrid');
     var countInfo  = document.getElementById('countInfo');
@@ -321,12 +337,10 @@
     var MAX_FILES  = 10;
     var MAX_BYTES  = 5 * 1024 * 1024;
     var ALLOWED    = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    var fileList   = []; // [{ file, dataUrl }]
+    var fileList   = [];
 
-    // Click drop zone → open picker
     dropZone.addEventListener('click', function() { filePicker.click(); });
 
-    // Drag & drop
     dropZone.addEventListener('dragover', function(e) {
         e.preventDefault(); dropZone.classList.add('drag-over');
     });
@@ -338,10 +352,9 @@
         handleFiles(Array.from(e.dataTransfer.files));
     });
 
-    // Picker selected → add to list, then reset picker
     filePicker.addEventListener('change', function(e) {
         handleFiles(Array.from(e.target.files));
-        e.target.value = ''; // reset so same file can be picked again
+        e.target.value = '';
     });
 
     function handleFiles(incoming) {
@@ -403,15 +416,12 @@
         updateCount();
     }
 
-    // Write fileList → fileSubmit.files using DataTransfer
-    // This makes normal form submit include all files in correct order
     function syncToSubmitInput() {
         try {
             var dt = new DataTransfer();
             fileList.forEach(function(item) { dt.items.add(item.file); });
             fileSubmit.files = dt.files;
         } catch(e) {
-            // DataTransfer not supported — very rare in modern browsers
             console.warn('DataTransfer not supported:', e);
         }
     }
@@ -425,12 +435,14 @@
         }
     }
 
-    // Color preview
     var COLOR_MAP = {
         Black:'#1a1a1a', Red:'#cc2200', Gold:'#c9a96e', Silver:'#c0c0c0',
         Tortoise:'#7b4f1e', Blue:'#1a4fa0', Pink:'#e879a0', Green:'#2d7a3a',
-        Transparent:'rgba(180,220,255,.5)'
+        Transparent:'rgba(180,220,255,.5)',
+        Brown:'#5c3a1e', Nude:'#c9a882', Purple:'#6b3fa0',
+        Orange:'#e8621a', White:'#f0f0f0', 'Rose Gold':'#c47b6f'
     };
+
     function updateColorPreview() {
         var val = document.getElementById('colorInput').value;
         var container = document.getElementById('colorPreview');
@@ -440,9 +452,11 @@
             var dot = document.createElement('div');
             dot.className = 'color-dot'; dot.title = c;
             dot.style.background = COLOR_MAP[c] || '#ccc';
+            if (c === 'White') dot.style.outline = '1px solid #ccc';
             container.appendChild(dot);
         });
     }
+
     function addColor(color) {
         var inp = document.getElementById('colorInput');
         var existing = inp.value.split(',').map(function(s){ return s.trim(); }).filter(Boolean);

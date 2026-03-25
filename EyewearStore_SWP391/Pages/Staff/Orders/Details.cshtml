@@ -2,59 +2,30 @@
 @model EyewearStore_SWP391.Pages.Staff.Orders.DetailsModel
 @using System.Text.Json
 @{
-    ViewData["Title"] = $"Order #{Model.Order?.OrderId} — Process";
+    ViewData["Title"] = $"Order #{Model.Order?.OrderId} — Operations";
     Layout = "_Layout";
 
     var order = Model.Order;
+
     bool hasServiceItems = order?.OrderItems?.Any(oi =>
         !string.IsNullOrEmpty(oi.SnapshotJson) &&
         (oi.SnapshotJson.Contains("\"isServiceOrder\":true") ||
          oi.SnapshotJson.Contains("\"lensProductId\":"))) ?? false;
 
-    string StatusBg(string s) => s switch
+    string? nextStatus = order?.Status switch
     {
-        "Pending Confirmation" => "#fef9ec",
-        "Confirmed" => "#eff6ff",
-        "Processing" => "#eef2ff",
-        "Shipped" => "#f0fdf4",
-        "Delivered" => "#f0fdf4",
-        "Completed" => "#f0fdf4",
-        "Cancelled" => "#fef2f2",
-        _ => "#f8fafc"
+        "Processing" => "Shipped",
+        "Shipped" => "Delivered",
+        "Delivered" => "Completed",
+        _ => null
     };
-    string StatusFg(string s) => s switch
-    {
-        "Pending Confirmation" => "#92400e",
-        "Confirmed" => "#1d4ed8",
-        "Processing" => "#4338ca",
-        "Shipped" => "#065f46",
-        "Delivered" => "#065f46",
-        "Completed" => "#14532d",
-        "Cancelled" => "#991b1b",
-        _ => "#374151"
-    };
-    string StatusBdr(string s) => s switch
-    {
-        "Pending Confirmation" => "#fcd34d",
-        "Confirmed" => "#93c5fd",
-        "Processing" => "#a5b4fc",
-        "Shipped" => "#6ee7b7",
-        "Delivered" => "#6ee7b7",
-        "Completed" => "#86efac",
-        "Cancelled" => "#fca5a5",
-        _ => "#e2e8f0"
-    };
-    string StatusIcon(string s) => s switch
-    {
-        "Pending Confirmation" => "bi-hourglass-split",
-        "Confirmed" => "bi-check-circle",
-        "Processing" => "bi-gear-wide-connected",
-        "Shipped" => "bi-truck",
-        "Delivered" => "bi-box-seam-fill",
-        "Completed" => "bi-bag-check-fill",
-        "Cancelled" => "bi-x-circle-fill",
-        _ => "bi-circle"
-    };
+
+    bool canAdvance = nextStatus != null;
+
+    bool needsTracking = nextStatus == "Shipped" &&
+                         !(order?.Shipments?.Any(s => !string.IsNullOrEmpty(s.TrackingNumber)) ?? false);
+
+    if (needsTracking) canAdvance = false;
 }
 
 @section Styles {
@@ -62,30 +33,26 @@
         :root {
             --navy: #0d1b2a;
             --navy2: #1a2f54;
-            --acc: #2563eb;
-            --acc-s: rgba(37,99,235,.1);
-            --gold: #b8862a;
+            --teal: #0f766e;
+            --teal2: #0d9488;
+            --red: #dc2626;
+            --red-s: rgba(220,38,38,.08);
             --ok: #059669;
-            --ok-s: rgba(5,150,105,.1);
+            --ok-s: rgba(5,150,105,.08);
             --warn: #d97706;
-            --warn-s: rgba(217,119,6,.1);
-            --err: #dc2626;
-            --err-s: rgba(220,38,38,.1);
             --purple: #7c3aed;
             --purple-s: rgba(124,58,237,.1);
+            --gold: #b8862a;
             --txt: #0f172a;
             --txt2: #475569;
             --muted: #94a3b8;
-            --surf: #ffffff;
+            --surf: #fff;
             --bg: #f1f5f9;
             --bg2: #e8edf4;
             --bdr: #e2e8f0;
             --bdr2: #cbd5e1;
-            --sh: 0 1px 4px rgba(0,0,0,.06), 0 2px 10px rgba(0,0,0,.05);
-            --sh-md: 0 4px 20px rgba(0,0,0,.09);
-            --sh-lg: 0 8px 32px rgba(0,0,0,.12);
-            --r: 14px;
-            --r-sm: 8px;
+            --sh: 0 1px 4px rgba(0,0,0,.06), 0 2px 10px rgba(0,0,0,.04);
+            --r: 12px;
         }
 
         *, *::before, *::after {
@@ -97,79 +64,379 @@
             font-family: 'Segoe UI', system-ui, sans-serif
         }
 
-        .pg-wrap {
-            max-width: 1160px;
+        .pg {
+            max-width: 1200px;
             margin: 0 auto;
             padding: 28px 20px 80px
         }
 
-        /* BREADCRUMB */
         .bc {
             display: flex;
             gap: 6px;
             align-items: center;
-            margin-bottom: 20px;
             font-size: 12px;
-            color: var(--muted)
+            color: var(--muted);
+            margin-bottom: 20px
         }
 
             .bc a {
                 color: var(--muted);
                 text-decoration: none;
-                font-weight: 600;
-                transition: color .2s
+                font-weight: 600
             }
 
                 .bc a:hover {
-                    color: var(--acc)
+                    color: var(--teal)
                 }
 
-        /* HEADER */
+        .al {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 16px
+        }
+
+        .al-ok {
+            background: var(--ok-s);
+            border: 1px solid rgba(5,150,105,.2);
+            color: var(--ok);
+            animation: sIn .3s ease
+        }
+
+        .al-err {
+            background: var(--red-s);
+            border: 1px solid rgba(220,38,38,.2);
+            color: var(--red)
+        }
+
+        @@keyframes sIn {
+            from {
+                opacity: 0;
+                transform: translateY(-4px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
         .pg-hdr {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 16px;
+            gap: 12px;
             flex-wrap: wrap;
-            margin-bottom: 24px
+            margin-bottom: 20px
         }
 
-        .pg-hdr-left h1 {
-            font-size: 1.6rem;
-            font-weight: 900;
-            color: var(--navy);
-            margin: 0 0 5px;
-            letter-spacing: -.5px
+            .pg-hdr h1 {
+                font-size: 1.5rem;
+                font-weight: 900;
+                color: var(--navy);
+                margin: 0 0 6px;
+                letter-spacing: -.4px
+            }
+
+        .hdr-meta {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap
         }
 
-        .pg-hdr-left p {
-            font-size: 13px;
-            color: var(--muted);
-            margin: 0
+        .date-info {
+            font-size: 12px;
+            color: var(--muted)
         }
 
         .status-pill {
             display: inline-flex;
             align-items: center;
-            gap: 7px;
-            padding: 8px 18px;
+            gap: 6px;
+            padding: 7px 16px;
             border-radius: 100px;
-            font-size: 13px;
-            font-weight: 800;
-            white-space: nowrap
+            font-size: 12px;
+            font-weight: 800
         }
 
-        /* SERVICE BADGE */
+        .wf-track {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r);
+            padding: 18px 22px;
+            margin-bottom: 18px;
+            box-shadow: var(--sh)
+        }
+
+        .wf-track-title {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .9px;
+            color: var(--muted);
+            margin-bottom: 14px
+        }
+
+        .wf-steps {
+            display: flex;
+            align-items: center;
+            overflow-x: auto;
+            padding-bottom: 4px
+        }
+
+        .wf-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0
+        }
+
+        .wf-circle {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            border: 2px solid var(--bdr);
+            background: var(--surf);
+            color: var(--muted);
+            position: relative;
+            z-index: 1
+        }
+
+        .wf-node.done .wf-circle {
+            background: var(--ok);
+            border-color: var(--ok);
+            color: #fff
+        }
+
+        .wf-node.active .wf-circle {
+            background: var(--navy);
+            border-color: var(--navy);
+            color: #fff;
+            box-shadow: 0 0 0 4px rgba(13,27,42,.12)
+        }
+
+        .wf-node.next .wf-circle {
+            background: var(--surf);
+            border-color: var(--teal);
+            color: var(--teal);
+            border-style: dashed
+        }
+
+        .wf-label {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--muted);
+            margin-top: 6px;
+            text-align: center;
+            max-width: 70px;
+            line-height: 1.3
+        }
+
+        .wf-node.done .wf-label {
+            color: var(--ok)
+        }
+
+        .wf-node.active .wf-label {
+            color: var(--navy);
+            font-weight: 900
+        }
+
+        .wf-node.next .wf-label {
+            color: var(--teal)
+        }
+
+        .wf-line {
+            flex: 1;
+            height: 2px;
+            background: var(--bdr);
+            min-width: 24px;
+            max-width: 60px;
+            margin-bottom: 22px
+        }
+
+            .wf-line.done {
+                background: var(--ok)
+            }
+
+        .wf-role-badge {
+            font-size: 8px;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 4px;
+            margin-top: 3px;
+            text-transform: uppercase;
+            letter-spacing: .4px
+        }
+
+        .rb-sale {
+            background: rgba(37,99,235,.1);
+            color: #1d4ed8
+        }
+
+        .rb-ops {
+            background: rgba(5,150,105,.1);
+            color: var(--ok)
+        }
+
+        .rb-manager {
+            background: rgba(13,27,42,.1);
+            color: var(--navy2)
+        }
+
+        .advance-card {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r);
+            overflow: hidden;
+            box-shadow: var(--sh);
+            margin-bottom: 14px
+        }
+
+        .advance-hdr {
+            padding: 12px 16px;
+            background: linear-gradient(135deg,var(--teal),var(--teal2));
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+            .advance-hdr h3 {
+                font-size: 12px;
+                font-weight: 800;
+                color: #fff;
+                margin: 0;
+                flex: 1;
+                text-transform: uppercase;
+                letter-spacing: .5px
+            }
+
+        .advance-body {
+            padding: 16px
+        }
+
+        .btn-advance {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: linear-gradient(135deg,var(--navy),var(--navy2));
+            color: #fff;
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: .3px;
+            transition: all .22s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px
+        }
+
+            .btn-advance:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(13,27,42,.3)
+            }
+
+            .btn-advance:disabled {
+                opacity: .45;
+                cursor: not-allowed;
+                transform: none
+            }
+
+            .btn-advance .arrow-icon {
+                width: 30px;
+                height: 30px;
+                background: rgba(255,255,255,.18);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px
+            }
+
+        .next-status-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px
+        }
+
+            .next-status-label strong {
+                color: var(--teal)
+            }
+
+        .lock-hint {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            background: rgba(217,119,6,.06);
+            border: 1px solid rgba(217,119,6,.2);
+            border-radius: 9px;
+            padding: 11px 14px;
+            font-size: 12px;
+            color: var(--warn);
+            line-height: 1.5
+        }
+
+            .lock-hint i {
+                flex-shrink: 0;
+                margin-top: 1px
+            }
+
+        .handoff-card {
+            background: var(--ok-s);
+            border: 1px solid rgba(5,150,105,.2);
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+            .handoff-card i {
+                font-size: 22px;
+                color: var(--ok);
+                flex-shrink: 0
+            }
+
+        .handoff-card-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--ok);
+            margin-bottom: 2px
+        }
+
+        .handoff-card-sub {
+            font-size: 12px;
+            color: var(--txt2)
+        }
+
         .svc-banner {
-            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            background: linear-gradient(135deg,#7c3aed,#4f46e5);
             border-radius: var(--r);
             padding: 14px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            margin-bottom: 18px;
+            flex-wrap: wrap
         }
 
         .svc-banner-left {
@@ -186,7 +453,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px
+            font-size: 18px;
+            color: #fff
         }
 
         .svc-banner-txt h4 {
@@ -224,63 +492,19 @@
                 transform: translateY(-1px)
             }
 
-        /* ALERTS */
-        .al-ok {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--ok-s);
-            border: 1px solid rgba(5,150,105,.22);
-            color: var(--ok);
-            border-radius: 10px;
-            padding: 12px 16px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 18px;
-            animation: sIn .3s ease
-        }
-
-        .al-err {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--err-s);
-            border: 1px solid rgba(220,38,38,.22);
-            color: var(--err);
-            border-radius: 10px;
-            padding: 12px 16px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 18px
-        }
-
-        @@keyframes sIn {
-            from {
-                opacity: 0;
-                transform: translateY(-5px)
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0)
-            }
-        }
-
-        /* GRID */
         .det-grid {
             display: grid;
-            grid-template-columns: 1fr 360px;
-            gap: 18px
+            grid-template-columns: 1fr 340px;
+            gap: 16px
         }
 
-        /* CARD */
         .dc {
             background: var(--surf);
             border: 1px solid var(--bdr);
             border-radius: var(--r);
             overflow: hidden;
             box-shadow: var(--sh);
-            margin-bottom: 16px
+            margin-bottom: 14px
         }
 
             .dc:last-child {
@@ -288,40 +512,47 @@
             }
 
         .dc-hdr {
-            background: linear-gradient(135deg, var(--navy), var(--navy2));
-            padding: 13px 18px;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
-            gap: 9px
+            gap: 8px
         }
 
             .dc-hdr h3 {
-                font-size: 13px;
+                font-size: 12px;
                 font-weight: 800;
                 color: #fff;
                 margin: 0;
-                flex: 1
+                flex: 1;
+                text-transform: uppercase;
+                letter-spacing: .5px
             }
 
-            .dc-hdr i {
-                font-size: 15px;
-                color: rgba(255,255,255,.65)
+            .dc-hdr.navy {
+                background: linear-gradient(135deg,var(--navy),var(--navy2))
             }
 
-            .dc-hdr .hdr-badge {
-                background: rgba(255,255,255,.15);
-                border-radius: 6px;
-                padding: 2px 8px;
-                font-size: 11px;
-                font-weight: 700;
-                color: rgba(255,255,255,.9)
+            .dc-hdr.teal {
+                background: linear-gradient(135deg,var(--teal),var(--teal2))
+            }
+
+            .dc-hdr.dark {
+                background: linear-gradient(135deg,#1e293b,#334155)
             }
 
         .dc-body {
-            padding: 18px
+            padding: 16px
         }
 
-        /* ORDER ITEMS */
+        .hdr-badge {
+            background: rgba(255,255,255,.15);
+            border-radius: 5px;
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: 700;
+            color: rgba(255,255,255,.9)
+        }
+
         .oi-list {
             display: flex;
             flex-direction: column;
@@ -331,17 +562,12 @@
         .oi-card {
             background: var(--bg);
             border: 1px solid var(--bdr);
-            border-radius: var(--r-sm);
+            border-radius: 9px;
             padding: 14px 16px;
             display: flex;
             align-items: center;
-            gap: 14px;
-            transition: box-shadow .2s
+            gap: 14px
         }
-
-            .oi-card:hover {
-                box-shadow: var(--sh)
-            }
 
         .oi-img {
             width: 54px;
@@ -393,7 +619,7 @@
         .oi-price-main {
             font-size: 15px;
             font-weight: 800;
-            color: var(--gold)
+            color: var(--red)
         }
 
         .oi-price-qty {
@@ -401,22 +627,6 @@
             color: var(--muted)
         }
 
-        /* SERVICE TAG in order item */
-        .svc-tag-inline {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: var(--purple-s);
-            border: 1px solid rgba(124,58,237,.2);
-            border-radius: 5px;
-            padding: 2px 7px;
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--purple);
-            margin-top: 3px
-        }
-
-        /* ORDER TOTAL */
         .oi-total {
             display: flex;
             justify-content: space-between;
@@ -435,20 +645,46 @@
         .oi-total-val {
             font-size: 20px;
             font-weight: 900;
-            color: var(--gold)
+            color: var(--red)
         }
 
-        /* INFO GRID */
+        .svc-tag-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--purple-s);
+            border: 1px solid rgba(124,58,237,.2);
+            border-radius: 5px;
+            padding: 2px 7px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--purple);
+            margin-top: 3px
+        }
+
+        .rx-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(13,27,42,.07);
+            border: 1px solid rgba(13,27,42,.12);
+            border-radius: 100px;
+            padding: 3px 9px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--navy2)
+        }
+
         .info-g {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px
+            gap: 9px
         }
 
         .ii {
             background: var(--bg);
-            border-radius: 10px;
-            padding: 12px 14px
+            border-radius: 8px;
+            padding: 10px 12px
         }
 
         .ii-l {
@@ -456,7 +692,7 @@
             font-weight: 700;
             color: var(--muted);
             text-transform: uppercase;
-            letter-spacing: .8px;
+            letter-spacing: .7px;
             margin-bottom: 3px
         }
 
@@ -473,7 +709,6 @@
             margin-top: 2px
         }
 
-        /* SHIPMENT */
         .ship-row {
             display: flex;
             align-items: center;
@@ -513,7 +748,6 @@
             color: var(--txt)
         }
 
-        /* STATUS FORM */
         .form-lbl {
             font-size: 11px;
             font-weight: 700;
@@ -538,258 +772,260 @@
 
             .fi:focus {
                 outline: none;
-                border-color: var(--acc);
-                box-shadow: 0 0 0 3px rgba(37,99,235,.1)
+                border-color: var(--teal);
+                box-shadow: 0 0 0 3px rgba(15,118,110,.1)
             }
 
-        .btn-submit {
-            width: 100%;
-            padding: 12px;
-            font-size: 14px;
-            font-weight: 800;
-            border-radius: 9px;
-            border: none;
-            cursor: pointer;
-            background: linear-gradient(135deg, var(--navy), var(--navy2));
-            color: #fff;
-            letter-spacing: .3px;
-            transition: all .2s
+        .act-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 7px;
+            margin-top: 12px
         }
 
-            .btn-submit:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 5px 16px rgba(13,27,42,.25)
-            }
-
-        .btn-danger {
-            width: 100%;
-            padding: 11px;
-            font-size: 13px;
-            font-weight: 700;
-            border-radius: 9px;
-            border: 1.5px solid rgba(220,38,38,.3);
-            cursor: pointer;
-            background: var(--err-s);
-            color: var(--err);
-            margin-top: 8px;
-            transition: all .2s
-        }
-
-            .btn-danger:hover {
-                background: var(--err);
-                color: #fff
-            }
-
-        /* PRESCRIPTION WORKFLOW */
-        .wf-steps {
-            display: flex;
-            flex-direction: column;
-            gap: 6px
-        }
-
-        .wf-step {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 13px;
-            border-radius: 9px;
-            border: 2px solid var(--bdr);
-            background: var(--surf);
-            cursor: pointer;
-            transition: all .18s;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--txt)
-        }
-
-            .wf-step:hover {
-                border-color: var(--acc);
-                background: var(--acc-s)
-            }
-
-            .wf-step.active {
-                border-color: var(--ok);
-                background: var(--ok-s);
-                color: var(--ok)
-            }
-
-        .wf-step-num {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: var(--bg2);
+        .act-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
-            font-weight: 800;
-            flex-shrink: 0;
-            color: var(--muted)
-        }
-
-        .wf-step.active .wf-step-num {
-            background: var(--ok);
-            color: #fff
-        }
-
-        /* TABS */
-        .tab-bar {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 16px;
-            background: var(--bg2);
-            border-radius: 10px;
-            padding: 4px
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 8px;
+            gap: 6px;
+            padding: 9px 11px;
             border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
             border: none;
-            background: transparent;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--muted);
             cursor: pointer;
-            transition: all .2s
+            transition: all .18s;
+            text-decoration: none
         }
 
-            .tab-btn.active {
-                background: var(--surf);
-                color: var(--navy);
-                box-shadow: var(--sh);
-                font-weight: 700
+            .act-btn:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 10px rgba(0,0,0,.12)
             }
 
-        .tab-content {
+            .act-btn.svc {
+                background: linear-gradient(135deg,var(--navy),var(--navy2));
+                color: #fff;
+                grid-column: 1/-1
+            }
+
+            .act-btn.cancel {
+                background: var(--red-s);
+                border: 1.5px solid rgba(220,38,38,.18);
+                color: var(--red);
+                grid-column: 1/-1
+            }
+
+        .divider {
+            height: 1px;
+            background: var(--bdr);
+            margin: 14px 0
+        }
+
+        .back-l {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px;
+            border: 1.5px solid var(--bdr);
+            border-radius: 9px;
+            color: var(--txt2);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all .18s;
+            background: var(--surf);
+            margin-top: 10px
+        }
+
+            .back-l:hover {
+                background: var(--bg2);
+                color: var(--txt)
+            }
+
+        .shipment-section {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r);
+            overflow: hidden;
+            box-shadow: var(--sh);
+            margin-bottom: 14px
+        }
+
+        .shipment-hdr {
+            padding: 12px 16px;
+            background: linear-gradient(135deg,#1e293b,#334155);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer
+        }
+
+            .shipment-hdr h3 {
+                font-size: 12px;
+                font-weight: 800;
+                color: #fff;
+                margin: 0;
+                flex: 1;
+                text-transform: uppercase;
+                letter-spacing: .5px
+            }
+
+        .shipment-body {
+            padding: 16px;
             display: none
         }
 
-            .tab-content.active {
+            .shipment-body.open {
                 display: block
             }
 
-        /* PRESCRIPTION BADGE */
-        .rx-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: var(--purple-s);
-            border: 1px solid rgba(124,58,237,.22);
-            border-radius: 100px;
-            padding: 3px 10px;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--purple)
+        .btn-save-ship {
+            width: 100%;
+            padding: 11px;
+            background: linear-gradient(135deg,var(--teal),var(--teal2));
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all .2s
         }
 
-        /* EMPTY */
-        .no-items {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--muted)
-        }
-
-            .no-items i {
-                font-size: 40px;
-                opacity: .2;
-                display: block;
-                margin-bottom: 10px
+            .btn-save-ship:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(15,118,110,.3)
             }
 
-        @@media(max-width: 900px) {
+        @@media(max-width:960px) {
             .det-grid {
                 grid-template-columns: 1fr
             }
+        }
 
+        @@media(max-width:600px) {
             .info-g {
                 grid-template-columns: 1fr
             }
-        }
 
-        @@media(max-width: 600px) {
-            .pg-wrap {
-                padding: 16px 12px 60px
+            .act-grid {
+                grid-template-columns: 1fr
             }
         }
     </style>
 }
 
-<div class="pg-wrap">
-
-    <!-- BREADCRUMB -->
+<div class="pg">
     <div class="bc">
-        <a asp-page="/Staff/Orders/Index">Operations</a>
+        <a asp-page="/Index">Home</a>
         <span style="opacity:.4">›</span>
-        <span>Order #@order?.OrderId</span>
+        <a asp-page="./Index">Operations Dashboard</a>
+        <span style="opacity:.4">›</span>
+        <span>Order #@Model.id</span>
     </div>
 
-    <!-- ALERTS -->
-    @if (TempData["Success"] is string okMsg)
+    @if (TempData["Success"] is string ok)
     {
-        <div class="al-ok"><i class="bi bi-check-circle-fill"></i> @okMsg</div>
+        <div class="al al-ok"><i class="bi bi-check-circle-fill"></i> @ok</div>
     }
-    @if (TempData["Error"] is string errMsg)
+    @if (TempData["Error"] is string err)
     {
-        <div class="al-err"><i class="bi bi-exclamation-circle-fill"></i> @errMsg</div>
+        <div class="al al-err"><i class="bi bi-exclamation-circle-fill"></i> @err</div>
     }
 
     @if (order == null)
     {
-        <div class="al-err"><i class="bi bi-exclamation-circle-fill"></i> Order not found.</div>
+        <div class="al al-err"><i class="bi bi-exclamation-circle-fill"></i> Order not found.</div>
     }
     else
     {
-        <!-- PAGE HEADER -->
         <div class="pg-hdr">
-            <div class="pg-hdr-left">
-                <h1><i class="bi bi-box-seam"></i> Order #@order.OrderId</h1>
-                <p>Placed @order.CreatedAt.ToString("MMMM dd, yyyy 'at' HH:mm")</p>
+            <div>
+                <h1><i class="bi bi-box-seam me-2"></i>Process Order #@order.OrderId</h1>
+                <div class="hdr-meta">
+                    <span class="date-info">Created: @order.CreatedAt.ToString("MMM dd, yyyy 'at' HH:mm")</span>
+                </div>
             </div>
-            <span class="status-pill"
-                  style="background:@StatusBg(order.Status);color:@StatusFg(order.Status);border:1.5px solid @StatusBdr(order.Status)">
-                <i class="bi @StatusIcon(order.Status)"></i> @order.Status
+            @{
+                var (spBg, spFg, spBdr) = order.Status switch
+                {
+                    "Processing" => ("rgba(13,27,42,.07)", "#1a2f54", "rgba(13,27,42,.2)"),
+                    "Shipped" => ("rgba(15,118,110,.08)", "#065f46", "rgba(15,118,110,.25)"),
+                    "Delivered" => ("rgba(15,118,110,.06)", "#065f46", "rgba(15,118,110,.18)"),
+                    "Completed" => ("rgba(13,27,42,.07)", "var(--navy)", "rgba(13,27,42,.15)"),
+                    "Cancelled" => ("var(--red-s)", "var(--red)", "rgba(220,38,38,.22)"),
+                    _ => ("var(--bg2)", "var(--txt2)", "var(--bdr)")
+                };
+            }
+            <span class="status-pill" style="background:@spBg;color:@spFg;border:1.5px solid @spBdr">
+                @order.Status
             </span>
         </div>
 
-        <!-- SERVICE JOB BANNER (only if order has service items) -->
+        <div class="wf-track">
+            <div class="wf-track-title"><i class="bi bi-signpost-2 me-1"></i>Order Workflow Pipeline</div>
+            <div class="wf-steps">
+                @{
+                    var pipeline = new (string Status, string Label, string Role, string RoleCss)[]
+                    {
+                        ("Pending Confirmation", "Pending",   "Sale/Support", "rb-sale"),
+                        ("Confirmed",           "Confirmed",  "Sale/Support", "rb-sale"),
+                        ("Processing",          "Processing", "Operations",   "rb-ops"),
+                        ("Shipped",             "Shipped",    "Operations",   "rb-ops"),
+                        ("Delivered",           "Delivered",  "Operations",   "rb-ops"),
+                        ("Completed",           "Completed",  "Manager",      "rb-manager"),
+                    };
+                    int curIdx = Array.FindIndex(pipeline, p => p.Status == order.Status);
+                }
+                @for (int i = 0; i < pipeline.Length; i++)
+                {
+                    var (pStatus, pLabel, pRole, pRoleCss) = pipeline[i];
+                    string cls = i < curIdx ? "done" : i == curIdx ? "active" : i == curIdx + 1 ? "next" : "";
+                    string icon = i < curIdx ? "✓" : i == curIdx ? "●" : (i + 1).ToString();
+                    <div class="wf-node @cls">
+                        <div class="wf-circle">@icon</div>
+                        <div class="wf-label">@pLabel</div>
+                        <span class="wf-role-badge @pRoleCss">@pRole</span>
+                    </div>
+                    if (i < pipeline.Length - 1)
+                    {
+                        <div class="wf-line @(i < curIdx ? "done" : "")"></div>
+                    }
+                }
+            </div>
+        </div>
+
         @if (hasServiceItems)
         {
             <div class="svc-banner">
                 <div class="svc-banner-left">
                     <div class="svc-banner-icon"><i class="bi bi-wrench"></i></div>
                     <div class="svc-banner-txt">
-                        <h4>This order contains Service Jobs</h4>
-                        <p>Frame + Lens fitting or customization requires technician processing</p>
+                        <h4>This order includes a Service Job</h4>
+                        <p>Fitting / customization requires technician handling</p>
                     </div>
                 </div>
                 <a asp-page="/Staff/ServiceOrders/Detail" asp-route-orderId="@order.OrderId" class="btn-svc-job">
-                    <i class="bi bi-tools"></i> View Service Job
-                    <i class="bi bi-arrow-right"></i>
+                    <i class="bi bi-tools"></i> View Service Job <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
         }
 
         <div class="det-grid">
-
-            <!-- LEFT COLUMN -->
             <div>
-
-                <!-- ORDER ITEMS -->
                 <div class="dc">
-                    <div class="dc-hdr">
-                        <i class="bi bi-bag-fill"></i>
+                    <div class="dc-hdr navy">
+                        <i class="bi bi-cart3" style="color:rgba(255,255,255,.7)"></i>
                         <h3>Order Items</h3>
-                        <span class="hdr-badge">@order.OrderItems.Count item(s)</span>
+                        <span class="hdr-badge">@order.OrderItems.Count</span>
                     </div>
                     <div class="dc-body">
                         @if (!order.OrderItems.Any())
                         {
-                            <div class="no-items">
-                                <i class="bi bi-bag"></i>
-                                <p>No items found</p>
-                            </div>
+                            <p style="color:var(--muted);font-size:13px;text-align:center;padding:30px 0">No items found.</p>
                         }
                         else
                         {
@@ -800,39 +1036,38 @@
                                     (oi.SnapshotJson.Contains("\"isServiceOrder\":true") ||
                                     oi.SnapshotJson.Contains("\"lensProductId\":"));
                                     bool isPrescItem = oi.PrescriptionId != null;
-
-                                    // Try parse snapshot for service items
                                     string? svcName = null;
+
                                     if (isService && !string.IsNullOrEmpty(oi.SnapshotJson))
                                     {
                                         try
                                         {
                                             using var doc = JsonDocument.Parse(oi.SnapshotJson);
-                                            if (doc.RootElement.TryGetProperty("serviceName", out var sn)) svcName = sn.GetString();
+                                            if (doc.RootElement.TryGetProperty("serviceName", out var sn))
+                                                svcName = sn.GetString();
                                         }
                                         catch { }
                                     }
 
+                                    var firstImg = oi.Product?.ProductImages?.FirstOrDefault()?.ImageUrl;
+
                                     <div class="oi-card">
-                                        @{
-                                            var firstImg = oi.Product?.ProductImages?.FirstOrDefault()?.ImageUrl;
-                                        }
                                         @if (!string.IsNullOrEmpty(firstImg))
                                         {
                                             <img src="@firstImg" class="oi-img" alt="@oi.Product?.Name" />
                                         }
                                         else
                                         {
-                                            <div class="oi-no-img">@(isService ? Html.Raw("<i class='bi bi-wrench'></i>") : Html.Raw("<i class='bi bi-eyeglasses'></i>"))</div>
+                                            <div class="oi-no-img">
+                                                <i class="bi @(isService ? "bi-wrench" : "bi-eyeglasses")" style="color:var(--muted)"></i>
+                                            </div>
                                         }
                                         <div class="oi-info">
                                             <div class="oi-name">@(oi.Product?.Name ?? "Unknown Product")</div>
-                                            <div class="oi-meta">
-                                                SKU: @(oi.Product?.Sku ?? "—") · Qty: @oi.Quantity
-                                            </div>
+                                            <div class="oi-meta">SKU: @(oi.Product?.Sku ?? "—") · Qty: @oi.Quantity</div>
                                             @if (isPrescItem)
                                             {
-                                                <span class="rx-pill" style="margin-top:3px"><i class="bi bi-eyeglasses" style="font-size:10px"></i> Prescription</span>
+                                                <span class="rx-pill" style="margin-top:3px"><i class="bi bi-eyeglasses"></i> Prescription</span>
                                             }
                                             @if (isService && !string.IsNullOrEmpty(svcName))
                                             {
@@ -846,6 +1081,7 @@
                                     </div>
                                 }
                             </div>
+
                             <div class="oi-total">
                                 <div class="oi-total-lbl">Order Total</div>
                                 <div class="oi-total-val">@order.TotalAmount.ToString("N0") ₫</div>
@@ -854,20 +1090,21 @@
                     </div>
                 </div>
 
-                <!-- CUSTOMER INFO -->
                 <div class="dc">
-                    <div class="dc-hdr"><i class="bi bi-person-fill"></i><h3>Customer Information</h3></div>
+                    <div class="dc-hdr teal">
+                        <i class="bi bi-person-fill" style="color:rgba(255,255,255,.7)"></i>
+                        <h3>Customer & Shipping</h3>
+                    </div>
                     <div class="dc-body">
                         <div class="info-g">
                             <div class="ii">
                                 <div class="ii-l">Customer</div>
                                 <div class="ii-v">@(order.User?.FullName ?? "N/A")</div>
-                                <div class="ii-s">@(order.User?.Email ?? "")</div>
+                                <div class="ii-s"><a href="mailto:@(order.User?.Email)" style="color:var(--teal);text-decoration:none">@(order.User?.Email ?? "")</a></div>
                             </div>
                             <div class="ii">
                                 <div class="ii-l">Payment</div>
                                 <div class="ii-v">@(order.PaymentMethod ?? "N/A")</div>
-                                <div class="ii-s">@(order.StripePaymentIntentId != null ? "Paid" : "—")</div>
                             </div>
                             <div class="ii">
                                 <div class="ii-l">Order Date</div>
@@ -875,8 +1112,8 @@
                                 <div class="ii-s">@order.CreatedAt.ToString("HH:mm")</div>
                             </div>
                             <div class="ii">
-                                <div class="ii-l">Total Paid</div>
-                                <div class="ii-v" style="color:var(--gold)">@order.TotalAmount.ToString("N0") ₫</div>
+                                <div class="ii-l">Total</div>
+                                <div class="ii-v" style="color:var(--red)">@order.TotalAmount.ToString("N0") ₫</div>
                             </div>
                         </div>
 
@@ -885,9 +1122,10 @@
                             var recvName = order.Address?.ReceiverName ?? order.ReceiverName;
                             var phone = order.Address?.Phone ?? order.Phone;
                         }
+
                         @if (!string.IsNullOrEmpty(addrLine))
                         {
-                            <div class="ii" style="margin-top:12px">
+                            <div class="ii" style="margin-top:9px">
                                 <div class="ii-l">Shipping Address</div>
                                 <div class="ii-v">@recvName · @phone</div>
                                 <div class="ii-s">@addrLine</div>
@@ -896,11 +1134,13 @@
                     </div>
                 </div>
 
-                <!-- SHIPMENTS -->
                 @if (order.Shipments != null && order.Shipments.Any())
                 {
                     <div class="dc">
-                        <div class="dc-hdr"><i class="bi bi-truck"></i><h3>Shipment Info</h3></div>
+                        <div class="dc-hdr dark">
+                            <i class="bi bi-truck" style="color:rgba(255,255,255,.7)"></i>
+                            <h3>Shipment Info</h3>
+                        </div>
                         <div class="dc-body">
                             @foreach (var ship in order.Shipments)
                             {
@@ -921,122 +1161,136 @@
                 }
             </div>
 
-            <!-- RIGHT COLUMN: Actions -->
             <div>
-                <div class="dc" style="position: sticky; top: 80px">
-                    <div class="dc-hdr"><i class="bi bi-pencil-square"></i><h3>Process Order</h3></div>
-                    <div class="dc-body">
-
-                        <!-- TABS -->
-                        <div class="tab-bar">
-                            <button class="tab-btn active" onclick="switchTab('status', this)">Status</button>
-                            @if (order.OrderItems.Any(oi => oi.PrescriptionId != null))
+                <div style="position:sticky;top:80px">
+                    <div class="advance-card">
+                        <div class="advance-hdr">
+                            <i class="bi bi-arrow-right-circle-fill" style="color:rgba(255,255,255,.8)"></i>
+                            <h3>Advance Order</h3>
+                        </div>
+                        <div class="advance-body">
+                            @if (order.Status == "Cancelled")
                             {
-                                <button class="tab-btn" onclick="switchTab('rx', this)">Rx Workflow</button>
-                            }
-                            <button class="tab-btn" onclick="switchTab('ship', this)">Shipment</button>
-                        </div>
-
-                        <!-- TAB: STATUS -->
-                        <div class="tab-content active" id="tab-status">
-                            <form method="post" asp-page-handler="UpdateStatus" asp-route-id="@order.OrderId">
-                                <div style="margin-bottom: 14px">
-                                    <span class="form-lbl"><i class="bi bi-bar-chart"></i> New Order Status</span>
-                                    <select name="NewStatus" class="fi">
-                                        @foreach (var s in new[] { "Confirmed", "Processing", "Shipped", "Delivered", "Completed", "Cancelled" })
-                                        {
-                                            if (order.Status == s)
-                                            {
-                                                <option value="@s" selected="selected">@s</option>
-                                            }
-                                            else
-                                            {
-                                                <option value="@s">@s</option>
-                                            }
-                                        }
-                                    </select>
-                                </div>
-                                <button type="submit" class="btn-submit">
-                                    <i class="bi bi-arrow-repeat"></i> Update Status
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- TAB: Prescription Workflow -->
-                        @if (order.OrderItems.Any(oi => oi.PrescriptionId != null))
-                        {
-                            <div class="tab-content" id="tab-rx">
-                                <form method="post" asp-page-handler="UpdatePrescriptionWorkflow" asp-route-id="@order.OrderId">
-                                    <span class="form-lbl"><i class="bi bi-eyeglasses"></i> Prescription Workflow Step</span>
-                                    <div class="wf-steps" style="margin-bottom: 14px">
-                                        @{
-                                            var rxSteps = new[] {
-                                                                "Confirmed",
-                                                                "Processing - Lens Ordered",
-                                                                "Processing - Lens Received",
-                                                                "Processing - Fitting",
-                                                                "Processing - QC",
-                                                                "Processing - Packed"
-                                                                };
-                                        }
-                                        @for (int i = 0; i < rxSteps.Length; i++)
-                                        {
-                                            bool isActive = order.Status == rxSteps[i];
-                                            <label class="wf-step @(isActive ? "active" : "")">
-                                                <input type="radio" name="WorkflowStep" value="@rxSteps[i]"
-                                                       @(isActive ? "checked" : "") style="display:none" />
-                                                <span class="wf-step-num">@(i + 1)</span>
-                                                @rxSteps[i]
-                                            </label>
-                                        }
+                                <div class="handoff-card" style="background:var(--red-s);border-color:rgba(220,38,38,.2)">
+                                    <i class="bi bi-x-circle-fill" style="color:var(--red)"></i>
+                                    <div>
+                                        <div class="handoff-card-title" style="color:var(--red)">Order Cancelled</div>
+                                        <div class="handoff-card-sub">This order has been cancelled and cannot be advanced.</div>
                                     </div>
-                                    <button type="submit" class="btn-submit">
-                                        <i class="bi bi-arrow-right-circle-fill"></i> Advance Workflow
+                                </div>
+                            }
+                            else if (order.Status == "Completed")
+                            {
+                                <div class="handoff-card">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    <div>
+                                        <div class="handoff-card-title">Order Completed</div>
+                                        <div class="handoff-card-sub">This order has already reached the final stage.</div>
+                                    </div>
+                                </div>
+                            }
+                            else if (order.Status is "Pending Confirmation" or "Confirmed")
+                            {
+                                <div class="handoff-card" style="background:rgba(217,119,6,.06);border-color:rgba(217,119,6,.2)">
+                                    <i class="bi bi-hourglass-split" style="color:var(--warn)"></i>
+                                    <div>
+                                        <div class="handoff-card-title" style="color:var(--warn)">Waiting for Sale / Support</div>
+                                        <div class="handoff-card-sub">This order is currently in <strong>@order.Status</strong>.</div>
+                                    </div>
+                                </div>
+                            }
+                            else if (needsTracking)
+                            {
+                                <div class="lock-hint">
+                                    <i class="bi bi-truck"></i>
+                                    <div>
+                                        Tracking number is required before moving to
+                                        <strong>Shipped</strong>. Enter shipment details below and save them first.
+                                    </div>
+                                </div>
+                            }
+                            else if (canAdvance && nextStatus != null)
+                            {
+                                <form method="post" asp-page-handler="AdvanceStatus">
+                                    <input type="hidden" name="orderId" value="@order.OrderId" />
+                                    <button type="submit" class="btn-advance">
+                                        <span>Advance to <strong>@nextStatus</strong></span>
+                                        <div class="arrow-icon"><i class="bi bi-arrow-right"></i></div>
+                                    </button>
+                                </form>
+                                <div class="next-status-label">
+                                    <i class="bi bi-arrow-right-circle" style="color:var(--teal);font-size:14px"></i>
+                                    Current: <span style="color:var(--txt2);font-weight:700">@order.Status</span>
+                                    &nbsp;→&nbsp; Next: <strong>@nextStatus</strong>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="lock-hint" style="background:var(--bg2);border-color:var(--bdr);color:var(--txt2)">
+                                    <i class="bi bi-info-circle"></i>
+                                    <span>No available actions for Operations at this stage.</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    @if (order.Status == "Processing" || order.Status == "Shipped")
+                    {
+                        <div class="shipment-section">
+                            <div class="shipment-hdr" onclick="toggleShipment()">
+                                <i class="bi bi-truck" style="color:rgba(255,255,255,.7)"></i>
+                                <h3>@((order.Shipments?.Any() == true) ? "Update Shipment" : "Enter Tracking Number")</h3>
+                                <i class="bi bi-chevron-down" id="shipChevron" style="color:rgba(255,255,255,.6);font-size:12px"></i>
+                            </div>
+                            <div class="shipment-body @(needsTracking ? "open" : "")" id="shipmentBody">
+                                <form method="post" asp-page-handler="CreateShipment">
+                                    <input type="hidden" name="orderId" value="@order.OrderId" />
+                                    <div style="margin-bottom:10px">
+                                        <label class="form-lbl">Tracking Number</label>
+                                        <input type="text" name="TrackingNumber" class="fi"
+                                               placeholder="e.g. VN123456789"
+                                               value="@(order.Shipments?.FirstOrDefault()?.TrackingNumber ?? "")" />
+                                    </div>
+                                    <div style="margin-bottom:10px">
+                                        <label class="form-lbl">Carrier</label>
+                                        <input type="text" name="Carrier" class="fi"
+                                               placeholder="e.g. GHN, GHTK, ViettelPost"
+                                               value="@(order.Shipments?.FirstOrDefault()?.Carrier ?? "")" />
+                                    </div>
+                                    <button type="submit" class="btn-save-ship">
+                                        <i class="bi bi-save"></i>
+                                        @((order.Shipments?.Any() == true) ? "Update Shipment" : "Save Tracking")
                                     </button>
                                 </form>
                             </div>
-                        }
-
-                        <!-- TAB: SHIPMENT -->
-                        <div class="tab-content" id="tab-ship">
-                            <form method="post" asp-page-handler="CreateShipment" asp-route-id="@order.OrderId">
-                                <div style="margin-bottom:12px">
-                                    <label class="form-lbl" for="trackNo"><i class="bi bi-box-seam"></i> Tracking Number</label>
-                                    <input type="text" id="trackNo" name="TrackingNumber"
-                                           class="fi" placeholder="e.g. VN123456789"
-                                           value="@(order.Shipments?.FirstOrDefault()?.TrackingNumber ?? "")" />
-                                </div>
-                                <div style="margin-bottom:14px">
-                                    <label class="form-lbl" for="carrier"><i class="bi bi-truck"></i> Carrier</label>
-                                    <input type="text" id="carrier" name="Carrier"
-                                           class="fi" placeholder="e.g. GHN, GHTK, ViettelPost"
-                                           value="@(order.Shipments?.FirstOrDefault()?.Carrier ?? "")" />
-                                </div>
-                                <button type="submit" class="btn-submit">
-                                    <i class="bi bi-truck"></i>
-                                    @(order.Shipments?.Any() == true ? "Update Shipment" : "Create Shipment")
-                                </button>
-                            </form>
                         </div>
-
-                    </div>
-                </div>
-
-                <!-- QUICK LINKS -->
-                <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
-                    @if (hasServiceItems)
-                    {
-                        <a asp-page="/Staff/ServiceOrders/Detail" asp-route-orderId="@order.OrderId"
-                           style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:linear-gradient(135deg,#7c3aed,#4f46e5);border-radius:10px;color:#fff;text-decoration:none;font-size:13px;font-weight:700;transition:all .2s"
-                           onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
-                            <i class="bi bi-tools"></i> Open Service Job #@order.OrderId
-                            <i class="bi bi-arrow-right" style="margin-left:auto"></i>
-                        </a>
                     }
-                    <a asp-page="/Staff/Orders/Index"
-                       style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border:1.5px solid var(--bdr);border-radius:10px;color:var(--txt2);text-decoration:none;font-size:13px;font-weight:600;transition:all .2s;background:var(--surf)"
-                       onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='var(--surf)'">
-                        <i class="bi bi-arrow-left"></i> Back to Orders
+
+                    <div class="dc">
+                        <div class="dc-hdr dark">
+                            <i class="bi bi-tools" style="color:rgba(255,255,255,.7)"></i>
+                            <h3>Operations Actions</h3>
+                        </div>
+                        <div class="dc-body">
+                            <div class="act-grid">
+                                @if (hasServiceItems)
+                                {
+                                    <a asp-page="/Staff/ServiceOrders/Detail" asp-route-orderId="@order.OrderId" class="act-btn svc">
+                                        <i class="bi bi-tools"></i> View Service Job <i class="bi bi-arrow-right" style="margin-left:auto"></i>
+                                    </a>
+                                }
+                                @if (order.Status == "Processing")
+                                {
+                                    <button type="button" class="act-btn cancel" onclick="cancelOrder()">
+                                        <i class="bi bi-x-circle-fill"></i> Cancel Order
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <a asp-page="./Index" class="back-l">
+                        <i class="bi bi-arrow-left"></i> Back to Operations Queue
                     </a>
                 </div>
             </div>
@@ -1044,22 +1298,33 @@
     }
 </div>
 
+<form id="cancelForm" method="post" asp-page-handler="CancelOrder" style="display:none">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="orderId" value="@(order?.OrderId)" />
+</form>
+
 @section Scripts {
     <script>
-        function switchTab(id, btn) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-' + id)?.classList.add('active');
-            btn.classList.add('active');
+        function cancelOrder() {
+            if (confirm('Cancel Order #@(order?.OrderId)?\n\nThis action will restore inventory and cannot be undone.')) {
+                document.getElementById('cancelForm').submit();
+            }
         }
 
-        // Make Rx workflow steps clickable
-        document.querySelectorAll('.wf-step').forEach(step => {
-            step.addEventListener('click', function() {
-                document.querySelectorAll('.wf-step').forEach(s => s.classList.remove('active'));
-                this.classList.add('active');
-                this.querySelector('input[type="radio"]').checked = true;
-            });
-        });
+        function toggleShipment() {
+            const body = document.getElementById('shipmentBody');
+            const chevron = document.getElementById('shipChevron');
+            body.classList.toggle('open');
+            chevron.classList.toggle('bi-chevron-down');
+            chevron.classList.toggle('bi-chevron-up');
+        }
+
+        @if (needsTracking)
+        {
+                <text>document.getElementById('shipmentBody')?.classList.add('open');</text>
+        }
+
+        var alOk = document.querySelector('.al-ok');
+        if (alOk) setTimeout(() => { alOk.style.transition = 'opacity .5s'; alOk.style.opacity = '0'; }, 4000);
     </script>
 }

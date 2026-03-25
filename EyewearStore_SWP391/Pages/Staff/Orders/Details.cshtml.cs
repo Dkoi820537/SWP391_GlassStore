@@ -6,10 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
+using System.Collections.Generic;
 
 namespace EyewearStore_SWP391.Pages.Staff.Orders
 {
-    [Authorize(Roles = "staff,admin,Administrator")]
+    [Authorize(Roles = "staff,operations,admin,Administrator")]
     public class DetailsModel : PageModel
     {
         private readonly EyewearStoreContext _context;
@@ -19,6 +20,13 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             _context = context;
         }
 
+        private static readonly Dictionary<string, string> OpsNextStatus = new()
+        {
+            ["Processing"] = "Shipped",
+            ["Shipped"] = "Delivered",
+            ["Delivered"] = "Completed"
+        };
+
         [BindProperty(SupportsGet = true)]
         public int id { get; set; }
 
@@ -27,124 +35,89 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
         public async Task<IActionResult> OnGetAsync()
         {
             Order = await _context.Orders
+                .AsSplitQuery()
                 .Include(o => o.User)
-                .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
-                .Include(o => o.OrderItems).ThenInclude(oi => oi.Prescription)
                 .Include(o => o.Address)
-                .Include(o => o.Shipments).ThenInclude(s => s.ShipmentStatusHistories)
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
+                    .ThenInclude(p => p.ProductImages)
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Prescription)
+                .Include(o => o.Shipments)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(o => o.OrderId == id);
 
-            if (Order == null) return NotFound();
+            if (Order == null)
+                return NotFound();
+
             return Page();
         }
 
-        /// <summary>
-        /// Update prescription workflow step (BR-OP004, BR-OP005)
-        /// </summary>
-        public async Task<IActionResult> OnPostUpdatePrescriptionWorkflowAsync(int id, string WorkflowStep)
+        public async Task<IActionResult> OnPostAdvanceStatusAsync(int orderId)
         {
             var order = await _context.Orders
-                .Include(o => o.OrderItems).ThenInclude(oi => oi.Prescription)
-                .FirstOrDefaultAsync(o => o.OrderId == id);
+                .Include(o => o.Shipments)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
             if (order == null) return NotFound();
 
-            if (!order.OrderItems.Any(oi => oi.PrescriptionId != null))
+            if (!OpsNextStatus.TryGetValue(order.Status, out var nextStatus))
             {
-                TempData["Error"] = "This is not a prescription order.";
-                return RedirectToPage(new { id });
+                TempData["Error"] = order.Status switch
+                {
+                    "Completed" => "This order has already been completed.",
+                    "Cancelled" => "This order has been cancelled.",
+                    "Pending Confirmation" or "Confirmed" => "This order is not yet ready for Operations.",
+                    _ => $"Cannot advance from status '{order.Status}'."
+                };
+
+                return RedirectToPage(new { id = orderId });
             }
 
-            var validSteps = new[]
+            if (nextStatus == "Shipped")
             {
-                "Confirmed",
-                "Processing - Lens Ordered",
-                "Processing - Lens Received",
-                "Processing - Fitting",
-                "Processing - QC",
-                "Processing - Packed"
-            };
+                var hasShipment = await _context.Shipments
+                    .AnyAsync(s => s.OrderId == orderId && !string.IsNullOrEmpty(s.TrackingNumber));
 
-            if (!validSteps.Contains(WorkflowStep))
-            {
-                TempData["Error"] = "Invalid workflow step.";
-                return RedirectToPage(new { id });
+                if (!hasShipment)
+                {
+                    TempData["Error"] = "Tracking number is required before marking the order as Shipped.";
+                    return RedirectToPage(new { id = orderId });
+                }
             }
 
-            order.Status = WorkflowStep;
-            _context.Orders.Update(order);
+            order.Status = nextStatus;
             await _context.SaveChangesAsync();
 
-            // TODO: Send notification email (BR-OP006)
-            // await _emailService.SendPrescriptionWorkflowUpdateEmail(order, WorkflowStep);
+            TempData["Success"] = nextStatus == "Completed"
+                ? $"Order #{orderId} has been completed successfully!"
+                : $"Order #{orderId} updated to: {nextStatus}";
 
-            TempData["Success"] = $"Workflow updated to: {WorkflowStep}";
-            return RedirectToPage(new { id });
+            return RedirectToPage(new { id = orderId });
         }
 
-        /// <summary>
-        /// Update ready stock order status (BR-OP003)
-        /// </summary>
-        public async Task<IActionResult> OnPostUpdateStatusAsync(int id, string NewStatus)
+        public async Task<IActionResult> OnPostCreateShipmentAsync(int orderId, string TrackingNumber, string Carrier)
         {
-            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == id);
-            if (order == null) return NotFound();
+            var order = await _context.Orders
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
-            if (string.IsNullOrWhiteSpace(NewStatus))
-            {
-                TempData["Error"] = "Status is required!";
-                return RedirectToPage(new { id });
-            }
-
-            var valids = new[] { "Confirmed", "Processing", "Shipped", "Delivered", "Completed", "Cancelled" };
-            if (!valids.Contains(NewStatus))
-            {
-                TempData["Error"] = "Invalid status!";
-                return RedirectToPage(new { id });
-            }
-
-            var prev = order.Status;
-            order.Status = NewStatus;
-
-            // Restore inventory if cancelled (BR-INV001)
-            if (NewStatus == "Cancelled" && prev != "Cancelled")
-            {
-                await RestoreInventoryAsync(order);
-            }
-
-            _context.Orders.Update(order);
-            await _context.SaveChangesAsync();
-
-            // TODO: Send notification email (BR-OP006)
-            // await _emailService.SendStatusUpdateEmail(order, NewStatus);
-
-            TempData["Success"] = $"Order status updated to: {NewStatus}";
-            return RedirectToPage(new { id });
-        }
-
-        /// <summary>
-        /// Create or update shipment
-        /// </summary>
-        public async Task<IActionResult> OnPostCreateShipmentAsync(int id, string TrackingNumber, string Carrier)
-        {
-            var order = await _context.Orders.Include(o => o.Shipments).FirstOrDefaultAsync(o => o.OrderId == id);
             if (order == null) return NotFound();
 
             if (string.IsNullOrWhiteSpace(TrackingNumber))
             {
                 TempData["Error"] = "Tracking number is required!";
-                return RedirectToPage(new { id });
+                return RedirectToPage(new { id = orderId });
             }
+
             if (string.IsNullOrWhiteSpace(Carrier))
             {
                 TempData["Error"] = "Carrier is required!";
-                return RedirectToPage(new { id });
+                return RedirectToPage(new { id = orderId });
             }
 
-            var existing = order.Shipments?.FirstOrDefault();
+            var existing = await _context.Shipments
+                .FirstOrDefaultAsync(s => s.OrderId == orderId);
+
             if (existing == null)
             {
-                // Create new shipment
                 var shipment = new Shipment
                 {
                     OrderId = order.OrderId,
@@ -153,10 +126,10 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                     Status = "Shipped",
                     ShippedAt = DateTime.UtcNow
                 };
+
                 _context.Shipments.Add(shipment);
                 await _context.SaveChangesAsync();
 
-                // Add history entry
                 _context.ShipmentStatusHistories.Add(new ShipmentStatusHistory
                 {
                     ShipmentId = shipment.ShipmentId,
@@ -164,92 +137,59 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                     CreatedAt = DateTime.UtcNow
                 });
 
-                TempData["Success"] = "Shipment created successfully!";
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "Shipment created successfully. You can now advance to Shipped.";
             }
             else
             {
-                // Update existing shipment
                 existing.TrackingNumber = TrackingNumber.Trim();
                 existing.Carrier = Carrier.Trim();
-                existing.Status = "Shipped";
                 existing.ShippedAt = DateTime.UtcNow;
 
-                _context.Shipments.Update(existing);
-
-                // Add history entry
                 _context.ShipmentStatusHistories.Add(new ShipmentStatusHistory
                 {
                     ShipmentId = existing.ShipmentId,
-                    Status = "Shipped",
+                    Status = "Updated",
                     CreatedAt = DateTime.UtcNow
                 });
 
-                TempData["Success"] = "Shipment updated successfully!";
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "Shipment updated successfully.";
             }
 
-            // Update order status to Shipped
-            if (order.Status != "Shipped")
-            {
-                order.Status = "Shipped";
-                _context.Orders.Update(order);
-            }
-
-            await _context.SaveChangesAsync();
-
-            // TODO: Send shipping notification email (BR-OP006)
-            // await _emailService.SendShippingEmail(order, TrackingNumber, Carrier);
-
-            return RedirectToPage(new { id });
+            return RedirectToPage(new { id = orderId });
         }
 
-        /// <summary>
-        /// Restore inventory when order is cancelled (BR-INV001)
-        /// </summary>
-        private async Task RestoreInventoryAsync(Order order)
+        public async Task<IActionResult> OnPostCancelOrderAsync(int orderId)
         {
-            var orderItems = await _context.OrderItems
-                .Include(oi => oi.Product)
-                .Where(oi => oi.OrderId == order.OrderId)
-                .ToListAsync();
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
-            foreach (var item in orderItems)
+            if (order == null) return NotFound();
+
+            if (order.Status != "Processing")
+            {
+                TempData["Error"] = "Operations can only cancel orders in Processing status.";
+                return RedirectToPage(new { id = orderId });
+            }
+
+            foreach (var item in order.OrderItems)
             {
                 if (item.Product != null)
                 {
                     item.Product.InventoryQty = (item.Product.InventoryQty ?? 0) + item.Quantity;
-                    _context.Products.Update(item.Product);
                 }
             }
 
+            order.Status = "Cancelled";
             await _context.SaveChangesAsync();
-        }
 
-        /// <summary>
-        /// Validate prescription values (BR-S003)
-        /// </summary>
-        private bool ValidatePrescriptionValues(PrescriptionProfile prescription)
-        {
-            if (prescription == null) return false;
-
-            // SPH: -20.00 to +20.00
-            if (prescription.RightSph.HasValue && (prescription.RightSph < -20.00m || prescription.RightSph > 20.00m))
-                return false;
-            if (prescription.LeftSph.HasValue && (prescription.LeftSph < -20.00m || prescription.LeftSph > 20.00m))
-                return false;
-
-            // CYL: -6.00 to +6.00
-            if (prescription.RightCyl.HasValue && (prescription.RightCyl < -6.00m || prescription.RightCyl > 6.00m))
-                return false;
-            if (prescription.LeftCyl.HasValue && (prescription.LeftCyl < -6.00m || prescription.LeftCyl > 6.00m))
-                return false;
-
-            // AXIS: 0 to 180
-            if (prescription.RightAxis.HasValue && (prescription.RightAxis < 0 || prescription.RightAxis > 180))
-                return false;
-            if (prescription.LeftAxis.HasValue && (prescription.LeftAxis < 0 || prescription.LeftAxis > 180))
-                return false;
-
-            return true;
+            TempData["Success"] = $"Order #{orderId} has been cancelled and inventory restored.";
+            return RedirectToPage(new { id = orderId });
         }
     }
 }

@@ -1,0 +1,559 @@
+@page
+@model EyewearStore_SWP391.Pages.Customer.MyRefundsModel
+@{
+    ViewData["Title"] = "My Refunds";
+}
+
+<div class="container py-5">
+    <!-- ── Breadcrumb ── -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb refund-breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="/Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-page="/Orders/Index">My Orders</a></li>
+            <li class="breadcrumb-item active" aria-current="page">My Refunds</li>
+        </ol>
+    </nav>
+
+    <!-- ── Page Header ── -->
+    <div class="refund-page-header mb-5">
+        <div class="d-flex align-items-center gap-3 mb-2">
+            <div class="refund-header-icon">
+                <i class="bi bi-arrow-counterclockwise"></i>
+            </div>
+            <div>
+                <h1 class="refund-title">
+                    My Refunds
+                    @if (Model.Refunds.Any())
+                    {
+                        <span class="refund-title-count">@Model.TotalCount</span>
+                    }
+                </h1>
+                <p class="refund-subtitle">Track the status of your refund requests</p>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Refunds.Any())
+    {
+        <!-- ── Summary Cards ── -->
+        <div class="row g-3 mb-5">
+            <div class="col-6 col-md-3">
+                <div class="refund-stat-card">
+                    <div class="refund-stat-value">@Model.TotalCount</div>
+                    <div class="refund-stat-label">Total Requests</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="refund-stat-card stat-pending">
+                    <div class="refund-stat-value">@Model.PendingCount</div>
+                    <div class="refund-stat-label">Pending</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="refund-stat-card stat-approved">
+                    <div class="refund-stat-value">@Model.ApprovedCount</div>
+                    <div class="refund-stat-label">Approved</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="refund-stat-card stat-rejected">
+                    <div class="refund-stat-value">@Model.RejectedCount</div>
+                    <div class="refund-stat-label">Rejected</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Refund Cards ── -->
+        <div class="row g-4">
+            @foreach (var refund in Model.Refunds)
+            {
+                <div class="col-12">
+                    <div class="refund-card">
+                        <!-- Card Header -->
+                        <div class="refund-card-header">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h5 class="refund-card-title">
+                                        <i class="bi bi-receipt me-2"></i>Refund #@refund.ReturnId
+                                    </h5>
+                                    <div class="refund-card-meta">
+                                        <span><i class="bi bi-box-seam me-1"></i>Order #@refund.OrderId</span>
+                                        <span class="refund-meta-sep">·</span>
+                                        <span><i class="bi bi-calendar3 me-1"></i>@refund.CreatedAt.ToString("MMM dd, yyyy")</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                                    <span class="refund-status-badge @MyRefundsModel.GetStatusBadgeClass(refund.Status)">
+                                        <i class="@MyRefundsModel.GetStatusIcon(refund.Status) me-1"></i>@refund.Status
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="refund-card-body">
+                            <div class="row g-4">
+                                <!-- Left: Details -->
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <h6 class="refund-product-name">@refund.ProductName</h6>
+                                        <small class="text-muted">SKU: @refund.Sku</small>
+                                    </div>
+
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-6">
+                                            <small class="refund-detail-label">Quantity</small>
+                                            <div class="refund-detail-value">@refund.Quantity</div>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="refund-detail-label">Date Requested</small>
+                                            <div class="refund-detail-value">@refund.CreatedAt.ToString("dd/MM/yyyy")</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Reason -->
+                                    @if (!string.IsNullOrEmpty(refund.Reason))
+                                    {
+                                        <div class="mb-3">
+                                            <small class="refund-detail-label">Reason</small>
+                                            <p class="refund-reason-text">
+                                                @(refund.Reason.Length > 150 ? refund.Reason.Substring(0, 150) + "…" : refund.Reason)
+                                            </p>
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrEmpty(refund.Description))
+                                    {
+                                        <div class="mb-3">
+                                            <small class="refund-detail-label">Description</small>
+                                            <p class="refund-reason-text">
+                                                @(refund.Description.Length > 200 ? refund.Description.Substring(0, 200) + "…" : refund.Description)
+                                            </p>
+                                        </div>
+                                    }
+
+                                    <!-- Rejection Reason -->
+                                    @if (refund.Status == "Rejected" && !string.IsNullOrEmpty(refund.RejectionReason))
+                                    {
+                                        <div class="refund-rejection-alert">
+                                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                            <div>
+                                                <strong>Rejection Reason</strong>
+                                                <p class="mb-0 mt-1">@refund.RejectionReason</p>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <!-- Evidence Images -->
+                                    @if (refund.ImageUrls.Any())
+                                    {
+                                        <div class="mt-3">
+                                            <small class="refund-detail-label mb-2 d-block">Evidence Photos</small>
+                                            <div class="d-flex gap-2 flex-wrap">
+                                                @foreach (var img in refund.ImageUrls.Take(4))
+                                                {
+                                                    <img src="@img" alt="Evidence" class="refund-evidence-thumb" />
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                                <!-- Right: Refund Amount Panel -->
+                                <div class="col-md-4">
+                                    <div class="refund-amount-panel">
+                                        <small class="refund-detail-label mb-2 d-block">Refund Amount</small>
+                                        <h3 class="refund-amount-value">
+                                            @refund.RefundAmount.ToString("N0") <span class="refund-currency">VND</span>
+                                        </h3>
+
+                                        @if (refund.ReviewedAt.HasValue)
+                                        {
+                                            <hr class="my-3" />
+                                            <small class="refund-detail-label">Reviewed On</small>
+                                            <div class="refund-detail-value">@refund.ReviewedAt.Value.ToString("MMM dd, yyyy")</div>
+                                        }
+
+                                        @if (refund.RefundResolvedAt.HasValue)
+                                        {
+                                            <div class="mt-2">
+                                                <small class="refund-detail-label">Resolved On</small>
+                                                <div class="refund-detail-value">@refund.RefundResolvedAt.Value.ToString("MMM dd, yyyy")</div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <!-- ── Empty State ── -->
+        <div class="refund-empty-state">
+            <div class="refund-empty-icon">
+                <i class="bi bi-cash-coin"></i>
+            </div>
+            <h2 class="refund-empty-title">No Refund Requests</h2>
+            <p class="refund-empty-desc">
+                You have no refund requests at this time.<br />
+                If you need to request a refund, you can do so from your order details.
+            </p>
+            <a asp-page="/Orders/Index" class="btn refund-empty-btn">
+                <i class="bi bi-arrow-left me-2"></i>Go to My Orders
+            </a>
+        </div>
+    }
+</div>
+
+<!-- ── Scoped Styles ── -->
+<style>
+    /* ── Breadcrumb ── */
+    .refund-breadcrumb {
+        background: transparent;
+        padding: 0;
+    }
+
+    .refund-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+    }
+
+    .refund-breadcrumb .breadcrumb-item a {
+        color: var(--primary-gold, #c9a96e);
+        text-decoration: none;
+        transition: color .2s;
+    }
+
+    .refund-breadcrumb .breadcrumb-item a:hover {
+        color: var(--primary-navy, #1a2332);
+    }
+
+    /* ── Page Header ── */
+    .refund-header-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        box-shadow: 0 4px 14px rgba(13, 148, 136, 0.3);
+    }
+
+    .refund-title {
+        font-family: var(--font-secondary, 'Inter', sans-serif);
+        color: var(--primary-navy, #1a2332);
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .refund-title-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+        border-radius: 100px;
+        background: var(--primary-gold, #c9a96e);
+        color: white;
+        font-size: 0.85rem;
+        font-weight: 700;
+        vertical-align: middle;
+        padding: 0 10px;
+        margin-left: 8px;
+    }
+
+    .refund-subtitle {
+        color: var(--secondary-warm-gray, #8b8680);
+        font-size: 1.05rem;
+        margin: 4px 0 0 0;
+    }
+
+    /* ── Summary Stat Cards ── */
+    .refund-stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        border-left: 4px solid #e2e8f0;
+        transition: transform .2s, box-shadow .2s;
+    }
+
+    .refund-stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .refund-stat-card.stat-pending { border-left-color: #f59e0b; }
+    .refund-stat-card.stat-approved { border-left-color: #10b981; }
+    .refund-stat-card.stat-rejected { border-left-color: #ef4444; }
+
+    .refund-stat-value {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--primary-navy, #1a2332);
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+
+    .refund-stat-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--secondary-warm-gray, #8b8680);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* ── Refund Cards ── */
+    .refund-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        border: none;
+        transition: box-shadow .25s, transform .25s;
+    }
+
+    .refund-card:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .refund-card-header {
+        background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+        padding: 1.25rem 2rem;
+    }
+
+    .refund-card-title {
+        color: white;
+        margin: 0 0 0.4rem 0;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .refund-card-meta {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 0.85rem;
+    }
+
+    .refund-meta-sep {
+        margin: 0 6px;
+        opacity: 0.5;
+    }
+
+    .refund-card-body {
+        padding: 2rem;
+    }
+
+    /* ── Status Badges ── */
+    .refund-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 0.45rem 1rem;
+        border-radius: 100px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+    }
+
+    .badge-pending {
+        background: rgba(245, 158, 11, 0.15);
+        color: #b45309;
+        border: 1.5px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .badge-approved {
+        background: rgba(16, 185, 129, 0.15);
+        color: #047857;
+        border: 1.5px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-rejected {
+        background: rgba(239, 68, 68, 0.15);
+        color: #b91c1c;
+        border: 1.5px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .badge-secondary {
+        background: rgba(107, 114, 128, 0.15);
+        color: #4b5563;
+        border: 1.5px solid rgba(107, 114, 128, 0.3);
+    }
+
+    /* ── Detail Fields ── */
+    .refund-product-name {
+        color: var(--primary-navy, #1a2332);
+        font-weight: 700;
+        font-size: 1.05rem;
+        margin-bottom: 2px;
+    }
+
+    .refund-detail-label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--secondary-warm-gray, #8b8680);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 2px;
+    }
+
+    .refund-detail-value {
+        font-weight: 600;
+        color: var(--primary-navy, #1a2332);
+        font-size: 0.95rem;
+    }
+
+    .refund-reason-text {
+        color: #4a5568;
+        font-size: 0.9rem;
+        margin: 4px 0 0 0;
+        line-height: 1.5;
+    }
+
+    /* ── Rejection Alert ── */
+    .refund-rejection-alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        color: #991b1b;
+        font-size: 0.9rem;
+    }
+
+    .refund-rejection-alert i {
+        font-size: 1.1rem;
+        margin-top: 2px;
+        flex-shrink: 0;
+    }
+
+    /* ── Evidence Thumbnails ── */
+    .refund-evidence-thumb {
+        width: 72px;
+        height: 72px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        transition: transform .2s, border-color .2s;
+        cursor: pointer;
+    }
+
+    .refund-evidence-thumb:hover {
+        transform: scale(1.08);
+        border-color: #0d9488;
+    }
+
+    /* ── Refund Amount Panel ── */
+    .refund-amount-panel {
+        background: #f8fafb;
+        border-radius: 14px;
+        padding: 1.5rem;
+        border: 1px solid #e2e8f0;
+    }
+
+    .refund-amount-value {
+        color: var(--primary-gold, #c9a96e);
+        font-family: var(--font-secondary, 'Inter', sans-serif);
+        font-weight: 800;
+        font-size: 1.6rem;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .refund-currency {
+        font-size: 0.85rem;
+        font-weight: 600;
+        opacity: 0.7;
+    }
+
+    /* ── Empty State ── */
+    .refund-empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    .refund-empty-icon {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: #94a3b8;
+        margin: 0 auto 2rem;
+    }
+
+    .refund-empty-title {
+        color: var(--primary-navy, #1a2332);
+        font-weight: 800;
+        font-size: 1.6rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .refund-empty-desc {
+        color: var(--secondary-warm-gray, #8b8680);
+        font-size: 1.05rem;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .refund-empty-btn {
+        background: linear-gradient(135deg, #0d9488, #14b8a6);
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: transform .2s, box-shadow .2s;
+    }
+
+    .refund-empty-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(13, 148, 136, 0.35);
+        color: white;
+    }
+
+    /* ── Responsive ── */
+    @@media (max-width: 768px) {
+        .refund-title {
+            font-size: 1.6rem;
+        }
+
+        .refund-card-header {
+            padding: 1rem 1.25rem;
+        }
+
+        .refund-card-body {
+            padding: 1.25rem;
+        }
+
+        .refund-stat-card {
+            padding: 1rem;
+        }
+
+        .refund-stat-value {
+            font-size: 1.35rem;
+        }
+
+        .refund-amount-value {
+            font-size: 1.3rem;
+        }
+    }
+</style>

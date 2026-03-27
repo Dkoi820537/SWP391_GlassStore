@@ -23,6 +23,11 @@ public class CreateModel : PageModel
     [BindProperty]
     public CreateFrameViewModel Input { get; set; } = new();
 
+    [BindProperty]
+    public List<string> SelectedLensTypes { get; set; } = new();
+
+    public string[] AllLensTypes => Models.LensTypes.All;
+
     public IActionResult OnGet()
     {
         Input = new CreateFrameViewModel { Currency = "VND", IsActive = true };
@@ -94,6 +99,16 @@ public class CreateModel : PageModel
 
         _context.Frames.Add(frame);
         await _context.SaveChangesAsync();
+
+        // Save compatible lens types
+        if (SelectedLensTypes != null && SelectedLensTypes.Any())
+        {
+            var lensTypes = SelectedLensTypes
+                .Select(lt => new FrameCompatibleLensType { FrameProductId = frame.ProductId, LensType = lt })
+                .ToList();
+            _context.FrameCompatibleLensTypes.AddRange(lensTypes);
+            await _context.SaveChangesAsync();
+        }
 
         if (files.Any())
             await SaveProductImagesAsync(frame.ProductId, files, Input.ImageAltText);

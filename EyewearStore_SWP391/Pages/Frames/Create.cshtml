@@ -290,6 +290,34 @@
                 </div>
             </div>
 
+            <!-- ── Compatible Lens Types ───────────────────────────────── -->
+            <div class="form-section">
+                <h2 class="section-title">Compatible Lens Types</h2>
+                <p class="helper-text" style="margin-bottom:1rem;">
+                    Select which lens types are physically compatible with this frame.
+                    If none are selected, <strong>all lens types</strong> will be shown to customers.
+                </p>
+                <div style="margin-bottom:.75rem;">
+                    <button type="button" class="btn-sm" id="toggleAllBtn" onclick="toggleAllLensTypes()"
+                            style="padding:.35rem .75rem; font-size:.8rem; border-radius:6px; border:none; cursor:pointer; background:#667eea; color:#fff;">
+                        Select All
+                    </button>
+                </div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:.75rem;">
+                    @foreach (var lt in Model.AllLensTypes)
+                    {
+                        <label style="display:flex; align-items:center; gap:.5rem; cursor:pointer; padding:.5rem .75rem; border:1px solid #e0e0e8; border-radius:8px; transition:all .2s;">
+                            <input type="checkbox"
+                                   name="SelectedLensTypes"
+                                   value="@lt"
+                                   class="lens-type-cb"
+                                   style="width:18px; height:18px; cursor:pointer;" />
+                            <span style="font-size:.9rem; color:#4a4a68;">@lt</span>
+                        </label>
+                    }
+                </div>
+            </div>
+
             <!-- ── Color Options ──────────────────────────────────────── -->
             <div class="form-section">
                 <h2 class="section-title">Color Options</h2>
@@ -506,6 +534,14 @@
             inp.value = existing.length ? existing.join(', ') + ', ' + color : color;
             updateColorPreview();
         }
+    }
+
+    // ── Compatible lens types toggle ──────────────────────────────────────────
+    function toggleAllLensTypes() {
+        var cbs = document.querySelectorAll('.lens-type-cb');
+        var allChecked = Array.from(cbs).every(function(cb) { return cb.checked; });
+        cbs.forEach(function(cb) { cb.checked = !allChecked; });
+        document.getElementById('toggleAllBtn').textContent = allChecked ? 'Select All' : 'Deselect All';
     }
 
     // ── Face shapes → hidden input ────────────────────────────────────────────

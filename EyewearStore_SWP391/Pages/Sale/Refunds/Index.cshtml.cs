@@ -45,6 +45,7 @@ namespace EyewearStore_SWP391.Pages.Sale.Refunds
             public int DaysAgo { get; set; }
             public string? StripePaymentIntentId { get; set; }
             public DateTime? RefundResolvedAt { get; set; }
+            public string? EvidenceImagePath { get; set; }
         }
 
         public List<RefundRequestItem> RefundRequests { get; set; } = new();
@@ -100,7 +101,8 @@ namespace EyewearStore_SWP391.Pages.Sale.Refunds
                 CreatedAt = r.CreatedAt,
                 DaysAgo = (int)(DateTime.UtcNow - r.CreatedAt).TotalDays,
                 StripePaymentIntentId = r.StripePaymentIntentId,
-                RefundResolvedAt = r.RefundResolvedAt
+                RefundResolvedAt = r.RefundResolvedAt,
+                EvidenceImagePath = r.ImageUrls
             }).ToList();
         }
 
@@ -130,32 +132,34 @@ namespace EyewearStore_SWP391.Pages.Sale.Refunds
                 return RedirectToPage();
             }
 
-            // Validate StripePaymentIntentId
+            // Process Stripe refund only if a PaymentIntentId exists (online payment)
             var paymentIntentId = returnRequest.StripePaymentIntentId;
-            if (string.IsNullOrEmpty(paymentIntentId))
-            {
-                TempData["ErrorMessage"] = "No Stripe Payment Intent ID found for this refund. Cannot process through Stripe.";
-                return RedirectToPage();
-            }
+            bool isStripeRefund = !string.IsNullOrEmpty(paymentIntentId);
 
-            // Call Stripe Refund API
-            try
+            if (isStripeRefund)
             {
-                var refundService = new RefundService();
-                var refundOptions = new RefundCreateOptions
+                try
                 {
-                    PaymentIntent = paymentIntentId,
-                };
-                await refundService.CreateAsync(refundOptions);
+                    var refundService = new RefundService();
+                    var refundOptions = new RefundCreateOptions
+                    {
+                        PaymentIntent = paymentIntentId,
+                    };
+                    await refundService.CreateAsync(refundOptions);
 
-                _logger.LogInformation("Stripe refund created for Return #{ReturnId}, PaymentIntent: {PaymentIntentId}",
-                    returnId, paymentIntentId);
+                    _logger.LogInformation("Stripe refund created for Return #{ReturnId}, PaymentIntent: {PaymentIntentId}",
+                        returnId, paymentIntentId);
+                }
+                catch (StripeException ex)
+                {
+                    _logger.LogError(ex, "Stripe refund failed for Return #{ReturnId}", returnId);
+                    TempData["ErrorMessage"] = $"Stripe refund failed: {ex.Message}. Please try again or process manually.";
+                    return RedirectToPage();
+                }
             }
-            catch (StripeException ex)
+            else
             {
-                _logger.LogError(ex, "Stripe refund failed for Return #{ReturnId}", returnId);
-                TempData["ErrorMessage"] = $"Stripe refund failed: {ex.Message}. Please try again or process manually.";
-                return RedirectToPage();
+                _logger.LogInformation("COD/manual refund approved for Return #{ReturnId} — no Stripe processing needed.", returnId);
             }
 
             // Update return status
@@ -189,7 +193,9 @@ namespace EyewearStore_SWP391.Pages.Sale.Refunds
                 _logger.LogWarning(ex, "Failed to send refund approval email for Return #{ReturnId}", returnId);
             }
 
-            TempData["SuccessMessage"] = $"Refund #{returnId} approved! Stripe refund has been initiated.";
+            TempData["SuccessMessage"] = isStripeRefund
+                ? $"Refund #{returnId} approved! Stripe refund has been initiated."
+                : $"Refund #{returnId} approved! This is a COD order — please process the refund manually (cash or bank transfer).";
             return RedirectToPage();
         }
 

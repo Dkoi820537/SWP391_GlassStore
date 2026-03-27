@@ -477,31 +477,6 @@
                 <h4><i class="bi bi-shield-fill-check"></i> Admin Override Controls</h4>
                 <p class="oc-sub">Only admins can see and use these controls.</p>
 
-                <!-- Force Advance / Revert -->
-                <form method="post" asp-page-handler="ForceAdvance">
-                    <input type="hidden" name="id" value="@Model.id" />
-                    <textarea name="AdminNote" class="oc-note" rows="2" placeholder="Optional note (logged in audit)…"></textarea>
-                    <div class="oc-btn-row">
-                        <button type="submit" class="oc-btn oc-advance"
-                                onclick="return confirm('Force advance order to next step?')">
-                            <i class="bi bi-arrow-right-circle-fill"></i> Force Advance
-                        </button>
-                    </div>
-                </form>
-
-                <form method="post" asp-page-handler="RevertStatus">
-                    <input type="hidden" name="id" value="@Model.id" />
-                    <textarea name="AdminNote" class="oc-note" rows="2" placeholder="Reason for revert…"></textarea>
-                    <div class="oc-btn-row">
-                        <button type="submit" class="oc-btn oc-revert"
-                                onclick="return confirm('Revert order to previous step?')">
-                            <i class="bi bi-arrow-left-circle"></i> Revert Step
-                        </button>
-                    </div>
-                </form>
-
-                <hr class="oc-sep" />
-
                 <!-- Force to any status -->
                 <form method="post" asp-page-handler="ForceStatus">
                     <input type="hidden" name="id" value="@Model.id" />
@@ -519,7 +494,6 @@
                             }
                         }
                     </select>
-                    <textarea name="AdminNote" class="oc-note" rows="2" placeholder="Reason (logged in audit)…"></textarea>
                     <button type="submit" class="oc-force"
                             onclick="return confirm('Force this order to the selected status? This action will be logged.')">
                         <i class="bi bi-exclamation-triangle-fill"></i> Force to Status

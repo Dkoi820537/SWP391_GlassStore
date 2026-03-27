@@ -237,15 +237,7 @@
                                 <i class="bi bi-arrow-return-left me-1"></i>Request Refund
                             </a>
                         }
-                        @if (canReturn)
-                        {
-                            <a asp-page="/Customer/RequestReturn"
-                               asp-route-orderId="@Model.Order.OrderId"
-                               class="btn"
-                               style="padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 600; background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%); color: white; box-shadow: 0 2px 6px rgba(255,152,0,0.3);">
-                                <i class="bi bi-arrow-repeat me-1"></i>Request Return
-                            </a>
-                        }
+
 
                         @if (Model.Order.Status == "Pending")
                         {

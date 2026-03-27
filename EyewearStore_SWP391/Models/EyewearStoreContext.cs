@@ -560,7 +560,7 @@ public partial class EyewearStoreContext : DbContext
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.AddressId).HasColumnName("address_id");
             entity.Property(e => e.Status)
-                .HasMaxLength(20)
+                .HasMaxLength(50)
                 .IsRequired()
                 .HasColumnName("status");
             entity.Property(e => e.TotalAmount)
@@ -685,7 +685,7 @@ public partial class EyewearStoreContext : DbContext
             entity.Property(e => e.HistoryId).HasColumnName("history_id");
             entity.Property(e => e.ShipmentId).HasColumnName("shipment_id");
             entity.Property(e => e.Status)
-                .HasMaxLength(20)
+                .HasMaxLength(500)
                 .HasColumnName("status");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("SYSDATETIME()")

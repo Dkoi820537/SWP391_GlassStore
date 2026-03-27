@@ -243,7 +243,7 @@
                     <i class="bi bi-arrow-return-left me-2"></i>Request Refund
                 </h5>
             </div>
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                 <div class="modal-body" style="padding: 2rem;">
                     <input type="hidden" name="RefundOrderItemId" id="refundOrderItemId" />
 
@@ -273,6 +273,28 @@
                                          resize: vertical;"></textarea>
                         <small style="color: var(--secondary-warm-gray);">
                             Your reason helps our team process the request faster.
+                        </small>
+                    </div>
+
+                    <!-- Evidence Image Upload -->
+                    <div class="mb-3">
+                        <label class="form-label" style="font-weight: 600; color: var(--primary-navy); font-size: 1rem;">
+                            <i class="bi bi-camera me-2"></i>Evidence Image <span style="font-weight: 400; color: var(--secondary-warm-gray);">(optional)</span>
+                        </label>
+                        <div class="evidence-upload-area" id="uploadArea" onclick="document.getElementById('evidenceImageInput').click()">
+                            <div id="uploadPlaceholder">
+                                <i class="bi bi-cloud-arrow-up" style="font-size: 2rem; color: var(--primary-gold); display: block; margin-bottom: 0.5rem;"></i>
+                                <span style="font-weight: 600; color: var(--primary-navy);">Click to upload</span>
+                                <span style="color: var(--secondary-warm-gray); font-size: 0.85rem; display: block; margin-top: 0.25rem;">JPG, PNG, GIF, WebP — Max 5 MB</span>
+                            </div>
+                            <img id="imagePreview" src="#" alt="Preview" style="display: none; max-width: 100%; max-height: 200px; border-radius: 8px; object-fit: contain;" />
+                            <button type="button" id="removeImageBtn" style="display: none;" class="btn btn-sm btn-outline-danger mt-2" onclick="event.stopPropagation(); removeImage();">
+                                <i class="bi bi-x-circle me-1"></i>Remove
+                            </button>
+                        </div>
+                        <input type="file" name="EvidenceImage" id="evidenceImageInput" accept=".jpg,.jpeg,.png,.gif,.webp" style="display: none;" onchange="previewImage(this)" />
+                        <small style="color: var(--secondary-warm-gray);">
+                            Upload a photo of the product issue to help speed up your refund.
                         </small>
                     </div>
 
@@ -340,6 +362,28 @@
         box-shadow: 0 4px 12px rgba(255,152,0,0.4);
         color: white;
     }
+
+    .evidence-upload-area {
+        border: 2px dashed var(--medium-gray);
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #fafafa;
+        margin-bottom: 0.5rem;
+    }
+
+    .evidence-upload-area:hover {
+        border-color: var(--primary-gold);
+        background: rgba(212, 165, 116, 0.04);
+    }
+
+    .evidence-upload-area.has-image {
+        border-style: solid;
+        border-color: var(--primary-gold);
+        background: rgba(212, 165, 116, 0.04);
+    }
 </style>
 
 <script>
@@ -347,5 +391,38 @@
         document.getElementById('refundOrderItemId').value = itemId;
         document.getElementById('refundProductName').textContent = productName;
         document.getElementById('refundAmount').textContent = amount;
+        // Reset the file input when opening a new modal
+        removeImage();
+    }
+
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var file = input.files[0];
+            // Client-side size check
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be under 5 MB.');
+                input.value = '';
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('imagePreview').src = e.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+                document.getElementById('removeImageBtn').style.display = 'inline-block';
+                document.getElementById('uploadPlaceholder').style.display = 'none';
+                document.getElementById('uploadArea').classList.add('has-image');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function removeImage() {
+        var input = document.getElementById('evidenceImageInput');
+        input.value = '';
+        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('imagePreview').src = '#';
+        document.getElementById('removeImageBtn').style.display = 'none';
+        document.getElementById('uploadPlaceholder').style.display = 'block';
+        document.getElementById('uploadArea').classList.remove('has-image');
     }
 </script>

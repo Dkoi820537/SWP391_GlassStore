@@ -88,7 +88,7 @@ namespace EyewearStore_SWP391.Pages.Admin.Orders
         }
 
         // ─── Force to any status ───────────────────────────────────────────────
-        public async Task<IActionResult> OnPostForceStatusAsync(int id, string TargetStatus, string? AdminNote)
+        public async Task<IActionResult> OnPostForceStatusAsync(int id, string TargetStatus)
         {
             var order = await _context.Orders
                 .Include(o => o.Shipments)
@@ -111,105 +111,13 @@ namespace EyewearStore_SWP391.Pages.Admin.Orders
                 await RestoreInventoryAsync(order);
 
             // Write audit entry into ShipmentStatusHistory
-            await WriteAuditEventAsync(order, $"[ADMIN OVERRIDE] {prevStatus} → {TargetStatus}" +
-                (string.IsNullOrWhiteSpace(AdminNote) ? "" : $" | Note: {AdminNote}"));
+            await WriteAuditEventAsync(order, $"[ADMIN OVERRIDE] {prevStatus} → {TargetStatus}");
 
             await _context.SaveChangesAsync();
             TempData["Success"] = $"✓ Order #{id} status forced to: {TargetStatus}";
             return RedirectToPage(new { id });
         }
 
-        // ─── Force Advance (next logical step) ────────────────────────────────
-        public async Task<IActionResult> OnPostForceAdvanceAsync(int id, string? AdminNote)
-        {
-            var order = await _context.Orders
-                .Include(o => o.Shipments)
-                .FirstOrDefaultAsync(o => o.OrderId == id);
-
-            if (order == null) return NotFound();
-
-            string next = GetNextStatus(order.Status ?? "Pending");
-            if (next == order.Status)
-            {
-                TempData["Error"] = "Order is already at the final step.";
-                return RedirectToPage(new { id });
-            }
-
-            var prev = order.Status;
-            order.Status = next;
-            _context.Orders.Update(order);
-            await WriteAuditEventAsync(order, $"[ADMIN ADVANCE] {prev} → {next}" +
-                (string.IsNullOrWhiteSpace(AdminNote) ? "" : $" | Note: {AdminNote}"));
-
-            await _context.SaveChangesAsync();
-            TempData["Success"] = $"✓ Order #{id} advanced to: {next}";
-            return RedirectToPage(new { id });
-        }
-
-        // ─── Revert (previous logical step) ───────────────────────────────────
-        public async Task<IActionResult> OnPostRevertStatusAsync(int id, string? AdminNote)
-        {
-            var order = await _context.Orders
-                .Include(o => o.Shipments)
-                .FirstOrDefaultAsync(o => o.OrderId == id);
-
-            if (order == null) return NotFound();
-
-            string prev2 = GetPrevStatus(order.Status ?? "Pending");
-            if (prev2 == order.Status)
-            {
-                TempData["Error"] = "Order is already at the first step.";
-                return RedirectToPage(new { id });
-            }
-
-            var prev = order.Status;
-            order.Status = prev2;
-            _context.Orders.Update(order);
-            await WriteAuditEventAsync(order, $"[ADMIN REVERT] {prev} → {prev2}" +
-                (string.IsNullOrWhiteSpace(AdminNote) ? "" : $" | Note: {AdminNote}"));
-
-            await _context.SaveChangesAsync();
-            TempData["Success"] = $"✓ Order #{id} reverted to: {prev2}";
-            return RedirectToPage(new { id });
-        }
-
-        // ─── Helpers ──────────────────────────────────────────────────────────
-        private static string GetNextStatus(string current)
-        {
-            return current switch
-            {
-                "Pending"                       => "Confirmed",
-                "Confirmed"                     => "Processing",
-                "Processing"                    => "Processing - Lens Ordered",
-                "Processing - Lens Ordered"     => "Processing - Lens Received",
-                "Processing - Lens Received"    => "Processing - Fitting",
-                "Processing - Fitting"          => "Processing - QC",
-                "Processing - QC"               => "Processing - Packed",
-                "Processing - Packed"           => "Shipped",
-                "Shipped"                       => "Delivered",
-                "Delivered"                     => "Completed",
-                _                               => current
-            };
-        }
-
-        private static string GetPrevStatus(string current)
-        {
-            return current switch
-            {
-                "Confirmed"                  => "Pending",
-                "Processing"                 => "Confirmed",
-                "Processing - Lens Ordered"  => "Processing",
-                "Processing - Lens Received" => "Processing - Lens Ordered",
-                "Processing - Fitting"       => "Processing - Lens Received",
-                "Processing - QC"            => "Processing - Fitting",
-                "Processing - Packed"        => "Processing - QC",
-                "Shipped"                    => "Processing - Packed",
-                "Delivered"                  => "Shipped",
-                "Completed"                  => "Delivered",
-                "Cancelled"                  => "Pending",
-                _                            => current
-            };
-        }
 
         private async Task WriteAuditEventAsync(Order order, string eventText)
         {

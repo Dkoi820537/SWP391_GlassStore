@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace EyewearStore_SWP391.Pages.Customer
 {
-    [Authorize(Roles = "customer")]
+    [Authorize(Roles = "Customer,customer")]
     public class MyReturnsModel : PageModel
     {
         private readonly EyewearStoreContext _context;

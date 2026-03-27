@@ -183,9 +183,9 @@
                                     }
                                 </td>
                                 <td>
-                                    @if (item.Status == "Pending")
-                                    {
-                                        <div class="action-group">
+                                    <div class="action-group">
+                                        @if (item.Status == "Pending")
+                                        {
                                             <form method="post" asp-page-handler="Approve" style="display:inline;">
                                                 <input type="hidden" name="returnId" value="@item.ReturnId" />
                                                 <button type="button" class="btn-action btn-approve"
@@ -199,12 +199,19 @@
                                                     onclick="setRejectId(@item.ReturnId, '@item.CustomerName.Replace("'", "\\'")' )">
                                                 Reject
                                             </button>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <span class="action-done">—</span>
-                                    }
+                                        }
+                                        <button type="button" class="btn-action btn-detail"
+                                                data-customer="@item.CustomerName"
+                                                data-email="@item.CustomerEmail"
+                                                data-product="@item.ProductName"
+                                                data-amount="@item.RefundAmount.ToString("N0")"
+                                                data-reason="@item.Reason"
+                                                data-status="@item.Status"
+                                                data-date="@item.CreatedAt.ToString("MMM dd, yyyy")"
+                                                data-image="@(item.EvidenceImagePath ?? "")">
+                                            Detail
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -279,6 +286,68 @@
                     <button type="submit" class="btn-modal-confirm btn-modal-reject">Reject Refund</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 520px;">
+        <div class="modal-content modal-clean">
+            <div class="modal-clean-header" style="background: #00756A; padding: 18px 22px;">
+                <h5 style="color: #fff; font-size: 15px; font-weight: 700; margin: 0;"><i class="bi bi-file-earmark-text me-2"></i>Refund Request Detail</h5>
+                <button type="button" class="modal-close-btn" data-bs-dismiss="modal" style="color: rgba(255,255,255,0.7);">×</button>
+            </div>
+            <div class="modal-clean-body" style="padding: 22px;">
+                <!-- Info Grid -->
+                <div class="modal-info-block" style="margin-bottom: 16px;">
+                    <div class="modal-info-row">
+                        <span class="modal-info-label">Customer</span>
+                        <span class="modal-info-val" id="detailCustomer"></span>
+                    </div>
+                    <div class="modal-info-row">
+                        <span class="modal-info-label">Email</span>
+                        <span class="modal-info-val" id="detailEmail" style="font-weight: 500; color: #6b7280;"></span>
+                    </div>
+                    <div class="modal-info-row">
+                        <span class="modal-info-label">Product</span>
+                        <span class="modal-info-val" id="detailProduct"></span>
+                    </div>
+                    <div class="modal-info-row">
+                        <span class="modal-info-label">Amount</span>
+                        <span class="modal-info-val modal-amount"><span id="detailAmount"></span> VND</span>
+                    </div>
+                    <div class="modal-info-row">
+                        <span class="modal-info-label">Status</span>
+                        <span id="detailStatus"></span>
+                    </div>
+                    <div class="modal-info-row">
+                        <span class="modal-info-label">Requested</span>
+                        <span class="modal-info-val" id="detailDate"></span>
+                    </div>
+                </div>
+
+                <!-- Reason -->
+                <div style="margin-bottom: 16px;">
+                    <label class="detail-section-label">Reason</label>
+                    <div class="detail-reason-box" id="detailReason"></div>
+                </div>
+
+                <!-- Evidence Image -->
+                <div id="detailImageSection">
+                    <label class="detail-section-label">Evidence Image</label>
+                    <div id="detailImageWrap" class="detail-image-wrap">
+                        <img id="detailImage" src="" alt="Evidence" class="detail-evidence-img" />
+                    </div>
+                    <div id="detailNoImage" class="detail-no-image" style="display: none;">
+                        <i class="bi bi-image" style="font-size: 28px; color: #d1d5db; display: block; margin-bottom: 6px;"></i>
+                        <span>No image provided</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-clean-footer">
+                <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>
@@ -740,6 +809,12 @@
         gap: 6px;
     }
 
+    .action-group {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
     .btn-action {
         padding: 6px 14px;
         border-radius: 6px;
@@ -773,9 +848,77 @@
             color: #111827;
         }
 
+    .btn-detail {
+        background: #fff;
+        color: #00756A;
+        border-color: #00756A;
+    }
+
+        .btn-detail:hover {
+            background: #00756A;
+            color: #fff;
+        }
+
     .action-done {
         color: #d1d5db;
         font-size: 14px;
+    }
+
+    /* ── Detail Modal Extras ── */
+    .detail-section-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .detail-reason-box {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-size: 13.5px;
+        color: #374151;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 120px;
+        overflow-y: auto;
+    }
+
+    .detail-image-wrap {
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #fafafa;
+        text-align: center;
+        padding: 8px;
+    }
+
+    .detail-evidence-img {
+        max-width: 100%;
+        max-height: 280px;
+        object-fit: contain;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+        .detail-evidence-img:hover {
+            transform: scale(1.02);
+        }
+
+    .detail-no-image {
+        background: #f9fafb;
+        border: 1px dashed #e5e7eb;
+        border-radius: 10px;
+        padding: 24px;
+        text-align: center;
+        color: #9ca3af;
+        font-size: 13px;
     }
 
     /* ── Empty State ── */
@@ -1034,4 +1177,62 @@
         document.getElementById('rejectReturnId').value = returnId;
         document.getElementById('rejectCustomerName').textContent = customerName;
     }
+
+    // ── Detail Modal Logic ──
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.btn-detail').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                // Extract data attributes
+                var customer = this.getAttribute('data-customer') || '';
+                var email = this.getAttribute('data-email') || '';
+                var product = this.getAttribute('data-product') || '';
+                var amount = this.getAttribute('data-amount') || '';
+                var reason = this.getAttribute('data-reason') || '';
+                var status = this.getAttribute('data-status') || '';
+                var date = this.getAttribute('data-date') || '';
+                var image = this.getAttribute('data-image') || '';
+
+                // Populate text fields
+                document.getElementById('detailCustomer').textContent = customer;
+                document.getElementById('detailEmail').textContent = email;
+                document.getElementById('detailProduct').textContent = product;
+                document.getElementById('detailAmount').textContent = amount;
+                document.getElementById('detailDate').textContent = date;
+                document.getElementById('detailReason').textContent = reason;
+
+                // Status badge
+                var statusEl = document.getElementById('detailStatus');
+                var statusClass = 'status-pending';
+                if (status === 'Approved') statusClass = 'status-approved';
+                else if (status === 'Rejected') statusClass = 'status-rejected';
+                statusEl.innerHTML = '<span class="status-badge ' + statusClass + '">' + status + '</span>';
+
+                // Evidence image
+                var imgWrap = document.getElementById('detailImageWrap');
+                var noImg = document.getElementById('detailNoImage');
+                var imgEl = document.getElementById('detailImage');
+
+                if (image && image.trim() !== '') {
+                    imgEl.src = image;
+                    imgWrap.style.display = 'block';
+                    noImg.style.display = 'none';
+                } else {
+                    imgEl.src = '';
+                    imgWrap.style.display = 'none';
+                    noImg.style.display = 'block';
+                }
+
+                // Show modal
+                var modal = new bootstrap.Modal(document.getElementById('detailModal'));
+                modal.show();
+            });
+        });
+
+        // Open image in new tab when clicked
+        document.getElementById('detailImage').addEventListener('click', function () {
+            if (this.src && this.src !== window.location.href) {
+                window.open(this.src, '_blank');
+            }
+        });
+    });
 </script>

@@ -6,24 +6,27 @@ using EyewearStore_SWP391.Models;
 using EyewearStore_SWP391.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace EyewearStore_SWP391.Pages.Customer
 {
-    [Authorize(Roles = "customer")]
+    [Authorize(Roles = "Customer,customer")]
     public class RequestReturnModel : PageModel
     {
         private readonly EyewearStoreContext _context;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _environment;
 
-        public RequestReturnModel(EyewearStoreContext context, IEmailService emailService, IConfiguration configuration)
+        public RequestReturnModel(EyewearStoreContext context, IEmailService emailService, IConfiguration configuration, IWebHostEnvironment environment)
         {
             _context = context;
             _emailService = emailService;
             _configuration = configuration;
+            _environment = environment;
         }
 
         public Order? Order { get; set; }
@@ -49,6 +52,9 @@ namespace EyewearStore_SWP391.Pages.Customer
 
         [BindProperty]
         public string? RefundReason { get; set; }
+
+        [BindProperty]
+        public IFormFile? EvidenceImage { get; set; }
 
         // ── OnGetAsync ───────────────────────────────────────────────────────
 
@@ -162,15 +168,44 @@ namespace EyewearStore_SWP391.Pages.Customer
                 return await OnGetAsync(orderId);
             }
 
-            // Validate StripePaymentIntentId exists on the order
-            if (string.IsNullOrEmpty(order.StripePaymentIntentId))
-            {
-                TempData["ErrorMessage"] = "This order does not have a valid payment reference for processing a refund. Please contact support.";
-                return await OnGetAsync(orderId);
-            }
+
 
             try
             {
+                // Handle evidence image upload
+                string? evidenceImagePath = null;
+                if (EvidenceImage != null && EvidenceImage.Length > 0)
+                {
+                    // Validate file size (max 5 MB)
+                    if (EvidenceImage.Length > 5 * 1024 * 1024)
+                    {
+                        TempData["ErrorMessage"] = "Image file size must be under 5 MB.";
+                        return await OnGetAsync(orderId);
+                    }
+
+                    // Validate file extension
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                    var fileExtension = Path.GetExtension(EvidenceImage.FileName).ToLowerInvariant();
+                    if (!allowedExtensions.Contains(fileExtension))
+                    {
+                        TempData["ErrorMessage"] = "Only image files (JPG, PNG, GIF, WebP) are allowed.";
+                        return await OnGetAsync(orderId);
+                    }
+
+                    // Generate unique filename and save
+                    var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
+                    var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "returns");
+                    Directory.CreateDirectory(uploadsFolder); // Ensure directory exists
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await EvidenceImage.CopyToAsync(stream);
+                    }
+
+                    evidenceImagePath = $"/uploads/returns/{uniqueFileName}";
+                }
+
                 // Create the return/refund request
                 var returnRequest = new Return
                 {
@@ -181,6 +216,7 @@ namespace EyewearStore_SWP391.Pages.Customer
                     ReasonCategory = "Refund Request",
                     Reason = RefundReason,
                     Description = RefundReason,
+                    ImageUrls = evidenceImagePath,
                     Status = "Pending",
                     RefundAmount = orderItem.UnitPrice * orderItem.Quantity,
                     StripePaymentIntentId = order.StripePaymentIntentId,

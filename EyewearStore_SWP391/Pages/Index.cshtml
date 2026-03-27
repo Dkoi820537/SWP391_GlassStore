@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model IndexModel
 @{
     ViewData["Title"] = "OptiPlus - Premium Eyewear for Your Unique Style";
@@ -147,19 +147,180 @@
                 </div>
             </div>
 
-            <!-- Brand Logos -->
-            <div class="brand-logos">
-                <p class="brand-logos-label">Shop Our Famous Brand:</p>
-                <div class="brand-logos-grid">
-                    <a href="/Products/Index?BrandFilter=Zeiss" class="brand-logo">ZEISS</a>
-                    <a href="/Products/Index?BrandFilter=Essilor" class="brand-logo">ESSILOR</a>
-                    <a href="/Products/Index?BrandFilter=Ray-Ban" class="brand-logo">Ray-Ban</a>
-                    <a href="/Products/Index?BrandFilter=Oakley" class="brand-logo">OAKLEY</a>
-                    <a href="/Products/Index?BrandFilter=Maui+Jim" class="brand-logo">Maui Jim</a>
+            <!-- Dynamic Brand Selector -->
+            <div class="dynamic-brand-selector">
+                <div class="dbs-header">
+                    <h3 class="dbs-title">Browse by Brand</h3>
+                    <div class="dbs-toggle">
+                        <button id="btn-frames" class="dbs-btn active" onclick="switchBrandTab('frames')">Frame Brands</button>
+                        <button id="btn-lenses" class="dbs-btn inactive" onclick="switchBrandTab('lenses')">Lens Brands</button>
+                    </div>
+                </div>
+
+                <div class="dbs-container">
+                    <div id="list-frames" class="dbs-list fade-in">
+                        <!-- JS handles population -->
+                    </div>
+                    <div id="list-lenses" class="dbs-list hidden">
+                        <!-- JS handles population -->
+                    </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Scoped Styles for Dynamic Brand Selector -->
+    <style>
+        .dynamic-brand-selector {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e7eb;
+            width: 100%;
+        }
+
+        .dbs-header {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        @@media (min-width: 768px) {
+            .dbs-header {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+
+        .dbs-title {
+            font-size: 1.875rem; /* 30px */
+            font-weight: 700;
+            color: #111827;
+            margin: 0;
+            letter-spacing: -0.025em;
+        }
+
+        .dbs-toggle {
+            display: inline-flex;
+            background-color: #f3f4f6;
+            padding: 0.25rem;
+            border-radius: 9999px;
+            align-self: flex-start;
+        }
+
+        @@media (min-width: 768px) {
+            .dbs-toggle {
+                align-self: auto;
+            }
+        }
+
+        .dbs-btn {
+            padding: 0.625rem 1.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            outline: none;
+        }
+
+        .dbs-btn.active {
+            background-color: #004d40;
+            color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .dbs-btn.inactive {
+            background-color: transparent;
+            color: #4b5563;
+        }
+
+        .dbs-btn.inactive:hover {
+            color: #111827;
+            background-color: #e5e7eb;
+        }
+
+        .dbs-container {
+            position: relative;
+            min-height: 100px;
+            overflow: hidden;
+            width: 100%;
+            padding-bottom: 1rem;
+        }
+
+        .dbs-list {
+            display: flex;
+            overflow-x: auto;
+            gap: 1rem;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .dbs-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        @@media (min-width: 768px) {
+            .dbs-list {
+                flex-wrap: wrap;
+                overflow-x: visible;
+            }
+        }
+
+        .dbs-list.hidden {
+            display: none;
+        }
+
+        /* The individual chip buttons */
+        .brand-chip {
+            white-space: nowrap;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem; /* 8px */
+            border: 1px solid #e5e7eb;
+            color: #1f2937;
+            font-weight: 500;
+            font-size: 1.125rem; /* 18px */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #ffffff;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        .brand-chip:hover, .brand-chip:focus {
+            border-color: #004d40;
+            background-color: #f0fdfa; /* Light teal */
+            color: #004d40;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 77, 64, 0.1), 0 2px 4px -1px rgba(0, 77, 64, 0.06);
+            outline: none;
+        }
+
+        .brand-chip:active {
+            transform: translateY(0);
+        }
+        
+        @@media (min-width: 768px) {
+            .brand-chip {
+                flex-shrink: 1;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: dbsFadeIn 0.35s ease-out forwards;
+        }
+        
+        @@keyframes dbsFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 
     <!-- ============================================
          SERVICES SECTION
@@ -340,6 +501,66 @@
             e.preventDefault();
             var el = document.getElementById(id);
             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ============================================
+        // BRAND SELECTOR LOGIC
+        // ============================================
+        document.addEventListener("DOMContentLoaded", function() {
+            const frameBrands = ['Ray-Ban', 'Oakley', 'Gucci', 'Prada', 'Tom Ford', 'Versace', 'Burberry', 'Persol', 'Maui Jim'];
+            const lensBrands = ['ZEISS', 'Essilor', 'Hoya', 'Nikon', 'Shamir', 'Kodak'];
+
+            const createBrandChip = (brandName, type) => {
+                const url = `/Products/Index?BrandFilter=${encodeURIComponent(brandName)}&ProductTypeFilter=${type}`;
+                return `<a href="${url}" class="brand-chip">${brandName}</a>`;
+            };
+
+            const listFrames = document.getElementById('list-frames');
+            const listLenses = document.getElementById('list-lenses');
+
+            if (listFrames && listLenses) {
+                listFrames.innerHTML = frameBrands.map(b => createBrandChip(b, 'Frame')).join('');
+                listLenses.innerHTML = lensBrands.map(b => createBrandChip(b, 'Lens')).join('');
+            }
+        });
+
+        function switchBrandTab(tabId) {
+            const btnFrames = document.getElementById('btn-frames');
+            const btnLenses = document.getElementById('btn-lenses');
+            const listFrames = document.getElementById('list-frames');
+            const listLenses = document.getElementById('list-lenses');
+            
+            if (!btnFrames || !btnLenses || !listFrames || !listLenses) return;
+
+            const setTabStyle = (btn, isActive) => {
+                if (isActive) {
+                    btn.classList.add('active');
+                    btn.classList.remove('inactive');
+                } else {
+                    btn.classList.add('inactive');
+                    btn.classList.remove('active');
+                }
+            };
+
+            const showList = (hideEl, showEl) => {
+                hideEl.classList.add('hidden');
+                hideEl.classList.remove('fade-in');
+                showEl.classList.remove('hidden');
+                
+                // Trigger browser reflow to instantly restart animation
+                void showEl.offsetWidth; 
+                showEl.classList.add('fade-in');
+            };
+
+            if (tabId === 'frames') {
+                setTabStyle(btnFrames, true);
+                setTabStyle(btnLenses, false);
+                showList(listLenses, listFrames);
+            } else {
+                setTabStyle(btnFrames, false);
+                setTabStyle(btnLenses, true);
+                showList(listFrames, listLenses);
+            }
         }
     </script>
 }

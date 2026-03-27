@@ -21,7 +21,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
     /// Each role only sees and can press the ONE button that moves the order
     /// to the NEXT step in their scope. No dropdown, no free-form selection.
     /// </summary>
-    [Authorize(Roles = "support,sales,sale,admin,Administrator")]
+    [Authorize(Roles = "sale,admin,manager")]
     public class DetailsModel : PageModel
     {
         private readonly EyewearStoreContext _context;

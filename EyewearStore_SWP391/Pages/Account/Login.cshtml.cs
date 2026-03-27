@@ -127,21 +127,17 @@ namespace EyewearStore_SWP391.Pages.Account
                 return LocalRedirect(returnUrl);
             }
 
-            if (r == "admin")
+            if (r == "admin" || r == "administrator")
             {
                 return LocalRedirect("/Admin");
             }
-            if (r == "sale" || r == "sale staff")
+            if (r == "sale" || r == "sales" || r == "sale staff" || r == "support")
             {
                 return LocalRedirect("/Support/Orders/Index");
             }
-            if (r == "staff" || r == "operational staff")
+            if (r == "operational" || r == "staff" || r == "operational staff")
             {
                 return LocalRedirect("/Staff/Orders/Index");
-            }
-            if (r == "support")
-            {
-                return LocalRedirect("/Support/Orders/Index");
             }
             if (r == "manager")
             {

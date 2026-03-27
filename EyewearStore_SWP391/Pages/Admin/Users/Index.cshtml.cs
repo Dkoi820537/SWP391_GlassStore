@@ -15,7 +15,7 @@ namespace EyewearStore_SWP391.Pages.Admin.Users
     /// User Management - Admin can manage all users, roles, and permissions
     /// BR: Admin has full control over user accounts
     /// </summary>
-    [Authorize(Roles = "admin,Administrator")]
+    [Authorize(Roles = "admin")]
     public class IndexModel : PageModel
     {
         private readonly EyewearStoreContext _context;
@@ -42,13 +42,9 @@ namespace EyewearStore_SWP391.Pages.Admin.Users
         {
             "customer",
             "sale",
-            "sales",
-            "support",
-            "staff",
             "operational",
             "manager",
-            "admin",
-            "Administrator"
+            "admin"
         };
 
         public class UserDto
@@ -133,12 +129,12 @@ namespace EyewearStore_SWP391.Pages.Admin.Users
 
             // Staff count (all non-customer, non-admin roles)
             Stats.StaffCount = await _context.Users
-                .Where(u => u.Role != "customer" && u.Role != "admin" && u.Role != "Administrator")
+                .Where(u => u.Role != "customer" && u.Role != "admin")
                 .CountAsync();
 
             // Admin count
             Stats.AdminCount = await _context.Users
-                .Where(u => u.Role == "admin" || u.Role == "Administrator")
+                .Where(u => u.Role == "admin")
                 .CountAsync();
         }
 

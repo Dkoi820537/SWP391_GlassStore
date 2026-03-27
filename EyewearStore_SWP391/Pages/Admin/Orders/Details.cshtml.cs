@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace EyewearStore_SWP391.Pages.Admin.Orders
 {
-    [Authorize(Roles = "admin,manager,Administrator")]
+    [Authorize(Roles = "admin,manager")]
     public class DetailsModel : PageModel
     {
         private readonly EyewearStoreContext _context;

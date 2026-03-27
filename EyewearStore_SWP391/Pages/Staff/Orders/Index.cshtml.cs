@@ -10,7 +10,7 @@ using System;
 
 namespace EyewearStore_SWP391.Pages.Staff.Orders
 {
-    [Authorize(Roles = "staff,operations,admin,Administrator")]
+    [Authorize(Roles = "operational,admin,manager")]
     public class IndexModel : PageModel
     {
         private readonly EyewearStoreContext _context;

@@ -9,7 +9,7 @@ using System;
 
 namespace EyewearStore_SWP391.Pages.Admin.Users
 {
-    [Authorize(Roles = "admin,Administrator")]
+    [Authorize(Roles = "admin")]
     public class EditModel : PageModel
     {
         private readonly EyewearStoreContext _context;
@@ -83,6 +83,17 @@ namespace EyewearStore_SWP391.Pages.Admin.Users
             if (emailExists)
             {
                 ModelState.AddModelError("Input.Email", "Email already in use by another user");
+                return Page();
+            }
+
+            // Validate role
+            var validRoles = new[] { "customer", "sale", "operational", "manager", "admin" };
+            if (!Array.Exists(validRoles, r => r == Input.Role))
+            {
+                ModelState.AddModelError("Input.Role", "Invalid role selected");
+                UserId = id;
+                CurrentRole = user.Role;
+                CreatedAt = user.CreatedAt;
                 return Page();
             }
 

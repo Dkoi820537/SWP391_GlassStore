@@ -13,7 +13,7 @@ namespace EyewearStore_SWP391.Pages.Admin.Users
     /// Create New User - Admin creates user accounts
     /// BR: Admin can create users with any role
     /// </summary>
-    [Authorize(Roles = "admin,Administrator")]
+    [Authorize(Roles = "admin")]
     public class CreateModel : PageModel
     {
         private readonly EyewearStoreContext _context;
@@ -75,7 +75,7 @@ namespace EyewearStore_SWP391.Pages.Admin.Users
             }
 
             // Validate role
-            var validRoles = new[] { "customer", "sale", "sales", "support", "staff", "operational", "manager", "admin", "Administrator" };
+            var validRoles = new[] { "customer", "sale", "operational", "manager", "admin" };
             if (!Array.Exists(validRoles, r => r == Input.Role))
             {
                 ModelState.AddModelError("Input.Role", "Invalid role selected");

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace EyewearStore_SWP391.Pages.Admin.Orders
 {
-    [Authorize(Roles = "admin,manager,Administrator")]
+    [Authorize(Roles = "admin,manager")]
     public class IndexModel : PageModel
     {
         private readonly EyewearStoreContext _context;

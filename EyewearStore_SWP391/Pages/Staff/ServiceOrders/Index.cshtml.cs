@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace EyewearStore_SWP391.Pages.Staff.ServiceOrders
 {
-    [Authorize(Roles = "staff,admin,Administrator,manager")]
+    [Authorize(Roles = "operational,admin,manager")]
     public class IndexModel : PageModel
     {
         private readonly EyewearStoreContext _db;

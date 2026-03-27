@@ -371,17 +371,39 @@
                             </a>
                         </li>
 
-                        @if (User.IsInRole("sale"))
+                        @if (User.IsInRole("sale") || User.IsInRole("sales") || User.IsInRole("support"))
                         {
-                            <li>
-                                <a class="stitch-menu-link" asp-page="/Support/Orders/Index">
+                            <li class="dropdown">
+                                <button class="stitch-menu-link" id="saleDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span class="material-symbols-outlined icon">support_agent</span>
-                                    <span>Support</span>
-                                </a>
+                                    <span>Sales</span>
+                                    <span class="material-symbols-outlined chevron">expand_more</span>
+                                </button>
+                                <ul class="dropdown-menu shop-dropdown-menu p-2" aria-labelledby="saleDropdown">
+                                    <li>
+                                        <a class="shop-drop-item" asp-page="/Support/Orders/Index">
+                                            <div class="shop-drop-icon frames"><i class="bi bi-bag-check"></i></div>
+                                            <div class="shop-drop-text">
+                                                <div class="shop-drop-name">Orders</div>
+                                                <div class="shop-drop-desc">Manage & track customer orders</div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li><div class="shop-drop-divider"></div></li>
+                                    <li>
+                                        <a class="shop-drop-item" asp-page="/Sale/Refunds/Index">
+                                            <div class="shop-drop-icon lenses"><i class="bi bi-arrow-counterclockwise"></i></div>
+                                            <div class="shop-drop-text">
+                                                <div class="shop-drop-name">Refund Requests</div>
+                                                <div class="shop-drop-desc">Review & process refunds</div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                         }
 
-                        @if (User.IsInRole("admin") || User.IsInRole("manager"))
+                        @if (User.IsInRole("admin") || User.IsInRole("Administrator") || User.IsInRole("manager"))
                         {
                             <li class="dropdown">
                                 <button class="stitch-menu-link active-admin" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -424,8 +446,8 @@
                                         <a class="shop-drop-item" asp-page="/Staff/Orders/Index">
                                             <div class="shop-drop-icon frames"><i class="bi bi-people-fill"></i></div>
                                             <div class="shop-drop-text">
-                                                <div class="shop-drop-name">Staff</div>
-                                                <div class="shop-drop-desc">General staff portal</div>
+                                                <div class="shop-drop-name">Operational Staff</div>
+                                                <div class="shop-drop-desc">Operations portal</div>
                                             </div>
                                         </a>
                                     </li>

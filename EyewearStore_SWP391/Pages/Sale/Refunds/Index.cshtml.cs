@@ -13,7 +13,7 @@ using Stripe;
 
 namespace EyewearStore_SWP391.Pages.Sale.Refunds
 {
-    [Authorize(Roles = "sale,sales,support,admin,Administrator")]
+    [Authorize(Roles = "sale,admin,manager")]
     public class IndexModel : PageModel
     {
         private readonly EyewearStoreContext _context;

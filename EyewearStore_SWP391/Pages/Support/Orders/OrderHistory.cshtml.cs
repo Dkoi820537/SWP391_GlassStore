@@ -9,7 +9,7 @@ using System;
 
 namespace EyewearStore_SWP391.Pages.Support.Customers
 {
-    [Authorize(Roles = "support,sales,sale,admin,Administrator")]
+    [Authorize(Roles = "sale,admin,manager")]
     public class OrderHistoryModel : PageModel
     {
         private readonly EyewearStoreContext _context;

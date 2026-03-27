@@ -15,7 +15,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
     /// Default scope: Pending Confirmation + Confirmed
     /// Processing and later statuses will move to Staff dashboard
     /// </summary>
-    [Authorize(Roles = "support,sales,sale,admin,Administrator")]
+    [Authorize(Roles = "sale,admin,manager")]
     public class IndexModel : PageModel
     {
         private readonly EyewearStoreContext _context;

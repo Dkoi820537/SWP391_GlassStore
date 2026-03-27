@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace EyewearStore_SWP391.Pages.Manager.Services
 {
-    [Authorize(Roles = "manager,admin,Administrator")]
+    [Authorize(Roles = "manager,admin")]
     public class EditModel : PageModel
     {
         private readonly IServiceService _svc;

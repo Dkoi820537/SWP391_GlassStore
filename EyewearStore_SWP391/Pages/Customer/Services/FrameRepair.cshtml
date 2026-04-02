@@ -34,7 +34,6 @@
             color: var(--ink);
         }
 
-        /* ── HERO STRIP ── */
         .rp-hero {
             background: var(--ink);
             padding: 56px 32px 48px;
@@ -125,7 +124,6 @@
                 margin-top: 2px;
             }
 
-        /* ── STEPPER ── */
         .rp-stepper-wrap {
             background: #fff;
             border-bottom: 1px solid var(--bdr);
@@ -185,9 +183,6 @@
             color: #fff;
         }
 
-        .rp-step-info {
-        }
-
         .rp-step-label {
             font-size: 11px;
             font-weight: 600;
@@ -219,14 +214,12 @@
             flex-shrink: 0;
         }
 
-        /* ── MAIN LAYOUT ── */
         .rp-main {
             max-width: 1000px;
             margin: 0 auto;
             padding: 40px 32px 80px;
         }
 
-        /* ── PANELS ── */
         .rp-panel {
             display: none;
         }
@@ -254,7 +247,6 @@
                 line-height: 1.55;
             }
 
-        /* ── FRAME GRID ── */
         .frame-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill,minmax(175px,1fr));
@@ -346,12 +338,11 @@
             padding: 2px 7px;
         }
 
-        /* ── REPAIR LIST ── */
         .repair-list {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-bottom: 32px;
+            margin-bottom: 18px;
         }
 
         .repair-row {
@@ -443,7 +434,61 @@
             letter-spacing: .5px;
         }
 
-        /* ── SUMMARY ── */
+        .pager-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin: 12px 0 30px;
+        }
+
+        .pager-info {
+            font-size: 12px;
+            color: var(--steel);
+        }
+
+        .pager {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .pager-link {
+            min-width: 38px;
+            height: 38px;
+            padding: 0 12px;
+            border: 1px solid var(--bdr);
+            background: #fff;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--ink);
+            font-size: 13px;
+            font-weight: 600;
+            transition: all .2s;
+        }
+
+            .pager-link:hover {
+                border-color: var(--amber);
+                color: var(--amber);
+                transform: translateY(-1px);
+            }
+
+            .pager-link.active {
+                background: linear-gradient(135deg,var(--amber),#9e6228);
+                color: #fff;
+                border-color: transparent;
+                box-shadow: 0 4px 12px rgba(193,127,58,.22);
+            }
+
+            .pager-link.disabled {
+                pointer-events: none;
+                opacity: .45;
+            }
+
         .summary-box {
             background: #fff;
             border: 1px solid var(--bdr);
@@ -556,7 +601,6 @@
             color: var(--amber);
         }
 
-        /* ── MINI SELECTION ── */
         .mini-sel {
             display: flex;
             gap: 8px;
@@ -589,7 +633,6 @@
                 font-weight: 600;
             }
 
-        /* ── BUTTONS ── */
         .nav-btns {
             display: flex;
             gap: 10px;
@@ -671,7 +714,6 @@
                 box-shadow: 0 8px 26px rgba(45,122,95,.38);
             }
 
-        /* ── EMPTY ── */
         .empty-state {
             text-align: center;
             padding: 60px 24px;
@@ -692,7 +734,6 @@
                 font-size: 14px;
             }
 
-        /* ── TRUST BADGES ── */
         .trust-row {
             display: flex;
             gap: 12px;
@@ -718,31 +759,40 @@
             }
 
         @@media (max-width: 600px) {
-            .rp-hero
+            .rp-hero {
+                padding: 48px 18px 36px
+            }
 
-        {
-            padding: 48px 18px 36px
-        }
+            .rp-main {
+                padding: 28px 18px 60px
+            }
 
-        .rp-main {
-            padding: 28px 18px 60px
-        }
+            .frame-grid {
+                grid-template-columns: repeat(auto-fill,minmax(140px,1fr))
+            }
 
-        .frame-grid {
-            grid-template-columns: repeat(auto-fill,minmax(140px,1fr))
-        }
+            .rp-stepper-wrap {
+                padding: 0 18px
+            }
 
-        .rp-stepper-wrap {
-            padding: 0 18px
-        }
+            .pager-wrap {
+                flex-direction: column;
+                align-items: stretch;
+            }
 
+            .pager {
+                justify-content: center;
+            }
+
+            .pager-info {
+                text-align: center;
+            }
         }
     </style>
 }
 
 <div class="rp-page">
 
-    <!-- HERO -->
     <div class="rp-hero">
         <a href="javascript:history.back()" class="rp-back"><i class="bi bi-arrow-left"></i> Back</a>
         <div class="rp-hero-inner">
@@ -757,7 +807,6 @@
         </div>
     </div>
 
-    <!-- STEPPER -->
     <div class="rp-stepper-wrap">
         <div class="rp-stepper">
             <div class="rp-step active" id="rs1">
@@ -786,10 +835,8 @@
         </div>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div class="rp-main">
 
-        <!-- STEP 1: FRAME -->
         <div class="rp-panel active" id="rp1">
             <div class="panel-head">
                 <h2>Which frame needs repair?</h2>
@@ -811,7 +858,6 @@
                                 }
                                 else
                                 {
-
                                     <div class="frame-img-ph">🕶</div>
                                 }
                             </div>
@@ -841,7 +887,6 @@
             </div>
         </div>
 
-        <!-- STEP 2: REPAIR TYPE -->
         <div class="rp-panel" id="rp2">
             <div class="panel-head">
                 <h2>Select repair type</h2>
@@ -878,6 +923,38 @@
                         </div>
                     }
                 </div>
+
+                @if (Model.TotalServicePages > 1)
+                {
+                    <div class="pager-wrap">
+                        <div class="pager-info">
+                            Showing @Model.ServicePageStartItem-@Model.ServicePageEndItem of @Model.TotalServiceCount services
+                        </div>
+
+                        <div class="pager">
+                            <a class="pager-link @(Model.HasPreviousServicePage ? "" : "disabled")"
+                               asp-page="./FrameRepair"
+                               asp-route-servicePage="@(Model.ServicePage - 1)">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+
+                            @for (var i = 1; i <= Model.TotalServicePages; i++)
+                            {
+                                <a class="pager-link @(i == Model.ServicePage ? "active" : "")"
+                                   asp-page="./FrameRepair"
+                                   asp-route-servicePage="@i">
+                                    @i
+                                </a>
+                            }
+
+                            <a class="pager-link @(Model.HasNextServicePage ? "" : "disabled")"
+                               asp-page="./FrameRepair"
+                               asp-route-servicePage="@(Model.ServicePage + 1)">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                }
             }
             else
             {
@@ -892,7 +969,6 @@
             </div>
         </div>
 
-        <!-- STEP 3: REVIEW -->
         <div class="rp-panel" id="rp3">
             <div class="panel-head">
                 <h2>Review your repair order</h2>
@@ -920,22 +996,26 @@
 
         function rGoStep(n) {
             if (n > 1 && !rSel.frame) { rShake('rp1'); return; }
-            if (n > 2 && !rSel.svc)   { rShake('rp2'); return; }
-            [1,2,3].forEach(i => {
-                document.getElementById('rp'+i)?.classList.toggle('active', i===n);
+            if (n > 2 && !rSel.svc) { rShake('rp2'); return; }
+
+            [1, 2, 3].forEach(i => {
+                document.getElementById('rp' + i)?.classList.toggle('active', i === n);
             });
+
             updateRStepper(n);
-            if (n===2) renderMini('miniSel2');
-            if (n===3) rBuildSummary();
-            window.scrollTo({top:0,behavior:'smooth'});
+
+            if (n === 2) renderMini('miniSel2');
+            if (n === 3) rBuildSummary();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function updateRStepper(cur) {
-            [1,2,3].forEach(i => {
-                const step = document.getElementById('rs'+i);
-                const num  = document.getElementById('rn'+i);
-                if(!step) return;
-                step.classList.remove('active','done');
+            [1, 2, 3].forEach(i => {
+                const step = document.getElementById('rs' + i);
+                const num = document.getElementById('rn' + i);
+                if (!step) return;
+                step.classList.remove('active', 'done');
                 if (i < cur) {
                     step.classList.add('done');
                     num.innerHTML = '<i class="bi bi-check-lg" style="font-size:12px"></i>';
@@ -951,20 +1031,25 @@
         function rShake(id) {
             const el = document.getElementById(id);
             let t = 0;
-            const s = [6,-6,4,-4,2,-2,0];
-            const next = () => { if(t>=s.length){el.style.transform='';return;} el.style.transform=`translateX(${s[t]}px)`; t++; setTimeout(next,60); };
+            const s = [6, -6, 4, -4, 2, -2, 0];
+            const next = () => {
+                if (t >= s.length) { el.style.transform = ''; return; }
+                el.style.transform = `translateX(${s[t]}px)`;
+                t++;
+                setTimeout(next, 60);
+            };
             next();
         }
 
         function rSelectFrame(card) {
-            document.querySelectorAll('#frameGrid .frame-card').forEach(c=>c.classList.remove('sel'));
+            document.querySelectorAll('#frameGrid .frame-card').forEach(c => c.classList.remove('sel'));
             card.classList.add('sel');
             rSel.frame = { id: card.dataset.id, name: card.dataset.name, img: card.dataset.img };
             document.getElementById('rBtn1').disabled = false;
         }
 
         function rSelectService(card) {
-            document.querySelectorAll('#repairGrid .repair-row').forEach(c=>c.classList.remove('sel'));
+            document.querySelectorAll('#repairGrid .repair-row').forEach(c => c.classList.remove('sel'));
             card.classList.add('sel');
             rSel.svc = { id: card.dataset.id, name: card.dataset.name, price: +card.dataset.price };
             document.getElementById('rBtn2').disabled = false;
@@ -999,7 +1084,8 @@
                     <div style="flex:1"><div class="sum-total-lbl">Total Amount</div></div>
                     <div class="sum-total-val">${s.price.toLocaleString('vi-VN')} ₫</div>
                 </div>`;
-            document.getElementById('rFrameId').value  = f.id;
+
+            document.getElementById('rFrameId').value = f.id;
             document.getElementById('rServiceId').value = s.id;
         }
     </script>

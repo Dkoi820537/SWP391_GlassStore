@@ -272,7 +272,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill,minmax(185px,1fr));
             gap: 16px;
-            margin-bottom: 32px;
+            margin-bottom: 8px;
         }
 
         .lens-card {
@@ -370,7 +370,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-bottom: 32px;
+            margin-bottom: 8px;
         }
 
         .svc-row {
@@ -742,25 +742,79 @@
                 font-size: 14px;
             }
 
-        @@media(max - width:600px) {
-            .lr-hero
-
-        {
-            padding: 48px 18px 60px
+        /* ── PAGINATION ── */
+        .pager {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+            margin-bottom: 20px;
         }
 
-        .lr-main {
-            padding: 28px 18px 60px
+        .pg-btn {
+            height: 34px;
+            min-width: 34px;
+            padding: 0 10px;
+            border: 1.5px solid var(--bdr);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--steel);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .18s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'DM Sans', sans-serif;
         }
 
-        .lens-grid {
-            grid-template-columns: repeat(auto-fill,minmax(145px,1fr))
+            .pg-btn:hover:not(:disabled) {
+                border-color: var(--teal);
+                color: var(--teal);
+                background: var(--teal-pale);
+            }
+
+            .pg-btn.active {
+                background: var(--teal);
+                border-color: var(--teal);
+                color: #fff;
+            }
+
+            .pg-btn:disabled {
+                opacity: .35;
+                cursor: not-allowed;
+            }
+
+        .pg-ellipsis {
+            font-size: 13px;
+            color: var(--steel);
+            padding: 0 4px;
         }
 
-        .lr-stepper-wrap {
-            padding: 0 18px
+        .pg-info {
+            font-size: 12px;
+            color: var(--steel);
+            margin-left: 6px;
         }
 
+        @@media(max-width:600px) {
+            .lr-hero {
+                padding: 48px 18px 60px
+            }
+
+            .lr-main {
+                padding: 28px 18px 60px
+            }
+
+            .lens-grid {
+                grid-template-columns: repeat(auto-fill,minmax(145px,1fr))
+            }
+
+            .lr-stepper-wrap {
+                padding: 0 18px
+            }
         }
     </style>
 }
@@ -826,7 +880,6 @@
                                 }
                                 else
                                 {
-
                                     <div class="lens-img-ph">⭕</div>
                                 }
                             </div>
@@ -838,6 +891,7 @@
                         </div>
                     }
                 </div>
+                <div class="pager" id="lensGridPager"></div>
             }
             else
             {
@@ -891,6 +945,7 @@
                         </div>
                     }
                 </div>
+                <div class="pager" id="svcGridPager"></div>
             }
             else
             {
@@ -930,13 +985,68 @@
 @section Scripts {
     <script>
         let lSel = { lens: null, svc: null };
+        const L_PAGE_SIZE = 8;
+        const lPagers = {};
 
+        /* ── Pagination engine ── */
+        function lInitPager(gridId, pagerId) {
+            const allCards = Array.from(document.querySelectorAll(
+                '#' + gridId + ' .lens-card, #' + gridId + ' .svc-row'
+            ));
+            lPagers[gridId] = { allCards, currentPage: 1, pagerId };
+            lRenderPage(gridId);
+        }
+
+        function lRenderPage(gridId) {
+            const state = lPagers[gridId];
+            if (!state) return;
+            const total = state.allCards.length;
+            const tp = Math.ceil(total / L_PAGE_SIZE) || 1;
+            if (state.currentPage > tp) state.currentPage = 1;
+
+            state.allCards.forEach(c => c.style.display = 'none');
+            const start = (state.currentPage - 1) * L_PAGE_SIZE;
+            state.allCards.slice(start, start + L_PAGE_SIZE).forEach(c => c.style.display = '');
+            lBuildPagerUI(gridId, tp, total);
+        }
+
+        function lBuildPagerUI(gridId, tp, total) {
+            const state = lPagers[gridId];
+            const page = state.currentPage;
+            const el = document.getElementById(state.pagerId);
+            if (!el) return;
+            if (tp <= 1) { el.innerHTML = ''; return; }
+
+            let html = `<button class="pg-btn" onclick="lChangePage('${gridId}',${page - 1})" ${page === 1 ? 'disabled' : ''}>&#8249; Prev</button>`;
+            for (let i = 1; i <= tp; i++) {
+                if (tp > 7 && i > 2 && i < tp - 1 && Math.abs(i - page) > 1) {
+                    if (i === 3 || i === tp - 2) html += `<span class="pg-ellipsis">…</span>`;
+                    continue;
+                }
+                html += `<button class="pg-btn ${i === page ? 'active' : ''}" onclick="lChangePage('${gridId}',${i})">${i}</button>`;
+            }
+            html += `<button class="pg-btn" onclick="lChangePage('${gridId}',${page + 1})" ${page === tp ? 'disabled' : ''}>Next &#8250;</button>`;
+            const from = (page - 1) * L_PAGE_SIZE + 1;
+            const to   = Math.min(page * L_PAGE_SIZE, total);
+            html += `<span class="pg-info">${from}–${to} / ${total}</span>`;
+            el.innerHTML = html;
+        }
+
+        function lChangePage(gridId, n) {
+            const state = lPagers[gridId];
+            if (!state) return;
+            const tp = Math.ceil(state.allCards.length / L_PAGE_SIZE) || 1;
+            state.currentPage = Math.max(1, Math.min(n, tp));
+            lRenderPage(gridId);
+        }
+
+        /* ── Step navigation ── */
         function lGoStep(n) {
             if (n > 1 && !lSel.lens) { lShake('lp1'); return; }
             if (n > 2 && !lSel.svc)  { lShake('lp2'); return; }
             [1,2,3].forEach(i => document.getElementById('lp'+i)?.classList.toggle('active', i===n));
             updateLStepper(n);
-            if (n===2) renderMini2();
+            if (n===2) { renderMini2(); lInitPager('svcGrid', 'svcGridPager'); }
             if (n===3) lBuildSummary();
             window.scrollTo({top:0,behavior:'smooth'});
         }
@@ -965,23 +1075,27 @@
             const next = () => { if(t>=s.length){el.style.transform='';return;} el.style.transform=`translateX(${s[t]}px)`; t++; setTimeout(next,60); };
             next();
         }
+
         function lSelectLens(card) {
             document.querySelectorAll('#lensGrid .lens-card').forEach(c=>c.classList.remove('sel'));
             card.classList.add('sel');
             lSel.lens = { id:card.dataset.id, name:card.dataset.name, price:+card.dataset.price, img:card.dataset.img };
             document.getElementById('lBtn1').disabled = false;
         }
+
         function lSelectService(card) {
             document.querySelectorAll('#svcGrid .svc-row').forEach(c=>c.classList.remove('sel'));
             card.classList.add('sel');
             lSel.svc = { id:card.dataset.id, name:card.dataset.name, price:+card.dataset.price };
             document.getElementById('lBtn2').disabled = false;
         }
+
         function renderMini2() {
             const el = document.getElementById('miniSel2');
             if(!el) return;
             el.innerHTML = `<div class="mini-pill"><span class="mp-dot"></span> Lens: <strong>${lSel.lens.name}</strong> &nbsp;·&nbsp; <strong>${lSel.lens.price.toLocaleString('vi-VN')} ₫</strong></div>`;
         }
+
         function lBuildSummary() {
             const l = lSel.lens, s = lSel.svc, total = l.price + s.price;
             const img = l.img ? `<img src="${l.img}" class="sum-thumb"/>` : `<div class="sum-ph">⭕</div>`;
@@ -1008,5 +1122,8 @@
             document.getElementById('lLensId').value  = l.id;
             document.getElementById('lServiceId').value = s.id;
         }
+
+        /* ── Init ── */
+        lInitPager('lensGrid', 'lensGridPager');
     </script>
 }

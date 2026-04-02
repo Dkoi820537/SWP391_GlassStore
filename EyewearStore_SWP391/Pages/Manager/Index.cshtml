@@ -5,7 +5,8 @@
 }
 
 @section Styles {
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>tailwind.config = { corePlugins: { preflight: false } }</script>
+    <script src="https://cdn.tailwindcss.com?plugins=container-queries"></script>
     <style data-purpose="custom-colors">
         .bg-primary-teal {
             background-color: #134e4a;

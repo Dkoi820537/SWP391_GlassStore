@@ -34,7 +34,7 @@ namespace EyewearStore_SWP391.Pages.Manager.Services
                 Price = s.Price,
                 DurationMin = s.DurationMin,
                 IsActive = s.IsActive,
-                ServiceCategory = s.ServiceCategory,  // NEW
+                ServiceCategory = s.ServiceCategory,  
             };
             return Page();
         }

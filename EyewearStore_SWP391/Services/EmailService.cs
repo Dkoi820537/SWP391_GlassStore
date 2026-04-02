@@ -6,18 +6,16 @@ namespace EyewearStore_SWP391.Services
 {
     public interface IEmailService
     {
-        // ── Existing ───────────────────────────────────────────────────────────
+     
         Task SendRestockNotificationAsync(string toEmail, string customerName,
             string productName, string productUrl);
         Task SendEmailAsync(string toEmail, string subject, string body);
 
-        // ── Eye Exam Appointment ───────────────────────────────────────────────
         Task SendAppointmentConfirmedAsync(string toEmail, string customerName,
             string date, string timeSlot);
         Task SendAppointmentCancelledAsync(string toEmail, string customerName,
             string date, string timeSlot, string reason);
 
-        // ── Service Order ──────────────────────────────────────────────────────
         Task SendServiceOrderStatusAsync(string toEmail, string customerName,
             int orderId, string frameName, string serviceName,
             string newStatus, string? assignedTo, string? note);
@@ -33,10 +31,6 @@ namespace EyewearStore_SWP391.Services
             _configuration = configuration;
             _logger = logger;
         }
-
-        // ═══════════════════════════════════════════════════════════════════════
-        // CORE SEND
-        // ═══════════════════════════════════════════════════════════════════════
         public async Task SendEmailAsync(string toEmail, string subject, string body)
         {
             var smtpHost = _configuration["Email:SmtpHost"] ?? "smtp.gmail.com";
@@ -68,10 +62,6 @@ namespace EyewearStore_SWP391.Services
                 _logger.LogError(ex, "Email failed to {To}: {Subject}", toEmail, subject);
             }
         }
-
-        // ═══════════════════════════════════════════════════════════════════════
-        // RESTOCK (existing, style updated to match new wrapper)
-        // ═══════════════════════════════════════════════════════════════════════
         public async Task SendRestockNotificationAsync(string toEmail, string customerName,
             string productName, string productUrl)
         {

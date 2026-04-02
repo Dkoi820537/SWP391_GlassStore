@@ -512,7 +512,7 @@
     <!-- STATS ROW 2: Appointments -->
     <div class="sec-lbl" style="margin-top:20px">📅 Eye Exam Appointments</div>
     <div class="stats-g">
-        <a class="sc" href="/Admin/Appointments">
+        <a class="sc" href="/Appointments">
             <div class="sc-ico i-info"><i class="bi bi-calendar2-week"></i></div>
             <div>
                 <div class="sc-lbl">Total Bookings</div>
@@ -520,7 +520,7 @@
                 <div class="sc-sub">All time</div>
             </div>
         </a>
-        <a class="sc" href="/Admin/Appointments?StatusFilter=Pending">
+        <a class="sc" href="/Appointments?StatusFilter=Pending">
             <div class="sc-ico i-warn"><i class="bi bi-hourglass-split"></i></div>
             <div>
                 <div class="sc-lbl">Awaiting Confirm</div>
@@ -528,7 +528,7 @@
                 <div class="sc-sub">Need action</div>
             </div>
         </a>
-        <a class="sc" href="/Admin/Appointments?StatusFilter=Confirmed">
+        <a class="sc" href="/Appointments?StatusFilter=Confirmed">
             <div class="sc-ico i-ok"><i class="bi bi-check-circle-fill"></i></div>
             <div>
                 <div class="sc-lbl">Confirmed</div>
@@ -536,7 +536,7 @@
                 <div class="sc-sub">Upcoming confirmed</div>
             </div>
         </a>
-        <a class="sc" href="/Admin/Appointments?DateFilter=@DateTime.Today.ToString("yyyy-MM-dd")">
+        <a class="sc" href="/Appointments?DateFilter=@DateTime.Today.ToString("yyyy-MM-dd")">
             <div class="sc-ico i-navy"><i class="bi bi-calendar-day"></i></div>
             <div>
                 <div class="sc-lbl">Today</div>
@@ -577,7 +577,7 @@
             <div class="card">
                 <div class="card-hdr">
                     <h3><i class="bi bi-calendar-check" style="color:#059669"></i> Upcoming Appointments</h3>
-                    <a href="/Admin/Appointments">View all →</a>
+                    <a href="/Appointments">View all →</a>
                 </div>
                 @if (Model.UpcomingAppts.Any())
                 {

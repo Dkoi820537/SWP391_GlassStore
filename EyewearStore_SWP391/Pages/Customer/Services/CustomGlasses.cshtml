@@ -218,7 +218,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill,minmax(170px,1fr));
             gap: 14px;
-            margin-bottom: 28px;
+            margin-bottom: 8px;
         }
 
         .prod-card {
@@ -245,7 +245,7 @@
             }
 
                 .prod-card.selected::after {
-                    content: 'checkmark';
+                    content: '✓';
                     position: absolute;
                     top: 8px;
                     right: 10px;
@@ -301,7 +301,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill,minmax(210px,1fr));
             gap: 14px;
-            margin-bottom: 28px;
+            margin-bottom: 8px;
         }
 
         .svc-card {
@@ -327,7 +327,7 @@
             }
 
                 .svc-card.selected::after {
-                    content: 'checkmark';
+                    content: '✓';
                     position: absolute;
                     top: 10px;
                     right: 12px;
@@ -605,6 +605,65 @@
             font-weight: 600;
             color: var(--acc);
         }
+
+        /* ── Pagination ── */
+        .pager {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+
+        .pg-btn {
+            height: 36px;
+            min-width: 36px;
+            padding: 0 10px;
+            border: 1.5px solid var(--bdr);
+            border-radius: 8px;
+            background: var(--surf);
+            color: var(--txt2);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .18s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+            .pg-btn:hover:not(:disabled) {
+                border-color: var(--navy);
+                color: var(--navy);
+                background: var(--bg2);
+            }
+
+            .pg-btn.active {
+                background: var(--navy);
+                border-color: var(--navy);
+                color: #fff;
+            }
+
+            .pg-btn:disabled {
+                opacity: .35;
+                cursor: not-allowed;
+            }
+
+        .pg-ellipsis {
+            font-size: 13px;
+            color: var(--muted);
+            padding: 0 4px;
+            line-height: 36px;
+        }
+
+        .pg-info {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 500;
+            margin-left: 6px;
+        }
     </style>
 }
 
@@ -676,6 +735,7 @@
                     </div>
                 }
             </div>
+            <div class="pager" id="frameGridPager"></div>
         }
         else
         {
@@ -725,6 +785,7 @@
                     </div>
                 }
             </div>
+            <div class="pager" id="lensGridPager"></div>
         }
         else
         {
@@ -776,6 +837,7 @@
                     </div>
                 }
             </div>
+            <div class="pager" id="serviceGridPager"></div>
         }
         else
         {
@@ -828,22 +890,90 @@
     <script>
         let sel = { frame: null, lens: null, service: null };
         const steps = 4;
+        const PAGE_SIZE = 8;
 
+        /* ── Pagination ── */
+        const pagers = {};
+
+        function initPager(gridId, pagerId) {
+            const allCards = Array.from(document.querySelectorAll(
+                '#' + gridId + ' .prod-card, #' + gridId + ' .svc-card'
+            ));
+            pagers[gridId] = { allCards, visibleCards: allCards, currentPage: 1, pagerId };
+            renderPage(gridId);
+        }
+
+        function getVisibleCards(gridId) {
+            return pagers[gridId].allCards.filter(c => !c._compatHidden);
+        }
+
+        function renderPage(gridId) {
+            const state = pagers[gridId];
+            if (!state) return;
+            state.visibleCards = getVisibleCards(gridId);
+            const tp = Math.ceil(state.visibleCards.length / PAGE_SIZE) || 1;
+            if (state.currentPage > tp) state.currentPage = 1;
+
+            state.allCards.forEach(c => c.style.display = 'none');
+            const start = (state.currentPage - 1) * PAGE_SIZE;
+            state.visibleCards.slice(start, start + PAGE_SIZE).forEach(c => {
+                c.style.display = '';
+            });
+            buildPagerUI(gridId, tp, state.visibleCards.length);
+        }
+
+        function buildPagerUI(gridId, tp, total) {
+            const state = pagers[gridId];
+            const page = state.currentPage;
+            const el = document.getElementById(state.pagerId);
+            if (!el) return;
+
+            if (tp <= 1) { el.innerHTML = ''; return; }
+
+            let html = `<button class="pg-btn" onclick="changePage('${gridId}',${page - 1})" ${page === 1 ? 'disabled' : ''}>&#8249; Prev</button>`;
+
+            for (let i = 1; i <= tp; i++) {
+                if (tp > 7 && i > 2 && i < tp - 1 && Math.abs(i - page) > 1) {
+                    if (i === 3 || i === tp - 2) html += `<span class="pg-ellipsis">…</span>`;
+                    continue;
+                }
+                html += `<button class="pg-btn ${i === page ? 'active' : ''}" onclick="changePage('${gridId}',${i})">${i}</button>`;
+            }
+
+            html += `<button class="pg-btn" onclick="changePage('${gridId}',${page + 1})" ${page === tp ? 'disabled' : ''}>Next &#8250;</button>`;
+
+            const from = (page - 1) * PAGE_SIZE + 1;
+            const to   = Math.min(page * PAGE_SIZE, total);
+            html += `<span class="pg-info">${from}–${to} / ${total}</span>`;
+            el.innerHTML = html;
+        }
+
+        function changePage(gridId, n) {
+            const state = pagers[gridId];
+            if (!state) return;
+            const tp = Math.ceil(state.visibleCards.length / PAGE_SIZE) || 1;
+            state.currentPage = Math.max(1, Math.min(n, tp));
+            renderPage(gridId);
+        }
+
+        /* ── Stepper ── */
         function tryGoStep(n) {
             if (n >= 2 && !sel.frame)   { shake('panel1'); return; }
             if (n >= 3 && !sel.lens)    { shake('panel2'); return; }
             if (n >= 4 && !sel.service) { shake('panel3'); return; }
             goStep(n);
         }
+
         function goStep(n) {
             for (let i = 1; i <= steps; i++)
                 document.getElementById('panel' + i)?.classList.toggle('active', i === n);
             updateStepper(n);
-            if (n === 2) renderMini('miniSel2', ['frame']);
-            if (n === 3) renderMini('miniSel3', ['frame', 'lens']);
+            if (n === 2) { renderMini('miniSel2', ['frame']);         initPager('lensGrid',    'lensGridPager');    }
+            if (n === 3) { renderMini('miniSel3', ['frame', 'lens']); initPager('serviceGrid', 'serviceGridPager'); }
             if (n === 4) buildSummary();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
         function updateStepper(cur) {
             for (let i = 1; i <= steps; i++) {
                 const el = document.getElementById('si' + i); if (!el) continue;
@@ -851,12 +981,13 @@
                 if (i < cur)        el.classList.add('done');
                 else if (i === cur) el.classList.add('active');
             }
-            [['ln12',2],['ln23',3],['ln34',4]].forEach(([id, t]) =>
+            [['ln12', 2], ['ln23', 3], ['ln34', 4]].forEach(([id, t]) =>
                 document.getElementById(id)?.classList.toggle('done', cur >= t));
         }
+
         function shake(panelId) {
             const el = document.getElementById(panelId);
-            let t = 0; const s = [4,-4,3,-3,2,-2,0];
+            let t = 0; const s = [4, -4, 3, -3, 2, -2, 0];
             const next = () => {
                 if (t >= s.length) { el.style.transform = ''; return; }
                 el.style.transform = 'translateX(' + s[t] + 'px)'; t++;
@@ -864,6 +995,7 @@
             };
             next();
         }
+
         function renderMini(containerId, keys) {
             const icons = { frame: '🕶', lens: 'O', service: 'S' };
             const el = document.getElementById(containerId); if (!el) return;
@@ -873,45 +1005,61 @@
                 sel[k].price.toLocaleString('vi-VN') + ' &#x20AB;</strong></div>'
             ).join('');
         }
-        // Frame → compatible lens types map (from server)
+
+        /* ── Compatibility map ── */
         const compatMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CompatibilityMap));
 
+        /* ── Selection ── */
         function selectFrame(card) {
             document.querySelectorAll('#frameGrid .prod-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
-            sel.frame = { id: card.dataset.id, name: card.dataset.name,
-                          price: parseFloat(card.dataset.price), img: card.dataset.img };
+            sel.frame = {
+                id: card.dataset.id, name: card.dataset.name,
+                price: parseFloat(card.dataset.price), img: card.dataset.img
+            };
             document.getElementById('btnN1').disabled = false;
 
-            // Filter lenses by compatible types (empty = show all)
             const frameId = parseInt(card.dataset.id);
             const allowed = compatMap[frameId] || null;
-            document.querySelectorAll('#lensGrid .prod-card').forEach(c => {
-                const lt = c.dataset.lensType || '';
-                c.style.display = (!allowed || allowed.includes(lt)) ? '' : 'none';
-            });
-            // Reset lens selection if current lens is now hidden
-            if (sel.lens && allowed && !allowed.includes(
-                document.querySelector('#lensGrid .prod-card.selected')?.dataset.lensType || '')) {
-                sel.lens = null;
-                document.querySelectorAll('#lensGrid .prod-card').forEach(c => c.classList.remove('selected'));
-                document.getElementById('btnN2').disabled = true;
+
+            const lensState = pagers['lensGrid'];
+            if (lensState) {
+                lensState.allCards.forEach(c => {
+                    const lt = c.dataset.lensType || '';
+                    c._compatHidden = !(!allowed || allowed.includes(lt));
+                });
+                const selCard = document.querySelector('#lensGrid .prod-card.selected');
+                if (sel.lens && selCard && selCard._compatHidden) {
+                    sel.lens = null;
+                    selCard.classList.remove('selected');
+                    document.getElementById('btnN2').disabled = true;
+                }
+                lensState.currentPage = 1;
+                renderPage('lensGrid');
             }
         }
+
         function selectLens(card) {
             document.querySelectorAll('#lensGrid .prod-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
-            sel.lens = { id: card.dataset.id, name: card.dataset.name,
-                         price: parseFloat(card.dataset.price), img: card.dataset.img };
+            sel.lens = {
+                id: card.dataset.id, name: card.dataset.name,
+                price: parseFloat(card.dataset.price), img: card.dataset.img
+            };
             document.getElementById('btnN2').disabled = false;
         }
+
         function selectService(card) {
             document.querySelectorAll('#serviceGrid .svc-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
-            sel.service = { id: card.dataset.id, name: card.dataset.name,
-                            price: parseFloat(card.dataset.price), dur: card.dataset.dur };
+            sel.service = {
+                id: card.dataset.id, name: card.dataset.name,
+                price: parseFloat(card.dataset.price), dur: card.dataset.dur
+            };
             document.getElementById('btnN3').disabled = false;
         }
+
+        /* ── Summary ── */
         function buildSummary() {
             const f = sel.frame, l = sel.lens, s = sel.service;
             const total = f.price + l.price + s.price;
@@ -922,18 +1070,18 @@
                 { label: 'Frame',           emoji: '🕶', item: f },
                 { label: 'Lens',            emoji: 'O',  item: l },
                 { label: 'Fitting Service', emoji: 'S',  item: s }
-            ].map(function(r) {
-                return '<div class="sum-row">' +
-                    '<div class="sum-item-left">' +
-                    thumb(r.item.img || '', r.emoji) +
-                    '<div class="sum-item-info">' +
-                    '<div class="lbl">' + r.label + '</div>' +
-                    '<div class="val">' + r.item.name +
-                    (r.item.dur ? '<span style="font-size:11px;color:#94a3b8;margin-left:6px">· ' + r.item.dur + '</span>' : '') +
-                    '</div></div></div>' +
-                    '<div class="sum-price">' + r.item.price.toLocaleString('vi-VN') + ' &#x20AB;</div>' +
-                    '</div>';
-            }).join('');
+            ].map(r =>
+                '<div class="sum-row">' +
+                '<div class="sum-item-left">' +
+                thumb(r.item.img || '', r.emoji) +
+                '<div class="sum-item-info">' +
+                '<div class="lbl">' + r.label + '</div>' +
+                '<div class="val">' + r.item.name +
+                (r.item.dur ? '<span style="font-size:11px;color:#94a3b8;margin-left:6px">· ' + r.item.dur + '</span>' : '') +
+                '</div></div></div>' +
+                '<div class="sum-price">' + r.item.price.toLocaleString('vi-VN') + ' &#x20AB;</div>' +
+                '</div>'
+            ).join('');
 
             document.getElementById('summaryBody').innerHTML = rows +
                 '<div class="sum-row total-row">' +
@@ -946,6 +1094,8 @@
             document.getElementById('fServiceId').value = s.id;
         }
 
+        /* ── Init ── */
         updateStepper(1);
+        initPager('frameGrid', 'frameGridPager');
     </script>
 }

@@ -169,9 +169,20 @@
             color: white;
         }
 
-        .icon-svg-small { height: 20px; width: 20px; }
-        .icon-svg-md { height: 20px; width: 20px; }
-        .icon-svg-large { height: 32px; width: 32px; }
+        .icon-svg-small {
+            height: 20px;
+            width: 20px;
+        }
+
+        .icon-svg-md {
+            height: 20px;
+            width: 20px;
+        }
+
+        .icon-svg-large {
+            height: 32px;
+            width: 32px;
+        }
 
         .profile-role-badge {
             background-color: #2d3748;
@@ -222,22 +233,25 @@
             text-align: left;
         }
 
-        .profile-nav-link:hover, .profile-nav-link:focus {
-            color: #0d9488 !important;
-            outline: none;
-        }
-        
-        .profile-nav-link:hover .text-dark-gray, .profile-nav-link:focus .text-dark-gray {
-            color: #0d9488 !important;
-        }
-        
+            .profile-nav-link:hover, .profile-nav-link:focus {
+                color: #0d9488 !important;
+                outline: none;
+            }
+
+                .profile-nav-link:hover .text-dark-gray, .profile-nav-link:focus .text-dark-gray {
+                    color: #0d9488 !important;
+                }
+
         .profile-nav-icon {
             width: 24px;
             display: flex;
             justify-content: center;
         }
 
-        .text-dark-gray { color: #000 !important; transition: color 0.15s; }
+        .text-dark-gray {
+            color: #000 !important;
+            transition: color 0.15s;
+        }
 
         .wl-badge-new {
             font-size: 12px;
@@ -250,6 +264,194 @@
             align-items: center;
             justify-content: center;
             margin-left: auto;
+        }
+
+        /* ══════════════════════════════════════
+                   NAV SEARCH BAR
+                ══════════════════════════════════════ */
+        .nav-search-wrap {
+            flex: 1;
+            max-width: 400px;
+            min-width: 0;
+            position: relative;
+            margin: 0 10px;
+        }
+
+        .nav-search-inner {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.11);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 24px;
+            height: 36px;
+            padding: 0 6px 0 4px;
+            transition: background .2s, border-color .2s, box-shadow .2s;
+        }
+
+            .nav-search-inner:focus-within {
+                background: rgba(255,255,255,0.18);
+                border-color: #5eead4;
+                box-shadow: 0 0 0 3px rgba(94,234,212,0.18);
+            }
+
+        .nav-search-filter {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            border-radius: 18px;
+            color: rgba(255,255,255,0.92);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 22px 4px 10px;
+            margin-right: 6px;
+            cursor: pointer;
+            outline: none;
+            flex-shrink: 0;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(255,255,255,0.6)'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 7px center;
+            transition: background-color .15s;
+            height: 28px;
+        }
+
+            .nav-search-filter:focus {
+                background-color: rgba(255,255,255,0.22);
+            }
+
+            .nav-search-filter option {
+                background: #134e4a;
+                color: #fff;
+            }
+
+        .nav-search-divider {
+            width: 1px;
+            height: 18px;
+            background: rgba(255,255,255,0.22);
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        .nav-search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            min-width: 0;
+            padding: 0;
+        }
+
+            .nav-search-input::placeholder {
+                color: rgba(255,255,255,0.42);
+            }
+
+        .nav-search-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: #0d9488;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            color: #fff;
+            font-size: 12px;
+            transition: background .15s, transform .1s;
+            margin-left: 4px;
+        }
+
+            .nav-search-btn:hover {
+                background: #0f766e;
+                transform: scale(1.06);
+            }
+
+        /* Suggestions dropdown */
+        .nav-search-suggestions {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: #1a5c57;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            display: none;
+            z-index: 1050;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+        }
+
+            .nav-search-suggestions.show {
+                display: block;
+            }
+
+        .nss-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            padding: 10px 14px 4px;
+        }
+
+        .nss-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 14px;
+            color: rgba(255,255,255,0.88);
+            font-size: 13px;
+            cursor: pointer;
+            transition: background .12s;
+            text-decoration: none;
+        }
+
+            .nss-item:hover {
+                background: rgba(255,255,255,0.1);
+                color: #fff;
+            }
+
+            .nss-item i {
+                font-size: 14px;
+                opacity: .7;
+                flex-shrink: 0;
+            }
+
+        .nss-tag {
+            margin-left: auto;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .nss-tag-frame {
+            background: rgba(94,234,212,0.18);
+            color: #5eead4;
+        }
+
+        .nss-tag-lens {
+            background: rgba(201,169,110,0.22);
+            color: #c9a96e;
+        }
+
+        .nss-empty {
+            padding: 14px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.4);
+            text-align: center;
+            display: none;
+        }
+
+        /* Hide search on very small screens */
+        @@media (max-width: 767px) {
+            .nav-search-wrap {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -467,6 +669,78 @@
                     </ul>
                 </div>
 
+                <!-- ══════════════════════════════════════
+                     SEARCH BAR - nằm giữa nav-left và nav-right
+                ══════════════════════════════════════ -->
+                <div class="nav-search-wrap">
+                    <div class="nav-search-inner">
+                        <!-- Filter dropdown: All / Frames / Lenses -->
+                        <select class="nav-search-filter" id="navSearchFilter" title="Filter by type">
+                            <option value="">All</option>
+                            <option value="Frame">Frames</option>
+                            <option value="Lens">Lenses</option>
+                        </select>
+
+                        <div class="nav-search-divider"></div>
+
+                        <!-- Text input -->
+                        <input class="nav-search-input"
+                               id="navSearchInput"
+                               type="text"
+                               placeholder="Search frames, lenses..."
+                               autocomplete="off"
+                               aria-label="Search products" />
+
+                        <!-- Search button -->
+                        <button class="nav-search-btn" id="navSearchBtn" type="button" title="Search">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+
+                    <!-- Quick-suggestion dropdown -->
+                    <div class="nav-search-suggestions" id="navSearchSuggestions">
+                        <!-- Frame suggestions -->
+                        <div class="nss-label" data-group="Frame">Frames</div>
+                        <a class="nss-item" data-type="Frame" data-q="Titanium" href="/Products?ProductTypeFilter=Frame&SearchTerm=Titanium">
+                            <i class="bi bi-eyeglasses"></i>
+                            <span>Titanium Rimless</span>
+                            <span class="nss-tag nss-tag-frame">Frame</span>
+                        </a>
+                        <a class="nss-item" data-type="Frame" data-q="Acetate" href="/Products?ProductTypeFilter=Frame&SearchTerm=Acetate">
+                            <i class="bi bi-eyeglasses"></i>
+                            <span>Acetate Full-rim</span>
+                            <span class="nss-tag nss-tag-frame">Frame</span>
+                        </a>
+                        <a class="nss-item" data-type="Frame" data-q="Sport" href="/Products?ProductTypeFilter=Frame&SearchTerm=Sport">
+                            <i class="bi bi-eyeglasses"></i>
+                            <span>Sport Wrap Frame</span>
+                            <span class="nss-tag nss-tag-frame">Frame</span>
+                        </a>
+
+                        <!-- Lens suggestions -->
+                        <div class="nss-label" data-group="Lens">Lenses</div>
+                        <a class="nss-item" data-type="Lens" data-q="Progressive" href="/Products?ProductTypeFilter=Lens&SearchTerm=Progressive">
+                            <i class="bi bi-circle"></i>
+                            <span>Progressive 1.67</span>
+                            <span class="nss-tag nss-tag-lens">Lens</span>
+                        </a>
+                        <a class="nss-item" data-type="Lens" data-q="Blue Light" href="/Products?ProductTypeFilter=Lens&SearchTerm=Blue+Light">
+                            <i class="bi bi-circle"></i>
+                            <span>Blue Light Filter</span>
+                            <span class="nss-tag nss-tag-lens">Lens</span>
+                        </a>
+                        <a class="nss-item" data-type="Lens" data-q="Photochromic" href="/Products?ProductTypeFilter=Lens&SearchTerm=Photochromic">
+                            <i class="bi bi-circle"></i>
+                            <span>Photochromic (Transitions)</span>
+                            <span class="nss-tag nss-tag-lens">Lens</span>
+                        </a>
+
+                        <!-- Empty state -->
+                        <div class="nss-empty" id="navSearchEmpty">No suggestions found</div>
+                    </div>
+                </div>
+                <!-- ══ END SEARCH BAR ══ -->
+
                 <div class="stitch-nav-right">
                     @if (User.Identity.IsAuthenticated)
                     {
@@ -497,7 +771,7 @@
                                     <span class="text-white fw-bold fs-5">@User.Identity.Name</span>
                                 </li>
                                 <!-- END: TopBar -->
-                                
+
                                 <li class="profile-main">
                                     <!-- BEGIN: ProfileHeader -->
                                     <div class="profile-header">
@@ -514,37 +788,31 @@
                                     </div>
                                     <!-- END: ProfileHeader -->
 
-                                    <hr class="border-gray-300 mb-4 mt-0"/>
+                                    <hr class="border-gray-300 mb-4 mt-0" />
 
                                     <!-- BEGIN: NavMenu -->
                                     <nav class="d-flex flex-column gap-2 mb-4">
-                                        <!-- My Profile -->
                                         <a class="profile-nav-link" asp-page="/Profile/Index">
                                             <div class="profile-nav-icon">
                                                 <svg class="icon-svg-md text-dark-gray" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                                             </div>
                                             <span>My Profile</span>
                                         </a>
-                                        
-                                        <!-- My Orders -->
+
                                         <a class="profile-nav-link" asp-page="/Orders/Index">
                                             <div class="profile-nav-icon">
                                                 <svg class="icon-svg-md text-dark-gray" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                                             </div>
                                             <span>My Orders</span>
                                         </a>
-                                        
-                                        <!-- My Service Orders -->
+
                                         <a class="profile-nav-link" asp-page="/Customer/ServiceTracking">
                                             <div class="profile-nav-icon">
                                                 <svg class="icon-svg-md text-dark-gray" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                                             </div>
-                                            <span class="d-flex align-items-center justify-content-between w-100">
-                                                My Service Orders
-                                            </span>
+                                            <span class="d-flex align-items-center justify-content-between w-100">My Service Orders</span>
                                         </a>
-                                        
-                                        <!-- My Wishlist -->
+
                                         <a class="profile-nav-link" asp-page="/Customer/Wishlist">
                                             <div class="profile-nav-icon">
                                                 <svg class="icon-svg-md text-dark-gray" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
@@ -552,16 +820,14 @@
                                             <span>My Wishlist</span>
                                             <span class="wl-badge-new" id="dropdownWlCount" style="display:none; margin-left: auto;"></span>
                                         </a>
-                                        
-                                        <!-- My Prescriptions -->
+
                                         <a class="profile-nav-link" asp-page="/Customer/Prescriptions/Index">
                                             <div class="profile-nav-icon">
                                                 <svg class="icon-svg-md text-dark-gray" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                                             </div>
                                             <span>My Prescriptions</span>
                                         </a>
-                                        
-                                        <!-- My Refunds -->
+
                                         <a class="profile-nav-link" asp-page="/Customer/MyRefunds">
                                             <div class="profile-nav-icon">
                                                 <svg class="icon-svg-md text-dark-gray" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 10h10a5 5 0 010 10H9M3 10l4-4M3 10l4 4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
@@ -571,9 +837,8 @@
                                     </nav>
                                     <!-- END: NavMenu -->
 
-                                    <hr class="border-gray-300 my-4"/>
+                                    <hr class="border-gray-300 my-4" />
 
-                                    <!-- BEGIN: LogoutSection -->
                                     <form method="post" asp-page="/Account/Logout" class="m-0">
                                         @Html.AntiForgeryToken()
                                         <button type="submit" class="profile-nav-link text-uppercase mt-2 flex items-center">
@@ -583,7 +848,6 @@
                                             <span class="fw-bold">Logout</span>
                                         </button>
                                     </form>
-                                    <!-- END: LogoutSection -->
                                 </li>
                             </ul>
                         </div>
@@ -677,5 +941,73 @@
             })();
         </script>
     }
+
+    <!-- ══ SEARCH BAR SCRIPT ══ -->
+    <script>
+        (function () {
+            const input  = document.getElementById('navSearchInput');
+            const filter = document.getElementById('navSearchFilter');
+            const btn    = document.getElementById('navSearchBtn');
+            const sugg   = document.getElementById('navSearchSuggestions');
+            const empty  = document.getElementById('navSearchEmpty');
+            if (!input || !btn || !sugg) return;
+
+            /* Navigate to Products page with filters */
+            function doSearch() {
+                const q    = input.value.trim();
+                const type = filter.value;
+                const params = new URLSearchParams();
+                if (type) params.set('ProductTypeFilter', type);
+                if (q)    params.set('SearchTerm', q);
+                window.location.href = '/Products?' + params.toString();
+            }
+
+            /* Show / hide suggestion dropdown */
+            function openSugg() { sugg.classList.add('show'); filterSugg(); }
+            function closeSugg() { setTimeout(() => sugg.classList.remove('show'), 160); }
+
+            /* Filter suggestion items by typed text + selected type */
+            function filterSugg() {
+                const q    = input.value.toLowerCase().trim();
+                const type = filter.value; // '' | 'Frame' | 'Lens'
+                const items  = sugg.querySelectorAll('.nss-item');
+                const labels = sugg.querySelectorAll('.nss-label');
+                let anyVisible = false;
+
+                items.forEach(el => {
+                    const matchType = !type || el.dataset.type === type;
+                    const matchText = !q    || el.dataset.q.toLowerCase().includes(q)
+                                             || el.querySelector('span:first-of-type')
+                                                  .textContent.toLowerCase().includes(q);
+                    el.style.display = (matchType && matchText) ? 'flex' : 'none';
+                    if (matchType && matchText) anyVisible = true;
+                });
+
+                /* Hide section labels if all items in that group are hidden */
+                labels.forEach(lbl => {
+                    const group = lbl.dataset.group; // 'Frame' | 'Lens'
+                    const visible = [...items].some(el =>
+                        el.dataset.type === group && el.style.display !== 'none');
+                    lbl.style.display = visible ? 'block' : 'none';
+                });
+
+                empty.style.display = anyVisible ? 'none' : 'block';
+            }
+
+            input.addEventListener('focus',  openSugg);
+            input.addEventListener('blur',   closeSugg);
+            input.addEventListener('input',  filterSugg);
+            filter.addEventListener('change', filterSugg);
+            btn.addEventListener('click', doSearch);
+            input.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+            /* If current page is /Products, pre-fill from URL params */
+            const urlParams = new URLSearchParams(window.location.search);
+            const st = urlParams.get('SearchTerm');
+            const pt = urlParams.get('ProductTypeFilter');
+            if (st) input.value = st;
+            if (pt) filter.value = pt;
+        })();
+    </script>
 </body>
 </html>

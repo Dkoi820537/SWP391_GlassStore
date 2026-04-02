@@ -32,7 +32,8 @@ namespace EyewearStore_SWP391.Pages.Cart
                         frameProductId: ProductId,
                         lensProductId: LensProductId.Value,
                         serviceId: ServiceId.Value,
-                        quantity: Quantity);
+                        quantity: Quantity,
+                        prescriptionId: PrescriptionId);
                 }
                 else
                 {

@@ -19,7 +19,7 @@ namespace EyewearStore_SWP391.Services
         /// LensProductId được encode vào TempPrescriptionJson dưới key "lensProductId".
         /// </summary>
         Task AddServiceOrderAsync(int userId, int frameProductId, int lensProductId,
-            int serviceId, int quantity = 1);
+            int serviceId, int quantity = 1, int? prescriptionId = null);
 
         Task UpdateQuantityAsync(int cartItemId, int newQuantity);
         Task UpdateItemPrescriptionAsync(int cartItemId, string? tempPrescriptionJson);

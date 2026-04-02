@@ -170,7 +170,7 @@ public class CartService : ICartService
     /// Không merge với item cũ — mỗi đơn gia công là 1 dòng riêng.
     /// </summary>
     public async Task AddServiceOrderAsync(int userId, int frameProductId, int lensProductId,
-        int serviceId, int quantity = 1)
+        int serviceId, int quantity = 1, int? prescriptionId = null)
     {
         if (quantity <= 0) throw new ArgumentException("Quantity must be greater than 0");
 
@@ -215,6 +215,22 @@ public class CartService : ICartService
             if (svc == null || !svc.IsActive)
                 throw new InvalidOperationException("Service is unavailable");
 
+            // Validate Prescription (optional)
+            decimal prescriptionFee = 0m;
+            if (prescriptionId.HasValue && prescriptionId.Value > 0)
+            {
+                var rx = await _context.PrescriptionProfiles.AsNoTracking()
+                    .FirstOrDefaultAsync(p => p.PrescriptionId == prescriptionId.Value
+                                           && p.UserId == userId && p.IsActive);
+                if (rx == null)
+                    throw new InvalidOperationException("Invalid or inactive prescription selected.");
+
+                // Use the lens-specific prescription fee
+                var lensEntity = await _context.Lenses.FindAsync(lensProductId);
+                if (lensEntity != null && lensEntity.IsPrescription)
+                    prescriptionFee = lensEntity.PrescriptionFee ?? DefaultPrescriptionFeeVnd;
+            }
+
             _context.CartItems.Add(new CartItem
             {
                 CartId = cart.CartId,
@@ -222,8 +238,8 @@ public class CartService : ICartService
                 ServiceId = serviceId,
                 Quantity = quantity,
                 TempPrescriptionJson = EncodeLensId(lensProductId),  // lưu LensId ở đây
-                PrescriptionId = null,
-                PrescriptionFee = 0m
+                PrescriptionId = prescriptionId,
+                PrescriptionFee = prescriptionFee
             });
 
             await _context.SaveChangesAsync();

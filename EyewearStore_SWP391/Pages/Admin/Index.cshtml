@@ -622,7 +622,7 @@
                                 <div class="svc-name">@(string.IsNullOrEmpty(s.FrameName) ? $"Order #{s.OrderId}" : s.FrameName)</div>
                                 <div class="svc-sub">@s.ServiceName · #@s.OrderId</div>
                             </div>
-                            <a href="/Admin/ServiceOrders/@s.OrderId" class="btn-sm">
+                            <a href="/Admin/ServiceOrders/Detail/@s.OrderId" class="btn-sm">
                                 <i class="bi bi-arrow-right"></i> Assign
                             </a>
                         </div>

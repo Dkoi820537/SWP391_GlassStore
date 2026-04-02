@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Handle Buy Now redirect
                 if (isBuyNow) {
-                    window.location.href = '/Cart/Index'; // Or direct to checkout
+                    window.location.href = '/Checkout/Index';
                 }
             } else {
                 // Show Error Toast

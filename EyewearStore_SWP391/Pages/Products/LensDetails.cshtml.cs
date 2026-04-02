@@ -87,6 +87,44 @@ public class LensDetailsModel : PageModel
         catch { ErrorMessage = "An error occurred. Please try again."; return Page(); }
     }
 
+    // ── POST: Buy Now (add to cart + redirect to checkout) ──────────────────
+    public async Task<IActionResult> OnPostBuyNowAsync()
+    {
+        await ReloadAsync(AddToCartInput.ProductId);
+        if (Lens == null) return NotFound();
+
+        if (!User.Identity?.IsAuthenticated ?? true)
+        {
+            TempData["ErrorMessage"] = "Please login to add items to your cart.";
+            return RedirectToPage("/Account/Login",
+                new { returnUrl = $"/Products/LensDetails/{AddToCartInput.ProductId}" });
+        }
+
+        if (AddToCartInput.Quantity < 1) { ErrorMessage = "Quantity must be at least 1."; return Page(); }
+        if (!Lens.IsInStock) { ErrorMessage = "Sorry, this lens is out of stock."; return Page(); }
+        if (Lens.InventoryQty.HasValue && AddToCartInput.Quantity > Lens.InventoryQty.Value)
+        {
+            ErrorMessage = $"Only {Lens.InventoryQty} items available.";
+            return Page();
+        }
+
+        try
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null) return RedirectToPage("/Account/Login");
+
+            await _cartService.AddToCartAsync(
+                int.Parse(userIdClaim.Value),
+                AddToCartInput.ProductId,
+                AddToCartInput.Quantity,
+                prescriptionId: AddToCartInput.PrescriptionId);
+
+            return RedirectToPage("/Checkout/Index");
+        }
+        catch (InvalidOperationException ex) { ErrorMessage = ex.Message; return Page(); }
+        catch { ErrorMessage = "An error occurred. Please try again."; return Page(); }
+    }
+
     // ── Helpers ────────────────────────────────────────────────────────────────
 
     private async Task<LensDetailsViewModel> MapToViewModelAsync(Lens lens)

@@ -85,6 +85,41 @@ public class FrameDetailsModel : PageModel
         catch { ErrorMessage = "An error occurred. Please try again."; return Page(); }
     }
 
+    // ── POST: Buy Now (add to cart + redirect to checkout) ──────────────────
+    public async Task<IActionResult> OnPostBuyNowAsync()
+    {
+        await ReloadAsync(AddToCartInput.ProductId);
+        if (Frame == null) return NotFound();
+
+        if (!User.Identity?.IsAuthenticated ?? true)
+        {
+            TempData["ErrorMessage"] = "Please log in to add items to your cart.";
+            return RedirectToPage("/Account/Login",
+                new { returnUrl = $"/Products/FrameDetails/{AddToCartInput.ProductId}" });
+        }
+
+        if (AddToCartInput.Quantity < 1) { ErrorMessage = "Quantity must be at least 1."; return Page(); }
+        if (!Frame.IsInStock) { ErrorMessage = "This product is out of stock."; return Page(); }
+        if (Frame.InventoryQty.HasValue && AddToCartInput.Quantity > Frame.InventoryQty)
+        {
+            ErrorMessage = $"Only {Frame.InventoryQty} unit(s) available.";
+            return Page();
+        }
+
+        try
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null) return RedirectToPage("/Account/Login");
+
+            await _cartService.AddToCartAsync(int.Parse(userIdClaim.Value),
+                AddToCartInput.ProductId, AddToCartInput.Quantity);
+
+            return RedirectToPage("/Checkout/Index");
+        }
+        catch (InvalidOperationException ex) { ErrorMessage = ex.Message; return Page(); }
+        catch { ErrorMessage = "An error occurred. Please try again."; return Page(); }
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private async Task<FrameDetailsViewModel> MapToViewModelAsync(Frame frame)

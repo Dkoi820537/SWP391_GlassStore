@@ -1073,7 +1073,7 @@
 
                 @if (Model.Lens.IsInStock)
                 {
-                    <form method="post" asp-page-handler="AddToCart" id="cartForm">
+                    <form method="post" id="cartForm">
                         <input type="hidden" asp-for="AddToCartInput.ProductId" />
                         <input type="hidden" asp-for="AddToCartInput.PrescriptionId" id="selectedPrescriptionId" />
                         <div class="qty-row">
@@ -1309,29 +1309,30 @@ else
         var prescriptionModal = document.getElementById('prescriptionModal');
         function triggerAddToCart() { doAddToCart(false); }
         function doAddToCart(isBuyNow) {
+            var handlerValue = isBuyNow ? 'BuyNow' : 'AddToCart';
             if (prescriptionModal) {
                 var modal = new bootstrap.Modal(prescriptionModal);
                 document.getElementById('rxConfirm').onclick = function() {
                     var sel = document.getElementById('rxSelect');
                     var hidden = document.getElementById('selectedPrescriptionId');
                     if (hidden) hidden.value = sel ? (sel.value || '') : '';
-                    if (isBuyNow) {
-                        var form = document.getElementById('cartForm');
-                        var inp = document.createElement('input');
-                        inp.type='hidden'; inp.name='handler'; inp.value='BuyNow';
-                        form.appendChild(inp);
-                    }
-                    document.getElementById('cartForm').submit();
+                    var form = document.getElementById('cartForm');
+                    var existing = form.querySelector('input[name="handler"]');
+                    if (existing) existing.remove();
+                    var inp = document.createElement('input');
+                    inp.type='hidden'; inp.name='handler'; inp.value=handlerValue;
+                    form.appendChild(inp);
+                    form.submit();
                 };
                 modal.show();
             } else {
-                if (isBuyNow) {
-                    var form = document.getElementById('cartForm');
-                    var inp = document.createElement('input');
-                    inp.type='hidden'; inp.name='handler'; inp.value='BuyNow';
-                    form.appendChild(inp);
-                }
-                document.getElementById('cartForm').submit();
+                var form = document.getElementById('cartForm');
+                var existing = form.querySelector('input[name="handler"]');
+                if (existing) existing.remove();
+                var inp = document.createElement('input');
+                inp.type='hidden'; inp.name='handler'; inp.value=handlerValue;
+                form.appendChild(inp);
+                form.submit();
             }
         }
         var btnBuyNow = document.getElementById('btnBuyNow');

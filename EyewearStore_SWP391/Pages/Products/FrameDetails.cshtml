@@ -1275,7 +1275,7 @@
 
                 @if (Model.Frame.IsInStock)
                 {
-                    <form method="post" asp-page-handler="AddToCart" id="cartForm">
+                    <form method="post" id="cartForm">
                         <input type="hidden" asp-for="AddToCartInput.ProductId" />
                         <div class="qty-row">
                             <span class="qty-lbl">Quantity:</span>
@@ -1287,10 +1287,10 @@
                             </div>
                         </div>
                         <div class="cta-row">
-                            <button type="submit" name="handler" value="BuyNow" class="btn-buy">
+                            <button type="submit" asp-page-handler="BuyNow" class="btn-buy">
                                 <i class="bi bi-lightning-fill"></i> BUY NOW
                             </button>
-                            <button type="submit" class="btn-cart">
+                            <button type="submit" asp-page-handler="AddToCart" class="btn-cart">
                                 <i class="bi bi-cart-plus"></i> ADD TO CART
                             </button>
                         </div>

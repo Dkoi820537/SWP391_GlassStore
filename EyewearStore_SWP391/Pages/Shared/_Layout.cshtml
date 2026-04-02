@@ -605,7 +605,49 @@
                             </li>
                         }
 
-                        @if (User.IsInRole("admin") || User.IsInRole("Administrator") || User.IsInRole("manager"))
+                        @if (User.IsInRole("operational"))
+                        {
+                            <li class="dropdown">
+                                <button class="stitch-menu-link" id="operationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="material-symbols-outlined icon">engineering</span>
+                                    <span>Operation</span>
+                                    <span class="material-symbols-outlined chevron">expand_more</span>
+                                </button>
+                                <ul class="dropdown-menu shop-dropdown-menu p-2" aria-labelledby="operationDropdown">
+                                    <li>
+                                        <a class="shop-drop-item" asp-page="/Staff/Orders/Index">
+                                            <div class="shop-drop-icon frames"><i class="bi bi-box-seam"></i></div>
+                                            <div class="shop-drop-text">
+                                                <div class="shop-drop-name">Product Orders</div>
+                                                <div class="shop-drop-desc">Process & ship customer orders</div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li><div class="shop-drop-divider"></div></li>
+                                    <li>
+                                        <a class="shop-drop-item" asp-page="/Staff/ServiceOrders/Index">
+                                            <div class="shop-drop-icon lenses"><i class="bi bi-wrench-adjustable"></i></div>
+                                            <div class="shop-drop-text">
+                                                <div class="shop-drop-name">Service Orders</div>
+                                                <div class="shop-drop-desc">Manage repair & service requests</div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+
+                        @if (User.IsInRole("manager"))
+                        {
+                            <li>
+                                <a class="stitch-menu-link" asp-page="/Manager/Index">
+                                    <span class="material-symbols-outlined icon">supervisor_account</span>
+                                    <span>Manager</span>
+                                </a>
+                            </li>
+                        }
+
+                        @if (User.IsInRole("admin") || User.IsInRole("Administrator"))
                         {
                             <li class="dropdown">
                                 <button class="stitch-menu-link active-admin" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">

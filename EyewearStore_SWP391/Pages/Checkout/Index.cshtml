@@ -15,7 +15,7 @@
     </nav>
 
     <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
-        🛍️ Checkout
+        Checkout
     </h1>
     <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin-bottom: 2rem;">
         Review your order and complete payment
@@ -25,7 +25,7 @@
     @if (TempData["ErrorMessage"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px; border-left: 4px solid var(--error);">
-            <strong>⚠</strong> @TempData["ErrorMessage"]
+            <strong>Warning:</strong> @TempData["ErrorMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
@@ -38,7 +38,7 @@
                 <!-- Shipping Address Section -->
                 <div class="card mb-4" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden;">
                     <div style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%); padding: 1.25rem 1.5rem;">
-                        <h4 style="color: white; margin: 0; font-size: 1.25rem;">📍 Shipping Address</h4>
+                        <h4 style="color: white; margin: 0; font-size: 1.25rem;">Shipping Address</h4>
                     </div>
                     <div style="padding: 1.5rem;">
                         @if (Model.Addresses.Any())
@@ -56,17 +56,17 @@
                                         if (addr.AddressId == Model.SelectedAddressId)
                                         {
                                             <option value="@addr.AddressId" selected>
-                                                @addr.ReceiverName — @addr.Phone — @addr.AddressLine@(addr.IsDefault ? " ⭐ Default" : "")
+                                                @addr.ReceiverName — @addr.Phone — @addr.AddressLine@(addr.IsDefault ? " (Default)" : "")
                                             </option>
                                         }
                                         else
                                         {
                                             <option value="@addr.AddressId">
-                                                @addr.ReceiverName — @addr.Phone — @addr.AddressLine@(addr.IsDefault ? " ⭐ Default" : "")
+                                                @addr.ReceiverName — @addr.Phone — @addr.AddressLine@(addr.IsDefault ? " (Default)" : "")
                                             </option>
                                         }
                                     }
-                                    <option value="0">➕ Add a new address...</option>
+                                    <option value="0">+ Add a new address...</option>
                                 </select>
                             </div>
 
@@ -100,7 +100,7 @@
                             <!-- No saved addresses — show inline form by default -->
                             <input type="hidden" name="SelectedAddressId" value="0" />
                             <div class="alert alert-info" style="border-radius: 8px;">
-                                <strong>📝</strong> You don't have any saved addresses. Please add one below.
+                                You don't have any saved addresses. Please add one below.
                             </div>
                             <div class="row g-3">
                                 <div class="col-md-6">
@@ -129,7 +129,7 @@
                 <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden;">
                     <div style="background: var(--light-gray); padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--medium-gray);">
                         <h4 style="color: var(--primary-navy); margin: 0; font-size: 1.25rem;">
-                            📦 Order Items (@Model.Cart!.CartItems.Count)
+                            Order Items (@Model.Cart!.CartItems.Count)
                         </h4>
                     </div>
 
@@ -223,7 +223,7 @@
                         }
                         <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 2px solid var(--medium-gray);">
                             <span style="color: var(--dark-gray);">Shipping</span>
-                            <span style="color: var(--success); font-weight: 600;">FREE 🎉</span>
+                            <span style="color: var(--success); font-weight: 600;">FREE</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; padding: 1.25rem 0;">
                             <span style="color: var(--primary-navy); font-weight: 700; font-size: 1.25rem;">Total</span>
@@ -268,7 +268,7 @@
 
                         <!-- Payment Info Message -->
                         <div id="paymentInfoMessage" style="text-align: center; padding: 1rem; background: var(--light-gray); border-radius: 8px;">
-                            <div style="margin-bottom: 0.5rem;">🔒</div>
+                            <div style="margin-bottom: 0.5rem;"></div>
                             <small style="color: var(--secondary-warm-gray); font-weight: 500;">
                                 Secure payment powered by Stripe
                             </small><br />
@@ -368,14 +368,14 @@
             btnStripe.classList.add('selected');
             checkoutBtn.textContent = 'PAY WITH STRIPE';
             checkoutBtn.style.background = 'linear-gradient(135deg, #635bff 0%, #7c3aed 100%)';
-            infoMsg.innerHTML = '<div style="margin-bottom: 0.5rem;">🔒</div>' +
+            infoMsg.innerHTML = '<div style="margin-bottom: 0.5rem;"></div>' +
                 '<small style="color: var(--secondary-warm-gray); font-weight: 500;">Secure payment powered by Stripe</small><br />' +
                 '<small style="color: var(--secondary-warm-gray);">Your payment information is encrypted and secure</small>';
         } else {
             btnCOD.classList.add('selected-cod');
             checkoutBtn.textContent = 'PLACE ORDER';
             checkoutBtn.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
-            infoMsg.innerHTML = '<div style="margin-bottom: 0.5rem;">📦</div>' +
+            infoMsg.innerHTML = '<div style="margin-bottom: 0.5rem;"></div>' +
                 '<small style="color: var(--secondary-warm-gray); font-weight: 500;">Cash on Delivery</small><br />' +
                 '<small style="color: var(--secondary-warm-gray);">You will pay in cash when your order is delivered</small>';
         }

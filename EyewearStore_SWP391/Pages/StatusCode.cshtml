@@ -1,0 +1,327 @@
+﻿@page "{code:int}"
+@model EyewearStore_SWP391.Pages.StatusCodeModel
+@{
+    var code = RouteData.Values["code"]?.ToString();
+    bool is404 = code == "404";
+    bool is403 = code == "403";
+
+    ViewData["Title"] = is404 ? "Page Not Found" : is403 ? "Access Denied" : "Error " + code;
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --teal: #00756A;
+            --teal-dk: #005a51;
+            --teal-lt: #e8f5f4;
+            --red: #e53935;
+            --text: #1a1a1a;
+            --sub: #6b7280;
+            --border: #e5e7eb;
+        }
+
+        .sc-page {
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 24px;
+            background: linear-gradient(135deg, #f9fafb 0%, #e8f5f4 100%);
+        }
+
+        .sc-card {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 8px 48px rgba(0,0,0,0.10);
+            padding: 56px 48px 48px;
+            max-width: 560px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .sc-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 5px;
+                background: linear-gradient(90deg, var(--teal), #5eead4, var(--teal));
+            }
+
+        .sc-big-number {
+            font-size: 96px;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 4px;
+            background: linear-gradient(135deg, var(--teal), #5eead4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sc-icon-wrap {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+            .sc-icon-wrap.not-found {
+                background: #e8f5f4;
+                border: 3px solid #5eead4;
+            }
+
+            .sc-icon-wrap.forbidden {
+                background: #fff3f3;
+                border: 3px solid #fecaca;
+            }
+
+            .sc-icon-wrap.generic {
+                background: #fef9ee;
+                border: 3px solid #fde68a;
+            }
+
+            .sc-icon-wrap i {
+                font-size: 32px;
+            }
+
+            .sc-icon-wrap.not-found i {
+                color: var(--teal);
+            }
+
+            .sc-icon-wrap.forbidden i {
+                color: var(--red);
+            }
+
+            .sc-icon-wrap.generic i {
+                color: #d97706;
+            }
+
+        .sc-code-label {
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--sub);
+            margin-bottom: 10px;
+        }
+
+        .sc-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text);
+            margin: 0 0 14px;
+            line-height: 1.3;
+        }
+
+        .sc-desc {
+            font-size: 15px;
+            color: var(--sub);
+            line-height: 1.7;
+            margin: 0 0 32px;
+        }
+
+        .sc-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 28px;
+            background: var(--teal);
+            color: #fff;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            transition: background .2s, transform .15s;
+        }
+
+            .btn-home:hover {
+                background: var(--teal-dk);
+                color: #fff;
+                transform: translateY(-2px);
+            }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 28px;
+            background: #fff;
+            color: var(--teal);
+            border: 2px solid var(--teal);
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            transition: background .2s, transform .15s;
+            cursor: pointer;
+        }
+
+            .btn-back:hover {
+                background: var(--teal-lt);
+                color: var(--teal);
+                transform: translateY(-2px);
+            }
+
+        /* Quick links */
+        .sc-quick-links {
+            border-top: 1px solid var(--border);
+            padding-top: 24px;
+        }
+
+        .sc-quick-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--sub);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+
+        .sc-links-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .sc-link-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: var(--teal-lt);
+            color: var(--teal);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background .15s, transform .15s;
+        }
+
+            .sc-link-chip:hover {
+                background: #c5e8e5;
+                color: var(--teal-dk);
+                transform: translateY(-2px);
+            }
+
+        .bg-glasses {
+            position: absolute;
+            bottom: -14px;
+            right: -14px;
+            font-size: 100px;
+            opacity: 0.04;
+            pointer-events: none;
+            transform: rotate(-15deg);
+        }
+
+        @@media (max-width: 576px) {
+            .sc-card {
+                padding: 40px 20px 32px;
+            }
+
+            .sc-big-number {
+                font-size: 72px;
+            }
+
+            .sc-title {
+                font-size: 20px;
+            }
+
+            .sc-actions {
+                flex-direction: column;
+            }
+
+            .btn-home, .btn-back {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+}
+
+<div class="sc-page">
+    <div class="sc-card">
+        <i class="bi bi-eyeglasses bg-glasses"></i>
+
+        <div class="sc-big-number">@code</div>
+
+        @if (is404)
+        {
+            <div class="sc-icon-wrap not-found">
+                <i class="bi bi-search"></i>
+            </div>
+            <div class="sc-code-label">Page Not Found</div>
+            <h1 class="sc-title">This page doesn't exist</h1>
+            <p class="sc-desc">
+                The product or page you're looking for may have been removed,
+                renamed, or is temporarily unavailable.
+            </p>
+        }
+        else if (is403)
+        {
+            <div class="sc-icon-wrap forbidden">
+                <i class="bi bi-lock-fill"></i>
+            </div>
+            <div class="sc-code-label">Access Denied</div>
+            <h1 class="sc-title">You don't have permission</h1>
+            <p class="sc-desc">
+                You're not authorized to view this page.
+                Please log in with the correct account or return to the homepage.
+            </p>
+        }
+        else
+        {
+            <div class="sc-icon-wrap generic">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <div class="sc-code-label">Error @code</div>
+            <h1 class="sc-title">Something went wrong</h1>
+            <p class="sc-desc">
+                We encountered an unexpected issue. Please try again or head back to the homepage.
+            </p>
+        }
+
+        <div class="sc-actions">
+            <a href="/" class="btn-home">
+                <i class="bi bi-house-fill"></i> Go to Homepage
+            </a>
+            <button onclick="history.back()" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Go Back
+            </button>
+        </div>
+
+        @if (is404)
+        {
+            <div class="sc-quick-links">
+                <div class="sc-quick-label">You might be looking for</div>
+                <div class="sc-links-row">
+                    <a href="/Products?ProductTypeFilter=Frame" class="sc-link-chip">
+                        <i class="bi bi-eyeglasses"></i> Frames
+                    </a>
+                    <a href="/Products?ProductTypeFilter=Lens" class="sc-link-chip">
+                        <i class="bi bi-circle"></i> Lenses
+                    </a>
+                    <a href="/Customer/Services/CustomGlasses" class="sc-link-chip">
+                        <i class="bi bi-tools"></i> Services
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>

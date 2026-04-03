@@ -9,7 +9,6 @@ namespace EyewearStore_SWP391.Pages
     public class ErrorModel : PageModel
     {
         public string? RequestId { get; set; }
-
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 
         private readonly ILogger<ErrorModel> _logger;
@@ -22,7 +21,7 @@ namespace EyewearStore_SWP391.Pages
         public void OnGet()
         {
             RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            _logger.LogError("Unhandled error. RequestId: {RequestId}", RequestId);
         }
     }
-
 }

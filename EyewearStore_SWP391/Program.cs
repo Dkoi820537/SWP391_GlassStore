@@ -50,6 +50,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IWishlistService, WishlistService>();
 builder.Services.AddSingleton<IOtpService, OtpService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
+
 // Configure Stripe
 Stripe.StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 var realKey = Stripe.StripeConfiguration.ApiKey ?? "(null)";
@@ -59,23 +60,21 @@ if (!realKey.StartsWith("sk_"))
 {
     Console.WriteLine("[WARN] Stripe key does NOT start with 'sk_'. That's wrong for a secret key.");
 }
+
 // Authentication (cookie) - secure defaults and RememberMe handling
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        // Paths
         options.LoginPath = "/Account/Login";
         options.AccessDeniedPath = "/Account/AccessDenied";
 
-        // Cookie settings
         options.Cookie.Name = "LensadeAuth";
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // change to Always when deploying with HTTPS
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
         options.SlidingExpiration = true;
 
-        // Optional: event to avoid redirect for API calls
         options.Events = new CookieAuthenticationEvents
         {
             OnRedirectToLogin = ctx =>
@@ -95,13 +94,17 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+// ── Exception & status-code handling (chạy ở MỌI môi trường) ────────────────
+// Bắt mọi unhandled exception → trang /Error
+app.UseExceptionHandler("/Error");
+
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 else
 {
+    // Swagger chỉ bật ở Development
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
@@ -113,14 +116,16 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+// Bắt lỗi HTTP (404, 403, 500...) → redirect sang trang custom /StatusCode/{code}
+// Phải đặt SAU UseStaticFiles và TRƯỚC UseRouting
+app.UseStatusCodePagesWithReExecute("/StatusCode/{0}");
+
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Map controllers & razor pages
 app.MapControllers();
-
 app.MapRazorPages();
 
 app.Run();

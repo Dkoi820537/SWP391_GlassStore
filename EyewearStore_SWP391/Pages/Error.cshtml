@@ -1,26 +1,220 @@
 ﻿@page
-@model ErrorModel
+@model EyewearStore_SWP391.Pages.ErrorModel
 @{
-    ViewData["Title"] = "Error";
+    ViewData["Title"] = "Oops! Something went wrong";
+    Layout = "_Layout";
 }
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+@section Styles {
+    <style>
+        :root {
+            --teal: #00756A;
+            --teal-lt: #e8f5f4;
+            --red: #e53935;
+            --text: #1a1a1a;
+            --sub: #6b7280;
+            --border: #e5e7eb;
+        }
 
-@if (Model.ShowRequestId)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
+        .error-page {
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 24px;
+            background: linear-gradient(135deg, #f9fafb 0%, #e8f5f4 100%);
+        }
+
+        .error-card {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 8px 48px rgba(0,0,0,0.10);
+            padding: 56px 48px 48px;
+            max-width: 540px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .error-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 5px;
+                background: linear-gradient(90deg, var(--teal), #5eead4, var(--teal));
+            }
+
+        .error-icon-wrap {
+            width: 96px;
+            height: 96px;
+            background: #fff3f3;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            border: 3px solid #fecaca;
+        }
+
+            .error-icon-wrap i {
+                font-size: 42px;
+                color: var(--red);
+            }
+
+        .error-code {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--teal);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .error-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text);
+            margin: 0 0 14px;
+            line-height: 1.3;
+        }
+
+        .error-desc {
+            font-size: 15px;
+            color: var(--sub);
+            line-height: 1.7;
+            margin: 0 0 32px;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 28px;
+            background: var(--teal);
+            color: #fff;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            transition: background .2s, transform .15s;
+        }
+
+            .btn-home:hover {
+                background: #005a51;
+                color: #fff;
+                transform: translateY(-2px);
+            }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 28px;
+            background: #fff;
+            color: var(--teal);
+            border: 2px solid var(--teal);
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            transition: background .2s, transform .15s;
+            cursor: pointer;
+        }
+
+            .btn-back:hover {
+                background: var(--teal-lt);
+                color: var(--teal);
+                transform: translateY(-2px);
+            }
+
+        .request-id {
+            margin-top: 28px;
+            padding: 12px 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--sub);
+            word-break: break-all;
+        }
+
+            .request-id code {
+                font-size: 11px;
+                color: #374151;
+                background: #e5e7eb;
+                padding: 2px 6px;
+                border-radius: 4px;
+            }
+
+        .error-glasses {
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            font-size: 80px;
+            opacity: 0.04;
+            pointer-events: none;
+            transform: rotate(-20deg);
+        }
+
+        @@media (max-width: 576px) {
+            .error-card {
+                padding: 40px 24px 36px;
+            }
+
+            .error-title {
+                font-size: 22px;
+            }
+
+            .error-actions {
+                flex-direction: column;
+            }
+
+            .btn-home, .btn-back {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
 }
 
-<h3>Development Mode</h3>
-<p>
-    Swapping to the <strong>Development</strong> environment displays detailed information about the error that occurred.
-</p>
-<p>
-    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
-    It can result in displaying sensitive information from exceptions to end users.
-    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
-    and restarting the app.
-</p>
+<div class="error-page">
+    <div class="error-card">
+        <i class="bi bi-eyeglasses error-glasses"></i>
+
+        <div class="error-icon-wrap">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+
+        <div class="error-code">500 — Server Error</div>
+        <h1 class="error-title">Oops! Something went wrong</h1>
+        <p class="error-desc">
+            An unexpected error occurred on our end.<br>
+            Our team has been notified. Please try again or return to the homepage.
+        </p>
+
+        <div class="error-actions">
+            <a href="/" class="btn-home">
+                <i class="bi bi-house-fill"></i> Go to Homepage
+            </a>
+            <button onclick="history.back()" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Go Back
+            </button>
+        </div>
+
+        @if (Model.ShowRequestId)
+        {
+            <div class="request-id">
+                Request ID: <code>@Model.RequestId</code>
+            </div>
+        }
+    </div>
+</div>

@@ -11,16 +11,6 @@ using System.Text.Json;
 
 namespace EyewearStore_SWP391.Pages.Support.Orders
 {
-    /// <summary>
-    /// Full 5-role linear workflow:
-    ///
-    ///   [Sale/Support]   Pending Confirmation → Confirmed → Processing
-    ///   [Operations]     Processing → Shipped → Delivered
-    ///   [Manager]        Delivered → Completed
-    ///
-    /// Each role only sees and can press the ONE button that moves the order
-    /// to the NEXT step in their scope. No dropdown, no free-form selection.
-    /// </summary>
     [Authorize(Roles = "sale,admin,manager")]
     public class DetailsModel : PageModel
     {
@@ -31,18 +21,15 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             _context = context;
         }
 
-        // ── Workflow: what Sale/Support is allowed to advance ────────
         private static readonly Dictionary<string, string> SaleNextStatus = new()
         {
             ["Pending Confirmation"] = "Confirmed",
             ["Confirmed"] = "Processing",
         };
 
-        // Statuses that must wait for service job to be Done
         private static readonly HashSet<string> ServiceLockedNextStatuses =
             new() { "Processing" };
 
-        // ── Page properties ──────────────────────────────────────────
         [BindProperty(SupportsGet = true)]
         public int OrderId { get; set; }
 
@@ -64,7 +51,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
         public string ServiceName { get; set; } = "";
         public string FrameName { get; set; } = "";
 
-        // ── DTOs ─────────────────────────────────────────────────────
+        // ── DTOs ──────────────────────────────────────────────────────────────
         public class OrderItemDto
         {
             public int OrderItemId { get; set; }
@@ -90,7 +77,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             public int? RightAxis { get; set; }
         }
 
-        // ── GET ───────────────────────────────────────────────────────
+        // ── GET ───────────────────────────────────────────────────────────────
         public async Task<IActionResult> OnGetAsync(int id)
         {
             OrderId = id;
@@ -101,6 +88,8 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
                 .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
                 .Include(o => o.OrderItems).ThenInclude(oi => oi.Prescription)
                 .Include(o => o.OrderItems).ThenInclude(oi => oi.Returns)
+                // ── load history for the timeline ──────────────────────────
+                .Include(o => o.StatusHistories)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(o => o.OrderId == OrderId);
 
@@ -118,7 +107,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             return Page();
         }
 
-        // ── POST: Advance Status — the ONLY mutation for Sale/Support ─
+        // ── POST: Advance Status ──────────────────────────────────────────────
         public async Task<IActionResult> OnPostAdvanceStatusAsync(int orderId)
         {
             var order = await _context.Orders
@@ -127,21 +116,19 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
 
             if (order == null) return NotFound();
 
-            // 1. Does this status have a next step for Sale/Support?
             if (!SaleNextStatus.TryGetValue(order.Status, out var nextStatus))
             {
                 TempData["Error"] = order.Status switch
                 {
                     "Processing" or "Shipped" or "Delivered" or "Completed"
-                        => "This order has been handed to Operations / Manager. Sale/Support cannot advance it further.",
-                    "Cancelled"
-                        => "This order has been cancelled.",
+                        => "This order has been handed to Operations / Manager.",
+                    "Cancelled" => "This order has been cancelled.",
                     _ => $"Cannot advance order from '{order.Status}'."
                 };
                 return RedirectToPage(new { id = orderId });
             }
 
-            // 2. Prescription must be verified before Confirming
+            // Prescription must be verified before Confirming
             if (nextStatus == "Confirmed" &&
                 order.OrderItems.Any(oi => oi.PrescriptionId != null))
             {
@@ -157,7 +144,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
                 }
             }
 
-            // 3. Service-lock: cannot advance to Processing until service job is Done
+            // Service-lock check
             if (ServiceLockedNextStatuses.Contains(nextStatus))
             {
                 var serviceItems = order.OrderItems
@@ -187,9 +174,21 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
                 }
             }
 
-            // 4. All checks passed — advance
+            // ── Advance ──────────────────────────────────────────────────────
+            var prevStatus = order.Status;
             order.Status = nextStatus;
             _context.Orders.Update(order);
+
+            // ── Record in history ─────────────────────────────────────────────
+            _context.OrderStatusHistories.Add(new OrderStatusHistory
+            {
+                OrderId = orderId,
+                Status = nextStatus,
+                Actor = "Sale/Support",
+                Note = $"Advanced from {prevStatus} to {nextStatus}",
+                CreatedAt = DateTime.UtcNow
+            });
+
             await _context.SaveChangesAsync();
 
             TempData["Success"] = nextStatus == "Processing"
@@ -199,7 +198,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
             return RedirectToPage(new { id = orderId });
         }
 
-        // ── POST: Verify Prescription ─────────────────────────────────
+        // ── POST: Verify Prescription ──────────────────────────────────────────
         public async Task<IActionResult> OnPostVerifyPrescriptionAsync(int orderItemId)
         {
             var orderItem = await _context.OrderItems
@@ -230,23 +229,43 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
 
             p.IsActive = true;
             _context.PrescriptionProfiles.Update(p);
+
+            _context.OrderStatusHistories.Add(new OrderStatusHistory
+            {
+                OrderId = orderItem.OrderId,
+                Status = orderItem.Order.Status,
+                Actor = "Sale/Support",
+                Note = "Prescription verified for order item",
+                CreatedAt = DateTime.UtcNow
+            });
+
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "Prescription verified!";
             return RedirectToPage(new { id = orderItem.OrderId });
         }
 
-        // ── POST: Escalate to Manager ─────────────────────────────────
+        // ── POST: Escalate ─────────────────────────────────────────────────────
         public async Task<IActionResult> OnPostEscalateAsync(int orderId)
         {
             var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
             if (order == null) return NotFound();
 
+            _context.OrderStatusHistories.Add(new OrderStatusHistory
+            {
+                OrderId = orderId,
+                Status = order.Status,
+                Actor = "Sale/Support",
+                Note = "Order flagged for Manager review",
+                CreatedAt = DateTime.UtcNow
+            });
+            await _context.SaveChangesAsync();
+
             TempData["Success"] = $"Order #{orderId} has been flagged for Manager review.";
             return RedirectToPage(new { id = orderId });
         }
 
-        // ── POST: Cancel Order ────────────────────────────────────────
+        // ── POST: Cancel ────────────────────────────────────────────────────────
         public async Task<IActionResult> OnPostCancelOrderAsync(int orderId)
         {
             var order = await _context.Orders
@@ -262,13 +281,23 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
 
             order.Status = "Cancelled";
             _context.Orders.Update(order);
+
+            _context.OrderStatusHistories.Add(new OrderStatusHistory
+            {
+                OrderId = orderId,
+                Status = "Cancelled",
+                Actor = "Sale/Support",
+                Note = "Cancelled by Sale/Support staff",
+                CreatedAt = DateTime.UtcNow
+            });
+
             await _context.SaveChangesAsync();
 
             TempData["Success"] = $"Order #{orderId} has been cancelled.";
             return RedirectToPage(new { id = orderId });
         }
 
-        // ── Helpers ───────────────────────────────────────────────────
+        // ── Helpers ─────────────────────────────────────────────────────────────
         private void PopulateCustomerInfo(Order order)
         {
             CustomerName = order.User?.FullName ?? "Unknown";

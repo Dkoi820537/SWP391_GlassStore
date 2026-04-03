@@ -18,6 +18,20 @@ namespace EyewearStore_SWP391.Services
             _logger = logger;
         }
 
+        // ── Helper: write a status history row ──────────────────────────────
+        private void RecordStatusHistory(int orderId, string status,
+                                         string actor = "System", string? note = null)
+        {
+            _context.OrderStatusHistories.Add(new OrderStatusHistory
+            {
+                OrderId = orderId,
+                Status = status,
+                Actor = actor,
+                Note = note,
+                CreatedAt = DateTime.UtcNow
+            });
+        }
+
         // ── CreatePendingOrderAsync ──────────────────────────────────────────
 
         public async Task<Order> CreatePendingOrderAsync(
@@ -26,7 +40,6 @@ namespace EyewearStore_SWP391.Services
             using var tx = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Load cart with all navigations we need
                 var cart = await _context.Carts
                     .Include(c => c.CartItems)
                         .ThenInclude(ci => ci.Product)
@@ -43,7 +56,6 @@ namespace EyewearStore_SWP391.Services
                 if (address == null)
                     throw new InvalidOperationException("Invalid address");
 
-                // Optional global prescription
                 PrescriptionProfile? prescription = null;
                 if (prescriptionId.HasValue && prescriptionId.Value > 0)
                 {
@@ -56,7 +68,6 @@ namespace EyewearStore_SWP391.Services
                         throw new InvalidOperationException("Invalid or inactive prescription selected.");
                 }
 
-                // Validate stock
                 foreach (var ci in cart.CartItems)
                 {
                     if (ci.Product == null) continue;
@@ -66,7 +77,6 @@ namespace EyewearStore_SWP391.Services
                         throw new InvalidOperationException($"Insufficient stock for \"{ci.Product.Name}\".");
                 }
 
-                // ── Collect all lensProductIds in ONE DB query ───────────────
                 var lensIds = cart.CartItems
                     .Select(ci => CartService.ExtractLensProductId(ci.TempPrescriptionJson))
                     .Where(id => id.HasValue)
@@ -80,7 +90,6 @@ namespace EyewearStore_SWP391.Services
                         .ToDictionaryAsync(p => p.ProductId)
                     : new Dictionary<int, Product>();
 
-                // ── Build OrderItems ─────────────────────────────────────────
                 var orderItems = new List<OrderItem>();
                 decimal totalAmount = 0m;
 
@@ -98,39 +107,26 @@ namespace EyewearStore_SWP391.Services
                     decimal servicePrice = ci.Service?.Price ?? 0m;
                     decimal unitPrice = framePrice + lensPrice + servicePrice;
 
-                    // ── Build rich SnapshotJson ──────────────────────────────
                     object snapshotObj;
-
                     if (isServiceOrder)
                     {
                         snapshotObj = new
                         {
-                            // Flag that admin pages use to detect service orders
                             isServiceOrder = true,
-
-                            // Frame
                             frameName = ci.Product?.Name,
                             framePrice,
-                            productName = ci.Product?.Name,   // backward compat
+                            productName = ci.Product?.Name,
                             productType = ci.Product?.ProductType,
-
-                            // Lens
                             lensProductId = lensId,
                             lensProductName = lensProduct?.Name,
                             lensPrice,
-
-                            // Service
                             serviceId = ci.ServiceId,
                             serviceName = ci.Service?.Name,
                             servicePrice,
-
-                            // Image (frame's primary image)
                             imageUrl = ci.Product?.ProductImages?
-                                                 .Where(img => img.IsPrimary && img.IsActive)
-                                                 .Select(img => img.ImageUrl)
-                                                 .FirstOrDefault(),
-
-                            // Admin workflow fields (written as null initially)
+                                               .Where(img => img.IsPrimary && img.IsActive)
+                                               .Select(img => img.ImageUrl)
+                                               .FirstOrDefault(),
                             serviceStatus = "Pending",
                             assignedTo = (string?)null,
                             internalNote = (string?)null
@@ -138,7 +134,6 @@ namespace EyewearStore_SWP391.Services
                     }
                     else
                     {
-                        // ── Regular order (unchanged logic) ─────────────────
                         snapshotObj = new
                         {
                             isServiceOrder = false,
@@ -146,9 +141,9 @@ namespace EyewearStore_SWP391.Services
                             productType = ci.Product?.ProductType,
                             serviceName = ci.Service?.Name,
                             imageUrl = ci.Product?.ProductImages?
-                                                .Where(img => img.IsPrimary && img.IsActive)
-                                                .Select(img => img.ImageUrl)
-                                                .FirstOrDefault(),
+                                               .Where(img => img.IsPrimary && img.IsActive)
+                                               .Select(img => img.ImageUrl)
+                                               .FirstOrDefault(),
                             prescription = prescription == null ? null : new
                             {
                                 id = prescription.PrescriptionId,
@@ -181,7 +176,6 @@ namespace EyewearStore_SWP391.Services
                     totalAmount += unitPrice * ci.Quantity;
                 }
 
-                // ── Create Order ─────────────────────────────────────────────
                 var order = new Order
                 {
                     UserId = userId,
@@ -193,12 +187,16 @@ namespace EyewearStore_SWP391.Services
                 };
 
                 _context.Orders.Add(order);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); // get OrderId
 
                 foreach (var oi in orderItems) oi.OrderId = order.OrderId;
                 _context.OrderItems.AddRange(orderItems);
-                await _context.SaveChangesAsync();
 
+                // ── Record initial status history ────────────────────────────
+                RecordStatusHistory(order.OrderId, "Pending", "Customer",
+                    "Order placed successfully");
+
+                await _context.SaveChangesAsync();
                 await tx.CommitAsync();
 
                 _logger.LogInformation(
@@ -214,32 +212,7 @@ namespace EyewearStore_SWP391.Services
             }
         }
 
-        // ── Remaining methods unchanged ───────────────────────────────────────
-
-        public async Task<Order?> GetOrderByIdAsync(int orderId)
-            => await _context.Orders
-                .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
-                    .ThenInclude(p => p.ProductImages)
-                .Include(o => o.OrderItems).ThenInclude(oi => oi.Returns)
-                .Include(o => o.OrderItems).ThenInclude(oi => oi.Prescription)
-                .Include(o => o.Address)
-                .Include(o => o.User)
-                .Include(o => o.Shipments)
-                .FirstOrDefaultAsync(o => o.OrderId == orderId);
-
-        public async Task<Order?> GetOrderByStripeSessionIdAsync(string sessionId)
-            => await _context.Orders
-                .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
-                .FirstOrDefaultAsync(o => o.StripeSessionId == sessionId);
-
-        public async Task<List<Order>> GetOrdersByUserIdAsync(int userId)
-            => await _context.Orders
-                .Where(o => o.UserId == userId)
-                .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
-                .Include(o => o.OrderItems).ThenInclude(oi => oi.Returns)
-                .Include(o => o.Shipments)
-                .OrderByDescending(o => o.CreatedAt)
-                .ToListAsync();
+        // ── MarkOrderPaidAsync ───────────────────────────────────────────────
 
         public async Task MarkOrderPaidAsync(int orderId, string paymentIntentId)
         {
@@ -273,6 +246,10 @@ namespace EyewearStore_SWP391.Services
                     }
                 }
 
+                // ── Record status history ────────────────────────────────────
+                RecordStatusHistory(orderId, "Pending Confirmation", "System",
+                    "Payment received via Stripe");
+
                 await _context.SaveChangesAsync();
                 await _cartService.ClearCartAsync(order.UserId);
                 await tx.CommitAsync();
@@ -284,6 +261,8 @@ namespace EyewearStore_SWP391.Services
             catch { await tx.RollbackAsync(); throw; }
         }
 
+        // ── CancelOrderAsync ─────────────────────────────────────────────────
+
         public async Task CancelOrderAsync(int orderId)
         {
             var order = await _context.Orders.FindAsync(orderId);
@@ -291,9 +270,15 @@ namespace EyewearStore_SWP391.Services
             if (order.Status == "Pending")
             {
                 order.Status = "Cancelled";
+
+                RecordStatusHistory(orderId, "Cancelled", "Customer",
+                    "Order cancelled by customer");
+
                 await _context.SaveChangesAsync();
             }
         }
+
+        // ── ConfirmOrderAsync ────────────────────────────────────────────────
 
         public async Task<Order> ConfirmOrderAsync(int orderId, string stripeSessionId)
         {
@@ -311,15 +296,49 @@ namespace EyewearStore_SWP391.Services
             if (cart != null)
                 _context.CartItems.RemoveRange(cart.CartItems);
 
+            RecordStatusHistory(orderId, "Confirmed", "System",
+                "Payment confirmed by Stripe");
+
             await _context.SaveChangesAsync();
             return order;
         }
+
+        // ── Retrieval methods (unchanged) ────────────────────────────────────
+
+        public async Task<Order?> GetOrderByIdAsync(int orderId)
+            => await _context.Orders
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
+                    .ThenInclude(p => p.ProductImages)
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Returns)
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Prescription)
+                .Include(o => o.Address)
+                .Include(o => o.User)
+                .Include(o => o.Shipments)
+                // ── Include status history for customer timeline ──────────────
+                .Include(o => o.StatusHistories)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+        public async Task<Order?> GetOrderByStripeSessionIdAsync(string sessionId)
+            => await _context.Orders
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
+                .FirstOrDefaultAsync(o => o.StripeSessionId == sessionId);
+
+        public async Task<List<Order>> GetOrdersByUserIdAsync(int userId)
+            => await _context.Orders
+                .Where(o => o.UserId == userId)
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Returns)
+                .Include(o => o.Shipments)
+                .Include(o => o.StatusHistories)
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
 
         public async Task<List<Order>> GetUserOrdersAsync(int userId)
             => await _context.Orders
                 .Where(o => o.UserId == userId)
                 .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
                 .Include(o => o.OrderItems).ThenInclude(oi => oi.Prescription)
+                .Include(o => o.StatusHistories)
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
     }

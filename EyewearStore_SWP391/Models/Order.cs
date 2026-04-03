@@ -13,11 +13,9 @@ public partial class Order
     [Column("user_id")]
     public int UserId { get; set; }
 
-    // DB column is address_id (nullable based on your SELECT)
     [Column("address_id")]
     public int? AddressId { get; set; }
 
-    // Snapshot fields present in DB (you SELECTed these)
     [Column("receiver_name")]
     public string ReceiverName { get; set; } = null!;
 
@@ -47,10 +45,11 @@ public partial class Order
 
     // Navigation
     public virtual User User { get; set; } = null!;
-
-    // Keep Address navigation if FK exists
     public virtual Address? Address { get; set; }
-
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     public virtual ICollection<Shipment> Shipments { get; set; } = new List<Shipment>();
+
+    // ── NEW: full status transition history ──────────────────────────────────
+    public virtual ICollection<OrderStatusHistory> StatusHistories { get; set; }
+        = new List<OrderStatusHistory>();
 }

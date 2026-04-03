@@ -42,6 +42,8 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                     .ThenInclude(p => p.ProductImages)
                 .Include(o => o.OrderItems).ThenInclude(oi => oi.Prescription)
                 .Include(o => o.Shipments)
+                // ── load history ────────────────────────────────────────────
+                .Include(o => o.StatusHistories)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(o => o.OrderId == id);
 
@@ -51,6 +53,7 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             return Page();
         }
 
+        // ── POST: Advance Status ─────────────────────────────────────────────
         public async Task<IActionResult> OnPostAdvanceStatusAsync(int orderId)
         {
             var order = await _context.Orders
@@ -68,7 +71,6 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                     "Pending Confirmation" or "Confirmed" => "This order is not yet ready for Operations.",
                     _ => $"Cannot advance from status '{order.Status}'."
                 };
-
                 return RedirectToPage(new { id = orderId });
             }
 
@@ -84,7 +86,23 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                 }
             }
 
+            var prevStatus = order.Status;
             order.Status = nextStatus;
+
+            // ── Record status history ──────────────────────────────────────
+            _context.OrderStatusHistories.Add(new OrderStatusHistory
+            {
+                OrderId = orderId,
+                Status = nextStatus,
+                Actor = "Operations",
+                Note = nextStatus == "Shipped"
+                    ? "Order packed and handed to carrier"
+                    : nextStatus == "Delivered"
+                        ? "Delivery confirmed by Operations"
+                        : $"Advanced from {prevStatus} to {nextStatus}",
+                CreatedAt = DateTime.UtcNow
+            });
+
             await _context.SaveChangesAsync();
 
             TempData["Success"] = nextStatus == "Completed"
@@ -94,7 +112,9 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             return RedirectToPage(new { id = orderId });
         }
 
-        public async Task<IActionResult> OnPostCreateShipmentAsync(int orderId, string TrackingNumber, string Carrier)
+        // ── POST: Create / Update Shipment ────────────────────────────────────
+        public async Task<IActionResult> OnPostCreateShipmentAsync(
+            int orderId, string TrackingNumber, string Carrier)
         {
             var order = await _context.Orders
                 .FirstOrDefaultAsync(o => o.OrderId == orderId);
@@ -106,7 +126,6 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                 TempData["Error"] = "Tracking number is required!";
                 return RedirectToPage(new { id = orderId });
             }
-
             if (string.IsNullOrWhiteSpace(Carrier))
             {
                 TempData["Error"] = "Carrier is required!";
@@ -137,8 +156,17 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                     CreatedAt = DateTime.UtcNow
                 });
 
-                await _context.SaveChangesAsync();
+                // ── Also log in order history ──────────────────────────────
+                _context.OrderStatusHistories.Add(new OrderStatusHistory
+                {
+                    OrderId = orderId,
+                    Status = order.Status,
+                    Actor = "Operations",
+                    Note = $"Tracking assigned: {Carrier} — {TrackingNumber.Trim()}",
+                    CreatedAt = DateTime.UtcNow
+                });
 
+                await _context.SaveChangesAsync();
                 TempData["Success"] = "Shipment created successfully. You can now advance to Shipped.";
             }
             else
@@ -154,14 +182,23 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                     CreatedAt = DateTime.UtcNow
                 });
 
-                await _context.SaveChangesAsync();
+                _context.OrderStatusHistories.Add(new OrderStatusHistory
+                {
+                    OrderId = orderId,
+                    Status = order.Status,
+                    Actor = "Operations",
+                    Note = $"Tracking updated: {Carrier} — {TrackingNumber.Trim()}",
+                    CreatedAt = DateTime.UtcNow
+                });
 
+                await _context.SaveChangesAsync();
                 TempData["Success"] = "Shipment updated successfully.";
             }
 
             return RedirectToPage(new { id = orderId });
         }
 
+        // ── POST: Cancel ─────────────────────────────────────────────────────
         public async Task<IActionResult> OnPostCancelOrderAsync(int orderId)
         {
             var order = await _context.Orders
@@ -180,12 +217,20 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             foreach (var item in order.OrderItems)
             {
                 if (item.Product != null)
-                {
                     item.Product.InventoryQty = (item.Product.InventoryQty ?? 0) + item.Quantity;
-                }
             }
 
             order.Status = "Cancelled";
+
+            _context.OrderStatusHistories.Add(new OrderStatusHistory
+            {
+                OrderId = orderId,
+                Status = "Cancelled",
+                Actor = "Operations",
+                Note = "Cancelled by Operations — inventory restored",
+                CreatedAt = DateTime.UtcNow
+            });
+
             await _context.SaveChangesAsync();
 
             TempData["Success"] = $"Order #{orderId} has been cancelled and inventory restored.";

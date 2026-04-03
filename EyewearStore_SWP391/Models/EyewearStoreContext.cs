@@ -46,6 +46,8 @@ public partial class EyewearStoreContext : DbContext
     public virtual DbSet<Order> Orders { get; set; }
     public virtual DbSet<OrderItem> OrderItems { get; set; }
 
+    public virtual DbSet<OrderStatusHistory> OrderStatusHistories { get; set; }
+
     // Shipments
     public virtual DbSet<Shipment> Shipments { get; set; }
     public virtual DbSet<ShipmentStatusHistory> ShipmentStatusHistories { get; set; }
@@ -641,6 +643,41 @@ public partial class EyewearStoreContext : DbContext
                 .HasForeignKey(d => d.PrescriptionId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_order_items_prescription");
+        });
+
+        // =========================
+        // ORDER STATUS HISTORY
+        // =========================
+        modelBuilder.Entity<OrderStatusHistory>(entity =>
+        {
+            entity.ToTable("order_status_history");
+            entity.HasKey(e => e.HistoryId);
+
+            entity.HasIndex(e => e.OrderId).HasDatabaseName("IX_order_status_history_order");
+            entity.HasIndex(e => e.CreatedAt).HasDatabaseName("IX_order_status_history_created");
+
+            entity.Property(e => e.HistoryId).HasColumnName("history_id");
+            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.Status)
+                .HasMaxLength(100)
+                .IsRequired()
+                .HasColumnName("status");
+            entity.Property(e => e.Actor)
+                .HasMaxLength(100)
+                .HasDefaultValue("System")
+                .HasColumnName("actor");
+            entity.Property(e => e.Note)
+                .HasMaxLength(500)
+                .HasColumnName("note");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("SYSDATETIME()")
+                .HasColumnName("created_at");
+
+            entity.HasOne(d => d.Order)
+                .WithMany(p => p.StatusHistories)
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_order_status_history_orders");
         });
 
         // =========================

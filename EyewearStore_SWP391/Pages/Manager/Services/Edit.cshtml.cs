@@ -32,10 +32,10 @@ namespace EyewearStore_SWP391.Pages.Manager.Services
                 Name = s.Name,
                 Description = s.Description,
                 Price = s.Price,
-                DurationMin = s.DurationMin,
                 IsActive = s.IsActive,
-                ServiceCategory = s.ServiceCategory,  
+                ServiceCategory = s.ServiceCategory
             };
+
             return Page();
         }
 
@@ -53,11 +53,10 @@ namespace EyewearStore_SWP391.Pages.Manager.Services
                 Name = Input.Name,
                 Description = Input.Description,
                 Price = Input.Price,
-                DurationMin = Input.DurationMin,
                 IsActive = Input.IsActive,
                 ImageFile = Input.ImageFile,
                 RemoveImage = Input.RemoveImage,
-                ServiceCategory = Input.ServiceCategory, 
+                ServiceCategory = Input.ServiceCategory
             }, _env);
 
             if (result == null) return NotFound();

@@ -10,10 +10,9 @@ namespace EyewearStore_SWP391.Services
         public string Name { get; set; } = "";
         public string? Description { get; set; }
         public decimal Price { get; set; }
-        public int? DurationMin { get; set; }
         public bool IsActive { get; set; } = true;
         public IFormFile? ImageFile { get; set; }
-        public string? ServiceCategory { get; set; }  // NEW
+        public string? ServiceCategory { get; set; }
     }
 
     public class ServiceUpdateDto
@@ -21,11 +20,10 @@ namespace EyewearStore_SWP391.Services
         public string Name { get; set; } = "";
         public string? Description { get; set; }
         public decimal Price { get; set; }
-        public int? DurationMin { get; set; }
         public bool IsActive { get; set; } = true;
         public IFormFile? ImageFile { get; set; }
         public bool RemoveImage { get; set; } = false;
-        public string? ServiceCategory { get; set; }  // NEW
+        public string? ServiceCategory { get; set; }
     }
 
     public class ServiceListResult
@@ -110,9 +108,8 @@ namespace EyewearStore_SWP391.Services
                 Name = dto.Name.Trim(),
                 Description = dto.Description?.Trim(),
                 Price = dto.Price,
-                DurationMin = dto.DurationMin,
                 IsActive = dto.IsActive,
-                ServiceCategory = dto.ServiceCategory,  // NEW
+                ServiceCategory = dto.ServiceCategory,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -137,9 +134,8 @@ namespace EyewearStore_SWP391.Services
             svc.Name = dto.Name.Trim();
             svc.Description = dto.Description?.Trim();
             svc.Price = dto.Price;
-            svc.DurationMin = dto.DurationMin;
             svc.IsActive = dto.IsActive;
-            svc.ServiceCategory = dto.ServiceCategory;  // NEW
+            svc.ServiceCategory = dto.ServiceCategory;
             svc.UpdatedAt = DateTime.UtcNow;
 
             if (dto.RemoveImage)

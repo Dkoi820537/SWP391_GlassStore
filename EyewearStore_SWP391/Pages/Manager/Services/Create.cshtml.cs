@@ -31,10 +31,9 @@ namespace EyewearStore_SWP391.Pages.Manager.Services
                 Name = Input.Name,
                 Description = Input.Description,
                 Price = Input.Price,
-                DurationMin = Input.DurationMin,
                 IsActive = Input.IsActive,
                 ImageFile = Input.ImageFile,
-                ServiceCategory = Input.ServiceCategory,  // NEW
+                ServiceCategory = Input.ServiceCategory
             }, _env);
 
             TempData["Success"] = $"Service \"{Input.Name}\" created successfully!";
@@ -42,7 +41,6 @@ namespace EyewearStore_SWP391.Pages.Manager.Services
         }
     }
 
-    // ── Shared input model (used by both Create and Edit) ─────────────────────
     public class ServiceFormInput
     {
         public int ServiceId { get; set; }
@@ -57,9 +55,6 @@ namespace EyewearStore_SWP391.Pages.Manager.Services
         [Range(0, 999_999_999, ErrorMessage = "Price must be a positive number.")]
         public decimal Price { get; set; }
 
-        [Range(1, 1440, ErrorMessage = "Duration must be between 1 and 1440 minutes.")]
-        public int? DurationMin { get; set; }
-
         public bool IsActive { get; set; } = true;
 
         public IFormFile? ImageFile { get; set; }
@@ -69,6 +64,6 @@ namespace EyewearStore_SWP391.Pages.Manager.Services
         /// <summary>
         /// "CustomGlasses" | "FrameRepair" | "LensReplacement" | null = All pages
         /// </summary>
-        public string? ServiceCategory { get; set; }  // NEW
+        public string? ServiceCategory { get; set; }
     }
 }

@@ -222,7 +222,6 @@
             color: var(--muted);
         }
 
-        /* Category pill selector */
         .cat-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -597,7 +596,6 @@
             <input type="hidden" asp-for="Input.ServiceId" />
             <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
 
-            @* ── BASIC INFO ── *@
             <div class="fs">
                 <div class="sl"><i class="bi bi-info-circle-fill"></i> Basic Information</div>
 
@@ -616,7 +614,6 @@
                     </div>
                 </div>
 
-                @* ── SERVICE CATEGORY ── *@
                 <div class="fg">
                     <label>Applies To</label>
                     <div class="cat-grid">
@@ -660,10 +657,9 @@
                 </div>
             </div>
 
-            @* ── PRICING ── *@
             <div class="fs">
-                <div class="sl"><i class="bi bi-tag-fill"></i> Pricing &amp; Duration</div>
-                <div class="fr">
+                <div class="sl"><i class="bi bi-tag-fill"></i> Pricing</div>
+                <div class="fr one">
                     <div class="fg">
                         <label asp-for="Input.Price">Price <span class="req">*</span></label>
                         <div class="pw">
@@ -672,15 +668,9 @@
                         </div>
                         <span asp-validation-for="Input.Price" class="field-validation-error"></span>
                     </div>
-                    <div class="fg">
-                        <label asp-for="Input.DurationMin">Duration (minutes)</label>
-                        <input asp-for="Input.DurationMin" class="si" type="number" min="1" />
-                        <span class="hint">Leave blank if duration varies</span>
-                    </div>
                 </div>
             </div>
 
-            @* ── IMAGE ── *@
             <div class="fs">
                 <div class="sl"><i class="bi bi-image-fill"></i> Service Image</div>
 
@@ -716,7 +706,6 @@
                 </div>
             </div>
 
-            @* ── STATUS ── *@
             <div class="fs">
                 <div class="sl"><i class="bi bi-toggles"></i> Visibility</div>
                 <div class="tgl-wrap">
@@ -776,7 +765,6 @@
             zone.classList.remove('d-none');
         }
 
-        // Đảm bảo radio được check đúng với giá trị hiện tại từ server
         window.addEventListener('DOMContentLoaded', () => {
             const anyChecked = document.querySelector('input[name="Input.ServiceCategory"]:checked');
             if (!anyChecked) {

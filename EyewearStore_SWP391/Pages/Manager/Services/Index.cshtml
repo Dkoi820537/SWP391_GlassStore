@@ -483,20 +483,12 @@
             white-space: nowrap
         }
 
-        .cell-dur {
-            font-size: 13px;
-            color: var(--txt2);
-            font-weight: 500;
-            white-space: nowrap
-        }
-
         .cell-date {
             font-family: 'DM Mono',monospace;
             font-size: 11px;
             color: var(--muted)
         }
 
-        /* Category badge */
         .cat-badge {
             display: inline-flex;
             align-items: center;
@@ -738,7 +730,6 @@
 }
 
 <div class="sv-wrap">
-    <!-- HEADER -->
     <div class="sv-hdr">
         <div class="sv-hdr-left">
             <h1><span class="h-icon">⚙️</span> Services</h1>
@@ -754,7 +745,6 @@
         </div>
     </div>
 
-    <!-- ALERTS -->
     @if (TempData["Success"] is string okMsg)
     {
         <div class="alert-bar ok"><i class="bi bi-check-circle-fill"></i> @okMsg</div>
@@ -764,7 +754,6 @@
         <div class="alert-bar er"><i class="bi bi-exclamation-triangle-fill"></i> @erMsg</div>
     }
 
-    <!-- STATS -->
     <div class="sv-stats">
         <div class="sc">
             <div class="sc-icon p"><i class="bi bi-gear-wide-connected"></i></div>
@@ -780,7 +769,6 @@
         </div>
     </div>
 
-    <!-- FILTER -->
     <form method="get" class="sv-filter">
         <div class="fg" style="flex:2">
             <label>Search</label>
@@ -814,7 +802,6 @@
         </div>
     </form>
 
-    <!-- TABLE -->
     <div class="sv-tbl-wrap">
         @if (Model.Items.Any())
         {
@@ -826,7 +813,6 @@
                             <th>Service</th>
                             <th>Applies To</th>
                             <th>Price</th>
-                            <th>Duration</th>
                             <th>Status</th>
                             <th>Created</th>
                             <th style="text-align:right">Actions</th>
@@ -842,7 +828,6 @@
                             string desc = s.Description ?? "No description provided.";
                             string encodedName = System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.Name);
 
-                            // Category badge info
                             var (catIcon, catLabel, catCss) = s.ServiceCategory switch
                             {
                                 "CustomGlasses" => ("🔭", "Custom Glasses", "cg"),
@@ -873,16 +858,6 @@
                                     <span class="cat-badge @catCss">@catIcon @catLabel</span>
                                 </td>
                                 <td class="cell-price">@s.Price.ToString("N0") ₫</td>
-                                <td class="cell-dur">
-                                    @if (s.DurationMin.HasValue)
-                                    {
-                                        <span><i class="bi bi-clock" style="font-size:11px;margin-right:4px;opacity:.55"></i>@s.DurationMin min</span>
-                                    }
-                                    else
-                                    {
-                                        <span style="color:var(--muted)">—</span>
-                                    }
-                                </td>
                                 <td>
                                     <span class="badge @badgeClass">
                                         <span class="bdot"></span>@badgeLabel
@@ -932,7 +907,6 @@
                         }
                         else
                         {
-
                             <span class="pg disabled"><i class="bi bi-chevron-left"></i></span>
                         }
 
@@ -962,7 +936,6 @@
                         }
                         else
                         {
-
                             <span class="pg disabled"><i class="bi bi-chevron-right"></i></span>
                         }
                     </div>
@@ -981,7 +954,6 @@
                     }
                     else
                     {
-
                         <text>No results match your search. Try adjusting the filters.</text>
                     }
                 </p>
@@ -1010,7 +982,7 @@
 
         function toggleTheme() {
             const current = document.documentElement.getAttribute('data-theme') || 'light';
-            const next    = current === 'dark' ? 'light' : 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
             localStorage.setItem('sv-theme', next);
             applyTheme(next, true);
         }

@@ -613,22 +613,14 @@
             </div>
 
             @* ── PRICING ── *@
-            <div class="fs">
-                <div class="sl"><i class="bi bi-tag-fill"></i> Pricing &amp; Duration</div>
-                <div class="fr">
-                    <div class="fg">
-                        <label asp-for="Input.Price">Price <span class="req">*</span></label>
-                        <div class="pw">
-                            <input asp-for="Input.Price" class="si" type="number" min="0" step="1000" placeholder="0" />
-                            <span class="psuf">VND</span>
-                        </div>
-                        <span asp-validation-for="Input.Price" class="field-validation-error"></span>
+            <div class="fr one">
+                <div class="fg">
+                    <label asp-for="Input.Price">Price <span class="req">*</span></label>
+                    <div class="pw">
+                        <input asp-for="Input.Price" class="si" type="number" min="0" step="1000" placeholder="0" />
+                        <span class="psuf">VND</span>
                     </div>
-                    <div class="fg">
-                        <label asp-for="Input.DurationMin">Duration (minutes)</label>
-                        <input asp-for="Input.DurationMin" class="si" type="number" min="1" placeholder="e.g., 30" />
-                        <span class="hint">Leave blank if duration varies</span>
-                    </div>
+                    <span asp-validation-for="Input.Price" class="field-validation-error"></span>
                 </div>
             </div>
 

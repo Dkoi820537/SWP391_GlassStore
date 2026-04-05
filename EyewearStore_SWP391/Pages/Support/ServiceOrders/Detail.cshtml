@@ -46,19 +46,18 @@
         "Cancelled" => "bi-x-circle-fill",
         _ => "bi-hourglass-split"
     };
-    string StatusEmoji(string s) => s switch
-    {
-        "Pending" => "⏳",
-        "Processing" => "⊛",
-        "Ready" => "●",
-        "Done" => "★",
-        "Cancelled" => "✕",
-        _ => "•"
-    };
 
     string[] steps = { "Pending", "Processing", "Ready", "Done" };
     int stepIdx = curStatus switch { "Processing" => 1, "Ready" => 2, "Done" => 3, _ => 0 };
     bool isCancelled = curStatus == "Cancelled";
+
+    string nextStatus = curStatus switch
+    {
+        "Pending" => "Processing",
+        "Processing" => "Ready",
+        "Ready" => "Done",
+        _ => ""
+    };
 }
 
 @section Styles {
@@ -423,7 +422,6 @@
             margin-top: 2px
         }
 
-        /* RADIO STATUS */
         .form-lbl {
             font-size: 11px;
             font-weight: 700;
@@ -452,166 +450,78 @@
                 box-shadow: 0 0 0 3px rgba(15,118,110,.1)
             }
 
-        .st-g {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 18px
-        }
-
-        .st-wrap {
-            position: relative
-        }
-
-            .st-wrap input[type="radio"] {
-                position: absolute;
-                opacity: 0;
-                width: 0;
-                height: 0
-            }
-
-        .st-lbl {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            padding: 10px 13px;
-            border-radius: 9px;
+        /* Advance button */
+        .btn-advance {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
             cursor: pointer;
-            border: 2px solid var(--bdr);
-            background: var(--surf);
-            transition: all .18s;
-            user-select: none;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--txt)
-        }
-
-            .st-lbl:hover {
-                border-color: #94a3b8;
-                background: var(--bg)
-            }
-
-        .st-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            transition: transform .2s
-        }
-
-        .st-chk {
-            width: 17px;
-            height: 17px;
-            border-radius: 50%;
-            border: 2px solid #d1d5db;
+            background: linear-gradient(135deg, var(--navy), var(--navy2));
+            color: #fff;
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: .3px;
+            transition: all .22s;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
-            transition: all .2s;
-            font-size: 9px;
-            color: transparent;
-            margin-left: auto
+            gap: 10px
         }
 
-        .st-wrap input:checked + .st-lbl {
-            font-weight: 800
+            .btn-advance:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(13,27,42,.3)
+            }
+
+            .btn-advance:disabled {
+                opacity: .45;
+                cursor: not-allowed;
+                transform: none
+            }
+
+            .btn-advance .arrow-icon {
+                width: 30px;
+                height: 30px;
+                background: rgba(255,255,255,.18);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px
+            }
+
+        .next-status-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px
         }
-
-            .st-wrap input:checked + .st-lbl .st-dot {
-                transform: scale(1.4)
-            }
-
-            .st-wrap input:checked + .st-lbl .st-chk {
-                color: #fff
-            }
-
-        [data-s="Pending"] input:checked + .st-lbl {
-            background: #fef3c7;
-            border-color: #fcd34d;
-            color: #92400e
-        }
-
-            [data-s="Pending"] input:checked + .st-lbl .st-chk {
-                background: #d97706;
-                border-color: #d97706
-            }
-
-        [data-s="Processing"] input:checked + .st-lbl {
-            background: #dbeafe;
-            border-color: #93c5fd;
-            color: #1e40af
-        }
-
-            [data-s="Processing"] input:checked + .st-lbl .st-chk {
-                background: #2563eb;
-                border-color: #2563eb
-            }
-
-        [data-s="Ready"] input:checked + .st-lbl {
-            background: #d1fae5;
-            border-color: #6ee7b7;
-            color: #065f46
-        }
-
-            [data-s="Ready"] input:checked + .st-lbl .st-chk {
-                background: #059669;
-                border-color: #059669
-            }
-
-        [data-s="Done"] input:checked + .st-lbl {
-            background: #f0fdf4;
-            border-color: #86efac;
-            color: #14532d
-        }
-
-            [data-s="Done"] input:checked + .st-lbl .st-chk {
-                background: #16a34a;
-                border-color: #16a34a
-            }
-
-        [data-s="Cancelled"] input:checked + .st-lbl {
-            background: #fee2e2;
-            border-color: #fca5a5;
-            color: #991b1b
-        }
-
-            [data-s="Cancelled"] input:checked + .st-lbl .st-chk {
-                background: #dc2626;
-                border-color: #dc2626
-            }
-
-        .btn-save {
-            width: 100%;
-            padding: 12px;
-            font-size: 14px;
-            font-weight: 800;
-            border-radius: 9px;
-            border: none;
-            cursor: pointer;
-            background: linear-gradient(135deg,var(--teal),var(--teal2));
-            color: #fff;
-            letter-spacing: .3px;
-            transition: all .2s
-        }
-
-            .btn-save:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 5px 16px rgba(15,118,110,.3)
-            }
 
         .back-l {
-            display: block;
-            text-align: center;
-            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px;
+            border: 1.5px solid var(--bdr);
+            border-radius: 9px;
+            color: var(--txt2);
+            text-decoration: none;
             font-size: 13px;
             font-weight: 600;
-            color: var(--teal);
-            text-decoration: none
+            transition: all .18s;
+            background: var(--surf);
+            margin-top: 10px
         }
 
             .back-l:hover {
-                text-decoration: underline
+                background: var(--bg2);
+                color: var(--txt)
             }
 
         .note-box {
@@ -630,7 +540,6 @@
                 line-height: 1.6
             }
 
-        /* Done banner — highlight when service is Done to show order can advance */
         .done-banner {
             background: rgba(5,150,105,.08);
             border: 1.5px solid rgba(5,150,105,.25);
@@ -677,7 +586,6 @@
 }
 
 <div class="wrap">
-    <!-- Breadcrumb -->
     <div class="bc">
         <a asp-page="/Index">Home</a>
         <span style="opacity:.4">›</span>
@@ -714,51 +622,48 @@
             </span>
         </div>
 
-        @* Show banner when Done — lets support know they can now advance the order to Processing *@
-        @if (curStatus == "Done")
-        {
-            <div class="done-banner">
-                <i class="bi bi-check-circle-fill"></i>
-                <div class="done-banner-txt">
-                    Service hoàn thành! Bạn có thể quay lại
-                    <a asp-page="/Support/Orders/Details" asp-route-id="@order.OrderId"
-                       style="color:var(--teal);font-weight:800">Order #@order.OrderId</a>
-                    và <strong>Advance to Processing</strong>.
-                </div>
-            </div>
-        }
-
         <div class="grid">
-            <!-- LEFT -->
+            <!-- LEFT COLUMN -->
             <div>
-                <!-- Service Breakdown -->
                 <div class="dc">
                     <div class="dc-hdr"><i class="bi bi-tools"></i><h3>Service Breakdown</h3></div>
                     <div class="dc-body">
                         <div class="bd-row">
                             <div class="bd-left">
                                 <div class="bd-ico"><i class="bi bi-eyeglasses"></i></div>
-                                <div><div class="bd-lbl">Frame</div><div class="bd-val">@(snap.FrameName ?? snap.ProductName ?? "N/A")</div></div>
+                                <div>
+                                    <div class="bd-lbl">Frame</div>
+                                    <div class="bd-val">@(snap.FrameName ?? snap.ProductName ?? "N/A")</div>
+                                </div>
                             </div>
                             <div class="bd-prc">@snap.FramePrice.ToString("N0") ₫</div>
                         </div>
+
                         @if (!string.IsNullOrEmpty(snap.LensProductName))
                         {
                             <div class="bd-row">
                                 <div class="bd-left">
                                     <div class="bd-ico">⭕</div>
-                                    <div><div class="bd-lbl">Lens</div><div class="bd-val">@snap.LensProductName</div></div>
+                                    <div>
+                                        <div class="bd-lbl">Lens</div>
+                                        <div class="bd-val">@snap.LensProductName</div>
+                                    </div>
                                 </div>
                                 <div class="bd-prc">@snap.LensPrice.ToString("N0") ₫</div>
                             </div>
                         }
+
                         <div class="bd-row">
                             <div class="bd-left">
                                 <div class="bd-ico"><i class="bi bi-gear"></i></div>
-                                <div><div class="bd-lbl">Service</div><div class="bd-val">@(snap.ServiceName ?? "N/A")</div></div>
+                                <div>
+                                    <div class="bd-lbl">Service</div>
+                                    <div class="bd-val">@(snap.ServiceName ?? "N/A")</div>
+                                </div>
                             </div>
                             <div class="bd-prc">@snap.ServicePrice.ToString("N0") ₫</div>
                         </div>
+
                         <div class="bd-tot">
                             <div class="bd-tot-lbl">Total</div>
                             <div class="bd-tot-val">@((item.UnitPrice * item.Quantity).ToString("N0")) ₫</div>
@@ -766,7 +671,6 @@
                     </div>
                 </div>
 
-                <!-- Progress Timeline -->
                 <div class="dc">
                     <div class="dc-hdr"><i class="bi bi-map"></i><h3>Progress</h3></div>
                     <div class="dc-body">
@@ -794,7 +698,6 @@
                     </div>
                 </div>
 
-                <!-- Customer Info -->
                 <div class="dc">
                     <div class="dc-hdr"><i class="bi bi-person-fill"></i><h3>Customer Info</h3></div>
                     <div class="dc-body">
@@ -823,56 +726,79 @@
                 </div>
             </div>
 
-            <!-- RIGHT: Update Form -->
+            <!-- RIGHT COLUMN -->
             <div>
                 <div class="dc" style="position:sticky;top:80px">
-                    <div class="dc-hdr"><i class="bi bi-pencil-fill"></i><h3>Update Service Job</h3></div>
+                    <div class="dc-hdr">
+                        <i class="bi bi-arrow-right-circle-fill"></i>
+                        <h3>Advance Service Job</h3>
+                    </div>
                     <div class="dc-body">
-                        <form method="post" asp-page-handler="Update" asp-route-orderId="@order.OrderId">
-                            <input type="hidden" name="OrderItemId" value="@item.OrderItemId" />
 
-                            <div style="margin-bottom:18px">
-                                <span class="form-lbl"><i class="bi bi-bar-chart me-1"></i> Trạng thái Service</span>
-                                <div class="st-g">
-                                    @foreach (var s in DetailModel.Statuses)
-                                    {
-                                        bool isCur = curStatus == s;
-                                        <div class="st-wrap" data-s="@s">
-                                            <input type="radio" id="s_@s" name="ServiceStatus"
-                                                   value="@s" @(isCur ? "checked" : "") />
-                                            <label class="st-lbl" for="s_@s">
-                                                <span class="st-dot" style="background:@StatusFg(s)"></span>
-                                                <span style="font-size:14px">@StatusEmoji(s)</span>
-                                                <span>@s</span>
-                                                <span class="st-chk">✓</span>
-                                            </label>
-                                        </div>
-                                    }
+                        @if (isCancelled)
+                        {
+                            <div style="display:flex;align-items:center;gap:10px;color:#dc2626;padding:8px 0">
+                                <i class="bi bi-x-circle" style="font-size:1.4rem"></i>
+                                <strong>Service order này đã bị huỷ.</strong>
+                            </div>
+                        }
+                        else if (curStatus == "Done")
+                        {
+                            <div class="done-banner">
+                                <i class="bi bi-check-circle-fill"></i>
+                                <div class="done-banner-txt">
+                                    Service hoàn thành! Quay lại
+                                    <a asp-page="/Support/Orders/Details" asp-route-id="@order.OrderId"
+                                       style="color:var(--teal);font-weight:800">Order #@order.OrderId</a>
+                                    và <strong>Advance to Processing</strong>.
                                 </div>
                             </div>
+                        }
+                        else
+                        {
+                            <form method="post" asp-page-handler="Update" asp-route-orderId="@order.OrderId">
+                                <input type="hidden" name="OrderItemId" value="@item.OrderItemId" />
 
-                            <div style="margin-bottom:13px">
-                                <label class="form-lbl" for="at"><i class="bi bi-person me-1"></i> Assign Technician</label>
-                                <input type="text" id="at" name="AssignedTo"
-                                       value="@snap.AssignedTo" class="fi-inp"
-                                       placeholder="Tên kỹ thuật viên hoặc mã nhân viên…" />
-                            </div>
+                                <div style="margin-bottom:13px">
+                                    <label class="form-lbl" for="at">
+                                        <i class="bi bi-person me-1"></i> Assign Technician
+                                    </label>
+                                    <input type="text" id="at" name="AssignedTo"
+                                           value="@snap.AssignedTo" class="fi-inp"
+                                           placeholder="Tên kỹ thuật viên hoặc mã nhân viên…" />
+                                </div>
 
-                            <div style="margin-bottom:18px">
-                                <label class="form-lbl" for="note">
-                                    <i class="bi bi-pencil me-1"></i> Ghi chú
-                                </label>
-                                <textarea id="note" name="InternalNote" rows="4"
+                                <div style="margin-bottom:20px">
+                                    <label class="form-lbl" for="note">
+                                        <i class="bi bi-pencil me-1"></i> Ghi chú
+                                    </label>
+                                    <textarea id="note" name="InternalNote" rows="3"
                                       class="fi-inp" style="resize:vertical"
                                       placeholder="e.g. Lens đang cắt, dự kiến 2 giờ…">@snap.InternalNote</textarea>
-                            </div>
+                                </div>
 
-                            <button type="submit" class="btn-save">
-                                <i class="bi bi-save me-1"></i> Lưu thay đổi
-                            </button>
-                        </form>
+                                @if (!string.IsNullOrEmpty(nextStatus))
+                                {
+                                    <button type="submit" class="btn-advance">
+                                        <span>Advance to <strong>@nextStatus</strong></span>
+                                        <div class="arrow-icon"><i class="bi bi-arrow-right"></i></div>
+                                    </button>
+                                    <div class="next-status-label">
+                                        Current: <span style="color:var(--txt2);font-weight:700">@curStatus</span>
+                                        &nbsp;→&nbsp; Next: <strong style="color:var(--teal)">@nextStatus</strong>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn-advance" disabled>
+                                        <span>Không thể cập nhật</span>
+                                    </button>
+                                }
+                            </form>
+                        }
 
-                        <a asp-page="/Support/Orders/Details" asp-route-id="@order.OrderId" class="back-l" style="margin-top:14px">
+                        <a asp-page="/Support/Orders/Details" asp-route-id="@order.OrderId"
+                           class="back-l" style="margin-top:14px">
                             ← Quay lại Order #@order.OrderId
                         </a>
                         <a asp-page="/Support/ServiceOrders/Index" class="back-l">
@@ -883,7 +809,7 @@
 
                 @if (!string.IsNullOrEmpty(snap.InternalNote))
                 {
-                    <div class="note-box">
+                    <div class="note-box" style="margin-top:14px">
                         <div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px">Current Note</div>
                         <p>@snap.InternalNote</p>
                     </div>
@@ -892,15 +818,3 @@
         </div>
     }
 </div>
-
-@section Scripts {
-    <script>
-        // Make radio labels clickable
-        document.querySelectorAll('.st-lbl').forEach(lbl => {
-            lbl.addEventListener('click', function() {
-                const radio = this.previousElementSibling;
-                if (radio) radio.checked = true;
-            });
-        });
-    </script>
-}

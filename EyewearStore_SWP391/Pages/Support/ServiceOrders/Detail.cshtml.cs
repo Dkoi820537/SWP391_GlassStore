@@ -20,10 +20,10 @@ namespace EyewearStore_SWP391.Pages.Support.ServiceOrders
             _email = email;
         }
 
-        public static readonly string[] Statuses = { "Pending", "Processing", "Ready", "Done", "Cancelled" };
+        // Chỉ cho đi tiến, không cho lùi
+        public static readonly string[] StatusFlow = { "Pending", "Processing", "Ready", "Done" };
 
         [BindProperty] public int OrderItemId { get; set; }
-        [BindProperty] public string ServiceStatus { get; set; } = "";
         [BindProperty] public string? AssignedTo { get; set; }
         [BindProperty] public string? InternalNote { get; set; }
 
@@ -38,9 +38,9 @@ namespace EyewearStore_SWP391.Pages.Support.ServiceOrders
             if (result != null) return result;
 
             OrderItemId = Item.OrderItemId;
-            ServiceStatus = Snap.ServiceStatus ?? "Pending";
             AssignedTo = Snap.AssignedTo;
             InternalNote = Snap.InternalNote;
+
             return Page();
         }
 
@@ -49,22 +49,30 @@ namespace EyewearStore_SWP391.Pages.Support.ServiceOrders
             var result = await LoadAsync(orderId);
             if (result != null) return result;
 
+            var currentStatus = Snap.ServiceStatus ?? "Pending";
+            var nextStatus = GetNextStatus(currentStatus);
+
+            if (string.IsNullOrEmpty(nextStatus))
+            {
+                TempData["Error"] = $"Không thể cập nhật tiếp vì trạng thái hiện tại là '{currentStatus}'.";
+                return RedirectToPage("Detail", new { orderId });
+            }
+
             var raw = Item.SnapshotJson ?? "{}";
             using var doc = JsonDocument.Parse(raw);
             var mutable = new Dictionary<string, object?>();
-            foreach (var kv in doc.RootElement.EnumerateObject())
-                mutable[kv.Name] = (object)kv.Value;
 
-            var oldStatus = Snap.ServiceStatus ?? "Pending";
-            mutable["serviceStatus"] = ServiceStatus;
+            foreach (var kv in doc.RootElement.EnumerateObject())
+                mutable[kv.Name] = JsonElementToObject(kv.Value);
+
+            mutable["serviceStatus"] = nextStatus;
             mutable["assignedTo"] = AssignedTo;
             mutable["internalNote"] = InternalNote;
 
             Item.SnapshotJson = JsonSerializer.Serialize(mutable);
             await _db.SaveChangesAsync();
 
-            // Send email notification on status change
-            if (ServiceStatus != oldStatus && !string.IsNullOrEmpty(Customer.Email))
+            if (nextStatus != currentStatus && !string.IsNullOrEmpty(Customer.Email))
             {
                 try
                 {
@@ -74,15 +82,43 @@ namespace EyewearStore_SWP391.Pages.Support.ServiceOrders
                         orderId: Order.OrderId,
                         frameName: Snap.FrameName ?? Snap.ProductName ?? "N/A",
                         serviceName: Snap.ServiceName ?? "N/A",
-                        newStatus: ServiceStatus,
+                        newStatus: nextStatus,
                         assignedTo: AssignedTo,
                         note: InternalNote);
                 }
-                catch { /* non-fatal */ }
+                catch
+                {
+                    // non-fatal
+                }
             }
 
-            TempData["Success"] = $"Order #{orderId} service status updated to: {ServiceStatus}";
+            TempData["Success"] = $"Service status đã được cập nhật lên: {nextStatus}";
             return RedirectToPage("Detail", new { orderId });
+        }
+
+        private static string? GetNextStatus(string current)
+        {
+            var idx = Array.IndexOf(StatusFlow, current);
+
+            if (idx < 0) return null;          // status lạ
+            if (idx >= StatusFlow.Length - 1)  // Done thì không đi tiếp
+                return null;
+
+            return StatusFlow[idx + 1];
+        }
+
+        private static object? JsonElementToObject(JsonElement el)
+        {
+            return el.ValueKind switch
+            {
+                JsonValueKind.String => el.GetString(),
+                JsonValueKind.Number => el.TryGetInt64(out var l) ? l : el.GetDecimal(),
+                JsonValueKind.True => true,
+                JsonValueKind.False => false,
+                JsonValueKind.Null => null,
+                JsonValueKind.Undefined => null,
+                _ => el.GetRawText()
+            };
         }
 
         private async Task<IActionResult?> LoadAsync(int orderId)

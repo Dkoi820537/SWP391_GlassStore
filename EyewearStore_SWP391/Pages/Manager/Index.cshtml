@@ -33,38 +33,6 @@
             .tw-root h1, .tw-root h2, .tw-root h3, .tw-root p, .tw-root span {
                 font-family: 'Inter', sans-serif;
             }
-
-        /* ── Service quick-action card highlight ── */
-        .qa-services {
-            border-color: #0d9488 !important;
-            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%) !important;
-            color: #0f766e !important;
-            position: relative;
-            overflow: hidden;
-        }
-
-            .qa-services::before {
-                content: '';
-                position: absolute;
-                top: -8px;
-                right: -8px;
-                width: 32px;
-                height: 32px;
-                background: #0d9488;
-                border-radius: 50%;
-                opacity: .12;
-            }
-
-            .qa-services:hover {
-                background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%) !important;
-                border-color: #0f766e !important;
-                color: #0f766e !important;
-            }
-
-            .qa-services .qa-icon {
-                font-size: 14px;
-                margin-right: 4px;
-            }
     </style>
 }
 
@@ -95,13 +63,8 @@
             </div>
         </div>
 
-        <!-- Summary Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
-            <div class="bg-white border-t-4 border-[#0d9488] text-slate-900 p-6 rounded-lg shadow-sm">
-                <h3 class="text-sm font-medium text-slate-500 uppercase">Total Revenue</h3>
-                <p class="text-4xl font-bold mt-2">@Model.Stats.TotalRevenue.ToString("N0")</p>
-                <p class="text-xs mt-1 text-slate-500">VND this month</p>
-            </div>
+        <!-- Summary Cards (bỏ Total Revenue) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div class="bg-white border-t-4 border-[#2563eb] text-slate-900 p-6 rounded-lg shadow-sm">
                 <h3 class="text-sm font-medium text-slate-500 uppercase">Total Orders</h3>
                 <p class="text-4xl font-bold mt-2">@Model.Stats.TotalOrders</p>
@@ -158,22 +121,18 @@
                 Quick Actions
             </h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-
                 <a asp-page="/Frames/Index"
                    class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
                     <span>MANAGE FRAMES</span>
                 </a>
-
                 <a asp-page="/Lenses/Index"
                    class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
                     <span>MANAGE LENSES</span>
                 </a>
-
                 <a asp-page="/Manager/Services/Index"
                    class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
                     <span>MANAGE SERVICES</span>
                 </a>
-
                 <a asp-page="/Sale/Refunds/Index"
                    class="border border-slate-300 bg-white p-3 text-[10px] font-bold uppercase rounded flex items-center justify-between hover:border-teal-600 transition-colors text-slate-800 hover:text-teal-700">
                     <span>MANAGE RETURNS</span>
@@ -182,24 +141,14 @@
                         <span class="bg-red-500 text-white rounded-full px-2 py-0.5 ml-1 text-[9px]">@Model.Stats.PendingReturns</span>
                     }
                 </a>
-
             </div>
         </section>
 
         <!-- Data Visualization & Sidebars -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-            <!-- Left: Chart & Orders -->
+            <!-- Left: Orders Table (bỏ chart doanh thu) -->
             <div class="lg:col-span-8 space-y-6">
-                <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
-                    <div class="bg-slate-800 text-white p-3 text-sm font-semibold">
-                        Revenue Overview (Last 7 Days)
-                    </div>
-                    <div class="p-6 h-64 bg-white relative">
-                        <canvas id="revenueChart" class="w-full h-full"></canvas>
-                    </div>
-                </div>
-
                 <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
                     <div class="bg-amber-100 text-amber-900 p-3 text-sm font-semibold">
                         Recent Orders
@@ -220,7 +169,6 @@
                                         <th class="p-4 font-semibold">Customer</th>
                                         <th class="p-4 font-semibold">Date</th>
                                         <th class="p-4 font-semibold">Status</th>
-                                        <th class="p-4 font-semibold text-right">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100" id="recentOrdersBody">
@@ -243,7 +191,6 @@
                                                     @order.Status
                                                 </span>
                                             </td>
-                                            <td class="p-4 text-right font-bold text-teal-700">@order.TotalAmount.ToString("N0") VND</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -257,7 +204,7 @@
                 </div>
             </div>
 
-            <!-- Right: Alerts & Top Products -->
+            <!-- Right: Alerts & Top Products (bỏ revenue, chỉ giữ sold count) -->
             <div class="lg:col-span-4 space-y-6">
                 <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
                     @if (Model.Stats.LowStockCount > 0 || Model.Stats.PendingReturns > 0)
@@ -309,7 +256,6 @@
                                         <p class="text-xs font-bold text-slate-800">@product.Name</p>
                                         <p class="text-[10px] text-slate-500 mt-1">@product.SoldCount sold</p>
                                     </div>
-                                    <div class="text-xs font-bold text-teal-700">@product.Revenue.ToString("N0") VND</div>
                                 </div>
                             }
                         }
@@ -322,64 +268,8 @@
 </div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // ── Revenue Chart ──────────────────────────────────────
-            const canvas = document.getElementById('revenueChart');
-            if (canvas) {
-                const labelsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartData.Labels));
-                const valuesData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartData.Values));
-                new Chart(canvas.getContext('2d'), {
-                    type: 'line',
-                    data: {
-                        labels: labelsData,
-                        datasets: [{
-                            label: 'Revenue (VND)',
-                            data: valuesData,
-                            borderColor: '#0d9488',
-                            backgroundColor: 'rgba(13,148,136,0.1)',
-                            tension: 0.4,
-                            fill: true,
-                            borderWidth: 2,
-                            pointBackgroundColor: '#fff',
-                            pointBorderColor: '#0d9488',
-                            pointBorderWidth: 2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                backgroundColor: 'rgba(15,23,42,0.9)',
-                                padding: 10,
-                                callbacks: {
-                                    label: ctx => 'Revenue: ' + ctx.parsed.y.toLocaleString() + ' VND'
-                                }
-                            }
-                        },
-                        scales: {
-                            x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
-                            y: {
-                                border: { display: false },
-                                grid: { color: '#f1f5f9' },
-                                beginAtZero: true,
-                                ticks: {
-                                    color: '#64748b',
-                                    font: { size: 10 },
-                                    callback: v => (v / 1000).toLocaleString() + 'K'
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // ── Orders Pagination ──────────────────────────────────
             const rowsPerPage = 5;
             let currentPage  = 1;
             const rows       = document.querySelectorAll('.order-row');

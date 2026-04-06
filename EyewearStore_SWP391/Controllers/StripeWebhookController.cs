@@ -44,6 +44,12 @@ public class StripeWebhookController : ControllerBase
     {
         var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
         var webhookSecret = _configuration["Stripe:WebhookSecret"];
+        
+        if (string.IsNullOrEmpty(webhookSecret))
+        {
+            _logger.LogError("Stripe webhook secret is not configured.");
+            return StatusCode(500, new { error = "Server improperly configured" });
+        }
 
         Event stripeEvent;
 

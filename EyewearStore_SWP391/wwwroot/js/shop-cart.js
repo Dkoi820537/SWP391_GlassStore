@@ -161,6 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const qtyDisplay = row?.querySelector('.cart-qty-display');
 
         // Optimistic UI update: show new quantity immediately
+        const originalQty = parseInt(qtyDisplay?.textContent, 10) || 1;
         if (qtyDisplay) {
             qtyDisplay.textContent = newQty;
             qtyDisplay.style.transition = 'transform 0.15s ease';
@@ -202,13 +203,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     rebuildCartDropdown(result.cartItems, result.cartCount, result.subtotal);
                 } else {
                     showToast(result.message || 'Failed to update quantity.', 'error');
-                    // Re-enable buttons on error
+                    // Re-enable buttons on error and revert quantity
+                    if (qtyDisplay) qtyDisplay.textContent = originalQty;
                     if (minusBtn) { minusBtn.disabled = false; minusBtn.style.opacity = '1'; }
                     if (plusBtn) plusBtn.disabled = false;
                 }
             } catch (error) {
                 console.error('Error updating cart item qty:', error);
                 showToast('Something went wrong. Please try again.', 'error');
+                // Revert optimistic updates
+                if (qtyDisplay) qtyDisplay.textContent = originalQty;
                 if (minusBtn) { minusBtn.disabled = false; minusBtn.style.opacity = '1'; }
                 if (plusBtn) plusBtn.disabled = false;
             }

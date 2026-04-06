@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace EyewearStore_SWP391.Models;
 
@@ -23,6 +24,7 @@ public class Product
 
     public string Currency { get; set; } = null!;
 
+    [ConcurrencyCheck]
     public int? InventoryQty { get; set; }
 
     public string? Attributes { get; set; }

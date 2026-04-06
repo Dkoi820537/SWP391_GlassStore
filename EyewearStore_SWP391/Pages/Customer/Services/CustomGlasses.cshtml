@@ -793,8 +793,8 @@
 
         /* ── Summary ── */
         function buildSummary() {
-            const f = sel.frame, l = sel.lens, s = sel.service, rx = sel.prescription;
-            let total = f.price + l.price + s.price;
+            const f = sel.frame || {}, l = sel.lens || {}, s = sel.service || {}, rx = sel.prescription;
+            let total = (f.price || 0) + (l.price || 0) + (s.price || 0);
             const rxFee = rx ? (l.prescriptionFee || 0) : 0;
             total += rxFee;
 
@@ -812,10 +812,10 @@
                 thumb(r.item.img || '', r.emoji) +
                 '<div class="sum-item-info">' +
                 '<div class="lbl">' + r.label + '</div>' +
-                '<div class="val">' + r.item.name +
+                '<div class="val">' + (r.item.name || 'Not Selected') +
                 (r.item.dur ? '<span style="font-size:11px;color:#94a3b8;margin-left:6px">· ' + r.item.dur + '</span>' : '') +
                 '</div></div></div>' +
-                '<div class="sum-price">' + r.item.price.toLocaleString('vi-VN') + ' &#x20AB;</div>' +
+                '<div class="sum-price">' + (r.item.price || 0).toLocaleString('vi-VN') + ' &#x20AB;</div>' +
                 '</div>'
             ).join('');
 

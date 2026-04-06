@@ -240,22 +240,25 @@ namespace EyewearStore_SWP391.Services
 
         public async Task MarkOrderPaidAsync(int orderId, string paymentIntentId)
         {
-            using var tx = await _context.Database.BeginTransactionAsync();
-            try
+            int maxRetries = 3;
+            for (int attempt = 0; attempt < maxRetries; attempt++)
             {
-                var order = await _context.Orders
-                    .Include(o => o.OrderItems)
-                    .FirstOrDefaultAsync(o => o.OrderId == orderId);
-
-                if (order == null)
+                using var tx = await _context.Database.BeginTransactionAsync();
+                try
                 {
-                    _logger.LogWarning("MarkOrderPaidAsync: order {OrderId} not found", orderId);
-                    return;
-                }
+                    var order = await _context.Orders
+                        .Include(o => o.OrderItems)
+                        .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
-                if (order.Status == "Pending Confirmation") return;
+                    if (order == null)
+                    {
+                        _logger.LogWarning("MarkOrderPaidAsync: order {OrderId} not found", orderId);
+                        return;
+                    }
 
-                order.Status = "Pending Confirmation";
+                    if (order.Status != "Pending") return;
+
+                    order.Status = "Pending Confirmation";
                 order.StripePaymentIntentId = paymentIntentId;
 
                 // ── Set PaymentStatus based on payment method ────────────────
@@ -288,15 +291,34 @@ namespace EyewearStore_SWP391.Services
                     : "Payment received via Stripe";
                 RecordStatusHistory(orderId, "Pending Confirmation", "System", historyNote);
 
-                await _context.SaveChangesAsync();
-                await _cartService.ClearCartAsync(order.UserId);
-                await tx.CommitAsync();
+                    await _context.SaveChangesAsync();
+                    await _cartService.ClearCartAsync(order.UserId);
+                    await tx.CommitAsync();
 
-                _logger.LogInformation(
-                    "Order {OrderId} marked Pending Confirmation for user {UserId} (PaymentStatus: {PaymentStatus})",
-                    orderId, order.UserId, order.PaymentStatus);
+                    _logger.LogInformation(
+                        "Order {OrderId} marked Pending Confirmation for user {UserId} (PaymentStatus: {PaymentStatus})",
+                        orderId, order.UserId, order.PaymentStatus);
+
+                    return; // Success, exit retry loop
+                }
+                catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException ex)
+                {
+                    await tx.RollbackAsync();
+                    _logger.LogWarning(ex, "Concurrency conflict processing order {OrderId}. Attempt {Attempt}", orderId, attempt + 1);
+                    if (attempt == maxRetries - 1) throw; // Rethrow on final attempt
+                    
+                    // Small fixed delay before retry
+                    await Task.Delay(150);
+                    
+                    // Clear EF tracker so next iteration fetches fresh data
+                    _context.ChangeTracker.Clear();
+                }
+                catch
+                {
+                    await tx.RollbackAsync();
+                    throw;
+                }
             }
-            catch { await tx.RollbackAsync(); throw; }
         }
 
         // ── CancelOrderAsync ─────────────────────────────────────────────────
@@ -364,7 +386,7 @@ namespace EyewearStore_SWP391.Services
                 }
 
                 // ── Set intermediate status ──────────────────────────────
-                var idempotencyKey = Guid.NewGuid().ToString();
+                var idempotencyKey = $"cancel_refund_order_{orderId}";
                 order.CancellationIdempotencyKey = idempotencyKey;
 
                 if (needsStripeRefund && refundAmount > 0)

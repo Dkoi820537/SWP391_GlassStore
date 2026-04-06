@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EyewearStore_SWP391.Models;
@@ -25,6 +26,7 @@ public partial class Order
     [Column("address_line")]
     public string AddressLine { get; set; } = null!;
 
+    [ConcurrencyCheck]
     [Column("status")]
     public string Status { get; set; } = null!;
 

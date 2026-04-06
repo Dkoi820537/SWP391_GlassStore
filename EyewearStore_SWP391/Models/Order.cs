@@ -76,6 +76,26 @@ public partial class Order
     [Column("payment_status")]
     public string PaymentStatus { get; set; } = "Pending";
 
+    // ── Cancellation / Refund fields ────────────────────────────────────────
+
+    /// <summary>
+    /// GUID idempotency key sent to Stripe to prevent duplicate refunds.
+    /// </summary>
+    [Column("cancellation_idempotency_key")]
+    public string? CancellationIdempotencyKey { get; set; }
+
+    /// <summary>
+    /// Amount actually refunded to the customer via Stripe.
+    /// </summary>
+    [Column("refund_amount")]
+    public decimal? RefundAmount { get; set; }
+
+    /// <summary>
+    /// Timestamp when the order was cancelled.
+    /// </summary>
+    [Column("cancelled_at")]
+    public DateTime? CancelledAt { get; set; }
+
     // Navigation
     public virtual User User { get; set; } = null!;
     public virtual Address? Address { get; set; }

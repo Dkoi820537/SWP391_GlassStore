@@ -33,6 +33,12 @@ namespace EyewearStore_SWP391.Services
         /// <summary>Cancel a pending order (e.g. user abandoned Stripe Checkout).</summary>
         Task CancelOrderAsync(int orderId);
 
+        /// <summary>
+        /// Customer-initiated cancellation with automated refund.
+        /// Validates order-type/status rules, issues Stripe refund, restores inventory.
+        /// </summary>
+        Task<DTOs.CancellationResult> RequestCancellationAsync(int orderId, int userId);
+
         /// <summary>Confirms an order after successful payment</summary>
         Task<Order> ConfirmOrderAsync(int orderId, string stripeSessionId);
 

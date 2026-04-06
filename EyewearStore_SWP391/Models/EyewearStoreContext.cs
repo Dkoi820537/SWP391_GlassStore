@@ -589,6 +589,16 @@ public partial class EyewearStoreContext : DbContext
                 .HasDefaultValueSql("SYSDATETIME()")
                 .HasColumnName("created_at");
 
+            // ── Cancellation / Refund columns ────────────────────────────
+            entity.Property(e => e.CancellationIdempotencyKey)
+                .HasMaxLength(36)
+                .HasColumnName("cancellation_idempotency_key");
+            entity.Property(e => e.RefundAmount)
+                .HasColumnType("decimal(18,2)")
+                .HasColumnName("refund_amount");
+            entity.Property(e => e.CancelledAt)
+                .HasColumnName("cancelled_at");
+
             entity.HasIndex(e => e.OrderGroupId).HasDatabaseName("IX_orders_order_group");
 
             entity.HasOne(d => d.User)

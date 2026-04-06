@@ -94,4 +94,40 @@ public class StripeService : IStripeService
 
         return session.Url;
     }
+
+    /// <inheritdoc />
+    public async Task<DTOs.StripeRefundResult> RefundPaymentAsync(
+        string paymentIntentId, long amountInSmallestUnit, string idempotencyKey)
+    {
+        try
+        {
+            var refundService = new Stripe.RefundService();
+            var options = new Stripe.RefundCreateOptions
+            {
+                PaymentIntent = paymentIntentId,
+                Amount = amountInSmallestUnit,   // VND is zero-decimal
+                Reason = Stripe.RefundReasons.RequestedByCustomer
+            };
+
+            var requestOptions = new Stripe.RequestOptions
+            {
+                IdempotencyKey = idempotencyKey
+            };
+
+            var refund = await refundService.CreateAsync(options, requestOptions);
+
+            _logger.LogInformation(
+                "Stripe refund {RefundId} created for PaymentIntent {PI} — Amount: {Amount} VND",
+                refund.Id, paymentIntentId, amountInSmallestUnit);
+
+            return DTOs.StripeRefundResult.Ok(refund.Id, refund.Amount);
+        }
+        catch (Stripe.StripeException ex)
+        {
+            _logger.LogError(ex,
+                "Stripe refund failed for PaymentIntent {PI}: {Message}",
+                paymentIntentId, ex.Message);
+            return DTOs.StripeRefundResult.Fail(ex.Message);
+        }
+    }
 }

@@ -464,7 +464,7 @@
         var canRefund = Model.Order.Status == "Completed"
         && (DateTime.UtcNow - Model.Order.CreatedAt).TotalDays <= 7;
         var hasPrescription = Model.Order.OrderItems.Any(oi => oi.PrescriptionId.HasValue);
-        bool isCancelled = Model.Order.Status == "Cancelled";
+        bool isCancelled = Model.Order.Status == "Cancelled" || Model.Order.Status == "Cancellation_Pending";
 
         // ── Build stepper data ────────────────────────────────────────────
         var pipeline = new (string Status, string Icon)[]
@@ -517,13 +517,16 @@
                                         "Shipped" => "os-shipped",
                                         "Delivered" => "os-delivered",
                                         "Completed" => "os-completed",
-                                        "Cancelled" => "os-cancelled",
+                                        "Cancelled" or "Cancellation_Pending" => "os-cancelled",
                                         _ => "os-pending"
                                     };
+                                    string statusDisplay = Model.Order.Status == "Cancellation_Pending"
+                                        ? "Cancelling..."
+                                        : Model.Order.Status;
                                 }
                                 <span class="os-badge @osCss" style="font-size:13px;">
                                     <i class="@Model.GetStatusIcon(Model.Order.Status)"></i>
-                                    @Model.Order.Status
+                                    @statusDisplay
                                 </span>
                                 @if (canReturn && daysLeft > 0)
                                 {
@@ -657,7 +660,7 @@
                                         "Shipped" => "dot-shipped",
                                         "Delivered" => "dot-delivered",
                                         "Completed" => "dot-completed",
-                                        "Cancelled" => "dot-cancelled",
+                                        "Cancelled" or "Cancellation_Pending" => "dot-cancelled",
                                         _ => "dot-note"
                                     };
 
@@ -670,7 +673,7 @@
                                         "Shipped" => "bi-truck",
                                         "Delivered" => "bi-box-seam-fill",
                                         "Completed" => "bi-patch-check-fill",
-                                        "Cancelled" => "bi-x-circle-fill",
+                                        "Cancelled" or "Cancellation_Pending" => "bi-x-circle-fill",
                                         _ => "bi-info-circle-fill"
                                     };
 
@@ -693,6 +696,8 @@
                                         "Order placed successfully" => "Your order has been placed and payment is pending.",
                                         "Payment received via Stripe" => "We've received your payment. Thank you!",
                                         "Payment confirmed by Stripe" => "Payment confirmed! Your order is now with our team.",
+                                        "Cancellation initiated \u2014 processing refund" => "Your cancellation request is being processed. Refund is on the way.",
+                                        var n when n != null && n.StartsWith("Order cancelled") => n,
                                         var n when n != null && n.StartsWith("Advanced from") => null,
                                         var n when n != null && n.StartsWith("Tracking assigned") => n,
                                         var n when n != null && n.StartsWith("Tracking updated") => n,
@@ -861,9 +866,10 @@
                                 <i class="bi bi-arrow-return-left me-1"></i>Request Refund
                             </a>
                         }
-                        @if (Model.Order.Status == "Pending")
+                        @if (Model.CanCancel)
                         {
-                            <button class="btn btn-outline-danger"
+                            <button type="button" class="btn btn-outline-danger"
+                                    id="btnOpenCancelModal"
                                     style="padding:.55rem 1.2rem;border-radius:8px;font-weight:700;">
                                 <i class="bi bi-x-circle me-1"></i>Cancel Order
                             </button>
@@ -967,6 +973,40 @@
                 }
 
                 <!-- Shipping Address -->
+                @* ── Refund Info Card (shown for cancelled orders with refund) ── *@
+                @if (Model.Order.Status == "Cancelled" && Model.Order.RefundAmount.HasValue && Model.Order.RefundAmount > 0)
+                {
+                    <div class="card mb-3"
+                         style="border:none;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);overflow:hidden;">
+                        <div style="background:linear-gradient(135deg,#059669,#10b981);padding:.9rem 1.2rem;">
+                            <h5 style="color:#fff;font-weight:700;margin:0;font-size:.95rem;">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i> Refund Issued
+                            </h5>
+                        </div>
+                        <div style="padding:1.2rem 1.4rem;">
+                            <div style="display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid #f1f5f9;">
+                                <span style="color:#64748b;">Refund Amount</span>
+                                <span style="font-weight:800;color:#059669;font-size:1.1rem;">@Model.Order.RefundAmount.Value.ToString("N0") VND</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid #f1f5f9;">
+                                <span style="color:#64748b;">Payment Status</span>
+                                <span style="font-weight:700;color:#059669;">@Model.Order.PaymentStatus</span>
+                            </div>
+                            @if (Model.Order.CancelledAt.HasValue)
+                            {
+                                <div style="display:flex;justify-content:space-between;padding:.45rem 0;">
+                                    <span style="color:#64748b;">Cancelled At</span>
+                                    <span style="font-weight:600;color:#0d1b2a;">@Model.Order.CancelledAt.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                </div>
+                            }
+                            <div style="background:#f0fdf4;border-radius:8px;padding:.7rem .9rem;margin-top:.8rem;font-size:.82rem;color:#166534;line-height:1.6;">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Refund will appear in your original payment method within 5–10 business days.
+                            </div>
+                        </div>
+                    </div>
+                }
+
                 @if (Model.Order.Address != null)
                 {
                     <div class="card mb-3"
@@ -1015,3 +1055,145 @@
         color: #64748b;
     }
 </style>
+
+@* ════════════════════════════════════════════════════════════ *@
+@*  CANCELLATION CONFIRMATION MODAL                            *@
+@* ════════════════════════════════════════════════════════════ *@
+@if (Model.CanCancel)
+{
+    <div id="cancelModal"
+         style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+        <div style="background:#fff;border-radius:18px;max-width:440px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden;animation:modalIn .25s ease;">
+            <!-- Header -->
+            <div style="background:linear-gradient(135deg,#dc2626,#ef4444);padding:1.6rem 1.8rem;text-align:center;">
+                <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);display:inline-flex;align-items:center;justify-content:center;font-size:26px;color:#fff;margin-bottom:10px;">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <h4 style="color:#fff;margin:0;font-weight:800;font-size:1.2rem;">Cancel Order #@Model.Order?.OrderId?</h4>
+            </div>
+
+            <!-- Body -->
+            <div style="padding:1.6rem 1.8rem;">
+                <p style="color:#475569;font-size:.95rem;line-height:1.7;margin-bottom:1.2rem;text-align:center;">
+                    Are you sure you want to cancel this order?<br>
+                    <strong style="color:#dc2626;">This action cannot be undone.</strong>
+                </p>
+
+                @if (Model.ExpectedRefundAmount > 0)
+                {
+                    <div style="background:linear-gradient(135deg,rgba(5,150,105,.06),rgba(16,185,129,.1));border:1.5px solid rgba(5,150,105,.2);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div>
+                                <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:2px;">Expected Refund</div>
+                                <div style="font-size:1.3rem;font-weight:900;color:#059669;">@Model.ExpectedRefundAmount.ToString("N0") VND</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:.75rem;color:#6b7280;">
+                                    @(Model.Order?.PaymentMethod == "COD" ? "Deposit refund" : "Full refund")
+                                </div>
+                                <div style="font-size:.75rem;color:#94a3b8;">5–10 business days</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div style="background:#fef3c7;border:1.5px solid #fde68a;border-radius:12px;padding:.8rem 1rem;margin-bottom:1rem;text-align:center;">
+                        <span style="font-size:.85rem;color:#92400e;"><i class="bi bi-info-circle me-1"></i> No online payment was made — no refund needed.</span>
+                    </div>
+                }
+
+                <!-- Buttons -->
+                <div class="d-flex gap-2">
+                    <button type="button" id="btnCloseModal"
+                            style="flex:1;padding:.7rem;border-radius:10px;border:1.5px solid #e2e8f0;background:#fff;color:#475569;font-weight:700;font-size:.9rem;cursor:pointer;transition:all .2s;"
+                            onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'">
+                        Go Back
+                    </button>
+                    <button type="button" id="btnConfirmCancel"
+                            style="flex:1;padding:.7rem;border-radius:10px;border:none;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;font-weight:700;font-size:.9rem;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(220,38,38,.3);"
+                            onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                        <i class="bi bi-x-circle me-1"></i> Yes, Cancel Order
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @@keyframes modalIn {
+            from { opacity: 0; transform: scale(.92) translateY(10px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+    </style>
+
+    <script>
+    (function() {
+        const modal     = document.getElementById('cancelModal');
+        const btnOpen   = document.getElementById('btnOpenCancelModal');
+        const btnClose  = document.getElementById('btnCloseModal');
+        const btnConfirm = document.getElementById('btnConfirmCancel');
+        const orderId   = @(Model.Order?.OrderId ?? 0);
+        let   isProcessing = false;
+
+        // Open modal
+        btnOpen.addEventListener('click', function() {
+            modal.style.display = 'flex';
+        });
+
+        // Close modal
+        btnClose.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+
+        // Close on backdrop click
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) modal.style.display = 'none';
+        });
+
+        // Confirm cancellation via AJAX
+        btnConfirm.addEventListener('click', async function() {
+            if (isProcessing) return; // prevent double-click
+            isProcessing = true;
+
+            // Disable button and show loading state
+            btnConfirm.disabled = true;
+            btnConfirm.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Processing...';
+            btnClose.disabled = true;
+
+            try {
+                const response = await fetch('/api/orders/' + orderId + '/cancel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin'
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Success — show confirmation and reload
+                    btnConfirm.style.background = 'linear-gradient(135deg,#059669,#10b981)';
+                    btnConfirm.innerHTML = '<i class="bi bi-check-circle me-1"></i> Cancelled Successfully';
+
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1200);
+                } else {
+                    // Error — show message and re-enable
+                    alert(data.error || 'Unable to cancel this order. Please try again.');
+                    btnConfirm.disabled = false;
+                    btnConfirm.innerHTML = '<i class="bi bi-x-circle me-1"></i> Yes, Cancel Order';
+                    btnClose.disabled = false;
+                    isProcessing = false;
+                }
+            } catch (err) {
+                alert('Network error. Please check your connection and try again.');
+                btnConfirm.disabled = false;
+                btnConfirm.innerHTML = '<i class="bi bi-x-circle me-1"></i> Yes, Cancel Order';
+                btnClose.disabled = false;
+                isProcessing = false;
+            }
+        });
+    })();
+    </script>
+}

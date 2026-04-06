@@ -16,4 +16,16 @@ public interface IStripeService
         string successUrl,
         string cancelUrl,
         string customerEmail);
+
+    /// <summary>
+    /// Issue a refund against a Stripe PaymentIntent.
+    /// Uses an idempotency key to prevent duplicate refunds.
+    /// </summary>
+    /// <param name="paymentIntentId">The Stripe PaymentIntent ID (pi_xxx).</param>
+    /// <param name="amountInSmallestUnit">Refund amount in smallest currency unit (VND = whole đồng).</param>
+    /// <param name="idempotencyKey">Unique key to guarantee at-most-once processing.</param>
+    Task<DTOs.StripeRefundResult> RefundPaymentAsync(
+        string paymentIntentId,
+        long amountInSmallestUnit,
+        string idempotencyKey);
 }

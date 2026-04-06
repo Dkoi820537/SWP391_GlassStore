@@ -1,4 +1,4 @@
-﻿// Services/EmailService.cs  — THAY THẾ HOÀN TOÀN file cũ
+// Services/EmailService.cs  — THAY THẾ HOÀN TOÀN file cũ
 using System.Net;
 using System.Net.Mail;
 
@@ -19,6 +19,10 @@ namespace EyewearStore_SWP391.Services
         Task SendServiceOrderStatusAsync(string toEmail, string customerName,
             int orderId, string frameName, string serviceName,
             string newStatus, string? assignedTo, string? note);
+
+        Task SendOrderCancellationAsync(string toEmail, string customerName,
+            int orderId, decimal totalAmount, decimal refundAmount,
+            string paymentMethod, string orderType);
     }
 
     public class EmailService : IEmailService
@@ -189,6 +193,49 @@ namespace EyewearStore_SWP391.Services
 <p style='font-size:14px;color:#4a4a5a;text-align:center;margin-top:18px'>{msg}</p>
 {noteBox}
 {readyBtn}");
+
+            await SendEmailAsync(toEmail, subject, body);
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // ORDER CANCELLATION
+        // ═══════════════════════════════════════════════════════════════════════
+        public async Task SendOrderCancellationAsync(string toEmail, string customerName,
+            int orderId, decimal totalAmount, decimal refundAmount,
+            string paymentMethod, string orderType)
+        {
+            var subject = $"Order #{orderId} Has Been Cancelled — OptiPlus";
+
+            var refundRow = refundAmount > 0
+                ? $"<tr><td style='{Lbl}'>Refund</td><td style='{Val}'><span style='color:#059669;font-weight:800'>{refundAmount:N0} VND</span></td></tr>"
+                : "";
+            var methodLabel = paymentMethod == "COD" ? "COD (Deposit Refunded)" : "Online Payment (Fully Refunded)";
+
+            var tableRows = new (string, string)[]
+            {
+                ("Order",    $"<strong>#{orderId}</strong>"),
+                ("Type",     orderType),
+                ("Total",    $"{totalAmount:N0} VND"),
+                ("Payment",  methodLabel)
+            };
+
+            var body = Wrap($@"
+<div style='text-align:center;margin-bottom:24px'>
+  <div style='width:56px;height:56px;border-radius:50%;background:rgba(220,38,38,.1);border:2px solid rgba(220,38,38,.25);display:inline-flex;align-items:center;justify-content:center;font-size:26px;color:#dc2626;margin-bottom:12px'>&#10007;</div>
+  <h2 style='margin:0 0 8px;font-size:22px;color:#1a2332'>Order Cancelled</h2>
+  <p style='margin:0;font-size:14px;color:#6b7280'>Hi <strong>{customerName}</strong>, your order has been cancelled.</p>
+</div>
+{Table(tableRows, extra: refundRow)}
+{(refundAmount > 0 ? $@"
+<div style='background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px 20px;margin-top:20px;text-align:center'>
+  <p style='margin:0;font-size:14px;color:#166534;line-height:1.7'>
+    <strong>{refundAmount:N0} VND</strong> will be refunded to your original payment method.<br>
+    Please allow 5–10 business days for the refund to appear.
+  </p>
+</div>" : "")}
+<div style='text-align:center;margin-top:24px'>
+  <a href='https://localhost:5005/Orders/Detail?id={orderId}' style='{Btn("#0d1b2a")}'>View Order Details</a>
+</div>");
 
             await SendEmailAsync(toEmail, subject, body);
         }

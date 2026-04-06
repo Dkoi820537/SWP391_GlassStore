@@ -21,6 +21,24 @@ public class DetailModel : PageModel
 
     public Order? Order { get; set; }
 
+    // ── Cancellation helpers (computed after order load) ──────────────────
+
+    /// <summary>Whether this order can be cancelled by the customer right now.</summary>
+    public bool CanCancel { get; private set; }
+
+    /// <summary>The amount the customer would receive as refund if they cancel.</summary>
+    public decimal ExpectedRefundAmount { get; private set; }
+
+    // Status sets for eligibility
+    private static readonly HashSet<string> StandardCancellable = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Pending", "Pending Confirmation", "Confirmed", "Processing"
+    };
+    private static readonly HashSet<string> CustomCancellable = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Pending", "Pending Confirmation", "Confirmed"
+    };
+
     public async Task<IActionResult> OnGetAsync(int id)
     {
         if (!User.Identity?.IsAuthenticated ?? true)
@@ -36,7 +54,35 @@ public class DetailModel : PageModel
             return RedirectToPage("/Orders/Index");
         }
 
+        // ── Compute cancellation eligibility ─────────────────────────────
+        ComputeCancellationInfo();
+
         return Page();
+    }
+
+    private void ComputeCancellationInfo()
+    {
+        if (Order == null) return;
+
+        // Already cancelled or cancellation in progress
+        if (Order.Status == "Cancelled" || Order.Status == "Cancellation_Pending")
+        {
+            CanCancel = false;
+            ExpectedRefundAmount = 0;
+            return;
+        }
+
+        CanCancel = Order.OrderType == "Custom"
+            ? CustomCancellable.Contains(Order.Status)
+            : StandardCancellable.Contains(Order.Status);
+
+        if (CanCancel && !string.IsNullOrEmpty(Order.StripePaymentIntentId))
+        {
+            // COD → refund deposit only; full payment → refund total
+            ExpectedRefundAmount = Order.PaymentMethod == "COD"
+                ? Order.DepositAmount
+                : Order.TotalAmount;
+        }
     }
 
     // ── Helper: parse SnapshotJson for service orders ────────────────────────
@@ -79,6 +125,7 @@ public class DetailModel : PageModel
         "Delivered" => "bg-success text-white",
         "Completed" => "bg-success text-white",
         "Cancelled" => "bg-danger text-white",
+        "Cancellation_Pending" => "bg-warning text-dark",
         "Pending Confirmation" => "bg-warning text-dark",
         _ => "bg-secondary text-white"
     };
@@ -93,6 +140,7 @@ public class DetailModel : PageModel
         "Delivered" => "bi-box-seam",
         "Completed" => "bi-check-all",
         "Cancelled" => "bi-x-circle",
+        "Cancellation_Pending" => "bi-hourglass-split",
         _ => "bi-question-circle"
     };
 
@@ -106,6 +154,7 @@ public class DetailModel : PageModel
         "Delivered" => 85,
         "Completed" => 100,
         "Cancelled" => 0,
+        "Cancellation_Pending" => 0,
         _ => 0
     };
 }

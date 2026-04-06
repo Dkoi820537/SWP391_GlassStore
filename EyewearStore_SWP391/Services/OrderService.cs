@@ -7,14 +7,17 @@ namespace EyewearStore_SWP391.Services
     {
         private readonly EyewearStoreContext _context;
         private readonly ICartService _cartService;
+        private readonly IStripeService _stripeService;
         private readonly ILogger<OrderService> _logger;
 
         public OrderService(EyewearStoreContext context,
                             ICartService cartService,
+                            IStripeService stripeService,
                             ILogger<OrderService> logger)
         {
             _context = context;
             _cartService = cartService;
+            _stripeService = stripeService;
             _logger = logger;
         }
 
@@ -30,6 +33,27 @@ namespace EyewearStore_SWP391.Services
                 Note = note,
                 CreatedAt = DateTime.UtcNow
             });
+        }
+
+        // ── Cancellation eligibility check ──────────────────────────────────
+        private static readonly HashSet<string> StandardCancellable = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Pending", "Pending Confirmation", "Confirmed", "Processing"
+        };
+
+        private static readonly HashSet<string> CustomCancellable = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Pending", "Pending Confirmation", "Confirmed"
+        };
+
+        private static bool IsCancellable(Order order)
+        {
+            if (order.Status == "Cancelled" || order.Status == "Cancellation_Pending")
+                return false;
+
+            return order.OrderType == "Custom"
+                ? CustomCancellable.Contains(order.Status)
+                : StandardCancellable.Contains(order.Status);
         }
 
         // ── CreatePendingOrderAsync ──────────────────────────────────────────
@@ -289,6 +313,130 @@ namespace EyewearStore_SWP391.Services
                     "Order cancelled by customer");
 
                 await _context.SaveChangesAsync();
+            }
+        }
+
+        // ── RequestCancellationAsync (customer-initiated with refund) ─────
+
+        public async Task<DTOs.CancellationResult> RequestCancellationAsync(int orderId, int userId)
+        {
+            using var tx = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var order = await _context.Orders
+                    .Include(o => o.OrderItems)
+                    .FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+                if (order == null)
+                    return DTOs.CancellationResult.Fail(orderId, "Order not found.");
+
+                // ── Ownership check ──────────────────────────────────────
+                if (order.UserId != userId)
+                    return DTOs.CancellationResult.Fail(orderId, "You do not have permission to cancel this order.");
+
+                // ── Idempotency: already cancelled / in progress ─────────
+                if (order.Status == "Cancelled")
+                    return DTOs.CancellationResult.Ok(orderId, order.RefundAmount ?? 0,
+                        order.PaymentStatus);
+                if (order.Status == "Cancellation_Pending")
+                    return DTOs.CancellationResult.Fail(orderId, "Cancellation is already being processed.");
+
+                // ── Eligibility check by order type + status ─────────────
+                if (!IsCancellable(order))
+                {
+                    var lockMsg = order.OrderType == "Custom"
+                        ? "Custom orders can only be cancelled before manufacturing begins (Processing)."
+                        : "Standard orders cannot be cancelled once shipped.";
+                    return DTOs.CancellationResult.Fail(orderId, lockMsg);
+                }
+
+                // ── Determine refund amount ──────────────────────────────
+                decimal refundAmount = 0m;
+                bool needsStripeRefund = !string.IsNullOrEmpty(order.StripePaymentIntentId);
+
+                if (needsStripeRefund)
+                {
+                    // COD orders: refund only the deposit paid online
+                    // Full Stripe orders: refund the full total
+                    refundAmount = order.PaymentMethod == "COD"
+                        ? order.DepositAmount
+                        : order.TotalAmount;
+                }
+
+                // ── Set intermediate status ──────────────────────────────
+                var idempotencyKey = Guid.NewGuid().ToString();
+                order.CancellationIdempotencyKey = idempotencyKey;
+
+                if (needsStripeRefund && refundAmount > 0)
+                {
+                    order.Status = "Cancellation_Pending";
+                    RecordStatusHistory(orderId, "Cancellation_Pending", "Customer",
+                        "Cancellation initiated — processing refund");
+                    await _context.SaveChangesAsync();
+
+                    // ── Issue Stripe refund ───────────────────────────────
+                    var refundResult = await _stripeService.RefundPaymentAsync(
+                        order.StripePaymentIntentId!,
+                        (long)refundAmount,       // VND is zero-decimal
+                        idempotencyKey);
+
+                    if (!refundResult.Success)
+                    {
+                        // Roll back intermediate status
+                        order.Status = order.StatusHistories?
+                            .Where(h => h.Status != "Cancellation_Pending")
+                            .OrderByDescending(h => h.CreatedAt)
+                            .FirstOrDefault()?.Status ?? "Pending";
+                        order.CancellationIdempotencyKey = null;
+
+                        RecordStatusHistory(orderId, order.Status, "System",
+                            $"Refund failed: {refundResult.ErrorMessage}");
+                        await _context.SaveChangesAsync();
+                        await tx.CommitAsync();
+
+                        return DTOs.CancellationResult.Fail(orderId,
+                            $"Refund could not be processed. Please try again or contact support.");
+                    }
+
+                    order.RefundAmount = refundAmount;
+                }
+
+                // ── Finalise cancellation ────────────────────────────────
+                order.Status = "Cancelled";
+                order.PaymentStatus = needsStripeRefund && refundAmount > 0 ? "Refunded" : order.PaymentStatus;
+                order.CancelledAt = DateTime.UtcNow;
+
+                RecordStatusHistory(orderId, "Cancelled", "Customer",
+                    refundAmount > 0
+                        ? $"Order cancelled — {refundAmount:N0} VND refunded"
+                        : "Order cancelled by customer (no payment to refund)");
+
+                // ── Restore inventory ────────────────────────────────────
+                foreach (var oi in order.OrderItems)
+                {
+                    var product = await _context.Products.FindAsync(oi.ProductId);
+                    if (product?.InventoryQty != null)
+                    {
+                        product.InventoryQty += oi.Quantity;
+                        var prop = product.GetType().GetProperty("UpdatedAt");
+                        prop?.SetValue(product, DateTime.UtcNow);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                await tx.CommitAsync();
+
+                _logger.LogInformation(
+                    "Order {OrderId} cancelled by user {UserId} — Refund: {Refund} VND",
+                    orderId, userId, refundAmount);
+
+                return DTOs.CancellationResult.Ok(orderId, refundAmount, order.PaymentStatus);
+            }
+            catch (Exception ex)
+            {
+                await tx.RollbackAsync();
+                _logger.LogError(ex, "RequestCancellationAsync failed for order {OrderId}", orderId);
+                return DTOs.CancellationResult.Fail(orderId, "An unexpected error occurred. Please try again.");
             }
         }
 

@@ -650,18 +650,23 @@
 
             const frameId = parseInt(card.dataset.id);
             const allowed = compatMap[frameId] || null;
+            
+            // Set _compatHidden directly on the lens cards in the DOM
+            // so it works even if the lens pager hasn't been initialized yet.
+            document.querySelectorAll('#lensGrid .prod-card').forEach(c => {
+                const lt = c.dataset.lensType || '';
+                c._compatHidden = !(!allowed || allowed.includes(lt));
+            });
+
+            const selCard = document.querySelector('#lensGrid .prod-card.selected');
+            if (sel.lens && selCard && selCard._compatHidden) {
+                sel.lens = null;
+                selCard.classList.remove('selected');
+                document.getElementById('btnN2').disabled = true;
+            }
+
             const lensState = pagers['lensGrid'];
             if (lensState) {
-                lensState.allCards.forEach(c => {
-                    const lt = c.dataset.lensType || '';
-                    c._compatHidden = !(!allowed || allowed.includes(lt));
-                });
-                const selCard = document.querySelector('#lensGrid .prod-card.selected');
-                if (sel.lens && selCard && selCard._compatHidden) {
-                    sel.lens = null;
-                    selCard.classList.remove('selected');
-                    document.getElementById('btnN2').disabled = true;
-                }
                 lensState.currentPage = 1;
                 renderPage('lensGrid');
             }

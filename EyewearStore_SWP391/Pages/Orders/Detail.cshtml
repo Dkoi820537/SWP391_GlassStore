@@ -884,7 +884,16 @@
                         </h5>
                         <div style="display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid #f1f5f9;">
                             <span style="color:#64748b;">Method</span>
-                            <span style="font-weight:600;color:#0d1b2a;">@(Model.Order.PaymentMethod ?? "—")</span>
+                            <span style="font-weight:600;color:#0d1b2a;">
+                                @if (Model.Order.PaymentMethod == "COD")
+                                {
+                                    <text>COD (50% Deposit)</text>
+                                }
+                                else
+                                {
+                                    @(Model.Order.PaymentMethod ?? "—")
+                                }
+                            </span>
                         </div>
                         <div style="display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid #f1f5f9;">
                             <span style="color:#64748b;">Items</span>
@@ -900,6 +909,26 @@
                                 @Model.Order.TotalAmount.ToString("N0") VND
                             </span>
                         </div>
+
+                        @if (Model.Order.PaymentMethod == "COD" && Model.Order.DepositAmount > 0)
+                        {
+                            <div style="margin-top:1rem; background:linear-gradient(135deg, rgba(245,158,11,0.06), rgba(217,119,6,0.10)); border:1.5px solid rgba(217,119,6,0.2); border-radius:10px; padding:0.9rem 1rem;">
+                                <div style="font-weight:700; color:#92400e; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.6rem;">
+                                    Deposit Breakdown
+                                </div>
+                                <div style="display:flex;justify-content:space-between;padding:.3rem 0;border-bottom:1px dashed rgba(217,119,6,0.2);">
+                                    <span style="color:#059669;font-weight:600;font-size:.9rem;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3" style="vertical-align:-1px;margin-right:3px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        Deposit Paid
+                                    </span>
+                                    <span style="color:#059669;font-weight:700;">@Model.Order.DepositAmount.ToString("N0") VND</span>
+                                </div>
+                                <div style="display:flex;justify-content:space-between;padding:.3rem 0;">
+                                    <span style="color:#b45309;font-weight:600;font-size:.9rem;">Balance on Delivery</span>
+                                    <span style="color:#b45309;font-weight:700;">@Model.Order.PendingBalance.ToString("N0") VND</span>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
 

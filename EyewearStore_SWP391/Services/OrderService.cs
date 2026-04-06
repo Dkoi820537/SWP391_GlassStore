@@ -234,6 +234,18 @@ namespace EyewearStore_SWP391.Services
                 order.Status = "Pending Confirmation";
                 order.StripePaymentIntentId = paymentIntentId;
 
+                // ── Set PaymentStatus based on payment method ────────────────
+                if (order.PaymentMethod == "COD")
+                {
+                    order.PaymentStatus = "DepositPaid_AwaitingCOD";
+                }
+                else
+                {
+                    order.PaymentStatus = "FullyPaid";
+                    order.DepositAmount = order.TotalAmount;
+                    order.PendingBalance = 0;
+                }
+
                 foreach (var oi in order.OrderItems)
                 {
                     var product = await _context.Products.FindAsync(oi.ProductId);
@@ -247,16 +259,18 @@ namespace EyewearStore_SWP391.Services
                 }
 
                 // ── Record status history ────────────────────────────────────
-                RecordStatusHistory(orderId, "Pending Confirmation", "System",
-                    "Payment received via Stripe");
+                var historyNote = order.PaymentMethod == "COD"
+                    ? $"Deposit of {order.DepositAmount:N0} VND received via Stripe (COD order)"
+                    : "Payment received via Stripe";
+                RecordStatusHistory(orderId, "Pending Confirmation", "System", historyNote);
 
                 await _context.SaveChangesAsync();
                 await _cartService.ClearCartAsync(order.UserId);
                 await tx.CommitAsync();
 
                 _logger.LogInformation(
-                    "Order {OrderId} marked Pending Confirmation for user {UserId}",
-                    orderId, order.UserId);
+                    "Order {OrderId} marked Pending Confirmation for user {UserId} (PaymentStatus: {PaymentStatus})",
+                    orderId, order.UserId, order.PaymentStatus);
             }
             catch { await tx.RollbackAsync(); throw; }
         }

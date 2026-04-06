@@ -15,8 +15,8 @@
                     <div class="success-icon-wrap">
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </div>
-                    <h1 class="success-title">Order Placed!</h1>
-                    <p class="success-subtitle">Please prepare cash payment upon delivery</p>
+                    <h1 class="success-title">Deposit Payment Successful!</h1>
+                    <p class="success-subtitle">Your 50% deposit has been received. The remaining balance will be collected upon delivery.</p>
                 </div>
             }
             else
@@ -46,8 +46,33 @@
                     </div>
                 }
 
-                <!-- Grand Total Banner -->
-                @if (Model.IsSplitOrder)
+                <!-- COD Deposit Breakdown Banner -->
+                @if (Model.IsCodOrder)
+                {
+                    <div style="background: linear-gradient(135deg, rgba(245,158,11,0.06), rgba(217,119,6,0.10)); border: 1.5px solid rgba(217,119,6,0.25); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1.5rem 0;">
+                        <div style="font-weight: 800; color: #92400e; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1rem;">
+                            Payment Summary — Cash on Delivery
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px dashed rgba(217,119,6,0.2);">
+                            <span style="color: #78350f;">Grand Total</span>
+                            <span style="color: #92400e; font-weight: 700; font-size: 1.1rem;">@Model.GrandTotal.ToString("N0") VND</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px dashed rgba(217,119,6,0.2);">
+                            <span style="color: #059669; font-weight: 600;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" style="vertical-align: -2px; margin-right: 4px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Deposit Paid (50%)
+                            </span>
+                            <span style="color: #059669; font-weight: 700; font-size: 1.1rem;">@Model.TotalDepositPaid.ToString("N0") VND</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
+                            <span style="color: #b45309; font-weight: 600;">Balance Due on Delivery</span>
+                            <span style="color: #b45309; font-weight: 700; font-size: 1.1rem;">@Model.TotalPendingBalance.ToString("N0") VND</span>
+                        </div>
+                    </div>
+                }
+
+                <!-- Grand Total Banner (non-COD or split) -->
+                @if (Model.IsSplitOrder && !Model.IsCodOrder)
                 {
                     <div class="grand-total-banner">
                         <span>Total Charged</span>
@@ -98,12 +123,23 @@
                             </div>
                             <div>
                                 <div class="info-label">Payment</div>
-                                <div class="info-value">@(order.PaymentMethod ?? "—")</div>
+                                <div class="info-value">@(order.PaymentMethod == "COD" ? "COD (50% Deposit)" : order.PaymentMethod ?? "—")</div>
                             </div>
                             <div>
                                 <div class="info-label">Items</div>
                                 <div class="info-value">@order.OrderItems.Count</div>
                             </div>
+                            @if (order.PaymentMethod == "COD")
+                            {
+                                <div>
+                                    <div class="info-label">Deposit Paid</div>
+                                    <div class="info-value" style="color: #059669;">@order.DepositAmount.ToString("N0") VND</div>
+                                </div>
+                                <div>
+                                    <div class="info-label">Balance Due</div>
+                                    <div class="info-value" style="color: #b45309;">@order.PendingBalance.ToString("N0") VND</div>
+                                </div>
+                            }
                         </div>
 
                         <!-- Order Items -->

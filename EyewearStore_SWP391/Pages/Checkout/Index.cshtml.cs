@@ -191,7 +191,7 @@ namespace EyewearStore_SWP391.Pages.Checkout
                         AddressLine = selectedAddress.AddressLine,
                         AddressId = selectedAddress.AddressId,
                         TotalAmount = groupTotal,
-                        Status = PaymentMethod == "COD" ? "Pending Confirmation" : "Pending",
+                        Status = "Pending",  // Both COD and Stripe start as Pending (payment via Stripe)
                         PaymentMethod = PaymentMethod == "COD" ? "COD" : "Stripe",
                         OrderType = orderType,
                         OrderGroupId = orderGroupId,
@@ -262,34 +262,58 @@ namespace EyewearStore_SWP391.Pages.Checkout
                 if (customItems.Any())
                     createdOrders.Add(await CreateOrderForGroup(customItems, "Custom"));
 
-                // ── COD PATH ─────────────────────────────────────────────────
+                // ── COD PATH — 50% deposit via Stripe ────────────────────────
                 if (PaymentMethod == "COD")
                 {
+                    // Set deposit = 50% of each order's total
                     foreach (var ord in createdOrders)
                     {
-                        // Reload order items for inventory deduction
-                        var orderWithItems = await _context.Orders
-                            .Include(o => o.OrderItems)
-                            .FirstAsync(o => o.OrderId == ord.OrderId);
-
-                        foreach (var oi in orderWithItems.OrderItems)
-                        {
-                            var product = await _context.Products.FindAsync(oi.ProductId);
-                            if (product != null && product.InventoryQty.HasValue)
-                            {
-                                product.InventoryQty -= oi.Quantity;
-                                if (product.InventoryQty < 0) product.InventoryQty = 0;
-                            }
-                        }
+                        ord.DepositAmount = Math.Ceiling(ord.TotalAmount * 0.5m);
+                        ord.PendingBalance = ord.TotalAmount - ord.DepositAmount;
+                        ord.PaymentStatus = "Pending";  // will become DepositPaid_AwaitingCOD after Stripe payment
                     }
                     await _context.SaveChangesAsync();
-                    await _cartService.ClearCartAsync(userId);
 
-                    var orderIds = string.Join(",", createdOrders.Select(o => o.OrderId));
-                    return RedirectToPage("/Checkout/Success", new { order_ids = orderIds });
+                    // Build Stripe line items for deposit amounts only
+                    var depositLineItems = new List<StripeLineItemDto>();
+                    foreach (var ord in createdOrders)
+                    {
+                        depositLineItems.Add(new StripeLineItemDto
+                        {
+                            ProductName = createdOrders.Count > 1
+                                ? $"COD Deposit — {ord.OrderType} Order #{ord.OrderId}"
+                                : $"COD Deposit — Order #{ord.OrderId}",
+                            UnitAmountInSmallestUnit = (long)ord.DepositAmount,
+                            Quantity = 1,
+                            ImageUrl = null
+                        });
+                    }
+
+                    var baseUrlCod = $"{Request.Scheme}://{Request.Host}";
+                    var successUrlCod = $"{baseUrlCod}/Checkout/Success";
+                    var cancelUrlCod = $"{baseUrlCod}/Checkout/Cancel";
+
+                    var userEmailCod = User.FindFirst(ClaimTypes.Email)?.Value
+                                     ?? User.FindFirst(ClaimTypes.Name)?.Value
+                                     ?? "";
+
+                    var codOrderIds = createdOrders.Select(o => o.OrderId).ToList();
+                    var stripeUrlCod = await _stripeService.CreateCheckoutSessionAsync(
+                        codOrderIds, depositLineItems, successUrlCod, cancelUrlCod, userEmailCod);
+
+                    return Redirect(stripeUrlCod);
                 }
 
-                // ── STRIPE PATH ──────────────────────────────────────────────
+                // ── STRIPE (FULL PAYMENT) PATH ──────────────────────────────
+                // Set deposit = full amount (no balance due)
+                foreach (var ord in createdOrders)
+                {
+                    ord.DepositAmount = ord.TotalAmount;
+                    ord.PendingBalance = 0;
+                    ord.PaymentStatus = "Pending"; // will become FullyPaid after Stripe payment
+                }
+                await _context.SaveChangesAsync();
+
                 var lineItems = new List<StripeLineItemDto>();
 
                 foreach (var ci in cart.CartItems)

@@ -56,6 +56,26 @@ public partial class Order
     [Column("order_type")]
     public string OrderType { get; set; } = "Standard";
 
+    // ── COD Deposit fields ───────────────────────────────────────────────────
+
+    /// <summary>
+    /// Amount paid online as deposit. For COD = 50% of TotalAmount; for Stripe = TotalAmount.
+    /// </summary>
+    [Column("deposit_amount")]
+    public decimal DepositAmount { get; set; }
+
+    /// <summary>
+    /// Remaining balance to be collected upon delivery. 0 for fully-paid orders.
+    /// </summary>
+    [Column("pending_balance")]
+    public decimal PendingBalance { get; set; }
+
+    /// <summary>
+    /// "Pending" → "DepositPaid_AwaitingCOD" → "FullyPaid"
+    /// </summary>
+    [Column("payment_status")]
+    public string PaymentStatus { get; set; } = "Pending";
+
     // Navigation
     public virtual User User { get; set; } = null!;
     public virtual Address? Address { get; set; }

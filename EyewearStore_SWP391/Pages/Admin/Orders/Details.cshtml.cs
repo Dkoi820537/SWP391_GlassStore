@@ -35,7 +35,7 @@ namespace EyewearStore_SWP391.Pages.Admin.Orders
         // Full set of statuses available for override
         public static readonly List<string> AllStatuses = new()
         {
-            "Pending", "Confirmed",
+            "Pending", "Pending Confirmation", "Confirmed",
             "Processing", "Processing - Lens Ordered", "Processing - Lens Received",
             "Processing - Fitting", "Processing - QC", "Processing - Packed",
             "Shipped", "Delivered", "Completed", "Cancelled"

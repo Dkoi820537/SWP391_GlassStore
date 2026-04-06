@@ -9,8 +9,8 @@ namespace EyewearStore_SWP391.Pages.Checkout;
 
 /// <summary>
 /// Success page shown after a successful checkout.
-/// Handles both Stripe (session_id) and COD (order_ids) flows.
-/// Supports split-order checkout: displays multiple order confirmations.
+/// All payment methods (Stripe full + COD deposit) now go through Stripe,
+/// so the primary path uses session_id. Legacy order_ids path kept as fallback.
 /// </summary>
 public class SuccessModel : PageModel
 {
@@ -34,7 +34,14 @@ public class SuccessModel : PageModel
     /// <summary>Grand total across all orders in this checkout group.</summary>
     public decimal GrandTotal => Orders.Sum(o => o.TotalAmount);
 
-    public bool IsCodOrder { get; set; }
+    /// <summary>Total deposit paid online across all orders.</summary>
+    public decimal TotalDepositPaid => Orders.Sum(o => o.DepositAmount);
+
+    /// <summary>Total remaining balance to collect on delivery.</summary>
+    public decimal TotalPendingBalance => Orders.Sum(o => o.PendingBalance);
+
+    /// <summary>True if any order in this checkout is COD (deposit-based).</summary>
+    public bool IsCodOrder => Orders.Any(o => o.PaymentMethod == "COD");
 
     /// <summary>True if the checkout produced multiple orders (split-order).</summary>
     public bool IsSplitOrder => Orders.Count > 1;
@@ -46,14 +53,13 @@ public class SuccessModel : PageModel
 
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-        // ── COD path: look up by order_ids (comma-separated) or legacy order_id ──
+        // ── Legacy COD path (order_ids) — kept as fallback ──────────────────
         if (!string.IsNullOrEmpty(order_ids) || (order_id.HasValue && order_id.Value > 0))
         {
             var ids = new List<int>();
 
             if (!string.IsNullOrEmpty(order_ids))
             {
-                // New split-order format: "123,456"
                 foreach (var s in order_ids.Split(',', StringSplitOptions.RemoveEmptyEntries))
                 {
                     if (int.TryParse(s.Trim(), out var id))
@@ -62,7 +68,6 @@ public class SuccessModel : PageModel
             }
             else if (order_id.HasValue)
             {
-                // Legacy single-order format
                 ids.Add(order_id.Value);
             }
 
@@ -79,8 +84,6 @@ public class SuccessModel : PageModel
                 return RedirectToPage("/Cart/Index");
             }
 
-            IsCodOrder = true;
-
             try
             {
                 await _cartService.ClearCartAsync(userId);
@@ -93,7 +96,7 @@ public class SuccessModel : PageModel
             return Page();
         }
 
-        // ── Stripe path: look up by session_id ──
+        // ── Primary path: look up by session_id (both Stripe and COD deposit) ──
         if (string.IsNullOrEmpty(session_id))
         {
             TempData["ErrorMessage"] = "Invalid session.";
@@ -111,8 +114,6 @@ public class SuccessModel : PageModel
             TempData["ErrorMessage"] = "Order not found.";
             return RedirectToPage("/Cart/Index");
         }
-
-        IsCodOrder = false;
 
         // Fallback for local testing without webhooks: Check status and manually mark as paid
         var pendingOrders = Orders.Where(o => o.Status == "Pending").ToList();
@@ -156,3 +157,4 @@ public class SuccessModel : PageModel
         return Page();
     }
 }
+

@@ -205,20 +205,37 @@
 
         string? serviceStatus = null;
         string? assignedTo = null;
-        string? internalNote = null;
+string? internalNote = null;
+var svcTimeline = new List<(string status, string assignedTo, string note, DateTime timestamp)>();
 
-        if (firstServiceItem != null)
+if (firstServiceItem != null)
+{
+    try
+    {
+        var snapDoc = System.Text.Json.JsonDocument.Parse(firstServiceItem.SnapshotJson!);
+        var snapRoot = snapDoc.RootElement;
+        if (snapRoot.TryGetProperty("serviceStatus",   out var ss)) serviceStatus = ss.GetString();
+        if (snapRoot.TryGetProperty("assignedTo",      out var at)) assignedTo    = at.GetString();
+        if (snapRoot.TryGetProperty("internalNote",    out var nt)) internalNote  = nt.GetString();
+
+        // Parse timeline
+        if (snapRoot.TryGetProperty("serviceTimeline", out var tlEl))
         {
-            try
+            var tlJson = tlEl.GetString() ?? "[]";
+            var tlDoc  = System.Text.Json.JsonDocument.Parse(tlJson);
+            foreach (var entry in tlDoc.RootElement.EnumerateArray())
             {
-                var snapDoc = System.Text.Json.JsonDocument.Parse(firstServiceItem.SnapshotJson!);
-                var snapRoot = snapDoc.RootElement;
-                if (snapRoot.TryGetProperty("serviceStatus", out var ss)) serviceStatus = ss.GetString();
-                if (snapRoot.TryGetProperty("assignedTo", out var at)) assignedTo = at.GetString();
-                if (snapRoot.TryGetProperty("internalNote", out var nt)) internalNote = nt.GetString();
+                var s  = entry.TryGetProperty("status",     out var sv) ? sv.GetString() ?? "" : "";
+                var a  = entry.TryGetProperty("assignedTo", out var av) ? av.GetString() ?? "" : "";
+                var n  = entry.TryGetProperty("note",       out var nv) ? nv.GetString() ?? "" : "";
+                var ts = entry.TryGetProperty("timestamp",  out var tv)
+                         && DateTime.TryParse(tv.GetString(), out var dt) ? dt : DateTime.UtcNow;
+                svcTimeline.Add((s, a, n, ts));
             }
-            catch { }
         }
+    }
+    catch { }
+}
 
         var pipeline = new (string Status, string Icon, string Label)[]
         {
@@ -910,7 +927,61 @@
                         </div>
                     </div>
                 }
-
+                <!-- Workshop Timeline Card -->
+@if (isServiceOrder && svcTimeline.Any())
+{
+    <div class="card mb-3"
+         style="border:none;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);overflow:hidden;">
+        <div style="background:linear-gradient(135deg,#5b21b6,#7c3aed);padding:.9rem 1.2rem;">
+            <h5 style="color:#fff;font-weight:700;margin:0;font-size:.95rem;">
+                <i class="bi bi-clock-history me-1"></i> Workshop Timeline
+            </h5>
+        </div>
+        <div style="padding:1rem 1.2rem;">
+            @foreach (var (s, a, n, ts) in svcTimeline.OrderBy(x => x.timestamp))
+            {
+                string dotColor = s switch {
+                    "Processing" => "#2563eb",
+                    "Ready"      => "#059669",
+                    "Done"       => "#14532d",
+                    _            => "#d97706"
+                };
+                string dotIcon = s switch {
+                    "Processing" => "bi-gear-fill",
+                    "Ready"      => "bi-check-circle-fill",
+                    "Done"       => "bi-bag-check-fill",
+                    _            => "bi-hourglass-split"
+                };
+                <div style="display:flex;gap:10px;padding-bottom:14px;position:relative;">
+                    @if (svcTimeline.IndexOf((s,a,n,ts)) < svcTimeline.Count - 1)
+                    {
+                        <div style="position:absolute;left:13px;top:28px;bottom:0;width:2px;background:#e2e8f0;"></div>
+                    }
+                    <div style="width:28px;height:28px;border-radius:50%;background:@(dotColor)1a;border:1.5px solid @dotColor;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1;">
+                        <i class="bi @dotIcon" style="color:@dotColor;font-size:11px;"></i>
+                    </div>
+                    <div style="flex:1;padding-top:3px;">
+                        <div style="font-weight:700;font-size:.88rem;color:#0d1b2a;">@s</div>
+                        @if (!string.IsNullOrEmpty(a))
+                        {
+                            <div style="font-size:.78rem;color:#7c3aed;font-weight:600;margin-top:1px;">
+                                <i class="bi bi-person-fill" style="font-size:.7rem;"></i> @a
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(n))
+                        {
+                            <div style="font-size:.78rem;color:#64748b;margin-top:2px;line-height:1.5;">@n</div>
+                        }
+                        <div style="font-size:.72rem;color:#94a3b8;margin-top:3px;">
+                            <i class="bi bi-clock" style="font-size:.65rem;"></i>
+                            @ts.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
                 <!-- Shipment Tracking -->
                 @if (Model.Order.Shipments?.Any() == true)
                 {

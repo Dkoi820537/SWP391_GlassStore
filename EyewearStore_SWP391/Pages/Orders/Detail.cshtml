@@ -5,424 +5,152 @@
 }
 
 <style>
-    /* ─── ORDER TIMELINE ─────────────────────────────────────────── */
     :root {
         --tl-ok: #059669;
         --tl-ok-s: rgba(5,150,105,.1);
         --tl-ok-bdr: rgba(5,150,105,.25);
         --tl-warn: #d97706;
-        --tl-warn-s: rgba(217,119,6,.08);
         --tl-cancel: #dc2626;
         --tl-cancel-s: rgba(220,38,38,.08);
         --tl-info: #2563eb;
-        --tl-info-s: rgba(37,99,235,.08);
         --tl-muted: #94a3b8;
         --tl-line: #e2e8f0;
         --tl-surf: #fff;
-        --tl-bg: #f8fafc;
         --tl-navy: #0d1b2a;
         --tl-navy2: #1a2f54;
         --tl-gold: #b8862a;
+        --tl-purple: #7c3aed;
     }
 
-    /* ── Status badge map ─────────────────────────── */
     .os-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 5px 14px;
-        border-radius: 100px;
-        font-size: 12px;
-        font-weight: 700;
-        border: 1.5px solid;
+        display:inline-flex;align-items:center;gap:5px;
+        padding:5px 14px;border-radius:100px;font-size:12px;font-weight:700;border:1.5px solid;
     }
+    .os-pending    { background:rgba(217,119,6,.08);  color:#92400e; border-color:rgba(217,119,6,.28); }
+    .os-confirmed  { background:rgba(37,99,235,.07);  color:#1d4ed8; border-color:rgba(37,99,235,.22); }
+    .os-processing { background:rgba(13,27,42,.07);   color:#1a2f54; border-color:rgba(13,27,42,.18); }
+    .os-shipped    { background:rgba(13,148,136,.07); color:#0d9488; border-color:rgba(13,148,136,.22); }
+    .os-delivered  { background:rgba(5,150,105,.08);  color:#059669; border-color:rgba(5,150,105,.22); }
+    .os-completed  { background:rgba(13,27,42,.07);   color:#1a2f54; border-color:rgba(13,27,42,.15); }
+    .os-cancelled  { background:rgba(220,38,38,.08);  color:#dc2626; border-color:rgba(220,38,38,.22); }
 
-    .os-pending {
-        background: rgba(217,119,6,.08);
-        color: #92400e;
-        border-color: rgba(217,119,6,.28);
-    }
-
-    .os-confirmed {
-        background: rgba(37,99,235,.07);
-        color: #1d4ed8;
-        border-color: rgba(37,99,235,.22);
-    }
-
-    .os-processing {
-        background: rgba(13,27,42,.07);
-        color: #1a2f54;
-        border-color: rgba(13,27,42,.18);
-    }
-
-    .os-shipped {
-        background: rgba(13,148,136,.07);
-        color: #0d9488;
-        border-color: rgba(13,148,136,.22);
-    }
-
-    .os-delivered {
-        background: rgba(5,150,105,.08);
-        color: #059669;
-        border-color: rgba(5,150,105,.22);
-    }
-
-    .os-completed {
-        background: rgba(13,27,42,.07);
-        color: var(--tl-navy2);
-        border-color: rgba(13,27,42,.15);
-    }
-
-    .os-cancelled {
-        background: rgba(220,38,38,.08);
-        color: #dc2626;
-        border-color: rgba(220,38,38,.22);
-    }
-
-    /* ── Horizontal progress stepper ────────────────── */
     .order-stepper-wrap {
-        background: var(--tl-surf);
-        border: 1.5px solid var(--tl-line);
-        border-radius: 16px;
-        padding: 22px 24px 18px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 12px rgba(0,0,0,.05);
+        background:var(--tl-surf);border:1.5px solid var(--tl-line);border-radius:16px;
+        padding:22px 24px 18px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,.05);
     }
-
     .order-stepper-title {
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: var(--tl-muted);
-        margin-bottom: 18px;
+        font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;
+        color:var(--tl-muted);margin-bottom:18px;
     }
+    .order-stepper { display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:4px; }
 
-    .order-stepper {
-        display: flex;
-        align-items: flex-start;
-        gap: 0;
-        overflow-x: auto;
-        padding-bottom: 4px;
-    }
-
-    .os-node {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        flex-shrink: 0;
-        min-width: 70px;
-        position: relative;
-    }
-
+    .os-node { display:flex;flex-direction:column;align-items:center;flex-shrink:0;min-width:70px;position:relative; }
     .os-circle {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 15px;
-        font-weight: 800;
-        border: 2.5px solid var(--tl-line);
-        background: var(--tl-surf);
-        color: var(--tl-muted);
-        position: relative;
-        z-index: 1;
-        transition: all .3s;
+        width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+        font-size:15px;font-weight:800;border:2.5px solid var(--tl-line);background:var(--tl-surf);
+        color:var(--tl-muted);position:relative;z-index:1;transition:all .3s;
     }
-
-    .os-node.done .os-circle {
-        background: var(--tl-ok);
-        border-color: var(--tl-ok);
-        color: #fff;
-    }
-
-    .os-node.active .os-circle {
-        background: var(--tl-navy);
-        border-color: var(--tl-navy);
-        color: #fff;
-        box-shadow: 0 0 0 5px rgba(13,27,42,.1);
-    }
-
-    .os-node.future .os-circle {
-        border-style: dashed;
-    }
-
-    .os-node.cancel .os-circle {
-        background: var(--tl-cancel-s);
-        border-color: var(--tl-cancel);
-        color: var(--tl-cancel);
-    }
+    .os-node.done   .os-circle { background:var(--tl-ok);   border-color:var(--tl-ok);   color:#fff; }
+    .os-node.active .os-circle { background:var(--tl-navy); border-color:var(--tl-navy); color:#fff; box-shadow:0 0 0 5px rgba(13,27,42,.1); }
+    .os-node.future .os-circle { border-style:dashed; }
+    .os-node.cancel .os-circle { background:var(--tl-cancel-s); border-color:var(--tl-cancel); color:var(--tl-cancel); }
 
     .os-lbl {
-        font-size: 9.5px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .5px;
-        color: var(--tl-muted);
-        margin-top: 7px;
-        text-align: center;
-        line-height: 1.3;
-        max-width: 66px;
+        font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+        color:var(--tl-muted);margin-top:7px;text-align:center;line-height:1.3;max-width:66px;
     }
+    .os-node.done   .os-lbl { color:var(--tl-ok); }
+    .os-node.active .os-lbl { color:var(--tl-navy);font-weight:900; }
 
-    .os-node.done .os-lbl {
-        color: var(--tl-ok);
+    .os-ts { font-size:8.5px;color:var(--tl-muted);margin-top:3px;text-align:center;max-width:72px;line-height:1.3; }
+    .os-node.done   .os-ts { color:var(--tl-ok);opacity:.8; }
+    .os-node.active .os-ts { color:var(--tl-navy);opacity:.7; }
+
+    .os-line { flex:1;height:2px;background:var(--tl-line);min-width:20px;max-width:72px;margin-top:18px;flex-shrink:0; }
+    .os-line.done { background:var(--tl-ok); }
+
+    .svc-stepper-wrap {
+        background:linear-gradient(135deg,rgba(124,58,237,.04),rgba(124,58,237,.08));
+        border:1.5px solid rgba(124,58,237,.18);border-radius:14px;
+        padding:18px 22px 16px;margin-bottom:20px;
     }
-
-    .os-node.active .os-lbl {
-        color: var(--tl-navy);
-        font-weight: 900;
+    .svc-stepper-title {
+        font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;
+        color:var(--tl-purple);margin-bottom:16px;display:flex;align-items:center;gap:6px;
     }
+    .svc-stepper { display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:4px; }
 
-    /* timestamp under the label */
-    .os-ts {
-        font-size: 8.5px;
-        color: var(--tl-muted);
-        margin-top: 3px;
-        text-align: center;
-        max-width: 72px;
-        line-height: 1.3;
+    .svc-node { display:flex;flex-direction:column;align-items:center;flex-shrink:0;min-width:72px; }
+    .svc-circle {
+        width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+        font-size:14px;border:2px solid rgba(124,58,237,.2);background:#fff;
+        color:rgba(124,58,237,.4);transition:all .3s;
     }
+    .svc-node.done   .svc-circle { background:var(--tl-ok);    border-color:var(--tl-ok);     color:#fff; }
+    .svc-node.active .svc-circle { background:var(--tl-purple); border-color:var(--tl-purple); color:#fff; box-shadow:0 0 0 4px rgba(124,58,237,.12); }
+    .svc-node.future .svc-circle { border-style:dashed; }
 
-    .os-node.done .os-ts {
-        color: var(--tl-ok);
-        opacity: .8;
+    .svc-lbl {
+        font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+        color:rgba(124,58,237,.4);margin-top:6px;text-align:center;max-width:68px;line-height:1.3;
     }
+    .svc-node.done   .svc-lbl { color:var(--tl-ok); }
+    .svc-node.active .svc-lbl { color:var(--tl-purple);font-weight:900; }
 
-    .os-node.active .os-ts {
-        color: var(--tl-navy);
-        opacity: .7;
-    }
+    .svc-line { flex:1;height:2px;background:rgba(124,58,237,.12);min-width:20px;max-width:80px;margin-top:17px;flex-shrink:0; }
+    .svc-line.done { background:var(--tl-ok); }
 
-    .os-line {
-        flex: 1;
-        height: 2px;
-        background: var(--tl-line);
-        min-width: 20px;
-        max-width: 72px;
-        margin-top: 18px; /* align with circle center */
-        flex-shrink: 0;
-    }
-
-        .os-line.done {
-            background: var(--tl-ok);
-        }
-
-    /* ── Vertical Timeline ───────────────────────────── */
     .timeline-wrap {
-        background: var(--tl-surf);
-        border: 1.5px solid var(--tl-line);
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 2px 12px rgba(0,0,0,.05);
-        margin-bottom: 20px;
+        background:var(--tl-surf);border:1.5px solid var(--tl-line);border-radius:16px;
+        overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.05);margin-bottom:20px;
     }
-
     .timeline-hdr {
-        padding: 14px 20px;
-        background: linear-gradient(135deg, var(--tl-navy), var(--tl-navy2));
-        display: flex;
-        align-items: center;
-        gap: 9px;
+        padding:14px 20px;background:linear-gradient(135deg,var(--tl-navy),var(--tl-navy2));
+        display:flex;align-items:center;gap:9px;
     }
+    .timeline-hdr h3 { font-size:13px;font-weight:800;color:#fff;margin:0;flex:1;text-transform:uppercase;letter-spacing:.6px; }
+    .tl-count { background:rgba(255,255,255,.15);border-radius:6px;padding:2px 9px;font-size:10px;font-weight:700;color:rgba(255,255,255,.9); }
+    .timeline-body { padding:20px 22px; }
+    .tl-list { list-style:none;margin:0;padding:0; }
 
-        .timeline-hdr h3 {
-            font-size: 13px;
-            font-weight: 800;
-            color: #fff;
-            margin: 0;
-            flex: 1;
-            text-transform: uppercase;
-            letter-spacing: .6px;
-        }
-
-    .tl-count {
-        background: rgba(255,255,255,.15);
-        border-radius: 6px;
-        padding: 2px 9px;
-        font-size: 10px;
-        font-weight: 700;
-        color: rgba(255,255,255,.9);
+    .tl-item { display:flex;gap:14px;padding-bottom:22px;position:relative; }
+    .tl-item:not(:last-child)::before {
+        content:'';position:absolute;left:17px;top:34px;bottom:0;width:2px;background:var(--tl-line);
     }
-
-    .timeline-body {
-        padding: 20px 22px;
-    }
-
-    .tl-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-
-    .tl-item {
-        display: flex;
-        gap: 14px;
-        padding-bottom: 22px;
-        position: relative;
-    }
-        /* vertical connector line */
-        .tl-item:not(:last-child)::before {
-            content: '';
-            position: absolute;
-            left: 17px;
-            top: 34px;
-            bottom: 0;
-            width: 2px;
-            background: var(--tl-line);
-        }
-
-        .tl-item.first::before {
-            background: linear-gradient(to bottom, var(--tl-ok), var(--tl-line));
-        }
+    .tl-item.first::before { background:linear-gradient(to bottom,var(--tl-ok),var(--tl-line)); }
 
     .tl-dot {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        position: relative;
-        z-index: 1;
-        border: 2px solid transparent;
+        width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;
+        justify-content:center;font-size:14px;position:relative;z-index:1;border:2px solid transparent;
+    }
+    .tl-dot.dot-pending    { background:rgba(217,119,6,.1);  border-color:rgba(217,119,6,.3);  color:#d97706; }
+    .tl-dot.dot-confirmed  { background:rgba(37,99,235,.1);  border-color:rgba(37,99,235,.25); color:#2563eb; }
+    .tl-dot.dot-processing { background:rgba(13,27,42,.08);  border-color:rgba(13,27,42,.2);   color:var(--tl-navy2); }
+    .tl-dot.dot-shipped    { background:rgba(13,148,136,.1); border-color:rgba(13,148,136,.3); color:#0d9488; }
+    .tl-dot.dot-delivered  { background:var(--tl-ok-s);     border-color:var(--tl-ok-bdr);    color:var(--tl-ok); }
+    .tl-dot.dot-completed  { background:rgba(13,27,42,.07);  border-color:rgba(13,27,42,.18);  color:var(--tl-navy); }
+    .tl-dot.dot-cancelled  { background:var(--tl-cancel-s); border-color:rgba(220,38,38,.25); color:var(--tl-cancel); }
+    .tl-dot.dot-svc        { background:rgba(124,58,237,.08); border-color:rgba(124,58,237,.25); color:var(--tl-purple); }
+    .tl-dot.dot-note       { background:rgba(37,99,235,.06); border-color:rgba(37,99,235,.18); color:#2563eb; }
+
+    .tl-content { flex:1;min-width:0;padding-top:4px; }
+    .tl-status-row { display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px; }
+    .tl-status-lbl { font-size:13.5px;font-weight:800;color:var(--tl-navy);line-height:1.3; }
+    .tl-note { font-size:12px;color:#64748b;margin-top:3px;line-height:1.5; }
+    .tl-timestamp { font-size:11px;color:var(--tl-muted);margin-top:5px;display:flex;align-items:center;gap:4px;font-weight:500; }
+
+    .svc-event-pill {
+        display:inline-flex;align-items:center;gap:5px;background:rgba(124,58,237,.07);
+        border:1px solid rgba(124,58,237,.18);border-radius:6px;padding:3px 10px;
+        font-size:11px;font-weight:700;color:var(--tl-purple);margin-top:5px;
     }
 
-        /* dot colour variants */
-        .tl-dot.dot-pending {
-            background: rgba(217,119,6,.1);
-            border-color: rgba(217,119,6,.3);
-            color: #d97706;
-        }
+    .order-progress-bar { height:8px;border-radius:8px;background:#e2e8f0;overflow:hidden;margin-top:8px;margin-bottom:4px; }
+    .order-progress-fill { height:100%;border-radius:8px;background:linear-gradient(90deg,var(--tl-gold),#d4a74a);transition:width .6s ease; }
 
-        .tl-dot.dot-confirmed {
-            background: rgba(37,99,235,.1);
-            border-color: rgba(37,99,235,.25);
-            color: #2563eb;
-        }
-
-        .tl-dot.dot-processing {
-            background: rgba(13,27,42,.08);
-            border-color: rgba(13,27,42,.2);
-            color: var(--tl-navy2);
-        }
-
-        .tl-dot.dot-shipped {
-            background: rgba(13,148,136,.1);
-            border-color: rgba(13,148,136,.3);
-            color: #0d9488;
-        }
-
-        .tl-dot.dot-delivered {
-            background: var(--tl-ok-s);
-            border-color: var(--tl-ok-bdr);
-            color: var(--tl-ok);
-        }
-
-        .tl-dot.dot-completed {
-            background: rgba(13,27,42,.07);
-            border-color: rgba(13,27,42,.18);
-            color: var(--tl-navy);
-        }
-
-        .tl-dot.dot-cancelled {
-            background: var(--tl-cancel-s);
-            border-color: rgba(220,38,38,.25);
-            color: var(--tl-cancel);
-        }
-
-        .tl-dot.dot-note {
-            background: rgba(37,99,235,.06);
-            border-color: rgba(37,99,235,.18);
-            color: #2563eb;
-        }
-
-    .tl-content {
-        flex: 1;
-        min-width: 0;
-        padding-top: 4px;
-    }
-
-    .tl-status-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-bottom: 4px;
-    }
-
-    .tl-status-lbl {
-        font-size: 13.5px;
-        font-weight: 800;
-        color: var(--tl-navy);
-        line-height: 1.3;
-    }
-
-    .tl-actor-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 2px 9px;
-        border-radius: 100px;
-        font-size: 10px;
-        font-weight: 700;
-        background: rgba(13,27,42,.06);
-        border: 1px solid rgba(13,27,42,.1);
-        color: var(--tl-navy2);
-    }
-
-    .tl-note {
-        font-size: 12px;
-        color: #64748b;
-        margin-top: 3px;
-        line-height: 1.5;
-    }
-
-    .tl-timestamp {
-        font-size: 11px;
-        color: var(--tl-muted);
-        margin-top: 5px;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        font-weight: 500;
-    }
-
-    /* ── Progress bar ───────────────────────────── */
-    .order-progress-bar {
-        height: 8px;
-        border-radius: 8px;
-        background: #e2e8f0;
-        overflow: hidden;
-        margin-top: 8px;
-        margin-bottom: 4px;
-    }
-
-    .order-progress-fill {
-        height: 100%;
-        border-radius: 8px;
-        background: linear-gradient(90deg, var(--tl-gold), #d4a74a);
-        transition: width .6s ease;
-    }
-
-    /* ── Responsive ─────────────────────────────── */
-    @@media(max-width: 600px) {
-        .order-stepper {
-            gap: 0;
-        }
-
-        .os-lbl {
-            font-size: 8.5px;
-            max-width: 54px;
-        }
-
-        .timeline-body {
-            padding: 14px 14px;
-        }
+    @@media(max-width:600px) {
+        .os-lbl { font-size:8.5px;max-width:54px; }
+        .timeline-body { padding:14px; }
     }
 </style>
 
@@ -459,39 +187,109 @@
     else
     {
         var canReturn = (Model.Order.Status == "Delivered" || Model.Order.Status == "Completed")
-        && (DateTime.UtcNow - Model.Order.CreatedAt).TotalDays <= 30;
+            && (DateTime.UtcNow - Model.Order.CreatedAt).TotalDays <= 30;
         var daysLeft = 30 - (int)(DateTime.UtcNow - Model.Order.CreatedAt).TotalDays;
         var canRefund = Model.Order.Status == "Completed"
-        && (DateTime.UtcNow - Model.Order.CreatedAt).TotalDays <= 7;
+            && (DateTime.UtcNow - Model.Order.CreatedAt).TotalDays <= 7;
         var hasPrescription = Model.Order.OrderItems.Any(oi => oi.PrescriptionId.HasValue);
         bool isCancelled = Model.Order.Status == "Cancelled" || Model.Order.Status == "Cancellation_Pending";
 
-        // ── Build stepper data ────────────────────────────────────────────
-        var pipeline = new (string Status, string Icon)[]
+        bool isServiceOrder = Model.Order.OrderType == "Custom"
+            || Model.Order.OrderItems.Any(oi =>
+                !string.IsNullOrEmpty(oi.SnapshotJson)
+                && oi.SnapshotJson.Contains("\"isServiceOrder\":true"));
+
+        var firstServiceItem = Model.Order.OrderItems.FirstOrDefault(oi =>
+            !string.IsNullOrEmpty(oi.SnapshotJson)
+            && oi.SnapshotJson.Contains("\"isServiceOrder\":true"));
+
+        string? serviceStatus = null;
+        string? assignedTo = null;
+        string? internalNote = null;
+
+        if (firstServiceItem != null)
         {
-        ("Pending Confirmation", "bi-hourglass-split"),
-        ("Confirmed",            "bi-check-circle-fill"),
-        ("Processing",           "bi-gear-fill"),
-        ("Shipped",              "bi-truck"),
-        ("Delivered",            "bi-box-seam-fill"),
-        ("Completed",            "bi-patch-check-fill"),
+            try
+            {
+                var snapDoc = System.Text.Json.JsonDocument.Parse(firstServiceItem.SnapshotJson!);
+                var snapRoot = snapDoc.RootElement;
+                if (snapRoot.TryGetProperty("serviceStatus", out var ss)) serviceStatus = ss.GetString();
+                if (snapRoot.TryGetProperty("assignedTo", out var at)) assignedTo = at.GetString();
+                if (snapRoot.TryGetProperty("internalNote", out var nt)) internalNote = nt.GetString();
+            }
+            catch { }
+        }
+
+        var pipeline = new (string Status, string Icon, string Label)[]
+        {
+            ("Pending Confirmation", "bi-hourglass-split", "Pending"),
+            ("Confirmed",            "bi-check-circle-fill", "Confirmed"),
+            ("Processing",           "bi-gear-fill", "Processing"),
+            ("Shipped",              "bi-truck", "Shipped"),
+            ("Delivered",            "bi-box-seam-fill", "Delivered"),
+            ("Completed",            "bi-patch-check-fill", "Completed"),
         };
-        int curIdx = Array.FindIndex(pipeline, p =>
-        Model.Order.Status.StartsWith(p.Status, StringComparison.OrdinalIgnoreCase));
+
+        // Map từng status sang index để so sánh
+        int curIdx = -1;
+        string curStatus = Model.Order.Status;
+        for (int pi = 0; pi < pipeline.Length; pi++)
+        {
+            if (string.Equals(pipeline[pi].Status, curStatus, StringComparison.OrdinalIgnoreCase))
+            {
+                curIdx = pi;
+                break;
+            }
+        }
+        // Fallback: nếu không khớp chính xác thì dùng StartsWith
+        if (curIdx < 0 && !isCancelled)
+        {
+            for (int pi = 0; pi < pipeline.Length; pi++)
+            {
+                if (curStatus.StartsWith(pipeline[pi].Status, StringComparison.OrdinalIgnoreCase))
+                {
+                    curIdx = pi;
+                    break;
+                }
+            }
+        }
         if (curIdx < 0 && !isCancelled) curIdx = 0;
 
-        // Build status → first timestamp map from history
-        var histMap = (Model.Order.StatusHistories ?? new List<EyewearStore_SWP391.Models.OrderStatusHistory>())
-        .GroupBy(h => h.Status)
-        .ToDictionary(g => g.Key, g => g.OrderBy(h => h.CreatedAt).First().CreatedAt);
+        // Build histMap: status → earliest timestamp
+        var statusHistories = Model.Order.StatusHistories
+            ?? new List<EyewearStore_SWP391.Models.OrderStatusHistory>();
 
-        // Ordered history list (newest first) for the vertical timeline
-        var historyList = (Model.Order.StatusHistories ?? new List<EyewearStore_SWP391.Models.OrderStatusHistory>())
-        .OrderByDescending(h => h.CreatedAt)
-        .ToList();
+        var histMap = statusHistories
+            .GroupBy(h => h.Status, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.OrderBy(h => h.CreatedAt).First().CreatedAt,
+                          StringComparer.OrdinalIgnoreCase);
+
+        // Ordered history list, newest first
+        var historyList = statusHistories
+            .OrderByDescending(h => h.CreatedAt)
+            .ToList();
+
+        var svcPipeline = new (string Status, string Icon, string Label)[]
+        {
+            ("Pending",    "bi-hourglass-split",  "Queued"),
+            ("Processing", "bi-gear-fill",         "In Workshop"),
+            ("Ready",      "bi-check-circle-fill", "Ready"),
+            ("Done",       "bi-bag-check-fill",    "Done"),
+        };
+
+        int svcCurIdx = -1;
+        for (int si = 0; si < svcPipeline.Length; si++)
+        {
+            if (string.Equals(svcPipeline[si].Status, serviceStatus, StringComparison.OrdinalIgnoreCase))
+            {
+                svcCurIdx = si;
+                break;
+            }
+        }
+        if (svcCurIdx < 0) svcCurIdx = 0;
 
         <div class="row g-4">
-            <!-- ────────────── LEFT COLUMN ────────────── -->
+            <!-- ── LEFT COLUMN ── -->
             <div class="col-lg-8">
 
                 <!-- Order header card -->
@@ -512,22 +310,29 @@
                                     string osCss = Model.Order.Status switch
                                     {
                                         "Pending" or "Pending Confirmation" => "os-pending",
-                                        "Confirmed" => "os-confirmed",
+                                        "Confirmed"                         => "os-confirmed",
                                         var s when s.StartsWith("Processing") => "os-processing",
-                                        "Shipped" => "os-shipped",
+                                        "Shipped"   => "os-shipped",
                                         "Delivered" => "os-delivered",
                                         "Completed" => "os-completed",
                                         "Cancelled" or "Cancellation_Pending" => "os-cancelled",
-                                        _ => "os-pending"
+                                        _           => "os-pending"
                                     };
                                     string statusDisplay = Model.Order.Status == "Cancellation_Pending"
-                                        ? "Cancelling..."
-                                        : Model.Order.Status;
+                                        ? "Cancelling..." : Model.Order.Status;
                                 }
                                 <span class="os-badge @osCss" style="font-size:13px;">
                                     <i class="@Model.GetStatusIcon(Model.Order.Status)"></i>
                                     @statusDisplay
                                 </span>
+                                @if (isServiceOrder && !string.IsNullOrEmpty(serviceStatus))
+                                {
+                                    <div class="mt-1">
+                                        <span style="background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);color:#7c3aed;border-radius:100px;padding:3px 10px;font-size:11px;font-weight:700;">
+                                            <i class="bi bi-wrench me-1"></i>Workshop: @serviceStatus
+                                        </span>
+                                    </div>
+                                }
                                 @if (canReturn && daysLeft > 0)
                                 {
                                     <div class="mt-2">
@@ -539,7 +344,6 @@
                             </div>
                         </div>
 
-                        <!-- Progress bar -->
                         @if (!isCancelled)
                         {
                             int pct = Model.GetStatusProgress(Model.Order.Status);
@@ -555,7 +359,25 @@
                         }
                     </div>
 
-                    @if (hasPrescription)
+                    @if (isServiceOrder)
+                    {
+                        <div style="padding:.85rem 1.4rem;background:rgba(124,58,237,.06);border-bottom:1px solid rgba(124,58,237,.12);">
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="font-size:1.4rem;">🔭</span>
+                                <div>
+                                    <strong style="color:#7c3aed;font-size:.9rem;">Custom Glasses Order</strong>
+                                    <p class="mb-0" style="color:#6d28d9;font-size:.8rem;">
+                                        Frame + Lens + Service assembly
+                                        @if (!string.IsNullOrEmpty(assignedTo))
+                                        {
+                                            <text> · Technician: <strong>@assignedTo</strong></text>
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else if (hasPrescription)
                     {
                         <div style="padding:.85rem 1.4rem;background:rgba(156,39,176,.06);border-bottom:1px solid rgba(156,39,176,.12);">
                             <div class="d-flex align-items-center gap-2">
@@ -569,9 +391,7 @@
                     }
                 </div>
 
-                <!-- ════════════════════════════════════════ -->
-                <!--  HORIZONTAL STEPPER                      -->
-                <!-- ════════════════════════════════════════ -->
+                <!-- ORDER STATUS STEPPER -->
                 @if (!isCancelled)
                 {
                     <div class="order-stepper-wrap">
@@ -581,26 +401,18 @@
                         <div class="order-stepper">
                             @for (int i = 0; i < pipeline.Length; i++)
                             {
-                                var (pStatus, pIcon) = pipeline[i];
-                                string nodeClass = i < curIdx ? "done"
-                                : i == curIdx ? "active"
-                                : "future";
+                                string nodeClass = i < curIdx ? "done" : i == curIdx ? "active" : "future";
                                 string circleContent = i < curIdx
-                                ? "<i class='bi bi-check-lg'></i>"
-                                : i == curIdx
-                                ? $"<i class='{pIcon}'></i>"
-                                : $"<i class='{pIcon}'></i>";
+                                    ? "<i class='bi bi-check-lg'></i>"
+                                    : $"<i class='{pipeline[i].Icon}'></i>";
 
-                                // Timestamp for this step (if done or active)
                                 string? stepTs = null;
-                                if (histMap.TryGetValue(pStatus, out var ts))
+                                if (histMap.TryGetValue(pipeline[i].Status, out var ts))
                                     stepTs = ts.ToString("dd/MM HH:mm");
 
                                 <div class="os-node @nodeClass">
                                     <div class="os-circle">@Html.Raw(circleContent)</div>
-                                    <div class="os-lbl">
-                                        @(pStatus == "Pending Confirmation" ? "Pending" : pStatus)
-                                    </div>
+                                    <div class="os-lbl">@pipeline[i].Label</div>
                                     @if (stepTs != null)
                                     {
                                         <div class="os-ts">@stepTs</div>
@@ -616,7 +428,6 @@
                 }
                 else
                 {
-                    <!-- Cancelled banner instead of stepper -->
                     <div style="background:rgba(220,38,38,.06);border:1.5px solid rgba(220,38,38,.2);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:12px;margin-bottom:20px;">
                         <div style="width:42px;height:42px;border-radius:50%;background:rgba(220,38,38,.1);border:2px solid rgba(220,38,38,.3);display:flex;align-items:center;justify-content:center;font-size:18px;color:#dc2626;flex-shrink:0;">
                             <i class="bi bi-x-circle-fill"></i>
@@ -633,9 +444,59 @@
                     </div>
                 }
 
-                <!-- ════════════════════════════════════════ -->
-                <!--  VERTICAL TIMELINE (Status History)      -->
-                <!-- ════════════════════════════════════════ -->
+                <!-- SERVICE JOB STEPPER -->
+                @if (isServiceOrder && !isCancelled)
+                {
+                    <div class="svc-stepper-wrap">
+                        <div class="svc-stepper-title">
+                            <i class="bi bi-wrench-adjustable"></i>
+                            Workshop Progress — Custom Assembly
+                        </div>
+                        <div class="svc-stepper">
+                            @for (int i = 0; i < svcPipeline.Length; i++)
+                            {
+                                string nodeClass = i < svcCurIdx ? "done" : i == svcCurIdx ? "active" : "future";
+                                string circleContent = i < svcCurIdx
+                                    ? "<i class='bi bi-check-lg'></i>"
+                                    : $"<i class='{svcPipeline[i].Icon}'></i>";
+
+                                <div class="svc-node @nodeClass">
+                                    <div class="svc-circle">@Html.Raw(circleContent)</div>
+                                    <div class="svc-lbl">@svcPipeline[i].Label</div>
+                                </div>
+                                @if (i < svcPipeline.Length - 1)
+                                {
+                                    <div class="svc-line @(i < svcCurIdx ? "done" : "")"></div>
+                                }
+                            }
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(internalNote))
+                        {
+                            <div style="margin-top:14px;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.15);border-radius:8px;padding:10px 14px;">
+                                <div style="font-size:10px;font-weight:700;color:rgba(124,58,237,.6);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">
+                                    Workshop Note
+                                </div>
+                                <div style="font-size:13px;color:#4c1d95;line-height:1.5;">@internalNote</div>
+                            </div>
+                        }
+
+                        <div style="margin-top:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(124,58,237,.6);">
+                            <i class="bi bi-info-circle"></i>
+                            <span>
+                                @(serviceStatus switch {
+                                    "Pending"    => "Your glasses are queued for assembly.",
+                                    "Processing" => "Our technicians are currently assembling your custom glasses.",
+                                    "Ready"      => "Your glasses are ready! Awaiting shipment.",
+                                    "Done"       => "Assembly complete. Your order has been handed off.",
+                                    _            => "Workshop status will update as your order progresses."
+                                })
+                            </span>
+                        </div>
+                    </div>
+                }
+
+                <!-- VERTICAL TIMELINE -->
                 @if (historyList.Any())
                 {
                     <div class="timeline-wrap">
@@ -651,62 +512,59 @@
                                     var h = historyList[i];
                                     bool isFirst = i == 0;
 
-                                    // Pick dot colour class
                                     string dotCls = h.Status switch
                                     {
                                         "Pending" or "Pending Confirmation" => "dot-pending",
-                                        "Confirmed" => "dot-confirmed",
+                                        "Confirmed"                         => "dot-confirmed",
                                         var s when s.StartsWith("Processing") => "dot-processing",
-                                        "Shipped" => "dot-shipped",
-                                        "Delivered" => "dot-delivered",
-                                        "Completed" => "dot-completed",
+                                        "Shipped"    => "dot-shipped",
+                                        "Delivered"  => "dot-delivered",
+                                        "Completed"  => "dot-completed",
                                         "Cancelled" or "Cancellation_Pending" => "dot-cancelled",
-                                        _ => "dot-note"
+                                        _            => "dot-note"
                                     };
 
-                                    // Pick icon
                                     string dotIcon = h.Status switch
                                     {
                                         "Pending" or "Pending Confirmation" => "bi-hourglass-split",
-                                        "Confirmed" => "bi-check-circle-fill",
+                                        "Confirmed"  => "bi-check-circle-fill",
                                         var s when s.StartsWith("Processing") => "bi-gear-fill",
-                                        "Shipped" => "bi-truck",
-                                        "Delivered" => "bi-box-seam-fill",
-                                        "Completed" => "bi-patch-check-fill",
+                                        "Shipped"    => "bi-truck",
+                                        "Delivered"  => "bi-box-seam-fill",
+                                        "Completed"  => "bi-patch-check-fill",
                                         "Cancelled" or "Cancellation_Pending" => "bi-x-circle-fill",
-                                        _ => "bi-info-circle-fill"
+                                        _            => "bi-info-circle-fill"
                                     };
 
-                                    // Human-readable label for the status
                                     string statusLabel = h.Status switch
                                     {
                                         "Pending Confirmation" => "Payment Confirmed — Awaiting Review",
-                                        "Confirmed" => "Order Confirmed",
-                                        "Processing" => "Order is Being Processed",
-                                        "Shipped" => "Order Shipped",
-                                        "Delivered" => "Order Delivered",
-                                        "Completed" => "Order Completed",
-                                        "Cancelled" => "Order Cancelled",
-                                        _ => h.Status
+                                        "Confirmed"   => "Order Confirmed",
+                                        "Processing"  => "Order is Being Processed",
+                                        "Shipped"     => "Order Shipped",
+                                        "Delivered"   => "Order Delivered",
+                                        "Completed"   => "Order Completed",
+                                        "Cancelled"   => "Order Cancelled",
+                                        "Cancellation_Pending" => "Cancellation Requested",
+                                        _             => h.Status
                                     };
 
-                                    // Customer-friendly note (hide internal staff notes)
                                     string? friendlyNote = h.Note switch
                                     {
-                                        "Order placed successfully" => "Your order has been placed and payment is pending.",
-                                        "Payment received via Stripe" => "We've received your payment. Thank you!",
-                                        "Payment confirmed by Stripe" => "Payment confirmed! Your order is now with our team.",
+                                        "Order placed successfully"          => "Your order has been placed and payment is pending.",
+                                        "Payment received via Stripe"        => "We've received your payment. Thank you!",
+                                        "Payment confirmed by Stripe"        => "Payment confirmed! Your order is now with our team.",
                                         "Cancellation initiated \u2014 processing refund" => "Your cancellation request is being processed. Refund is on the way.",
-                                        var n when n != null && n.StartsWith("Order cancelled") => n,
-                                        var n when n != null && n.StartsWith("Advanced from") => null,
+                                        var n when n != null && n.StartsWith("Order cancelled")   => n,
+                                        var n when n != null && n.StartsWith("Advanced from")     => null,
                                         var n when n != null && n.StartsWith("Tracking assigned") => n,
-                                        var n when n != null && n.StartsWith("Tracking updated") => n,
-                                        "Order packed and handed to carrier" => "Your package has been handed to the carrier.",
-                                        "Delivery confirmed by Operations" => "Your order has been marked as delivered.",
-                                        "Cancelled by Sale/Support staff" => "This order was cancelled by our support team.",
-                                        "Cancelled by customer" => "You cancelled this order.",
-                                        "Cancelled by Operations — inventory restored" => "Order was cancelled and inventory has been restored.",
-                                        var n when n != null && n.StartsWith("[ADMIN") => null, // hide admin internals
+                                        var n when n != null && n.StartsWith("Tracking updated")  => n,
+                                        "Order packed and handed to carrier"  => "Your package has been handed to the carrier.",
+                                        "Delivery confirmed by Operations"    => "Your order has been marked as delivered.",
+                                        "Cancelled by Sale/Support staff"     => "This order was cancelled by our support team.",
+                                        "Cancelled by customer"               => "You cancelled this order.",
+                                        "Cancelled by Operations \u2014 inventory restored" => "Order was cancelled and inventory has been restored.",
+                                        var n when n != null && n.StartsWith("[ADMIN") => null,
                                         _ => h.Note
                                     };
 
@@ -721,6 +579,13 @@
                                                 {
                                                     <span style="background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.25);color:#059669;border-radius:100px;padding:2px 9px;font-size:10px;font-weight:800;">
                                                         LATEST
+                                                    </span>
+                                                }
+                                                @if (isServiceOrder && h.Status == "Processing" && !string.IsNullOrEmpty(serviceStatus))
+                                                {
+                                                    <span class="svc-event-pill">
+                                                        <i class="bi bi-wrench" style="font-size:10px;"></i>
+                                                        Workshop: @serviceStatus
                                                     </span>
                                                 }
                                             </div>
@@ -741,7 +606,6 @@
                 }
                 else
                 {
-                    <!-- Fallback for orders without history yet (old orders) -->
                     <div style="background:#f8fafc;border:1.5px dashed #e2e8f0;border-radius:14px;padding:20px 22px;margin-bottom:20px;text-align:center;">
                         <i class="bi bi-clock-history" style="font-size:28px;color:#cbd5e1;display:block;margin-bottom:8px;"></i>
                         <p style="color:#94a3b8;font-size:13px;margin:0;">
@@ -750,7 +614,7 @@
                     </div>
                 }
 
-                <!-- Order Items -->
+                <!-- ORDER ITEMS -->
                 <div class="card mb-4"
                      style="border:none;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden;">
                     <div style="padding:1.1rem 1.4rem;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
@@ -758,22 +622,39 @@
                             <i class="bi bi-box-seam me-1"></i> Items (@Model.Order.OrderItems.Count)
                         </h5>
                     </div>
+
                     @foreach (var oi in Model.Order.OrderItems)
                     {
-                        var (isServiceOrder, lensName, lensPrice, serviceName, servicePrice, framePrice)
-                        = DetailModel.ParseSnapshot(oi.SnapshotJson);
+                        var parsed = DetailModel.ParseSnapshot(oi.SnapshotJson);
+                        bool isItemSvc = parsed.isServiceOrder;
+                        string? lensName = parsed.lensName;
+                        decimal? lensPrice = parsed.lensPrice;
+                        string? serviceName = parsed.serviceName;
+                        decimal? servicePrice = parsed.servicePrice;
+                        decimal? framePrice = parsed.framePrice;
+
                         var latestReturn = oi.Returns?.OrderByDescending(r => r.CreatedAt).FirstOrDefault();
+
+                        string? itemSvcStatus = null;
+                        if (isItemSvc && !string.IsNullOrEmpty(oi.SnapshotJson))
+                        {
+                            try
+                            {
+                                var d = System.Text.Json.JsonDocument.Parse(oi.SnapshotJson);
+                                if (d.RootElement.TryGetProperty("serviceStatus", out var sv))
+                                    itemSvcStatus = sv.GetString();
+                            }
+                            catch { }
+                        }
+
+                        var imgUrl = oi.Product?.ProductImages?
+                            .FirstOrDefault(img => img.IsPrimary && img.IsActive)?.ImageUrl;
+                        if (string.IsNullOrEmpty(imgUrl))
+                            imgUrl = oi.Product?.ProductImages?.FirstOrDefault(img => img.IsActive)?.ImageUrl;
 
                         <div style="padding:1.1rem 1.4rem;border-bottom:1px solid #f1f5f9;">
                             <div class="row align-items-center g-3">
                                 <div class="col-auto">
-                                    @{
-                                        var imgUrl = oi.Product?.ProductImages?
-                                        .FirstOrDefault(img => img.IsPrimary && img.IsActive)?.ImageUrl;
-                                        if (string.IsNullOrEmpty(imgUrl))
-                                            imgUrl = oi.Product?.ProductImages?
-                                            .FirstOrDefault(img => img.IsActive)?.ImageUrl;
-                                    }
                                     <div style="width:58px;height:58px;background:#f0f4f8;border-radius:10px;border:1.5px solid #e2e8f0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:22px;">
                                         @if (!string.IsNullOrEmpty(imgUrl))
                                         {
@@ -781,28 +662,56 @@
                                         }
                                         else
                                         {
-                                            <span>@(isServiceOrder ? "⚙" : "👓")</span>
+                                            <span>@(isItemSvc ? "🔭" : "👓")</span>
                                         }
                                     </div>
                                 </div>
                                 <div class="col">
                                     <h6 style="color:#0d1b2a;margin-bottom:4px;font-weight:700;font-size:.95rem;">
-                                        @if (isServiceOrder)
+                                        @if (isItemSvc)
                                         {
-                                            <span style="font-size:11px;background:#f0f0ff;color:#5b5bdb;border-radius:6px;padding:2px 8px;font-weight:700;margin-right:6px;">🔧 Custom</span>
+                                            <span style="font-size:11px;background:rgba(124,58,237,.08);color:#7c3aed;border-radius:6px;padding:2px 8px;font-weight:700;margin-right:6px;">
+                                                🔭 Custom
+                                            </span>
                                         }
                                         @(oi.Product?.Name ?? "Product")
-                                        @if (isServiceOrder && lensName != null)
+                                        @if (isItemSvc && lensName != null)
                                         {
                                             <text> + @lensName</text>
                                         }
                                     </h6>
-                                    @if (isServiceOrder)
+
+                                    @if (isItemSvc)
                                     {
-                                        <div style="background:#f8fafc;border-radius:8px;padding:6px 10px;font-size:.78rem;line-height:1.8;color:#64748b;margin:4px 0;">
-                                            <div>🕶 Frame: <strong style="color:#0d1b2a;">@framePrice?.ToString("N0") VND</strong></div>
-                                            <div>⭕ Lens (@lensName): <strong style="color:#0d1b2a;">@lensPrice?.ToString("N0") VND</strong></div>
-                                            <div>⚙️ Service (@serviceName): <strong style="color:#0d1b2a;">@servicePrice?.ToString("N0") VND</strong></div>
+                                        <div style="background:linear-gradient(135deg,rgba(124,58,237,.04),rgba(124,58,237,.08));border:1px solid rgba(124,58,237,.12);border-radius:10px;padding:10px 14px;font-size:.8rem;line-height:2;color:#64748b;margin:6px 0;">
+                                            <div style="display:flex;justify-content:space-between;">
+                                                <span>🕶 Frame</span>
+                                                <strong style="color:#0d1b2a;">@framePrice?.ToString("N0") VND</strong>
+                                            </div>
+                                            <div style="display:flex;justify-content:space-between;">
+                                                <span>⭕ Lens <span style="color:#94a3b8;font-size:.75rem;">(@lensName)</span></span>
+                                                <strong style="color:#0d1b2a;">@lensPrice?.ToString("N0") VND</strong>
+                                            </div>
+                                            <div style="display:flex;justify-content:space-between;">
+                                                <span>⚙️ Service <span style="color:#94a3b8;font-size:.75rem;">(@serviceName)</span></span>
+                                                <strong style="color:#0d1b2a;">@servicePrice?.ToString("N0") VND</strong>
+                                            </div>
+                                            @if (!string.IsNullOrEmpty(itemSvcStatus))
+                                            {
+                                                <div style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(124,58,237,.15);display:flex;align-items:center;gap:6px;">
+                                                    <i class="bi bi-wrench" style="color:#7c3aed;font-size:11px;"></i>
+                                                    <span style="color:#7c3aed;font-weight:700;font-size:.78rem;">
+                                                        Workshop Status:
+                                                        @(itemSvcStatus switch {
+                                                            "Pending"    => "⏳ Queued for assembly",
+                                                            "Processing" => "⚙️ Being assembled",
+                                                            "Ready"      => "✅ Ready — awaiting shipment",
+                                                            "Done"       => "🎉 Assembly complete",
+                                                            _            => itemSvcStatus
+                                                        })
+                                                    </span>
+                                                </div>
+                                            }
                                         </div>
                                     }
                                     else
@@ -811,12 +720,14 @@
                                             <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;">SKU: @(oi.Product?.Sku ?? "N/A")</code>
                                         </div>
                                     }
+
                                     @if (oi.PrescriptionId.HasValue && oi.Prescription != null)
                                     {
                                         <span class="badge bg-secondary mt-1" style="font-size:.72rem;">
                                             👓 Rx: @oi.Prescription.ProfileName
                                         </span>
                                     }
+
                                     @if (latestReturn != null)
                                     {
                                         <div class="mt-1">
@@ -868,8 +779,7 @@
                         }
                         @if (Model.CanCancel)
                         {
-                            <button type="button" class="btn btn-outline-danger"
-                                    id="btnOpenCancelModal"
+                            <button type="button" class="btn btn-outline-danger" id="btnOpenCancelModal"
                                     style="padding:.55rem 1.2rem;border-radius:8px;font-weight:700;">
                                 <i class="bi bi-x-circle me-1"></i>Cancel Order
                             </button>
@@ -878,7 +788,7 @@
                 </div>
             </div>
 
-            <!-- ────────────── RIGHT COLUMN ────────────── -->
+            <!-- ── RIGHT COLUMN ── -->
             <div class="col-lg-4">
 
                 <!-- Payment Summary -->
@@ -891,14 +801,7 @@
                         <div style="display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid #f1f5f9;">
                             <span style="color:#64748b;">Method</span>
                             <span style="font-weight:600;color:#0d1b2a;">
-                                @if (Model.Order.PaymentMethod == "COD")
-                                {
-                                    <text>COD (50% Deposit)</text>
-                                }
-                                else
-                                {
-                                    @(Model.Order.PaymentMethod ?? "—")
-                                }
+                                @(Model.Order.PaymentMethod == "COD" ? "COD (50% Deposit)" : (Model.Order.PaymentMethod ?? "—"))
                             </span>
                         </div>
                         <div style="display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid #f1f5f9;">
@@ -918,15 +821,12 @@
 
                         @if (Model.Order.PaymentMethod == "COD" && Model.Order.DepositAmount > 0)
                         {
-                            <div style="margin-top:1rem; background:linear-gradient(135deg, rgba(245,158,11,0.06), rgba(217,119,6,0.10)); border:1.5px solid rgba(217,119,6,0.2); border-radius:10px; padding:0.9rem 1rem;">
-                                <div style="font-weight:700; color:#92400e; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.6rem;">
+                            <div style="margin-top:1rem;background:linear-gradient(135deg,rgba(245,158,11,.06),rgba(217,119,6,.10));border:1.5px solid rgba(217,119,6,.2);border-radius:10px;padding:.9rem 1rem;">
+                                <div style="font-weight:700;color:#92400e;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.6rem;">
                                     Deposit Breakdown
                                 </div>
-                                <div style="display:flex;justify-content:space-between;padding:.3rem 0;border-bottom:1px dashed rgba(217,119,6,0.2);">
-                                    <span style="color:#059669;font-weight:600;font-size:.9rem;">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3" style="vertical-align:-1px;margin-right:3px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                        Deposit Paid
-                                    </span>
+                                <div style="display:flex;justify-content:space-between;padding:.3rem 0;border-bottom:1px dashed rgba(217,119,6,.2);">
+                                    <span style="color:#059669;font-weight:600;font-size:.9rem;">✓ Deposit Paid</span>
                                     <span style="color:#059669;font-weight:700;">@Model.Order.DepositAmount.ToString("N0") VND</span>
                                 </div>
                                 <div style="display:flex;justify-content:space-between;padding:.3rem 0;">
@@ -938,7 +838,80 @@
                     </div>
                 </div>
 
-                <!-- Shipping info -->
+                <!-- Workshop Status Card -->
+                @if (isServiceOrder && !string.IsNullOrEmpty(serviceStatus))
+                {
+                    string svcCardIcon, svcCardColor, svcCardBg, svcCardDesc;
+                    switch (serviceStatus)
+                    {
+                        case "Pending":
+                            svcCardIcon = "bi-hourglass-split"; svcCardColor = "#92400e";
+                            svcCardBg = "rgba(245,158,11,.1)"; svcCardDesc = "Your order is queued for assembly.";
+                            break;
+                        case "Processing":
+                            svcCardIcon = "bi-gear-fill"; svcCardColor = "#1e40af";
+                            svcCardBg = "rgba(37,99,235,.08)"; svcCardDesc = "Technicians are assembling your glasses.";
+                            break;
+                        case "Ready":
+                            svcCardIcon = "bi-check-circle-fill"; svcCardColor = "#065f46";
+                            svcCardBg = "rgba(5,150,105,.08)"; svcCardDesc = "Your custom glasses are ready!";
+                            break;
+                        case "Done":
+                            svcCardIcon = "bi-bag-check-fill"; svcCardColor = "#14532d";
+                            svcCardBg = "rgba(5,150,105,.06)"; svcCardDesc = "Assembly complete. Awaiting shipment.";
+                            break;
+                        default:
+                            svcCardIcon = "bi-question-circle"; svcCardColor = "#475569";
+                            svcCardBg = "rgba(0,0,0,.04)"; svcCardDesc = "Updating...";
+                            break;
+                    }
+
+                    <div class="card mb-3"
+                         style="border:none;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);overflow:hidden;">
+                        <div style="background:linear-gradient(135deg,#5b21b6,#7c3aed);padding:.9rem 1.2rem;">
+                            <h5 style="color:#fff;font-weight:700;margin:0;font-size:.95rem;">
+                                <i class="bi bi-wrench-adjustable me-1"></i> Workshop Status
+                            </h5>
+                        </div>
+                        <div style="padding:1.1rem 1.4rem;">
+                            <div style="background:@svcCardBg;border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
+                                <i class="bi @svcCardIcon" style="color:@svcCardColor;font-size:20px;margin-top:2px;flex-shrink:0;"></i>
+                                <div>
+                                    <div style="font-weight:800;color:@svcCardColor;font-size:.9rem;">@serviceStatus</div>
+                                    <div style="font-size:.8rem;color:#64748b;margin-top:2px;">@svcCardDesc</div>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(assignedTo))
+                            {
+                                <div style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid #f1f5f9;font-size:.85rem;">
+                                    <span style="color:#64748b;">Technician</span>
+                                    <span style="font-weight:700;color:#0d1b2a;">@assignedTo</span>
+                                </div>
+                            }
+
+                            <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;">
+                                @for (int di = 0; di < svcPipeline.Length; di++)
+                                {
+                                    bool isDotDone   = di < svcCurIdx;
+                                    bool isDotActive = di == svcCurIdx;
+                                    string dotW   = isDotActive ? "24px" : "10px";
+                                    string dotBg  = isDotDone ? "#059669" : isDotActive ? "#7c3aed" : "#e2e8f0";
+
+                                    <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+                                        <div style="width:@dotW;height:10px;border-radius:5px;background:@dotBg;transition:all .3s;"></div>
+                                        @if (isDotActive)
+                                        {
+                                            <div style="font-size:9px;font-weight:700;color:#7c3aed;">@svcPipeline[di].Label</div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Shipment Tracking -->
                 @if (Model.Order.Shipments?.Any() == true)
                 {
                     var ship = Model.Order.Shipments.OrderByDescending(s => s.ShipmentId).First();
@@ -972,8 +945,7 @@
                     }
                 }
 
-                <!-- Shipping Address -->
-                @* ── Refund Info Card (shown for cancelled orders with refund) ── *@
+                <!-- Refund Info Card -->
                 @if (Model.Order.Status == "Cancelled" && Model.Order.RefundAmount.HasValue && Model.Order.RefundAmount > 0)
                 {
                     <div class="card mb-3"
@@ -1007,6 +979,7 @@
                     </div>
                 }
 
+                <!-- Shipping Address -->
                 @if (Model.Order.Address != null)
                 {
                     <div class="card mb-3"
@@ -1036,49 +1009,28 @@
 </div>
 
 <style>
-    .breadcrumb {
-        background: transparent;
-        padding: 0;
-        margin-bottom: 1rem;
-    }
-
-    .breadcrumb-item + .breadcrumb-item::before {
-        content: "›";
-    }
-
-    .breadcrumb-item a {
-        color: #b8862a;
-        text-decoration: none;
-    }
-
-    .breadcrumb-item.active {
-        color: #64748b;
-    }
+    .breadcrumb { background:transparent;padding:0;margin-bottom:1rem; }
+    .breadcrumb-item + .breadcrumb-item::before { content:"›"; }
+    .breadcrumb-item a { color:#b8862a;text-decoration:none; }
+    .breadcrumb-item.active { color:#64748b; }
 </style>
 
-@* ════════════════════════════════════════════════════════════ *@
-@*  CANCELLATION CONFIRMATION MODAL                            *@
-@* ════════════════════════════════════════════════════════════ *@
 @if (Model.CanCancel)
 {
     <div id="cancelModal"
          style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
         <div style="background:#fff;border-radius:18px;max-width:440px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden;animation:modalIn .25s ease;">
-            <!-- Header -->
             <div style="background:linear-gradient(135deg,#dc2626,#ef4444);padding:1.6rem 1.8rem;text-align:center;">
                 <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);display:inline-flex;align-items:center;justify-content:center;font-size:26px;color:#fff;margin-bottom:10px;">
                     <i class="bi bi-exclamation-triangle-fill"></i>
                 </div>
                 <h4 style="color:#fff;margin:0;font-weight:800;font-size:1.2rem;">Cancel Order #@Model.Order?.OrderId?</h4>
             </div>
-
-            <!-- Body -->
             <div style="padding:1.6rem 1.8rem;">
                 <p style="color:#475569;font-size:.95rem;line-height:1.7;margin-bottom:1.2rem;text-align:center;">
                     Are you sure you want to cancel this order?<br>
                     <strong style="color:#dc2626;">This action cannot be undone.</strong>
                 </p>
-
                 @if (Model.ExpectedRefundAmount > 0)
                 {
                     <div style="background:linear-gradient(135deg,rgba(5,150,105,.06),rgba(16,185,129,.1));border:1.5px solid rgba(5,150,105,.2);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;">
@@ -1088,9 +1040,7 @@
                                 <div style="font-size:1.3rem;font-weight:900;color:#059669;">@Model.ExpectedRefundAmount.ToString("N0") VND</div>
                             </div>
                             <div style="text-align:right;">
-                                <div style="font-size:.75rem;color:#6b7280;">
-                                    @(Model.Order?.PaymentMethod == "COD" ? "Deposit refund" : "Full refund")
-                                </div>
+                                <div style="font-size:.75rem;color:#6b7280;">@(Model.Order?.PaymentMethod == "COD" ? "Deposit refund" : "Full refund")</div>
                                 <div style="font-size:.75rem;color:#94a3b8;">5–10 business days</div>
                             </div>
                         </div>
@@ -1102,17 +1052,14 @@
                         <span style="font-size:.85rem;color:#92400e;"><i class="bi bi-info-circle me-1"></i> No online payment was made — no refund needed.</span>
                     </div>
                 }
-
-                <!-- Buttons -->
                 <div class="d-flex gap-2">
                     <button type="button" id="btnCloseModal"
-                            style="flex:1;padding:.7rem;border-radius:10px;border:1.5px solid #e2e8f0;background:#fff;color:#475569;font-weight:700;font-size:.9rem;cursor:pointer;transition:all .2s;"
+                            style="flex:1;padding:.7rem;border-radius:10px;border:1.5px solid #e2e8f0;background:#fff;color:#475569;font-weight:700;font-size:.9rem;cursor:pointer;"
                             onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'">
                         Go Back
                     </button>
                     <button type="button" id="btnConfirmCancel"
-                            style="flex:1;padding:.7rem;border-radius:10px;border:none;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;font-weight:700;font-size:.9rem;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(220,38,38,.3);"
-                            onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                            style="flex:1;padding:.7rem;border-radius:10px;border:none;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;font-weight:700;font-size:.9rem;cursor:pointer;box-shadow:0 2px 8px rgba(220,38,38,.3);">
                         <i class="bi bi-x-circle me-1"></i> Yes, Cancel Order
                     </button>
                 </div>
@@ -1122,41 +1069,27 @@
 
     <style>
         @@keyframes modalIn {
-            from { opacity: 0; transform: scale(.92) translateY(10px); }
-            to   { opacity: 1; transform: scale(1) translateY(0); }
+            from { opacity:0;transform:scale(.92) translateY(10px); }
+            to   { opacity:1;transform:scale(1) translateY(0); }
         }
     </style>
 
     <script>
     (function() {
-        const modal     = document.getElementById('cancelModal');
-        const btnOpen   = document.getElementById('btnOpenCancelModal');
-        const btnClose  = document.getElementById('btnCloseModal');
+        const modal      = document.getElementById('cancelModal');
+        const btnOpen    = document.getElementById('btnOpenCancelModal');
+        const btnClose   = document.getElementById('btnCloseModal');
         const btnConfirm = document.getElementById('btnConfirmCancel');
-        const orderId   = @(Model.Order?.OrderId ?? 0);
+        const orderId    = @(Model.Order?.OrderId ?? 0);
         let   isProcessing = false;
 
-        // Open modal
-        btnOpen.addEventListener('click', function() {
-            modal.style.display = 'flex';
-        });
+        btnOpen.addEventListener('click', function() { modal.style.display = 'flex'; });
+        btnClose.addEventListener('click', function() { modal.style.display = 'none'; });
+        modal.addEventListener('click', function(e) { if (e.target === modal) modal.style.display = 'none'; });
 
-        // Close modal
-        btnClose.addEventListener('click', function() {
-            modal.style.display = 'none';
-        });
-
-        // Close on backdrop click
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) modal.style.display = 'none';
-        });
-
-        // Confirm cancellation via AJAX
         btnConfirm.addEventListener('click', async function() {
-            if (isProcessing) return; // prevent double-click
+            if (isProcessing) return;
             isProcessing = true;
-
-            // Disable button and show loading state
             btnConfirm.disabled = true;
             btnConfirm.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Processing...';
             btnClose.disabled = true;
@@ -1167,19 +1100,12 @@
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'same-origin'
                 });
-
                 const data = await response.json();
-
                 if (response.ok) {
-                    // Success — show confirmation and reload
                     btnConfirm.style.background = 'linear-gradient(135deg,#059669,#10b981)';
                     btnConfirm.innerHTML = '<i class="bi bi-check-circle me-1"></i> Cancelled Successfully';
-
-                    setTimeout(function() {
-                        window.location.reload();
-                    }, 1200);
+                    setTimeout(function() { window.location.reload(); }, 1200);
                 } else {
-                    // Error — show message and re-enable
                     alert(data.error || 'Unable to cancel this order. Please try again.');
                     btnConfirm.disabled = false;
                     btnConfirm.innerHTML = '<i class="bi bi-x-circle me-1"></i> Yes, Cancel Order';

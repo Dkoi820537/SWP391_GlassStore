@@ -7,17 +7,18 @@
 <div class="container py-5">
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert" style="border-radius: 8px; border-left: 4px solid #4CAF50;">
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert"
+             style="border-radius:8px;border-left:4px solid #4CAF50;">
             <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
-
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert" style="border-radius: 8px; border-left: 4px solid #f44336;">
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert"
+             style="border-radius:8px;border-left:4px solid #f44336;">
             <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
@@ -28,29 +29,26 @@
         </ol>
     </nav>
 
-    <!-- ===== PAGE HEADER ===== -->
     <div class="mb-5">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div>
-                <h1 style="font-family: var(--font-secondary); color: var(--primary-navy); font-size: 2.5rem; margin-bottom: 0.5rem;">
+                <h1 style="font-family:var(--font-secondary);color:var(--primary-navy);font-size:2.5rem;margin-bottom:.5rem;">
                     My Orders
                     @if (Model.Orders.Any())
                     {
-                        <span class="badge" style="background: var(--primary-gold); font-size: 1.2rem; vertical-align: middle;">
+                        <span class="badge" style="background:var(--primary-gold);font-size:1.2rem;vertical-align:middle;">
                             @Model.Orders.Count
                         </span>
                     }
                 </h1>
-                <p style="color: var(--secondary-warm-gray); font-size: 1.1rem; margin: 0;">
+                <p style="color:var(--secondary-warm-gray);font-size:1.1rem;margin:0;">
                     View and track your order history
                 </p>
             </div>
-
             @if (Model.Orders.Any())
             {
-                <a asp-page="/Index"
-                   class="btn btn-primary"
-                   style="padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%); border: none; border-radius: 8px; font-weight: 600;">
+                <a asp-page="/Index" class="btn btn-primary"
+                   style="padding:.875rem 2rem;background:linear-gradient(135deg,var(--primary-navy) 0%,var(--primary-navy-light) 100%);border:none;border-radius:8px;font-weight:600;">
                     <i class="bi bi-shop me-2"></i>Continue Shopping
                 </a>
             }
@@ -59,13 +57,14 @@
 
     @if (!Model.Orders.Any())
     {
-        <div class="card" style="border: none; border-radius: 16px; box-shadow: var(--shadow-lg); text-align: center; padding: 4rem 2rem; background: linear-gradient(135deg, var(--white), var(--secondary-cream));">
-            <div style="font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.3;"><i class="bi bi-box-seam"></i></div>
-            <h3 style="color: var(--primary-navy); margin-bottom: 1rem;">No Orders Yet</h3>
-            <p style="color: var(--secondary-warm-gray); max-width: 400px; margin: 0 auto 2rem;">
+        <div class="card" style="border:none;border-radius:16px;box-shadow:var(--shadow-lg);text-align:center;padding:4rem 2rem;background:linear-gradient(135deg,var(--white),var(--secondary-cream));">
+            <div style="font-size:4rem;margin-bottom:1.5rem;opacity:.3;"><i class="bi bi-box-seam"></i></div>
+            <h3 style="color:var(--primary-navy);margin-bottom:1rem;">No Orders Yet</h3>
+            <p style="color:var(--secondary-warm-gray);max-width:400px;margin:0 auto 2rem;">
                 You haven't placed any orders yet. Start shopping to see your order history here.
             </p>
-            <a asp-page="/Index" class="btn" style="padding: 0.75rem 2rem; background: linear-gradient(135deg, var(--primary-navy), var(--primary-navy-light)); color: white; border: none; border-radius: 8px; font-weight: 600; text-decoration: none;">
+            <a asp-page="/Index" class="btn"
+               style="padding:.75rem 2rem;background:linear-gradient(135deg,var(--primary-navy),var(--primary-navy-light));color:white;border:none;border-radius:8px;font-weight:600;text-decoration:none;">
                 Start Shopping
             </a>
         </div>
@@ -75,40 +74,93 @@
         <div class="row g-4">
             @foreach (var order in Model.Orders)
             {
+                bool isCustom = order.OrderType == "Custom"
+                || order.OrderItems.Any(oi =>
+                !string.IsNullOrEmpty(oi.SnapshotJson)
+                && oi.SnapshotJson.Contains("\"isServiceOrder\":true"));
+
+                string? svcStatus = null;
+                if (isCustom)
+                {
+                    var svcItem = order.OrderItems.FirstOrDefault(oi =>
+                    !string.IsNullOrEmpty(oi.SnapshotJson)
+                    && oi.SnapshotJson.Contains("\"isServiceOrder\":true"));
+                    if (svcItem != null)
+                    {
+                        try
+                        {
+                            var d = System.Text.Json.JsonDocument.Parse(svcItem.SnapshotJson!);
+                            if (d.RootElement.TryGetProperty("serviceStatus", out var sv))
+                                svcStatus = sv.GetString();
+                        }
+                        catch { }
+                    }
+                }
+
                 <div class="col-12">
-                    <div class="card" style="border: none; border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;"
+                    <div class="card"
+                         style="border:none;border-radius:12px;box-shadow:var(--shadow-md);overflow:hidden;transition:transform .2s,box-shadow .2s;cursor:pointer;"
                          onclick="window.location='/Orders/Detail?id=@order.OrderId'"
-                         onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.12)'"
-                         onmouseout="this.style.transform='none'; this.style.boxShadow='var(--shadow-md)'">
-                        <div style="padding: 1.25rem 1.5rem;">
+                         onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 25px rgba(0,0,0,.12)'"
+                         onmouseout="this.style.transform='none';this.style.boxShadow='var(--shadow-md)'">
+
+                        @if (isCustom)
+                        {
+                            <div style="background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(124,58,237,.14));border-bottom:1px solid rgba(124,58,237,.18);padding:.45rem 1.5rem;display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:13px;">🔭</span>
+                                <span style="font-size:.78rem;font-weight:700;color:#7c3aed;">Custom Glasses Order</span>
+                                @if (!string.IsNullOrEmpty(svcStatus))
+                                {
+                                    <span style="margin-left:auto;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.22);color:#7c3aed;border-radius:100px;padding:2px 10px;font-size:.72rem;font-weight:700;">
+                                        <i class="bi bi-wrench me-1"></i>Workshop: @svcStatus
+                                    </span>
+                                }
+                            </div>
+                        }
+
+                        <div style="padding:1.25rem 1.5rem;">
                             <div class="row align-items-center g-3">
                                 <div class="col-sm-3">
-                                    <div style="font-size: 0.8rem; color: var(--secondary-warm-gray); margin-bottom: 0.25rem;">Order</div>
-                                    <div style="font-weight: 700; color: var(--primary-navy); font-size: 1.15rem;">#@order.OrderId</div>
-                                    <div style="font-size: 0.8rem; color: var(--secondary-warm-gray);">@order.CreatedAt.ToString("MMM dd, yyyy HH:mm")</div>
+                                    <div style="font-size:.8rem;color:var(--secondary-warm-gray);margin-bottom:.25rem;">Order</div>
+                                    <div style="font-weight:700;color:var(--primary-navy);font-size:1.15rem;">#@order.OrderId</div>
+                                    <div style="font-size:.8rem;color:var(--secondary-warm-gray);">@order.CreatedAt.ToString("MMM dd, yyyy HH:mm")</div>
                                 </div>
                                 <div class="col-sm-3">
-                                    <div style="font-size: 0.8rem; color: var(--secondary-warm-gray); margin-bottom: 0.25rem;">Status</div>
-                                    <span class="badge @(Model.GetStatusBadgeClass(order.Status))" style="padding: 0.45rem 0.85rem; border-radius: 20px; font-size: 0.85rem;">
-                                        <i class="@(Model.GetStatusIcon(order.Status)) me-1"></i>
-                                        @order.Status
+                                    <div style="font-size:.8rem;color:var(--secondary-warm-gray);margin-bottom:.25rem;">Status</div>
+                                    <span class="badge @Model.GetStatusBadgeClass(order.Status)"
+                                          style="padding:.45rem .85rem;border-radius:20px;font-size:.85rem;">
+                                        <i class="@Model.GetStatusIcon(order.Status) me-1"></i>
+                                        @(order.Status == "Cancellation_Pending" ? "Cancelling..." : order.Status)
                                     </span>
                                 </div>
                                 <div class="col-sm-3">
-                                    <div style="font-size: 0.8rem; color: var(--secondary-warm-gray); margin-bottom: 0.25rem;">Items</div>
-                                    <div style="font-weight: 600; color: var(--primary-navy);">@order.OrderItems.Count item(s)</div>
+                                    <div style="font-size:.8rem;color:var(--secondary-warm-gray);margin-bottom:.25rem;">Items</div>
+                                    <div style="font-weight:600;color:var(--primary-navy);">@order.OrderItems.Count item(s)</div>
+                                    @if (isCustom)
+                                    {
+                                        <div style="font-size:.75rem;color:#7c3aed;font-weight:600;margin-top:2px;">
+                                            <i class="bi bi-wrench" style="font-size:.7rem;"></i> Includes assembly
+                                        </div>
+                                    }
                                 </div>
                                 <div class="col-sm-3 text-sm-end">
-                                    <div style="font-size: 0.8rem; color: var(--secondary-warm-gray); margin-bottom: 0.25rem;">Total</div>
-                                    <div style="font-weight: 700; color: var(--primary-gold); font-size: 1.25rem;">
+                                    <div style="font-size:.8rem;color:var(--secondary-warm-gray);margin-bottom:.25rem;">Total</div>
+                                    <div style="font-weight:700;color:var(--primary-gold);font-size:1.25rem;">
                                         @order.TotalAmount.ToString("N0") VND
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div style="background: var(--light-gray); padding: 0.5rem 1.5rem; font-size: 0.85rem; color: var(--secondary-warm-gray); display: flex; justify-content: space-between; align-items: center;">
-                            <span>Payment: @(order.PaymentMethod ?? "—")</span>
-                            <span style="color: var(--primary-gold); font-weight: 600;">View Details →</span>
+
+                        <div style="background:var(--light-gray);padding:.5rem 1.5rem;font-size:.85rem;color:var(--secondary-warm-gray);display:flex;justify-content:space-between;align-items:center;">
+                            <span>
+                                Payment: @(order.PaymentMethod ?? "—")
+                                @if (order.PaymentMethod == "COD" && order.DepositAmount > 0)
+                                {
+                                    <text> · Deposit: @order.DepositAmount.ToString("N0") VND</text>
+                                }
+                            </span>
+                            <span style="color:var(--primary-gold);font-weight:600;">View Details →</span>
                         </div>
                     </div>
                 </div>
@@ -118,8 +170,23 @@
 </div>
 
 <style>
-    .breadcrumb { background: transparent; padding: 0; margin-bottom: 1rem; }
-    .breadcrumb-item + .breadcrumb-item::before { content: "›"; color: var(--secondary-warm-gray); }
-    .breadcrumb-item a { color: var(--primary-gold); text-decoration: none; }
-    .breadcrumb-item.active { color: var(--dark-gray); }
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin-bottom: 1rem;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--secondary-warm-gray);
+    }
+
+    .breadcrumb-item a {
+        color: var(--primary-gold);
+        text-decoration: none;
+    }
+
+    .breadcrumb-item.active {
+        color: var(--dark-gray);
+    }
 </style>

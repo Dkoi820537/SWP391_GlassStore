@@ -137,7 +137,7 @@ namespace EyewearStore_SWP391.Pages.Checkout
                     return RedirectToPage("/Cart/Index");
                 }
 
-                // Load lens products để tính giá đúng
+                // Load lens products for price calculation
                 var lensIds = cart.CartItems
                     .Select(ci => CartService.ExtractLensProductId(ci.TempPrescriptionJson))
                     .Where(id => id.HasValue).Select(id => id!.Value).Distinct().ToList();
@@ -148,96 +148,148 @@ namespace EyewearStore_SWP391.Pages.Checkout
                         .ToDictionaryAsync(p => p.ProductId)
                     : new Dictionary<int, Product>();
 
-                // CREATE ORDER
-                var order = new Order
+                // ── STEP: Group cart items by type ────────────────────────────
+                var customItems = new List<CartItem>();
+                var standardItems = new List<CartItem>();
+
+                foreach (var ci in cart.CartItems)
                 {
-                    UserId = userId,
-                    ReceiverName = selectedAddress.ReceiverName,
-                    Phone = selectedAddress.Phone,
-                    AddressLine = selectedAddress.AddressLine,
-                    AddressId = selectedAddress.AddressId,
-                    TotalAmount = total,
-                    Status = PaymentMethod == "COD" ? "Pending Confirmation" : "Pending",
-                    PaymentMethod = PaymentMethod == "COD" ? "COD" : "Stripe",
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                _context.Orders.Add(order);
-                await _context.SaveChangesAsync();
-
-                // CREATE ORDER ITEMS
-                foreach (var cartItem in cart.CartItems)
-                {
-                    var lensId = CartService.ExtractLensProductId(cartItem.TempPrescriptionJson);
-                    bool isServiceOrder = lensId.HasValue;
-
-                    // Tính unitPrice: Frame + Lens (nếu gia công) + Service
-                    decimal unitPrice = cartItem.Product?.Price ?? 0m;
-
-                    Product? lensProduct = null;
-                    if (isServiceOrder && lensId.HasValue && lensProducts.TryGetValue(lensId.Value, out var lp))
-                    {
-                        lensProduct = lp;
-                        unitPrice += lp.Price;
-                    }
-
-                    if (cartItem.Service != null)
-                        unitPrice += cartItem.Service.Price;
-
-                    // Encode thông tin gia công vào SnapshotJson
-                    string? snapshotJson = null;
-                    if (isServiceOrder)
-                    {
-                        snapshotJson = JsonSerializer.Serialize(new
-                        {
-                            // Thông tin đơn gia công
-                            isServiceOrder = true,
-                            lensProductId = lensId!.Value,
-                            lensProductName = lensProduct?.Name ?? "",
-                            lensPrice = lensProduct?.Price ?? 0m,
-                            serviceId = cartItem.ServiceId,
-                            serviceName = cartItem.Service?.Name ?? "",
-                            servicePrice = cartItem.Service?.Price ?? 0m,
-                            framePrice = cartItem.Product?.Price ?? 0m,
-                            frameName = cartItem.Product?.Name ?? ""
-                        });
-                    }
-
-                    var orderItem = new OrderItem
-                    {
-                        OrderId = order.OrderId,
-                        ProductId = cartItem.ProductId,   // luôn là Frame
-                        PrescriptionId = cartItem.PrescriptionId,
-                        PrescriptionFee = cartItem.PrescriptionFee,
-                        Quantity = cartItem.Quantity,
-                        UnitPrice = unitPrice,            // Frame + Lens + Service
-                        IsBundle = false,
-                        SnapshotJson = snapshotJson          // null nếu đơn thường
-                    };
-
-                    _context.OrderItems.Add(orderItem);
+                    var extractedLensId = CartService.ExtractLensProductId(ci.TempPrescriptionJson);
+                    if (extractedLensId.HasValue)
+                        customItems.Add(ci);
+                    else
+                        standardItems.Add(ci);
                 }
 
-                await _context.SaveChangesAsync();
+                // Generate a shared group ID if we have both types
+                bool hasBothTypes = customItems.Any() && standardItems.Any();
+                string? orderGroupId = hasBothTypes ? Guid.NewGuid().ToString("N") : null;
 
-                // COD PATH
+                var createdOrders = new List<Order>();
+
+                // ── Helper: create an order for a group of items ─────────────
+                async Task<Order> CreateOrderForGroup(
+                    List<CartItem> items, string orderType)
+                {
+                    // Calculate group total
+                    decimal groupTotal = 0m;
+                    foreach (var ci in items)
+                    {
+                        var lid = CartService.ExtractLensProductId(ci.TempPrescriptionJson);
+                        decimal up = ci.Product?.Price ?? 0m;
+                        if (lid.HasValue && lensProducts.TryGetValue(lid.Value, out var lp))
+                            up += lp.Price;
+                        if (ci.Service != null) up += ci.Service.Price;
+                        groupTotal += (up + ci.PrescriptionFee) * ci.Quantity;
+                    }
+
+                    var order = new Order
+                    {
+                        UserId = userId,
+                        ReceiverName = selectedAddress.ReceiverName,
+                        Phone = selectedAddress.Phone,
+                        AddressLine = selectedAddress.AddressLine,
+                        AddressId = selectedAddress.AddressId,
+                        TotalAmount = groupTotal,
+                        Status = PaymentMethod == "COD" ? "Pending Confirmation" : "Pending",
+                        PaymentMethod = PaymentMethod == "COD" ? "COD" : "Stripe",
+                        OrderType = orderType,
+                        OrderGroupId = orderGroupId,
+                        CreatedAt = DateTime.UtcNow
+                    };
+
+                    _context.Orders.Add(order);
+                    await _context.SaveChangesAsync();
+
+                    // Create order items
+                    foreach (var cartItem in items)
+                    {
+                        var lid = CartService.ExtractLensProductId(cartItem.TempPrescriptionJson);
+                        bool isServiceOrder = lid.HasValue;
+
+                        decimal unitPrice = cartItem.Product?.Price ?? 0m;
+
+                        Product? lensProduct = null;
+                        if (isServiceOrder && lid.HasValue && lensProducts.TryGetValue(lid.Value, out var lp))
+                        {
+                            lensProduct = lp;
+                            unitPrice += lp.Price;
+                        }
+
+                        if (cartItem.Service != null)
+                            unitPrice += cartItem.Service.Price;
+
+                        string? snapshotJson = null;
+                        if (isServiceOrder)
+                        {
+                            snapshotJson = JsonSerializer.Serialize(new
+                            {
+                                isServiceOrder = true,
+                                lensProductId = lid!.Value,
+                                lensProductName = lensProduct?.Name ?? "",
+                                lensPrice = lensProduct?.Price ?? 0m,
+                                serviceId = cartItem.ServiceId,
+                                serviceName = cartItem.Service?.Name ?? "",
+                                servicePrice = cartItem.Service?.Price ?? 0m,
+                                framePrice = cartItem.Product?.Price ?? 0m,
+                                frameName = cartItem.Product?.Name ?? ""
+                            });
+                        }
+
+                        var orderItem = new OrderItem
+                        {
+                            OrderId = order.OrderId,
+                            ProductId = cartItem.ProductId,
+                            PrescriptionId = cartItem.PrescriptionId,
+                            PrescriptionFee = cartItem.PrescriptionFee,
+                            Quantity = cartItem.Quantity,
+                            UnitPrice = unitPrice,
+                            IsBundle = false,
+                            SnapshotJson = snapshotJson
+                        };
+
+                        _context.OrderItems.Add(orderItem);
+                    }
+
+                    await _context.SaveChangesAsync();
+                    return order;
+                }
+
+                // ── Create order(s) ──────────────────────────────────────────
+                if (standardItems.Any())
+                    createdOrders.Add(await CreateOrderForGroup(standardItems, "Standard"));
+
+                if (customItems.Any())
+                    createdOrders.Add(await CreateOrderForGroup(customItems, "Custom"));
+
+                // ── COD PATH ─────────────────────────────────────────────────
                 if (PaymentMethod == "COD")
                 {
-                    foreach (var oi in order.OrderItems)
+                    foreach (var ord in createdOrders)
                     {
-                        var product = await _context.Products.FindAsync(oi.ProductId);
-                        if (product != null && product.InventoryQty.HasValue)
+                        // Reload order items for inventory deduction
+                        var orderWithItems = await _context.Orders
+                            .Include(o => o.OrderItems)
+                            .FirstAsync(o => o.OrderId == ord.OrderId);
+
+                        foreach (var oi in orderWithItems.OrderItems)
                         {
-                            product.InventoryQty -= oi.Quantity;
-                            if (product.InventoryQty < 0) product.InventoryQty = 0;
+                            var product = await _context.Products.FindAsync(oi.ProductId);
+                            if (product != null && product.InventoryQty.HasValue)
+                            {
+                                product.InventoryQty -= oi.Quantity;
+                                if (product.InventoryQty < 0) product.InventoryQty = 0;
+                            }
                         }
                     }
                     await _context.SaveChangesAsync();
                     await _cartService.ClearCartAsync(userId);
-                    return RedirectToPage("/Checkout/Success", new { order_id = order.OrderId });
+
+                    var orderIds = string.Join(",", createdOrders.Select(o => o.OrderId));
+                    return RedirectToPage("/Checkout/Success", new { order_ids = orderIds });
                 }
 
-                // STRIPE PATH
+                // ── STRIPE PATH ──────────────────────────────────────────────
                 var lineItems = new List<StripeLineItemDto>();
 
                 foreach (var ci in cart.CartItems)
@@ -249,7 +301,6 @@ namespace EyewearStore_SWP391.Pages.Checkout
                     if (ci.Service != null) unitPrice += ci.Service.Price;
                     decimal unitTotal = unitPrice + ci.PrescriptionFee;
 
-                    // Tên item hiển thị trên Stripe
                     var itemName = ci.Product?.Name ?? "Product";
                     if (lensId.HasValue && lensProducts.TryGetValue(lensId.Value, out var lp3))
                         itemName += $" + {lp3.Name}";
@@ -288,8 +339,9 @@ namespace EyewearStore_SWP391.Pages.Checkout
                              ?? User.FindFirst(ClaimTypes.Name)?.Value
                              ?? "";
 
+                var allOrderIds = createdOrders.Select(o => o.OrderId).ToList();
                 var stripeUrl = await _stripeService.CreateCheckoutSessionAsync(
-                    order.OrderId, lineItems, successUrl, cancelUrl, userEmail);
+                    allOrderIds, lineItems, successUrl, cancelUrl, userEmail);
 
                 return Redirect(stripeUrl);
             }

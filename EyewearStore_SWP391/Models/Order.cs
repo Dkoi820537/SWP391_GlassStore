@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -42,6 +42,19 @@ public partial class Order
 
     [Column("stripe_payment_intent_id")]
     public string? StripePaymentIntentId { get; set; }
+
+    /// <summary>
+    /// GUID that links sibling orders created from the same checkout session.
+    /// NULL if only one order was created (single-type cart).
+    /// </summary>
+    [Column("order_group_id")]
+    public string? OrderGroupId { get; set; }
+
+    /// <summary>
+    /// "Standard" for off-the-shelf products, "Custom" for custom lens/service orders.
+    /// </summary>
+    [Column("order_type")]
+    public string OrderType { get; set; } = "Standard";
 
     // Navigation
     public virtual User User { get; set; } = null!;

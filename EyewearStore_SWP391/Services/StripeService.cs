@@ -23,7 +23,7 @@ public class StripeService : IStripeService
 
     /// <inheritdoc />
     public async Task<string> CreateCheckoutSessionAsync(
-        int orderId,
+        List<int> orderIds,
         List<StripeLineItemDto> lineItems,
         string successUrl,
         string cancelUrl,
@@ -56,6 +56,9 @@ public class StripeService : IStripeService
             return li;
         }).ToList();
 
+        // Comma-separated order IDs for multi-order support
+        var orderIdsStr = string.Join(",", orderIds);
+
         var options = new SessionCreateOptions
         {
             PaymentMethodTypes = new List<string> { "card" },
@@ -64,26 +67,30 @@ public class StripeService : IStripeService
             SuccessUrl = successUrl + "?session_id={CHECKOUT_SESSION_ID}",
             CancelUrl = cancelUrl,
             CustomerEmail = customerEmail,
-            ClientReferenceId = orderId.ToString(),
+            ClientReferenceId = orderIdsStr,
             Metadata = new Dictionary<string, string>
             {
-                { "order_id", orderId.ToString() }
+                { "order_ids", orderIdsStr }
             }
         };
 
         var service = new SessionService();
         var session = await service.CreateAsync(options);
 
-        // Store the session ID on the order
-        var order = await _context.Orders.FindAsync(orderId);
-        if (order != null)
+        // Store the session ID on ALL orders in this group
+        foreach (var orderId in orderIds)
         {
-            order.StripeSessionId = session.Id;
-            await _context.SaveChangesAsync();
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order != null)
+            {
+                order.StripeSessionId = session.Id;
+            }
         }
+        await _context.SaveChangesAsync();
 
-        _logger.LogInformation("Created Stripe Checkout Session {SessionId} for Order {OrderId}",
-            session.Id, orderId);
+        _logger.LogInformation(
+            "Created Stripe Checkout Session {SessionId} for Orders [{OrderIds}]",
+            session.Id, orderIdsStr);
 
         return session.Url;
     }

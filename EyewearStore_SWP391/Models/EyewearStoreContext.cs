@@ -578,9 +578,18 @@ public partial class EyewearStoreContext : DbContext
             entity.Property(e => e.StripePaymentIntentId)
                 .HasMaxLength(255)
                 .HasColumnName("stripe_payment_intent_id");
+            entity.Property(e => e.OrderGroupId)
+                .HasMaxLength(36)
+                .HasColumnName("order_group_id");
+            entity.Property(e => e.OrderType)
+                .HasMaxLength(20)
+                .HasDefaultValue("Standard")
+                .HasColumnName("order_type");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("SYSDATETIME()")
                 .HasColumnName("created_at");
+
+            entity.HasIndex(e => e.OrderGroupId).HasDatabaseName("IX_orders_order_group");
 
             entity.HasOne(d => d.User)
                 .WithMany(p => p.Orders)

@@ -18,6 +18,9 @@ namespace EyewearStore_SWP391.Services
         /// <summary>Find an order by its Stripe Checkout Session ID.</summary>
         Task<Order?> GetOrderByStripeSessionIdAsync(string sessionId);
 
+        /// <summary>Find all orders sharing the same Stripe Checkout Session ID (split-order support).</summary>
+        Task<List<Order>> GetOrdersByStripeSessionIdAsync(string sessionId);
+
         /// <summary>Get all orders for a user, newest first.</summary>
         Task<List<Order>> GetOrdersByUserIdAsync(int userId);
 
@@ -35,5 +38,8 @@ namespace EyewearStore_SWP391.Services
 
         /// <summary>Get orders for a user (with items & product snapshots).</summary>
         Task<List<Order>> GetUserOrdersAsync(int userId);
+
+        /// <summary>Get all orders sharing the same OrderGroupId (split-order siblings).</summary>
+        Task<List<Order>> GetOrdersByGroupIdAsync(string orderGroupId);
     }
 }

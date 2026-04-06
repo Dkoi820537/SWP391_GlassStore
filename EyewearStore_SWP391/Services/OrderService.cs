@@ -303,7 +303,7 @@ namespace EyewearStore_SWP391.Services
             return order;
         }
 
-        // ── Retrieval methods (unchanged) ────────────────────────────────────
+        // ── Retrieval methods ─────────────────────────────────────────────────
 
         public async Task<Order?> GetOrderByIdAsync(int orderId)
             => await _context.Orders
@@ -314,7 +314,6 @@ namespace EyewearStore_SWP391.Services
                 .Include(o => o.Address)
                 .Include(o => o.User)
                 .Include(o => o.Shipments)
-                // ── Include status history for customer timeline ──────────────
                 .Include(o => o.StatusHistories)
                 .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
@@ -322,6 +321,34 @@ namespace EyewearStore_SWP391.Services
             => await _context.Orders
                 .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
                 .FirstOrDefaultAsync(o => o.StripeSessionId == sessionId);
+
+        /// <summary>
+        /// Returns ALL orders sharing the same Stripe session ID (split-order support).
+        /// </summary>
+        public async Task<List<Order>> GetOrdersByStripeSessionIdAsync(string sessionId)
+            => await _context.Orders
+                .Where(o => o.StripeSessionId == sessionId)
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
+                    .ThenInclude(p => p.ProductImages)
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Prescription)
+                .Include(o => o.Address)
+                .Include(o => o.StatusHistories)
+                .OrderBy(o => o.OrderType) // Custom first, then Standard
+                .ToListAsync();
+
+        /// <summary>
+        /// Returns all orders sharing the same OrderGroupId (split-order siblings).
+        /// </summary>
+        public async Task<List<Order>> GetOrdersByGroupIdAsync(string orderGroupId)
+            => await _context.Orders
+                .Where(o => o.OrderGroupId == orderGroupId)
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
+                    .ThenInclude(p => p.ProductImages)
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Prescription)
+                .Include(o => o.Address)
+                .Include(o => o.StatusHistories)
+                .OrderBy(o => o.OrderType)
+                .ToListAsync();
 
         public async Task<List<Order>> GetOrdersByUserIdAsync(int userId)
             => await _context.Orders

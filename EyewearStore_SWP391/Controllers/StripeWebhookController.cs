@@ -8,6 +8,7 @@ namespace EyewearStore_SWP391.Controllers;
 /// <summary>
 /// Handles Stripe webhook events. This endpoint receives POST requests from
 /// Stripe when payment events occur (e.g. checkout.session.completed).
+/// Supports split-order checkout: a single payment session may cover multiple orders.
 /// </summary>
 [ApiController]
 [Route("api/stripe")]
@@ -63,18 +64,50 @@ public class StripeWebhookController : ControllerBase
             if (session != null)
             {
                 _logger.LogInformation(
-                    "Checkout session completed: {SessionId}, PaymentIntent: {PaymentIntentId}, OrderId: {OrderId}",
+                    "Checkout session completed: {SessionId}, PaymentIntent: {PaymentIntentId}, OrderIds: {OrderIds}",
                     session.Id, session.PaymentIntentId, session.ClientReferenceId);
 
-                // Find the order by Stripe Session ID
-                var order = await _orderService.GetOrderByStripeSessionIdAsync(session.Id);
-                if (order != null)
+                // ── Multi-order support ──────────────────────────────────
+                // ClientReferenceId may contain comma-separated order IDs
+                // (e.g. "123,456") for split-order checkout.
+                var orderIdStrings = (session.ClientReferenceId ?? "")
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                if (orderIdStrings.Any())
                 {
-                    await _orderService.MarkOrderPaidAsync(order.OrderId, session.PaymentIntentId);
+                    foreach (var idStr in orderIdStrings)
+                    {
+                        if (int.TryParse(idStr.Trim(), out var orderId))
+                        {
+                            var order = await _orderService.GetOrderByIdAsync(orderId);
+                            if (order != null)
+                            {
+                                await _orderService.MarkOrderPaidAsync(order.OrderId, session.PaymentIntentId);
+                                _logger.LogInformation(
+                                    "Marked order {OrderId} as paid (split-order group)",
+                                    order.OrderId);
+                            }
+                            else
+                            {
+                                _logger.LogWarning(
+                                    "No order found for ID {OrderId} from session {SessionId}",
+                                    orderId, session.Id);
+                            }
+                        }
+                    }
                 }
                 else
                 {
-                    _logger.LogWarning("No order found for Stripe session {SessionId}", session.Id);
+                    // Fallback: look up by session ID (legacy single-order path)
+                    var order = await _orderService.GetOrderByStripeSessionIdAsync(session.Id);
+                    if (order != null)
+                    {
+                        await _orderService.MarkOrderPaidAsync(order.OrderId, session.PaymentIntentId);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("No order found for Stripe session {SessionId}", session.Id);
+                    }
                 }
             }
         }

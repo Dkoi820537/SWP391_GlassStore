@@ -472,6 +472,33 @@
         </div>
     }
 
+    @* ══════════════════════════════════════════════════════════════
+       💰 REVENUE SECTION — Admin Only (RBAC)
+       Manager role will NEVER see this block.
+       ══════════════════════════════════════════════════════════════ *@
+    @if (Model.IsAdmin)
+    {
+        <div class="sec-lbl" style="margin-top:8px">💰 Revenue</div>
+        <div class="stats-g" style="grid-template-columns:repeat(2,1fr)">
+            <div class="sc">
+                <div class="sc-ico i-gold"><i class="bi bi-cash-stack"></i></div>
+                <div>
+                    <div class="sc-lbl">Total Revenue</div>
+                    <div class="sc-val">@Model.Revenue.ToString("N0") ₫</div>
+                    <div class="sc-sub">All non-cancelled orders</div>
+                </div>
+            </div>
+            <div class="sc">
+                <div class="sc-ico i-ok"><i class="bi bi-graph-up-arrow"></i></div>
+                <div>
+                    <div class="sc-lbl">Today's Revenue</div>
+                    <div class="sc-val">@Model.RevenueToday.ToString("N0") ₫</div>
+                    <div class="sc-sub">Revenue earned today</div>
+                </div>
+            </div>
+        </div>
+    }
+
     <!-- STATS ROW 1: Orders -->
     <div class="sec-lbl" style="margin-top:8px">📦 Orders</div>
     <div class="stats-g">
@@ -561,7 +588,10 @@
                     <div class="ord-row">
                         <span class="ord-id">#@o.OrderId</span>
                         <span class="ord-name">@(o.CustomerName ?? "Guest")</span>
-                        <span class="ord-amt">@o.Total.ToString("N0") ₫</span>
+                        @if (Model.IsAdmin)
+                        {
+                            <span class="ord-amt">@o.Total.ToString("N0") ₫</span>
+                        }
                         <span class="bd bd-@o.Status">@o.Status</span>
                     </div>
                 }

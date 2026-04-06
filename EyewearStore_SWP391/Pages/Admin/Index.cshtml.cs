@@ -12,6 +12,12 @@ namespace EyewearStore_SWP391.Pages.Admin
         private readonly EyewearStoreContext _db;
         public IndexModel(EyewearStoreContext db) => _db = db;
 
+        /// <summary>
+        /// True when the logged-in user has the "admin" role.
+        /// Used to gate financial data on both backend and frontend.
+        /// </summary>
+        public bool IsAdmin => User.IsInRole("admin");
+
         // ── Order stats ───────────────────────────────────────────────────────
         public int OrderTotal { get; set; }
         public int OrderPending { get; set; }
@@ -48,10 +54,14 @@ namespace EyewearStore_SWP391.Pages.Admin
             OrderTotal = await orders.CountAsync();
             OrderPending = await orders.CountAsync(o => o.Status == "Pending" || o.Status == "Processing");
             OrderToday = await orders.CountAsync(o => o.CreatedAt.Date == today);
-            Revenue = await orders.Where(o => o.Status != "Cancelled")
-                                       .SumAsync(o => (decimal?)o.TotalAmount) ?? 0;
-            RevenueToday = await orders.Where(o => o.CreatedAt.Date == today && o.Status != "Cancelled")
-                                       .SumAsync(o => (decimal?)o.TotalAmount) ?? 0;
+            // ── Financial data: Admin-only (defense-in-depth) ──────────
+            if (IsAdmin)
+            {
+                Revenue = await orders.Where(o => o.Status != "Cancelled")
+                                           .SumAsync(o => (decimal?)o.TotalAmount) ?? 0;
+                RevenueToday = await orders.Where(o => o.CreatedAt.Date == today && o.Status != "Cancelled")
+                                           .SumAsync(o => (decimal?)o.TotalAmount) ?? 0;
+            }
 
             // ── Service orders (scan SnapshotJson) ───────────────────────────
             var allItems = await _db.OrderItems
@@ -122,6 +132,13 @@ namespace EyewearStore_SWP391.Pages.Admin
                     CreatedAt = o.CreatedAt
                 })
                 .ToListAsync();
+
+            // ── Strip financial data for non-admin (Manager) ──────────────────
+            if (!IsAdmin)
+            {
+                foreach (var o in RecentOrders)
+                    o.Total = 0;
+            }
 
             // ── Upcoming appointments (next 5) ────────────────────────────────
             UpcomingAppts = await _db.EyeExamAppointments

@@ -20,7 +20,6 @@ namespace EyewearStore_SWP391.Pages.Support.ServiceOrders
             _email = email;
         }
 
-        // Chỉ cho đi tiến, không cho lùi
         public static readonly string[] StatusFlow = { "Pending", "Processing", "Ready", "Done" };
 
         [BindProperty] public int OrderItemId { get; set; }
@@ -49,6 +48,13 @@ namespace EyewearStore_SWP391.Pages.Support.ServiceOrders
             var result = await LoadAsync(orderId);
             if (result != null) return result;
 
+            // ── Bắt buộc nhập tên kỹ thuật viên ─────────────────────────────
+            if (string.IsNullOrWhiteSpace(AssignedTo))
+            {
+                TempData["Error"] = "Vui lòng nhập tên kỹ thuật viên trước khi cập nhật trạng thái.";
+                return RedirectToPage("Detail", new { orderId });
+            }
+
             var currentStatus = Snap.ServiceStatus ?? "Pending";
             var nextStatus = GetNextStatus(currentStatus);
 
@@ -65,9 +71,30 @@ namespace EyewearStore_SWP391.Pages.Support.ServiceOrders
             foreach (var kv in doc.RootElement.EnumerateObject())
                 mutable[kv.Name] = JsonElementToObject(kv.Value);
 
+            // ── Lấy timeline hiện tại (hoặc tạo mới) ─────────────────────────
+            List<Dictionary<string, object?>> timeline = new();
+            if (mutable.TryGetValue("serviceTimeline", out var tlRaw) && tlRaw is string tlStr)
+            {
+                try
+                {
+                    timeline = JsonSerializer.Deserialize<List<Dictionary<string, object?>>>(tlStr) ?? new();
+                }
+                catch { timeline = new(); }
+            }
+
+            // ── Thêm milestone mới vào timeline ──────────────────────────────
+            timeline.Add(new Dictionary<string, object?>
+            {
+                ["status"] = nextStatus,
+                ["assignedTo"] = AssignedTo?.Trim(),
+                ["note"] = InternalNote,
+                ["timestamp"] = DateTime.UtcNow.ToString("o")
+            });
+
             mutable["serviceStatus"] = nextStatus;
-            mutable["assignedTo"] = AssignedTo;
+            mutable["assignedTo"] = AssignedTo?.Trim();
             mutable["internalNote"] = InternalNote;
+            mutable["serviceTimeline"] = JsonSerializer.Serialize(timeline);
 
             Item.SnapshotJson = JsonSerializer.Serialize(mutable);
             await _db.SaveChangesAsync();
@@ -86,10 +113,7 @@ namespace EyewearStore_SWP391.Pages.Support.ServiceOrders
                         assignedTo: AssignedTo,
                         note: InternalNote);
                 }
-                catch
-                {
-                    // non-fatal
-                }
+                catch { }
             }
 
             TempData["Success"] = $"Service status đã được cập nhật lên: {nextStatus}";
@@ -99,11 +123,8 @@ namespace EyewearStore_SWP391.Pages.Support.ServiceOrders
         private static string? GetNextStatus(string current)
         {
             var idx = Array.IndexOf(StatusFlow, current);
-
-            if (idx < 0) return null;          // status lạ
-            if (idx >= StatusFlow.Length - 1)  // Done thì không đi tiếp
-                return null;
-
+            if (idx < 0) return null;
+            if (idx >= StatusFlow.Length - 1) return null;
             return StatusFlow[idx + 1];
         }
 
@@ -163,5 +184,6 @@ namespace EyewearStore_SWP391.Pages.Support.ServiceOrders
         public string? ServiceStatus { get; set; }
         public string? AssignedTo { get; set; }
         public string? InternalNote { get; set; }
+        public string? ServiceTimeline { get; set; }  // JSON array string
     }
 }

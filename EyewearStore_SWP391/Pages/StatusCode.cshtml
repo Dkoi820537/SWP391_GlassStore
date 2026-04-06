@@ -1,12 +1,39 @@
-﻿@page "{code:int}"
+@page "{code:int}"
 @model EyewearStore_SWP391.Pages.StatusCodeModel
 @{
-    var code = RouteData.Values["code"]?.ToString();
-    bool is404 = code == "404";
-    bool is403 = code == "403";
+    var code = Model.StatusCodeValue;
+    bool is401 = code == 401;
+    bool is403 = code == 403;
+    bool is404 = code == 404;
 
-    ViewData["Title"] = is404 ? "Page Not Found" : is403 ? "Access Denied" : "Error " + code;
+    ViewData["Title"] = is404 ? "Page Not Found"
+                      : is401 ? "Authentication Required"
+                      : is403 ? "Access Denied"
+                      : "Error " + code;
     Layout = "_Layout";
+
+    // Determine gradient colors per error type
+    string gradientStart, gradientEnd;
+    if (is404)
+    {
+        gradientStart = "var(--teal)";
+        gradientEnd = "#5eead4";
+    }
+    else if (is401)
+    {
+        gradientStart = "#6366f1";
+        gradientEnd = "#a5b4fc";
+    }
+    else if (is403)
+    {
+        gradientStart = "#e53935";
+        gradientEnd = "#fca5a5";
+    }
+    else
+    {
+        gradientStart = "#d97706";
+        gradientEnd = "#fde68a";
+    }
 }
 
 @section Styles {
@@ -16,6 +43,7 @@
             --teal-dk: #005a51;
             --teal-lt: #e8f5f4;
             --red: #e53935;
+            --indigo: #6366f1;
             --text: #1a1a1a;
             --sub: #6b7280;
             --border: #e5e7eb;
@@ -40,29 +68,38 @@
             text-align: center;
             position: relative;
             overflow: hidden;
+            animation: scSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
-            .sc-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 5px;
-                background: linear-gradient(90deg, var(--teal), #5eead4, var(--teal));
-            }
+        @@keyframes scSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0);    }
+        }
 
+        .sc-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, @gradientStart, @gradientEnd, @gradientStart);
+        }
+
+        /* ── Big number ── */
         .sc-big-number {
             font-size: 96px;
             font-weight: 900;
             line-height: 1;
             margin-bottom: 4px;
-            background: linear-gradient(135deg, var(--teal), #5eead4);
+            background: linear-gradient(135deg, @gradientStart, @gradientEnd);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            animation: scFadeIn 0.5s 0.1s both;
         }
 
+        /* ── Icon circle ── */
         .sc-icon-wrap {
             width: 80px;
             height: 80px;
@@ -71,39 +108,41 @@
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
+            animation: scBounce 0.6s 0.2s both;
         }
 
-            .sc-icon-wrap.not-found {
-                background: #e8f5f4;
-                border: 3px solid #5eead4;
-            }
+        @@keyframes scBounce {
+            0%   { opacity: 0; transform: scale(0.5); }
+            60%  { transform: scale(1.08); }
+            100% { opacity: 1; transform: scale(1);   }
+        }
 
-            .sc-icon-wrap.forbidden {
-                background: #fff3f3;
-                border: 3px solid #fecaca;
-            }
+        .sc-icon-wrap.not-found {
+            background: #e8f5f4;
+            border: 3px solid #5eead4;
+        }
+        .sc-icon-wrap.unauthorized {
+            background: #eef2ff;
+            border: 3px solid #a5b4fc;
+        }
+        .sc-icon-wrap.forbidden {
+            background: #fff3f3;
+            border: 3px solid #fecaca;
+        }
+        .sc-icon-wrap.generic {
+            background: #fef9ee;
+            border: 3px solid #fde68a;
+        }
 
-            .sc-icon-wrap.generic {
-                background: #fef9ee;
-                border: 3px solid #fde68a;
-            }
+        .sc-icon-wrap i {
+            font-size: 32px;
+        }
+        .sc-icon-wrap.not-found i    { color: var(--teal);   }
+        .sc-icon-wrap.unauthorized i  { color: var(--indigo); }
+        .sc-icon-wrap.forbidden i     { color: var(--red);    }
+        .sc-icon-wrap.generic i       { color: #d97706;       }
 
-            .sc-icon-wrap i {
-                font-size: 32px;
-            }
-
-            .sc-icon-wrap.not-found i {
-                color: var(--teal);
-            }
-
-            .sc-icon-wrap.forbidden i {
-                color: var(--red);
-            }
-
-            .sc-icon-wrap.generic i {
-                color: #d97706;
-            }
-
+        /* ── Text ── */
         .sc-code-label {
             font-size: 12px;
             font-weight: 800;
@@ -111,6 +150,7 @@
             text-transform: uppercase;
             color: var(--sub);
             margin-bottom: 10px;
+            animation: scFadeIn 0.5s 0.3s both;
         }
 
         .sc-title {
@@ -119,6 +159,7 @@
             color: var(--text);
             margin: 0 0 14px;
             line-height: 1.3;
+            animation: scFadeIn 0.5s 0.35s both;
         }
 
         .sc-desc {
@@ -126,14 +167,22 @@
             color: var(--sub);
             line-height: 1.7;
             margin: 0 0 32px;
+            animation: scFadeIn 0.5s 0.4s both;
         }
 
+        @@keyframes scFadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0);    }
+        }
+
+        /* ── Action buttons ── */
         .sc-actions {
             display: flex;
             gap: 12px;
             justify-content: center;
             flex-wrap: wrap;
             margin-bottom: 28px;
+            animation: scFadeIn 0.5s 0.5s both;
         }
 
         .btn-home {
@@ -147,14 +196,36 @@
             text-decoration: none;
             font-size: 14px;
             font-weight: 700;
-            transition: background .2s, transform .15s;
+            transition: background .2s, transform .15s, box-shadow .2s;
         }
 
-            .btn-home:hover {
-                background: var(--teal-dk);
-                color: #fff;
-                transform: translateY(-2px);
-            }
+        .btn-home:hover {
+            background: var(--teal-dk);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 117, 106, 0.3);
+        }
+
+        .btn-login {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 28px;
+            background: var(--indigo);
+            color: #fff;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            transition: background .2s, transform .15s, box-shadow .2s;
+        }
+
+        .btn-login:hover {
+            background: #4f46e5;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+        }
 
         .btn-back {
             display: inline-flex;
@@ -172,16 +243,38 @@
             cursor: pointer;
         }
 
-            .btn-back:hover {
-                background: var(--teal-lt);
-                color: var(--teal);
-                transform: translateY(-2px);
-            }
+        .btn-back:hover {
+            background: var(--teal-lt);
+            color: var(--teal);
+            transform: translateY(-2px);
+        }
 
-        /* Quick links */
+        .btn-shop {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 28px;
+            background: #fff;
+            color: var(--teal);
+            border: 2px solid var(--teal);
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            transition: background .2s, transform .15s;
+        }
+
+        .btn-shop:hover {
+            background: var(--teal-lt);
+            color: var(--teal);
+            transform: translateY(-2px);
+        }
+
+        /* ── Quick links ── */
         .sc-quick-links {
             border-top: 1px solid var(--border);
             padding-top: 24px;
+            animation: scFadeIn 0.5s 0.6s both;
         }
 
         .sc-quick-label {
@@ -214,12 +307,26 @@
             transition: background .15s, transform .15s;
         }
 
-            .sc-link-chip:hover {
-                background: #c5e8e5;
-                color: var(--teal-dk);
-                transform: translateY(-2px);
-            }
+        .sc-link-chip:hover {
+            background: #c5e8e5;
+            color: var(--teal-dk);
+            transform: translateY(-2px);
+        }
 
+        /* ── SVG illustration area ── */
+        .sc-illustration {
+            margin: 0 auto 12px;
+            width: 120px;
+            height: 120px;
+            animation: scBounce 0.6s 0.1s both;
+        }
+
+        .sc-illustration svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ── Background decoration ── */
         .bg-glasses {
             position: absolute;
             bottom: -14px;
@@ -247,7 +354,7 @@
                 flex-direction: column;
             }
 
-            .btn-home, .btn-back {
+            .btn-home, .btn-back, .btn-login, .btn-shop {
                 width: 100%;
                 justify-content: center;
             }
@@ -259,6 +366,63 @@
     <div class="sc-card">
         <i class="bi bi-eyeglasses bg-glasses"></i>
 
+        @* ── SVG illustrations per error type ── *@
+        @if (is404)
+        {
+            <div class="sc-illustration">
+                <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Magnifying glass with question mark -->
+                    <circle cx="52" cy="52" r="32" fill="#e8f5f4" stroke="#5eead4" stroke-width="3"/>
+                    <circle cx="52" cy="52" r="22" fill="#fff" stroke="#00756A" stroke-width="2"/>
+                    <text x="52" y="60" text-anchor="middle" font-size="28" font-weight="800" fill="#00756A">?</text>
+                    <line x1="76" y1="76" x2="100" y2="100" stroke="#00756A" stroke-width="6" stroke-linecap="round"/>
+                    <!-- Broken glasses hint -->
+                    <path d="M30 40 Q40 32 52 40" stroke="#5eead4" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>
+                </svg>
+            </div>
+        }
+        else if (is401)
+        {
+            <div class="sc-illustration">
+                <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Person silhouette with lock -->
+                    <circle cx="60" cy="38" r="18" fill="#eef2ff" stroke="#a5b4fc" stroke-width="2.5"/>
+                    <path d="M30 95c0-16.6 13.4-30 30-30s30 13.4 30 30" fill="#eef2ff" stroke="#a5b4fc" stroke-width="2.5"/>
+                    <!-- Lock overlay -->
+                    <rect x="48" y="52" width="24" height="18" rx="3" fill="#6366f1" opacity="0.9"/>
+                    <rect x="53" y="44" width="14" height="12" rx="7" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+                    <circle cx="60" cy="62" r="2.5" fill="#fff"/>
+                    <line x1="60" y1="64" x2="60" y2="67" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+        }
+        else if (is403)
+        {
+            <div class="sc-illustration">
+                <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Shield with X -->
+                    <path d="M60 12L20 32v28c0 24 16.8 46 40 52 23.2-6 40-28 40-52V32L60 12z"
+                          fill="#fff3f3" stroke="#fca5a5" stroke-width="2.5"/>
+                    <path d="M60 22L28 38v22c0 20 13.5 38.4 32 43 18.5-4.6 32-23 32-43V38L60 22z"
+                          fill="#fef2f2"/>
+                    <circle cx="60" cy="56" r="18" fill="#fee2e2" stroke="#e53935" stroke-width="2"/>
+                    <path d="M52 48l16 16M68 48L52 64" stroke="#e53935" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+            </div>
+        }
+        else
+        {
+            <div class="sc-illustration">
+                <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Warning triangle -->
+                    <path d="M60 18L10 100h100L60 18z" fill="#fef9ee" stroke="#fde68a" stroke-width="2.5"/>
+                    <path d="M60 28L18 94h84L60 28z" fill="#fffbeb"/>
+                    <rect x="56" y="50" width="8" height="22" rx="4" fill="#d97706"/>
+                    <circle cx="60" cy="82" r="5" fill="#d97706"/>
+                </svg>
+            </div>
+        }
+
         <div class="sc-big-number">@code</div>
 
         @if (is404)
@@ -267,16 +431,28 @@
                 <i class="bi bi-search"></i>
             </div>
             <div class="sc-code-label">Page Not Found</div>
-            <h1 class="sc-title">This page doesn't exist</h1>
+            <h1 class="sc-title">We can't find that page</h1>
             <p class="sc-desc">
                 The product or page you're looking for may have been removed,
-                renamed, or is temporarily unavailable.
+                renamed, or is temporarily unavailable. Double-check the URL or explore our store.
+            </p>
+        }
+        else if (is401)
+        {
+            <div class="sc-icon-wrap unauthorized">
+                <i class="bi bi-person-lock"></i>
+            </div>
+            <div class="sc-code-label">Authentication Required</div>
+            <h1 class="sc-title">Please log in to continue</h1>
+            <p class="sc-desc">
+                You need to be signed in to access this page.
+                Log in with your account or create a new one to get started.
             </p>
         }
         else if (is403)
         {
             <div class="sc-icon-wrap forbidden">
-                <i class="bi bi-lock-fill"></i>
+                <i class="bi bi-shield-lock-fill"></i>
             </div>
             <div class="sc-code-label">Access Denied</div>
             <h1 class="sc-title">You don't have permission</h1>
@@ -301,15 +477,49 @@
             <a href="/" class="btn-home">
                 <i class="bi bi-house-fill"></i> Go to Homepage
             </a>
+
+            @if (is401)
+            {
+                <a href="/Account/Login" class="btn-login">
+                    <i class="bi bi-box-arrow-in-right"></i> Log In
+                </a>
+            }
+            else if (is403 && !(User.Identity?.IsAuthenticated ?? false))
+            {
+                <a href="/Account/Login" class="btn-login">
+                    <i class="bi bi-box-arrow-in-right"></i> Log In
+                </a>
+            }
+
             <button onclick="history.back()" class="btn-back">
                 <i class="bi bi-arrow-left"></i> Go Back
             </button>
         </div>
 
-        @if (is404)
+        @* ── Quick-links for 404 and 401 ── *@
+        @if (is404 || is401)
         {
             <div class="sc-quick-links">
-                <div class="sc-quick-label">You might be looking for</div>
+                <div class="sc-quick-label">
+                    @(is404 ? "You might be looking for" : "Popular destinations")
+                </div>
+                <div class="sc-links-row">
+                    <a href="/Products?ProductTypeFilter=Frame" class="sc-link-chip">
+                        <i class="bi bi-eyeglasses"></i> Frames
+                    </a>
+                    <a href="/Products?ProductTypeFilter=Lens" class="sc-link-chip">
+                        <i class="bi bi-circle"></i> Lenses
+                    </a>
+                    <a href="/Customer/Services/CustomGlasses" class="sc-link-chip">
+                        <i class="bi bi-tools"></i> Services
+                    </a>
+                </div>
+            </div>
+        }
+        else if (is403)
+        {
+            <div class="sc-quick-links">
+                <div class="sc-quick-label">Browse instead</div>
                 <div class="sc-links-row">
                     <a href="/Products?ProductTypeFilter=Frame" class="sc-link-chip">
                         <i class="bi bi-eyeglasses"></i> Frames

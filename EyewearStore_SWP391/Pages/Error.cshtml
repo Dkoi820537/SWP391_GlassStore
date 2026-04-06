@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model EyewearStore_SWP391.Pages.ErrorModel
 @{
     ViewData["Title"] = "Oops! Something went wrong";
@@ -9,6 +9,7 @@
     <style>
         :root {
             --teal: #00756A;
+            --teal-dk: #005a51;
             --teal-lt: #e8f5f4;
             --red: #e53935;
             --text: #1a1a1a;
@@ -22,7 +23,7 @@
             align-items: center;
             justify-content: center;
             padding: 60px 24px;
-            background: linear-gradient(135deg, #f9fafb 0%, #e8f5f4 100%);
+            background: linear-gradient(135deg, #f9fafb 0%, #fef2f2 50%, #e8f5f4 100%);
         }
 
         .error-card {
@@ -30,47 +31,78 @@
             border-radius: 24px;
             box-shadow: 0 8px 48px rgba(0,0,0,0.10);
             padding: 56px 48px 48px;
-            max-width: 540px;
+            max-width: 560px;
             width: 100%;
             text-align: center;
             position: relative;
             overflow: hidden;
+            animation: errSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
-            .error-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 5px;
-                background: linear-gradient(90deg, var(--teal), #5eead4, var(--teal));
-            }
-
-        .error-icon-wrap {
-            width: 96px;
-            height: 96px;
-            background: #fff3f3;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-            border: 3px solid #fecaca;
+        @@keyframes errSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0);    }
         }
 
-            .error-icon-wrap i {
-                font-size: 42px;
-                color: var(--red);
-            }
+        .error-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--red), #fca5a5, var(--red));
+        }
 
+        /* ── SVG Illustration ── */
+        .error-illustration {
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 16px;
+            animation: errBounce 0.6s 0.1s both;
+        }
+
+        @@keyframes errBounce {
+            0%   { opacity: 0; transform: scale(0.5); }
+            60%  { transform: scale(1.06); }
+            100% { opacity: 1; transform: scale(1);   }
+        }
+
+        .error-illustration svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Gear spin animation inside SVG */
+        .gear-spin {
+            transform-origin: center;
+            animation: gearRotate 4s linear infinite;
+        }
+
+        @@keyframes gearRotate {
+            from { transform: rotate(0deg);   }
+            to   { transform: rotate(360deg); }
+        }
+
+        .gear-spin-reverse {
+            transform-origin: center;
+            animation: gearRotateReverse 5s linear infinite;
+        }
+
+        @@keyframes gearRotateReverse {
+            from { transform: rotate(360deg); }
+            to   { transform: rotate(0deg);   }
+        }
+
+        /* ── Text ── */
         .error-code {
             font-size: 13px;
             font-weight: 800;
             letter-spacing: 2px;
-            color: var(--teal);
+            color: var(--red);
             text-transform: uppercase;
             margin-bottom: 12px;
+            animation: errFadeIn 0.5s 0.25s both;
         }
 
         .error-title {
@@ -79,6 +111,7 @@
             color: var(--text);
             margin: 0 0 14px;
             line-height: 1.3;
+            animation: errFadeIn 0.5s 0.35s both;
         }
 
         .error-desc {
@@ -86,13 +119,22 @@
             color: var(--sub);
             line-height: 1.7;
             margin: 0 0 32px;
+            animation: errFadeIn 0.5s 0.45s both;
         }
 
+        @@keyframes errFadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0);    }
+        }
+
+        /* ── Action buttons ── */
         .error-actions {
             display: flex;
             gap: 12px;
             justify-content: center;
             flex-wrap: wrap;
+            margin-bottom: 28px;
+            animation: errFadeIn 0.5s 0.55s both;
         }
 
         .btn-home {
@@ -106,16 +148,17 @@
             text-decoration: none;
             font-size: 14px;
             font-weight: 700;
-            transition: background .2s, transform .15s;
+            transition: background .2s, transform .15s, box-shadow .2s;
         }
 
-            .btn-home:hover {
-                background: #005a51;
-                color: #fff;
-                transform: translateY(-2px);
-            }
+        .btn-home:hover {
+            background: var(--teal-dk);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 117, 106, 0.3);
+        }
 
-        .btn-back {
+        .btn-retry {
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -129,32 +172,102 @@
             font-weight: 700;
             transition: background .2s, transform .15s;
             cursor: pointer;
+            border-style: solid;
         }
 
-            .btn-back:hover {
-                background: var(--teal-lt);
-                color: var(--teal);
-                transform: translateY(-2px);
-            }
+        .btn-retry:hover {
+            background: var(--teal-lt);
+            color: var(--teal);
+            transform: translateY(-2px);
+        }
 
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 28px;
+            background: #fff;
+            color: var(--sub);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            transition: background .2s, transform .15s;
+            cursor: pointer;
+        }
+
+        .btn-back:hover {
+            background: #f9fafb;
+            color: var(--text);
+            transform: translateY(-2px);
+        }
+
+        /* ── Request ID ── */
         .request-id {
-            margin-top: 28px;
+            margin-top: 0;
             padding: 12px 16px;
             background: #f9fafb;
             border-radius: 8px;
             font-size: 12px;
             color: var(--sub);
             word-break: break-all;
+            animation: errFadeIn 0.5s 0.65s both;
         }
 
-            .request-id code {
-                font-size: 11px;
-                color: #374151;
-                background: #e5e7eb;
-                padding: 2px 6px;
-                border-radius: 4px;
-            }
+        .request-id code {
+            font-size: 11px;
+            color: #374151;
+            background: #e5e7eb;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
 
+        /* ── Quick links ── */
+        .error-quick-links {
+            border-top: 1px solid var(--border);
+            padding-top: 24px;
+            margin-top: 24px;
+            animation: errFadeIn 0.5s 0.7s both;
+        }
+
+        .error-quick-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--sub);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+
+        .error-links-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .error-link-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: var(--teal-lt);
+            color: var(--teal);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background .15s, transform .15s;
+        }
+
+        .error-link-chip:hover {
+            background: #c5e8e5;
+            color: var(--teal-dk);
+            transform: translateY(-2px);
+        }
+
+        /* ── Background decoration ── */
         .error-glasses {
             position: absolute;
             bottom: -10px;
@@ -174,11 +287,16 @@
                 font-size: 22px;
             }
 
+            .error-illustration {
+                width: 100px;
+                height: 100px;
+            }
+
             .error-actions {
                 flex-direction: column;
             }
 
-            .btn-home, .btn-back {
+            .btn-home, .btn-retry, .btn-back {
                 width: 100%;
                 justify-content: center;
             }
@@ -190,8 +308,41 @@
     <div class="error-card">
         <i class="bi bi-eyeglasses error-glasses"></i>
 
-        <div class="error-icon-wrap">
-            <i class="bi bi-exclamation-triangle-fill"></i>
+        <!-- Animated broken-gears illustration -->
+        <div class="error-illustration">
+            <svg viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background circle -->
+                <circle cx="65" cy="65" r="58" fill="#fff3f3" stroke="#fecaca" stroke-width="2"/>
+
+                <!-- Large gear (spins) -->
+                <g class="gear-spin" style="transform-origin: 55px 58px;">
+                    <circle cx="55" cy="58" r="20" fill="#fee2e2" stroke="#e53935" stroke-width="2"/>
+                    <circle cx="55" cy="58" r="8" fill="#fff" stroke="#e53935" stroke-width="1.5"/>
+                    <!-- Gear teeth -->
+                    <rect x="51" y="35" width="8" height="8" rx="1.5" fill="#e53935"/>
+                    <rect x="51" y="73" width="8" height="8" rx="1.5" fill="#e53935"/>
+                    <rect x="32" y="54" width="8" height="8" rx="1.5" fill="#e53935"/>
+                    <rect x="70" y="54" width="8" height="8" rx="1.5" fill="#e53935"/>
+                    <rect x="37" y="40" width="7" height="7" rx="1.5" fill="#e53935" transform="rotate(45 40.5 43.5)"/>
+                    <rect x="66" y="40" width="7" height="7" rx="1.5" fill="#e53935" transform="rotate(45 69.5 43.5)"/>
+                    <rect x="37" y="69" width="7" height="7" rx="1.5" fill="#e53935" transform="rotate(45 40.5 72.5)"/>
+                    <rect x="66" y="69" width="7" height="7" rx="1.5" fill="#e53935" transform="rotate(45 69.5 72.5)"/>
+                </g>
+
+                <!-- Small gear (spins reverse) -->
+                <g class="gear-spin-reverse" style="transform-origin: 88px 45px;">
+                    <circle cx="88" cy="45" r="12" fill="#fee2e2" stroke="#fb7185" stroke-width="1.5"/>
+                    <circle cx="88" cy="45" r="5" fill="#fff" stroke="#fb7185" stroke-width="1.2"/>
+                    <rect x="85" y="30" width="6" height="5" rx="1" fill="#fb7185"/>
+                    <rect x="85" y="55" width="6" height="5" rx="1" fill="#fb7185"/>
+                    <rect x="73" y="42" width="5" height="6" rx="1" fill="#fb7185"/>
+                    <rect x="98" y="42" width="5" height="6" rx="1" fill="#fb7185"/>
+                </g>
+
+                <!-- Exclamation mark -->
+                <rect x="61" y="88" width="8" height="20" rx="4" fill="#e53935"/>
+                <circle cx="65" cy="116" r="4.5" fill="#e53935"/>
+            </svg>
         </div>
 
         <div class="error-code">500 — Server Error</div>
@@ -205,6 +356,9 @@
             <a href="/" class="btn-home">
                 <i class="bi bi-house-fill"></i> Go to Homepage
             </a>
+            <button onclick="location.reload()" class="btn-retry">
+                <i class="bi bi-arrow-clockwise"></i> Try Again
+            </button>
             <button onclick="history.back()" class="btn-back">
                 <i class="bi bi-arrow-left"></i> Go Back
             </button>
@@ -213,8 +367,23 @@
         @if (Model.ShowRequestId)
         {
             <div class="request-id">
-                Request ID: <code>@Model.RequestId</code>
+                If reporting this issue, include Request ID: <code>@Model.RequestId</code>
             </div>
         }
+
+        <div class="error-quick-links">
+            <div class="error-quick-label">Continue browsing</div>
+            <div class="error-links-row">
+                <a href="/Products?ProductTypeFilter=Frame" class="error-link-chip">
+                    <i class="bi bi-eyeglasses"></i> Frames
+                </a>
+                <a href="/Products?ProductTypeFilter=Lens" class="error-link-chip">
+                    <i class="bi bi-circle"></i> Lenses
+                </a>
+                <a href="/Customer/Services/CustomGlasses" class="error-link-chip">
+                    <i class="bi bi-tools"></i> Services
+                </a>
+            </div>
+        </div>
     </div>
 </div>

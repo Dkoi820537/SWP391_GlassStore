@@ -222,7 +222,6 @@
                 margin: 0;
             }
 
-        /* ── Search bar ── */
         .search-bar-wrap {
             display: flex;
             align-items: center;
@@ -286,7 +285,6 @@
                 color: var(--txt);
             }
 
-        /* ── Product grids ── */
         .prod-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill,minmax(170px,1fr));
@@ -370,7 +368,6 @@
             color: var(--gold);
         }
 
-        /* ── View Detail button ── */
         .btn-view-detail {
             position: absolute;
             top: 7px;
@@ -396,7 +393,6 @@
                 border-color: var(--navy);
             }
 
-        /* ── Service grid ── */
         .svc-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill,minmax(210px,1fr));
@@ -483,7 +479,6 @@
             font-weight: 500;
         }
 
-        /* ── Prescription cards ── */
         .rx-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill,minmax(240px,1fr));
@@ -588,7 +583,6 @@
                 color: var(--txt);
             }
 
-        /* ── Inline create form ── */
         .rx-create-toggle {
             display: inline-flex;
             align-items: center;
@@ -628,17 +622,14 @@
             margin-bottom: 16px;
         }
 
-        .rx-form-group {
+        .rx-form-group h4 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            color: var(--muted);
+            margin: 0 0 10px;
         }
-
-            .rx-form-group h4 {
-                font-size: 12px;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: .8px;
-                color: var(--muted);
-                margin: 0 0 10px;
-            }
 
         .rx-field-row {
             display: grid;
@@ -729,7 +720,6 @@
                 color: #ef4444;
             }
 
-        /* ── Summary card ── */
         .summary-card {
             background: var(--surf);
             border: 2px solid var(--bdr);
@@ -840,7 +830,6 @@
             color: var(--gold);
         }
 
-        /* ── Nav buttons ── */
         .nav-btns {
             display: flex;
             gap: 12px;
@@ -919,7 +908,6 @@
                 box-shadow: 0 8px 24px rgba(5,150,105,.35);
             }
 
-        /* ── Empty state ── */
         .empty-state {
             text-align: center;
             padding: 48px 24px;
@@ -936,7 +924,6 @@
                 margin-bottom: 12px;
             }
 
-        /* ── Mini selected pills ── */
         .mini-sel {
             display: flex;
             gap: 8px;
@@ -957,7 +944,6 @@
             color: var(--acc);
         }
 
-        /* ── Pagination ── */
         .pager {
             display: flex;
             align-items: center;
@@ -1016,7 +1002,6 @@
             margin-left: 6px;
         }
 
-        /* ── Detail Modal ── */
         .clf-modal-overlay {
             display: none;
             position: fixed;
@@ -1036,25 +1021,26 @@
         .clf-modal {
             background: var(--surf);
             border-radius: 20px;
-            max-width: 480px;
+            max-width: 520px;
             width: 100%;
             box-shadow: 0 28px 70px rgba(0,0,0,.22);
             overflow: hidden;
             animation: modalIn .22s cubic-bezier(.34,1.56,.64,1);
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
         }
+
         @@keyframes modalIn {
-            from
+            from {
+                opacity: 0;
+                transform: scale(.93) translateY(14px);
+            }
 
-        {
-            opacity: 0;
-            transform: scale(.93) translateY(14px);
-        }
-
-        to {
-            opacity: 1;
-            transform: none;
-        }
-
+            to {
+                opacity: 1;
+                transform: none;
+            }
         }
 
         .clf-modal-header {
@@ -1063,6 +1049,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-shrink: 0;
         }
 
             .clf-modal-header h3 {
@@ -1093,13 +1080,18 @@
                 background: rgba(255,255,255,.28);
             }
 
+        .clf-modal-scroll {
+            overflow-y: auto;
+            flex: 1;
+        }
+
         .clf-modal-body {
             padding: 22px 24px 16px;
         }
 
         .clf-modal-img {
             width: 100%;
-            max-height: 190px;
+            max-height: 200px;
             object-fit: cover;
             border-radius: 12px;
             margin-bottom: 18px;
@@ -1108,7 +1100,7 @@
 
         .clf-modal-img-ph {
             width: 100%;
-            height: 150px;
+            height: 120px;
             background: var(--bg2);
             border-radius: 12px;
             display: flex;
@@ -1146,7 +1138,7 @@
         .clf-modal-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             font-size: 13px;
             padding: 10px 14px;
             border-bottom: 1px solid var(--bdr);
@@ -1168,18 +1160,24 @@
                 font-size: 10px;
                 letter-spacing: .7px;
                 flex-shrink: 0;
+                min-width: 110px;
+                padding-top: 2px;
             }
 
             .clf-modal-row .val {
                 color: var(--txt);
                 font-weight: 600;
                 text-align: right;
+                line-height: 1.45;
             }
 
         .clf-modal-footer {
             display: flex;
             gap: 10px;
             padding: 16px 24px 22px;
+            flex-shrink: 0;
+            border-top: 1px solid var(--bdr);
+            background: var(--surf);
         }
 
         .btn-modal-select {
@@ -1217,6 +1215,24 @@
                 background: #e2e8f0;
                 color: var(--txt);
             }
+
+        .modal-tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            justify-content: flex-end;
+        }
+
+        .modal-tag {
+            display: inline-block;
+            background: var(--bg2);
+            border: 1px solid rgba(37,99,235,.15);
+            color: var(--acc);
+            border-radius: 100px;
+            padding: 2px 9px;
+            font-size: 11px;
+            font-weight: 600;
+        }
     </style>
 }
 
@@ -1261,7 +1277,9 @@
         </div>
     </div>
 
-    <!-- STEP 1: FRAME -->
+    <!-- ═══════════════════════════════════════════════════════════
+         STEP 1: FRAME
+    ═══════════════════════════════════════════════════════════ -->
     <div class="clf-panel active" id="panel1">
         <div class="panel-heading">
             <div class="step-count"><i class="bi bi-1-circle"></i> <span class="step-label-1">Step 1 of 5</span></div>
@@ -1270,11 +1288,14 @@
         </div>
         @if (Model.Frames.Any())
         {
-            <!-- Search bar: Frame -->
             <div class="search-bar-wrap">
                 <i class="bi bi-search"></i>
-                <input type="text" id="searchFrame" placeholder="Search frames by name..." oninput="filterGrid('frameGrid','frameGridPager','searchFrame','frameCount')" />
-                <button class="search-clear" id="clearFrame" onclick="clearSearch('searchFrame','frameGrid','frameGridPager','frameCount','clearFrame')">&#10005;</button>
+                <input type="text" id="searchFrame" placeholder="Search frames by name..."
+                       oninput="filterGrid('frameGrid','frameGridPager','searchFrame','frameCount')" />
+                <button class="search-clear" id="clearFrame"
+                        onclick="clearSearch('searchFrame','frameGrid','frameGridPager','frameCount','clearFrame')">
+                    &#10005;
+                </button>
                 <span class="search-count" id="frameCount"></span>
             </div>
             <div class="prod-grid" id="frameGrid">
@@ -1286,6 +1307,22 @@
                          data-name="@f.Name"
                          data-price="@f.Price"
                          data-img="@(img ?? "")"
+                         data-sku="@(f.Sku ?? "")"
+                         data-brand="@(f.Brand ?? "")"
+                         data-material="@(f.FrameMaterial ?? "")"
+                         data-frame-type="@(f.FrameType ?? "")"
+                         data-frame-shape="@(f.FrameShape ?? "")"
+                         data-color="@(f.Color ?? "")"
+                         data-gender="@(f.Gender ?? "")"
+                         data-origin="@(f.Origin ?? "")"
+                         data-lens-width="@(f.LensWidth?.ToString("0.#") ?? "")"
+                         data-bridge="@(f.BridgeWidth?.ToString("0.#") ?? "")"
+                         data-temple="@(f.TempleLength?.ToString("0.#") ?? "")"
+                         data-face-shapes="@(f.SuitableFaceShapes ?? "")"
+                         data-style-tags="@(f.StyleTags ?? "")"
+                         data-uv="@(f.HasUvProtection.HasValue ? (f.HasUvProtection.Value ? "true" : "false") : "")"
+                         data-polarized="@(f.IsPolarized.HasValue ? (f.IsPolarized.Value ? "true" : "false") : "")"
+                         data-stock="@(f.InventoryQty?.ToString() ?? "")"
                          onclick="selectFrame(this)">
                         <button class="btn-view-detail" onclick="openFrameDetail(event, this.closest('.prod-card'))">
                             <i class="bi bi-eye"></i> Detail
@@ -1319,7 +1356,9 @@
         </div>
     </div>
 
-    <!-- STEP 2: LENS -->
+    <!-- ═══════════════════════════════════════════════════════════
+         STEP 2: LENS
+    ═══════════════════════════════════════════════════════════ -->
     <div class="clf-panel" id="panel2">
         <div class="panel-heading">
             <div class="step-count"><i class="bi bi-2-circle"></i> <span class="step-label-2">Step 2 of 5</span></div>
@@ -1329,11 +1368,14 @@
         <div class="mini-sel" id="miniSel2"></div>
         @if (Model.Lenses.Any())
         {
-            <!-- Search bar: Lens -->
             <div class="search-bar-wrap">
                 <i class="bi bi-search"></i>
-                <input type="text" id="searchLens" placeholder="Search lenses by name..." oninput="filterGrid('lensGrid','lensGridPager','searchLens','lensCount')" />
-                <button class="search-clear" id="clearLens" onclick="clearSearch('searchLens','lensGrid','lensGridPager','lensCount','clearLens')">&#10005;</button>
+                <input type="text" id="searchLens" placeholder="Search lenses by name..."
+                       oninput="filterGrid('lensGrid','lensGridPager','searchLens','lensCount')" />
+                <button class="search-clear" id="clearLens"
+                        onclick="clearSearch('searchLens','lensGrid','lensGridPager','lensCount','clearLens')">
+                    &#10005;
+                </button>
                 <span class="search-count" id="lensCount"></span>
             </div>
             <div class="prod-grid" id="lensGrid">
@@ -1346,6 +1388,15 @@
                          data-price="@l.Price"
                          data-img="@(img ?? "")"
                          data-lens-type="@(l.LensType ?? "")"
+                         data-sku="@(l.Sku ?? "")"
+                         data-brand="@(l.Brand ?? "")"
+                         data-material="@(l.LensMaterial ?? "")"
+                         data-coating=""
+                         data-index=""
+                         data-uv-protection=""
+                         data-anti-reflect=""
+                         data-blue-light=""
+                         data-stock="@(l.InventoryQty?.ToString() ?? "")"
                          onclick="selectLens(this)">
                         <button class="btn-view-detail" onclick="openLensDetail(event, this.closest('.prod-card'))">
                             <i class="bi bi-eye"></i> Detail
@@ -1380,7 +1431,9 @@
         </div>
     </div>
 
-    <!-- STEP 3: PRESCRIPTION (conditional) -->
+    <!-- ═══════════════════════════════════════════════════════════
+         STEP 3: PRESCRIPTION (conditional)
+    ═══════════════════════════════════════════════════════════ -->
     <div class="clf-panel" id="panel3">
         <div class="panel-heading">
             <div class="step-count"><i class="bi bi-3-circle"></i> <span class="step-label-3">Step 3 of 5</span></div>
@@ -1390,7 +1443,6 @@
         <div class="mini-sel" id="miniSel3"></div>
 
         <div class="rx-grid" id="rxGrid">
-            <!-- Skip card -->
             <div class="rx-card skip-card selected" onclick="selectPrescription(this, null)" data-rx-id="">
                 <div class="skip-icon">🚫</div>
                 <div class="skip-text">No Prescription<br><small style="color:var(--muted);font-weight:400">Skip this step</small></div>
@@ -1398,7 +1450,9 @@
 
             @foreach (var rx in Model.PrescriptionProfiles)
             {
-                <div class="rx-card" onclick="selectPrescription(this, @rx.PrescriptionId)" data-rx-id="@rx.PrescriptionId"
+                <div class="rx-card"
+                     onclick="selectPrescription(this, @rx.PrescriptionId)"
+                     data-rx-id="@rx.PrescriptionId"
                      data-rx-name="@rx.ProfileName"
                      data-rx-lsph="@(rx.LeftSph?.ToString("0.00") ?? "")"
                      data-rx-lcyl="@(rx.LeftCyl?.ToString("0.00") ?? "")"
@@ -1427,7 +1481,6 @@
             }
         </div>
 
-        <!-- Inline create new -->
         <button class="rx-create-toggle" onclick="toggleRxForm()">
             <i class="bi bi-plus-circle"></i> Create a new prescription profile
         </button>
@@ -1468,7 +1521,9 @@
         </div>
     </div>
 
-    <!-- STEP 4: SERVICE -->
+    <!-- ═══════════════════════════════════════════════════════════
+         STEP 4: SERVICE
+    ═══════════════════════════════════════════════════════════ -->
     <div class="clf-panel" id="panel4">
         <div class="panel-heading">
             <div class="step-count"><i class="bi bi-4-circle"></i> <span class="step-label-4">Step 4 of 5</span></div>
@@ -1478,11 +1533,14 @@
         <div class="mini-sel" id="miniSel4"></div>
         @if (Model.Services.Any())
         {
-            <!-- Search bar: Service -->
             <div class="search-bar-wrap">
                 <i class="bi bi-search"></i>
-                <input type="text" id="searchService" placeholder="Search services by name..." oninput="filterGrid('serviceGrid','serviceGridPager','searchService','serviceCount')" />
-                <button class="search-clear" id="clearService" onclick="clearSearch('searchService','serviceGrid','serviceGridPager','serviceCount','clearService')">&#10005;</button>
+                <input type="text" id="searchService" placeholder="Search services by name..."
+                       oninput="filterGrid('serviceGrid','serviceGridPager','searchService','serviceCount')" />
+                <button class="search-clear" id="clearService"
+                        onclick="clearSearch('searchService','serviceGrid','serviceGridPager','serviceCount','clearService')">
+                    &#10005;
+                </button>
                 <span class="search-count" id="serviceCount"></span>
             </div>
             <div class="svc-grid" id="serviceGrid">
@@ -1531,7 +1589,9 @@
         </div>
     </div>
 
-    <!-- STEP 5: REVIEW -->
+    <!-- ═══════════════════════════════════════════════════════════
+         STEP 5: REVIEW
+    ═══════════════════════════════════════════════════════════ -->
     <div class="clf-panel" id="panel5">
         <div class="panel-heading">
             <div class="step-count"><i class="bi bi-5-circle"></i> <span class="step-label-5">Step 5 of 5</span></div>
@@ -1564,18 +1624,22 @@
 
 </div>
 
-<!-- ── Detail Modal ── -->
+<!-- ═══════════════════════════════════════════════════════════
+     Detail Modal
+═══════════════════════════════════════════════════════════ -->
 <div class="clf-modal-overlay" id="detailModal" onclick="closeModalOverlay(event)">
     <div class="clf-modal">
         <div class="clf-modal-header">
             <h3 id="modalTitle">Product Detail</h3>
             <button class="clf-modal-close" onclick="closeDetailModal()">&#10005;</button>
         </div>
-        <div class="clf-modal-body">
-            <div id="modalImgWrap"></div>
-            <div class="clf-modal-name" id="modalName"></div>
-            <div class="clf-modal-price" id="modalPrice"></div>
-            <div class="clf-modal-meta" id="modalMeta"></div>
+        <div class="clf-modal-scroll">
+            <div class="clf-modal-body">
+                <div id="modalImgWrap"></div>
+                <div class="clf-modal-name" id="modalName"></div>
+                <div class="clf-modal-price" id="modalPrice"></div>
+                <div class="clf-modal-meta" id="modalMeta"></div>
+            </div>
         </div>
         <div class="clf-modal-footer">
             <button class="btn-modal-cancel" onclick="closeDetailModal()">Close</button>
@@ -1593,7 +1657,15 @@
 
         /* ── Data from server ── */
         const compatMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CompatibilityMap));
-        const lensRxMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LensPrescriptionMap, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }));
+        const lensRxMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LensPrescriptionMap,
+                    new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }));
+
+    /* ── Helpers ── */
+    function boolBadge(val, trueText, falseText) {
+        if (val === 'true') return '<span style="color:#059669;font-weight:700">✓ ' + trueText + '</span>';
+        if (val === 'false') return '<span style="color:#94a3b8">✗ ' + falseText + '</span>';
+        return '—';
+    }
 
         /* ── Prescription step visibility ── */
         function isRxStepNeeded() {
@@ -1689,23 +1761,17 @@
         function filterGrid(gridId, pagerId, inputId, countId) {
             const inputEl = document.getElementById(inputId);
             const q = (inputEl?.value || '').toLowerCase().trim();
-            const clearBtn = document.getElementById(inputId.replace('search', 'clear').replace('Search', 'Clear'));
-
-            // Show/hide clear button
-            const clearId = 'clear' + inputId.replace('search','').replace('Search','');
+            const clearId = 'clear' + inputId.replace('search', '').replace('Search', '');
             const clearEl = document.getElementById(clearId);
             if (clearEl) clearEl.classList.toggle('visible', q.length > 0);
-
             const state = pagers[gridId];
             if (!state) return;
-
             state.allCards.forEach(c => {
                 const name = (c.dataset.name || c.querySelector('.prod-name,.svc-name')?.textContent || '').toLowerCase();
                 c._searchHidden = q.length > 0 && !name.includes(q);
             });
             state.currentPage = 1;
             renderPage(gridId);
-
             const countEl = document.getElementById(countId);
             if (countEl) {
                 const vis = state.allCards.filter(c => !c._searchHidden && !c._compatHidden).length;
@@ -1811,10 +1877,7 @@
             }
 
             const lensState = pagers['lensGrid'];
-            if (lensState) {
-                lensState.currentPage = 1;
-                renderPage('lensGrid');
-            }
+            if (lensState) { lensState.currentPage = 1; renderPage('lensGrid'); }
         }
 
         /* ── Selection: Lens ── */
@@ -1829,11 +1892,7 @@
                 isPrescription: rxInfo.isPrescription, prescriptionFee: rxInfo.prescriptionFee
             };
             document.getElementById('btnN2').disabled = false;
-
-            if (!rxInfo.isPrescription) {
-                sel.prescription = null;
-                resetRxSelection();
-            }
+            if (!rxInfo.isPrescription) { sel.prescription = null; resetRxSelection(); }
             updateStepperVisibility();
         }
 
@@ -1893,10 +1952,7 @@
                            || document.querySelector('meta[name="RequestVerificationToken"]')?.content || '';
                 const res = await fetch('?handler=CreatePrescription', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'RequestVerificationToken': token
-                    },
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'RequestVerificationToken': token },
                     body: body.toString()
                 });
                 const data = await res.json();
@@ -1913,9 +1969,17 @@
                     newCard.innerHTML =
                         `<div class="rx-name">${data.profileName}</div>
                          <div class="rx-eye-row"><span class="rx-eye-label">OD (Right)</span>
-                           <div class="rx-eye-vals"><span>SPH ${fmtVal(data.rightSph)}</span><span>CYL ${fmtVal(data.rightCyl)}</span><span>AXIS ${data.rightAxis ?? '—'}</span></div></div>
+                           <div class="rx-eye-vals">
+                             <span>SPH ${fmtVal(data.rightSph)}</span>
+                             <span>CYL ${fmtVal(data.rightCyl)}</span>
+                             <span>AXIS ${data.rightAxis ?? '—'}</span>
+                           </div></div>
                          <div class="rx-eye-row"><span class="rx-eye-label">OS (Left)</span>
-                           <div class="rx-eye-vals"><span>SPH ${fmtVal(data.leftSph)}</span><span>CYL ${fmtVal(data.leftCyl)}</span><span>AXIS ${data.leftAxis ?? '—'}</span></div></div>`;
+                           <div class="rx-eye-vals">
+                             <span>SPH ${fmtVal(data.leftSph)}</span>
+                             <span>CYL ${fmtVal(data.leftCyl)}</span>
+                             <span>AXIS ${data.leftAxis ?? '—'}</span>
+                           </div></div>`;
                     grid.appendChild(newCard);
                     selectPrescription(newCard, data.prescriptionId);
                     document.getElementById('rxCreateForm').classList.remove('open');
@@ -1996,10 +2060,7 @@
             document.getElementById('modalMeta').innerHTML = meta.map(r =>
                 `<div class="clf-modal-row"><span class="key">${r.k}</span><span class="val">${r.v}</span></div>`
             ).join('');
-            document.getElementById('modalSelectBtn').onclick = () => {
-                onSelect();
-                closeDetailModal();
-            };
+            document.getElementById('modalSelectBtn').onclick = () => { onSelect(); closeDetailModal(); };
             document.getElementById('detailModal').classList.add('open');
             document.body.style.overflow = 'hidden';
         }
@@ -2013,63 +2074,122 @@
             if (e.target === document.getElementById('detailModal')) closeDetailModal();
         }
 
-        // Keyboard close
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') closeDetailModal();
-        });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetailModal(); });
 
+        /* ── Frame Detail Modal ── */
         function openFrameDetail(e, card) {
             e.stopPropagation();
+            const compatLabel = card._compatHidden
+                ? '<span style="color:#f59e0b;font-weight:700">⚠ Not compatible with selected lens</span>'
+                : '<span style="color:#059669;font-weight:700">✓ Available</span>';
+
+            const meta = [
+                { k: 'SKU', v: card.dataset.sku || '—' },
+                { k: 'Price', v: parseFloat(card.dataset.price).toLocaleString('vi-VN') + ' ₫' },
+                { k: 'Availability', v: compatLabel },
+            ];
+
+            if (card.dataset.brand) meta.push({ k: 'Brand', v: card.dataset.brand });
+            if (card.dataset.origin) meta.push({ k: 'Origin', v: card.dataset.origin });
+            if (card.dataset.gender) meta.push({ k: 'Gender', v: card.dataset.gender });
+            if (card.dataset.material) meta.push({ k: 'Material', v: card.dataset.material });
+            if (card.dataset.frameType) meta.push({ k: 'Frame Type', v: card.dataset.frameType });
+            if (card.dataset.frameShape) meta.push({ k: 'Frame Shape', v: card.dataset.frameShape });
+            if (card.dataset.color) meta.push({ k: 'Color Options', v: card.dataset.color });
+
+            const dims = [];
+            if (card.dataset.lensWidth) dims.push(card.dataset.lensWidth + ' mm (lens)');
+            if (card.dataset.bridge) dims.push(card.dataset.bridge + ' mm (bridge)');
+            if (card.dataset.temple) dims.push(card.dataset.temple + ' mm (temple)');
+            if (dims.length) meta.push({ k: 'Dimensions', v: dims.join(' · ') });
+
+            if (card.dataset.faceShapes) meta.push({ k: 'Face Shapes', v: card.dataset.faceShapes });
+            if (card.dataset.styleTags) meta.push({ k: 'Style Tags', v: card.dataset.styleTags });
+            if (card.dataset.uv) meta.push({ k: 'UV Protection', v: boolBadge(card.dataset.uv, 'Yes', 'No') });
+            if (card.dataset.polarized) meta.push({ k: 'Polarized', v: boolBadge(card.dataset.polarized, 'Yes', 'No') });
+
+            const stockQty = card.dataset.stock;
+            if (stockQty) meta.push({ k: 'In Stock', v: stockQty + ' units available' });
+
             openDetailModal({
                 title: 'Frame Detail',
                 emoji: '🕶',
                 img: card.dataset.img || '',
                 name: card.dataset.name,
                 price: parseFloat(card.dataset.price),
-                meta: [
-                    { k: 'Product ID', v: '#' + card.dataset.id },
-                    { k: 'Category', v: 'Eyeglass Frame' },
-                    { k: 'Price', v: parseFloat(card.dataset.price).toLocaleString('vi-VN') + ' ₫' },
-                    { k: 'Status', v: card._compatHidden ? '⚠ Not compatible with selected frame' : '✓ Available' }
-                ],
+                meta,
                 onSelect: () => selectFrame(card)
             });
         }
 
+        /* ── Lens Detail Modal ── */
         function openLensDetail(e, card) {
             e.stopPropagation();
             const lensId = parseInt(card.dataset.id);
             const rxInfo = lensRxMap[lensId] || { isPrescription: false, prescriptionFee: 0 };
+            const compatLabel = card._compatHidden
+                ? '<span style="color:#f59e0b;font-weight:700">⚠ Not compatible with selected frame</span>'
+                : '<span style="color:#059669;font-weight:700">✓ Compatible</span>';
+
+            const meta = [
+                { k: 'SKU', v: card.dataset.sku || '—' },
+                { k: 'Price', v: parseFloat(card.dataset.price).toLocaleString('vi-VN') + ' ₫' },
+                { k: 'Compatibility', v: compatLabel },
+                { k: 'Lens Type', v: card.dataset.lensType || '—' },
+                {
+                    k: 'Rx Required',
+                    v: rxInfo.isPrescription
+                        ? '<span style="color:#2563eb;font-weight:700">✓ Yes</span>'
+                        : '<span style="color:#94a3b8">✗ No</span>'
+                },
+                {
+                    k: 'Prescription Fee',
+                    v: rxInfo.isPrescription
+                        ? (rxInfo.prescriptionFee || 0).toLocaleString('vi-VN') + ' ₫'
+                        : '—'
+                },
+            ];
+
+            if (card.dataset.brand) meta.push({ k: 'Brand', v: card.dataset.brand });
+            if (card.dataset.material) meta.push({ k: 'Material', v: card.dataset.material });
+            if (card.dataset.index) meta.push({ k: 'Refractive Index', v: card.dataset.index });
+            if (card.dataset.coating) meta.push({ k: 'Coating', v: card.dataset.coating });
+            if (card.dataset.uvProtection) meta.push({ k: 'UV Protection', v: boolBadge(card.dataset.uvProtection, 'Yes', 'No') });
+            if (card.dataset.antiReflect) meta.push({ k: 'Anti-Reflection', v: boolBadge(card.dataset.antiReflect, 'Yes', 'No') });
+            if (card.dataset.blueLight) meta.push({ k: 'Blue Light Filter', v: boolBadge(card.dataset.blueLight, 'Yes', 'No') });
+
+            const stockQty = card.dataset.stock;
+            if (stockQty) meta.push({ k: 'In Stock', v: stockQty + ' units available' });
+
             openDetailModal({
                 title: 'Lens Detail',
                 emoji: '◯',
                 img: card.dataset.img || '',
                 name: card.dataset.name,
                 price: parseFloat(card.dataset.price),
-                meta: [
-                    { k: 'Product ID', v: '#' + card.dataset.id },
-                    { k: 'Lens Type', v: card.dataset.lensType || '—' },
-                    { k: 'Prescription Required', v: rxInfo.isPrescription ? '✓ Yes' : '✗ No' },
-                    { k: 'Prescription Fee', v: rxInfo.isPrescription ? (rxInfo.prescriptionFee || 0).toLocaleString('vi-VN') + ' ₫' : '—' },
-                    { k: 'Compatibility', v: card._compatHidden ? '⚠ Not compatible with selected frame' : '✓ Compatible' }
-                ],
+                meta,
                 onSelect: () => selectLens(card)
             });
         }
 
+        /* ── Service Detail Modal ── */
         function openServiceDetail(e, card) {
             e.stopPropagation();
+            const desc = card.dataset.desc || card.querySelector('.svc-desc')?.textContent?.trim() || '—';
+            const meta = [
+                { k: 'Service ID', v: '#' + card.dataset.id },
+                { k: 'Price', v: parseFloat(card.dataset.price).toLocaleString('vi-VN') + ' ₫' },
+                { k: 'Duration', v: card.dataset.dur || '—' },
+                { k: 'Description', v: desc },
+            ];
+
             openDetailModal({
                 title: 'Service Detail',
                 emoji: '⚙',
                 img: '',
                 name: card.dataset.name,
                 price: parseFloat(card.dataset.price),
-                meta: [
-                    { k: 'Service ID', v: '#' + card.dataset.id },
-                    { k: 'Duration', v: card.dataset.dur || '—' },
-                    { k: 'Description', v: card.dataset.desc || card.querySelector('.svc-desc')?.textContent?.trim() || '—' }
-                ],
+                meta,
                 onSelect: () => selectService(card)
             });
         }

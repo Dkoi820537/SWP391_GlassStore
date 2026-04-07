@@ -3,12 +3,24 @@
 @{
     ViewData["Title"] = "Admin Dashboard";
     Layout = "_Layout";
+
+    var breakdownLabels = (Model.RevenueBreakdownLabels != null && Model.RevenueBreakdownLabels.Any())
+        ? Model.RevenueBreakdownLabels
+        : new List<string> { "Gọng kính", "Tròng kính", "Dịch vụ" };
+
+    var breakdownValues = (Model.RevenueBreakdownValues != null && Model.RevenueBreakdownValues.Any())
+        ? Model.RevenueBreakdownValues
+        : new List<decimal> { 0m, 0m, 0m };
+
+    var breakdownColors = new[] { "#185FA5", "#0F6E56", "#BA7517" };
 }
 
 @section Styles {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; }
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
 
         body {
             background: #ffffff;
@@ -16,14 +28,12 @@
             color: #0f172a;
         }
 
-        /* ── PAGE WRAPPER ── */
         .adm-wrap {
             max-width: 1160px;
             margin: 0 auto;
             padding: 28px 28px 80px;
         }
 
-        /* ── BREADCRUMB ── */
         .adm-bc {
             display: flex;
             align-items: center;
@@ -33,16 +43,27 @@
             color: #64748b;
             margin-bottom: 20px;
         }
-        .adm-bc a {
-            color: #64748b;
-            text-decoration: none;
-            transition: color .18s;
-        }
-        .adm-bc a:hover { color: #0f172a; }
-        .adm-bc .bc-sep { color: #94a3b8; font-size: 14px; }
-        .adm-bc .bc-cur { color: #0f172a; font-weight: 600; }
 
-        /* ── WELCOME BANNER ── */
+            .adm-bc a {
+                color: #64748b;
+                text-decoration: none;
+                transition: color .18s;
+            }
+
+                .adm-bc a:hover {
+                    color: #0f172a;
+                }
+
+            .adm-bc .bc-sep {
+                color: #94a3b8;
+                font-size: 14px;
+            }
+
+            .adm-bc .bc-cur {
+                color: #0f172a;
+                font-weight: 600;
+            }
+
         .adm-banner {
             background: #0d1b3e;
             border-radius: 16px;
@@ -53,22 +74,28 @@
             margin-bottom: 32px;
             box-shadow: 0 4px 20px rgba(13,27,62,.22);
         }
-        .adm-banner .wave-emoji { font-size: 32px; line-height: 1; flex-shrink: 0; }
-        .adm-banner .banner-text h2 {
-            margin: 0 0 4px;
-            font-size: 18px;
-            font-weight: 700;
-            color: #ffffff;
-            letter-spacing: -.01em;
-        }
-        .adm-banner .banner-text p {
-            margin: 0;
-            font-size: 13.5px;
-            color: rgba(255,255,255,.65);
-            font-weight: 400;
-        }
 
-        /* ── PAGE TITLE ── */
+            .adm-banner .wave-emoji {
+                font-size: 32px;
+                line-height: 1;
+                flex-shrink: 0;
+            }
+
+            .adm-banner .banner-text h2 {
+                margin: 0 0 4px;
+                font-size: 18px;
+                font-weight: 700;
+                color: #ffffff;
+                letter-spacing: -.01em;
+            }
+
+            .adm-banner .banner-text p {
+                margin: 0;
+                font-size: 13.5px;
+                color: rgba(255,255,255,.65);
+                font-weight: 400;
+            }
+
         .adm-page-title {
             text-align: center;
             font-size: 26px;
@@ -78,7 +105,6 @@
             margin: 0 0 28px;
         }
 
-        /* ── FEATURE CARD GRID (2×2) ── */
         .feat-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -98,12 +124,12 @@
             text-decoration: none;
             color: inherit;
         }
-        .feat-card:hover {
-            box-shadow: 0 6px 24px rgba(0,0,0,.1);
-            transform: translateY(-2px);
-        }
 
-        /* card top row: icon + title + badge */
+            .feat-card:hover {
+                box-shadow: 0 6px 24px rgba(0,0,0,.1);
+                transform: translateY(-2px);
+            }
+
         .feat-card-top {
             display: flex;
             align-items: center;
@@ -112,14 +138,30 @@
         }
 
         .feat-icon {
-            width: 46px; height: 46px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             flex-shrink: 0;
         }
-        .feat-icon.teal    { background: #e6f7f5; }
-        .feat-icon.navy    { background: #e8edf6; }
-        .feat-icon.dkgreen { background: #e8f5ee; }
-        .feat-icon.blue    { background: #e8f0fb; }
+
+            .feat-icon.teal {
+                background: #e6f7f5;
+            }
+
+            .feat-icon.navy {
+                background: #e8edf6;
+            }
+
+            .feat-icon.dkgreen {
+                background: #e8f5ee;
+            }
+
+            .feat-icon.blue {
+                background: #e8f0fb;
+            }
 
         .feat-card-top h3 {
             flex: 1;
@@ -143,7 +185,6 @@
             white-space: nowrap;
         }
 
-        /* description */
         .feat-desc {
             font-size: 13px;
             color: #64748b;
@@ -152,7 +193,6 @@
             flex: 1;
         }
 
-        /* sparkline + stat row */
         .feat-spark-row {
             display: flex;
             align-items: flex-end;
@@ -160,8 +200,18 @@
             gap: 10px;
             margin-bottom: 16px;
         }
-        .feat-spark { flex: 1; height: 40px; min-width: 0; }
-        .feat-spark svg { width: 100%; height: 100%; overflow: visible; }
+
+        .feat-spark {
+            flex: 1;
+            height: 40px;
+            min-width: 0;
+        }
+
+            .feat-spark svg {
+                width: 100%;
+                height: 100%;
+                overflow: visible;
+            }
 
         .feat-stat {
             font-size: 12.5px;
@@ -172,9 +222,12 @@
             align-items: center;
             gap: 4px;
         }
-        .feat-stat .stat-arrow { font-size: 14px; color: #64748b; }
 
-        /* manage button */
+            .feat-stat .stat-arrow {
+                font-size: 14px;
+                color: #64748b;
+            }
+
         .feat-btn {
             display: flex;
             align-items: center;
@@ -193,11 +246,22 @@
             transition: background .18s;
             letter-spacing: .01em;
         }
-        .feat-btn:hover { background: #162045; color: #fff; }
-        .feat-btn .btn-arrow { font-size: 15px; line-height: 1; transition: transform .18s; }
-        .feat-card:hover .feat-btn .btn-arrow { transform: translateX(3px); }
 
-        /* ── SECTION LABEL ── */
+            .feat-btn:hover {
+                background: #162045;
+                color: #fff;
+            }
+
+            .feat-btn .btn-arrow {
+                font-size: 15px;
+                line-height: 1;
+                transition: transform .18s;
+            }
+
+        .feat-card:hover .feat-btn .btn-arrow {
+            transform: translateX(3px);
+        }
+
         .sec-lbl {
             font-size: 10.5px;
             font-weight: 800;
@@ -205,15 +269,25 @@
             letter-spacing: 1.6px;
             color: #94a3b8;
             margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        /* STATS GRID */
+            .sec-lbl::after {
+                content: '';
+                flex: 1;
+                height: 0.5px;
+                background: #e2e8f0;
+            }
+
         .stats-g {
             display: grid;
             grid-template-columns: repeat(4,1fr);
             gap: 14px;
             margin-bottom: 20px;
         }
+
         .sc {
             background: #fff;
             border: 1px solid #e2e8f0;
@@ -227,124 +301,640 @@
             transition: all .2s;
             color: inherit;
         }
-        .sc:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); transform: translateY(-1px); }
-        .sc-ico {
-            width: 44px; height: 44px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 20px; flex-shrink: 0;
-        }
-        .i-navy  { background: rgba(13,27,62,.08);  color: #0d1b3e; }
-        .i-ok    { background: rgba(5,150,105,.08);  color: #059669; }
-        .i-warn  { background: rgba(217,119,6,.09);  color: #d97706; }
-        .i-info  { background: rgba(37,99,235,.08);  color: #2563eb; }
-        .i-gold  { background: rgba(184,134,42,.10); color: #b8862a; }
-        .sc-lbl  { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.1px; margin-bottom: 3px; }
-        .sc-val  { font-size: 22px; font-weight: 700; color: #0f172a; }
-        .sc-sub  { font-size: 11px; color: #94a3b8; margin-top: 2px; }
 
-        /* ALERTS */
-        .alert-list { display: flex; flex-direction: column; gap: 9px; margin-bottom: 20px; }
+            .sc:hover {
+                box-shadow: 0 4px 16px rgba(0,0,0,.1);
+                transform: translateY(-1px);
+            }
+
+        .sc-ico {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .i-navy {
+            background: rgba(13,27,62,.08);
+            color: #0d1b3e;
+        }
+
+        .i-ok {
+            background: rgba(5,150,105,.08);
+            color: #059669;
+        }
+
+        .i-warn {
+            background: rgba(217,119,6,.09);
+            color: #d97706;
+        }
+
+        .i-info {
+            background: rgba(37,99,235,.08);
+            color: #2563eb;
+        }
+
+        .i-gold {
+            background: rgba(184,134,42,.10);
+            color: #b8862a;
+        }
+
+        .sc-lbl {
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1.1px;
+            margin-bottom: 3px;
+        }
+
+        .sc-val {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .sc-sub {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .kpi {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            transition: box-shadow .2s, transform .2s;
+        }
+
+            .kpi:hover {
+                box-shadow: 0 4px 16px rgba(0,0,0,.08);
+                transform: translateY(-1px);
+            }
+
+        .kpi-ico {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .ico-gold {
+            background: #FAEEDA;
+            color: #854F0B;
+        }
+
+        .ico-teal {
+            background: #E1F5EE;
+            color: #0F6E56;
+        }
+
+        .ico-blue {
+            background: #E6F1FB;
+            color: #185FA5;
+        }
+
+        .ico-purple {
+            background: #EEEDFE;
+            color: #534AB7;
+        }
+
+        .kpi-lbl {
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1.1px;
+            margin-bottom: 4px;
+        }
+
+        .kpi-val {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.1;
+        }
+
+        .kpi-sub {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 3px;
+        }
+
+        .kpi-delta {
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 2px 7px;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+
+        .delta-up {
+            background: rgba(5,150,105,.1);
+            color: #059669;
+        }
+
+        .delta-dn {
+            background: rgba(220,38,38,.08);
+            color: #dc2626;
+        }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1.55fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .charts-row2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .ch-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 18px 20px;
+            box-shadow: 0 1px 6px rgba(0,0,0,.05);
+        }
+
+        .ch-hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .ch-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .ch-sub {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .ch-tabs {
+            display: flex;
+            gap: 4px;
+        }
+
+        .ch-tab {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 7px;
+            border: 1px solid #e2e8f0;
+            background: transparent;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all .15s;
+        }
+
+            .ch-tab.active, .ch-tab:hover {
+                background: #f1f5f9;
+                color: #0f172a;
+                border-color: #cbd5e1;
+            }
+
+        .ch-wrap {
+            position: relative;
+        }
+
+        .legend-row {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .leg-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .leg-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            margin-top: 14px;
+        }
+
+        .bk-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        .bk-lbl {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #64748b;
+        }
+
+        .bk-val {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .bk-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: #f1f5f9;
+            margin-top: 3px;
+            overflow: hidden;
+        }
+
+        .bk-fill {
+            height: 100%;
+            border-radius: 2px;
+        }
+
+        .alert-list {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            margin-bottom: 20px;
+        }
+
         .al {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 16px; border-radius: 10px;
-            font-size: 13px; font-weight: 600; text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
             transition: all .2s;
         }
-        .al:hover { filter: brightness(.96); transform: translateX(3px); }
-        .al.ok   { background: rgba(5,150,105,.08);  border: 1px solid rgba(5,150,105,.22);  color: #059669; }
-        .al.warn { background: rgba(217,119,6,.09);  border: 1px solid rgba(217,119,6,.25);  color: #d97706; }
-        .al.info { background: rgba(37,99,235,.08);  border: 1px solid rgba(37,99,235,.22);  color: #2563eb; }
-        .al i { font-size: 16px; flex-shrink: 0; }
-        .al-arrow { margin-left: auto; font-size: 16px; opacity: .5; }
 
-        /* 2-COL LAYOUT */
-        .two-col { display: grid; grid-template-columns: 1.5fr 1fr; gap: 18px; margin-top: 20px; }
+            .al:hover {
+                filter: brightness(.96);
+                transform: translateX(3px);
+            }
 
-        /* CARD */
-        .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.05); }
-        .card-hdr { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #e2e8f0; }
-        .card-hdr h3 { font-size: 14px; font-weight: 700; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px; }
-        .card-hdr a { font-size: 12px; font-weight: 600; color: #2563eb; text-decoration: none; }
-        .card-hdr a:hover { text-decoration: underline; }
+            .al.ok {
+                background: rgba(5,150,105,.08);
+                border: 1px solid rgba(5,150,105,.22);
+                color: #059669;
+            }
 
-        /* ORDER LIST */
-        .ord-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #f1f5f9; }
-        .ord-row:last-child { border-bottom: none; }
-        .ord-id   { font-size: 12px; color: #94a3b8; width: 52px; }
-        .ord-name { font-size: 13px; font-weight: 600; color: #0f172a; flex: 1; margin: 0 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .ord-amt  { font-size: 12px; font-weight: 600; color: #b8862a; white-space: nowrap; }
-        .bd { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 100px; font-size: 10px; font-weight: 700; margin-left: 8px; }
-        .bd-Pending    { background: rgba(217,119,6,.09); color: #d97706; border: 1px solid rgba(217,119,6,.25); }
-        .bd-Processing { background: rgba(37,99,235,.08); color: #2563eb; border: 1px solid rgba(37,99,235,.22); }
-        .bd-Completed,.bd-Done { background: rgba(15,23,42,.07); color: #0f172a; border: 1px solid rgba(15,23,42,.18); }
-        .bd-Cancelled  { background: rgba(220,38,38,.08); color: #dc2626; border: 1px solid rgba(220,38,38,.22); }
-        .bd-Confirmed,.bd-Ready { background: rgba(5,150,105,.08); color: #059669; border: 1px solid rgba(5,150,105,.22); }
+            .al.warn {
+                background: rgba(217,119,6,.09);
+                border: 1px solid rgba(217,119,6,.25);
+                color: #d97706;
+            }
 
-        /* APPT LIST */
-        .appt-row { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid #f1f5f9; }
-        .appt-row:last-child { border-bottom: none; }
-        .av { width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg,#e0e7ff,#c7d2fe); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #2563eb; flex-shrink: 0; }
-        .appt-name { font-size: 13px; font-weight: 700; color: #0f172a; }
-        .appt-dt   { font-size: 11px; color: #94a3b8; margin-top: 1px; }
-        .appt-today{ font-size: 10px; font-weight: 700; color: #059669; background: rgba(5,150,105,.08); border: 1px solid rgba(5,150,105,.22); border-radius: 4px; padding: 1px 5px; margin-left: 4px; }
+            .al.info {
+                background: rgba(37,99,235,.08);
+                border: 1px solid rgba(37,99,235,.22);
+                color: #2563eb;
+            }
 
-        /* SVC PENDING */
-        .svc-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #f1f5f9; }
-        .svc-row:last-child { border-bottom: none; }
-        .svc-name { font-size: 13px; font-weight: 700; color: #0f172a; }
-        .svc-sub  { font-size: 11px; color: #94a3b8; margin-top: 2px; }
-        .btn-sm { display: inline-flex; align-items: center; gap: 5px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 7px; padding: 5px 10px; font-size: 11px; font-weight: 700; color: #94a3b8; text-decoration: none; transition: all .2s; }
-        .btn-sm:hover { border-color: #2563eb; color: #2563eb; }
-        .empty-card { text-align: center; padding: 36px 20px; color: #94a3b8; font-size: 13px; }
+            .al i {
+                font-size: 16px;
+                flex-shrink: 0;
+            }
 
-        /* RESPONSIVE */
-        @@media(max-width:900px) {
-            .feat-grid { grid-template-columns: 1fr; }
-            .stats-g   { grid-template-columns: repeat(2,1fr); }
-            .two-col   { grid-template-columns: 1fr; }
+        .al-arrow {
+            margin-left: auto;
+            font-size: 16px;
+            opacity: .5;
         }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 1px 6px rgba(0,0,0,.05);
+        }
+
+        .card-hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+            .card-hdr h3 {
+                font-size: 14px;
+                font-weight: 700;
+                color: #0f172a;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .card-hdr a {
+                font-size: 12px;
+                font-weight: 600;
+                color: #2563eb;
+                text-decoration: none;
+            }
+
+                .card-hdr a:hover {
+                    text-decoration: underline;
+                }
+
+        .ord-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+            .ord-row:last-child {
+                border-bottom: none;
+            }
+
+        .ord-id {
+            font-size: 12px;
+            color: #94a3b8;
+            width: 52px;
+        }
+
+        .ord-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            flex: 1;
+            margin: 0 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ord-amt {
+            font-size: 12px;
+            font-weight: 600;
+            color: #b8862a;
+            white-space: nowrap;
+        }
+
+        .bd {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 9px;
+            border-radius: 100px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+
+        .bd-Pending {
+            background: rgba(217,119,6,.09);
+            color: #d97706;
+            border: 1px solid rgba(217,119,6,.25);
+        }
+
+        .bd-Processing {
+            background: rgba(37,99,235,.08);
+            color: #2563eb;
+            border: 1px solid rgba(37,99,235,.22);
+        }
+
+        .bd-Completed, .bd-Done {
+            background: rgba(15,23,42,.07);
+            color: #0f172a;
+            border: 1px solid rgba(15,23,42,.18);
+        }
+
+        .bd-Cancelled {
+            background: rgba(220,38,38,.08);
+            color: #dc2626;
+            border: 1px solid rgba(220,38,38,.22);
+        }
+
+        .bd-Confirmed, .bd-Ready {
+            background: rgba(5,150,105,.08);
+            color: #059669;
+            border: 1px solid rgba(5,150,105,.22);
+        }
+
+        .appt-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+            .appt-row:last-child {
+                border-bottom: none;
+            }
+
+        .av {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: linear-gradient(135deg,#e0e7ff,#c7d2fe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #2563eb;
+            flex-shrink: 0;
+        }
+
+        .appt-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .appt-dt {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 1px;
+        }
+
+        .appt-today {
+            font-size: 10px;
+            font-weight: 700;
+            color: #059669;
+            background: rgba(5,150,105,.08);
+            border: 1px solid rgba(5,150,105,.22);
+            border-radius: 4px;
+            padding: 1px 5px;
+            margin-left: 4px;
+        }
+
+        .svc-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+            .svc-row:last-child {
+                border-bottom: none;
+            }
+
+        .svc-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .svc-sub {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .btn-sm {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 7px;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all .2s;
+        }
+
+            .btn-sm:hover {
+                border-color: #2563eb;
+                color: #2563eb;
+            }
+
+        .empty-card {
+            text-align: center;
+            padding: 36px 20px;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        @@media(max-width:1000px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2,1fr);
+            }
+
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-row2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @@media(max-width:900px) {
+            .feat-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-g {
+                grid-template-columns: repeat(2,1fr);
+            }
+
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @@media(max-width:600px) {
-            .stats-g  { grid-template-columns: 1fr; }
-            .adm-wrap { padding: 16px 14px 60px; }
+            .stats-g {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .adm-wrap {
+                padding: 16px 14px 60px;
+            }
         }
     </style>
 }
 
 <div class="adm-wrap">
 
-    <!-- BREADCRUMB -->
     <nav class="adm-bc">
         <a href="/">Home</a>
         <span class="bc-sep">›</span>
         <span class="bc-cur">Admin Dashboard</span>
     </nav>
 
-    <!-- WELCOME BANNER -->
     <div class="adm-banner">
         <span class="wave-emoji">👋</span>
         <div class="banner-text">
-            <h2>Welcome, admin!</h2>
+            <h2>Welcome, @(User.Identity?.Name ?? "admin")!</h2>
             <p>Manage your OptiPlus eyewear store from this central dashboard.</p>
         </div>
     </div>
 
-    <!-- PAGE TITLE -->
     <h1 class="adm-page-title">Admin Dashboard</h1>
 
-    <!-- 2×2 FEATURE CARD GRID -->
     <div class="feat-grid">
-
-        <!-- ① Lens Management -->
         <div class="feat-card">
             <div class="feat-card-top">
                 <div class="feat-icon teal">
                     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="8"/>
-                        <circle cx="12" cy="12" r="3"/>
-                        <line x1="12" y1="2"  x2="12" y2="6"/>
-                        <line x1="12" y1="18" x2="12" y2="22"/>
-                        <line x1="2"  y1="12" x2="6"  y2="12"/>
-                        <line x1="18" y1="12" x2="22" y2="12"/>
+                        <circle cx="12" cy="12" r="8" />
+                        <circle cx="12" cy="12" r="3" />
+                        <line x1="12" y1="2" x2="12" y2="6" />
+                        <line x1="12" y1="18" x2="12" y2="22" />
+                        <line x1="2" y1="12" x2="6" y2="12" />
+                        <line x1="18" y1="12" x2="22" y2="12" />
                     </svg>
                 </div>
                 <h3>Lens Management</h3>
@@ -354,27 +944,23 @@
             <div class="feat-spark-row">
                 <div class="feat-spark">
                     <svg viewBox="0 0 120 40" preserveAspectRatio="none">
-                        <polyline points="0,35 15,28 30,31 45,22 60,26 75,16 90,20 105,12 120,8"
-                                  fill="none" stroke="#0d9488" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+                        <polyline points="0,35 15,28 30,31 45,22 60,26 75,16 90,20 105,12 120,8" fill="none" stroke="#0d9488" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" />
                     </svg>
                 </div>
                 <span class="feat-stat">+15 today <span class="stat-arrow">↗</span></span>
             </div>
-            <a href="/Lenses" class="feat-btn">
-                Manage Lenses <span class="btn-arrow">→</span>
-            </a>
+            <a href="/Lenses" class="feat-btn">Manage Lenses <span class="btn-arrow">→</span></a>
         </div>
 
-        <!-- ② Frame Management -->
         <div class="feat-card">
             <div class="feat-card-top">
                 <div class="feat-icon navy">
                     <svg width="28" height="26" viewBox="0 0 28 18" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="1"  y="4" width="10" height="9" rx="4.5"/>
-                        <rect x="17" y="4" width="10" height="9" rx="4.5"/>
-                        <line x1="11" y1="8.5" x2="17" y2="8.5"/>
-                        <line x1="1"  y1="8.5" x2="0"  y2="5"/>
-                        <line x1="27" y1="8.5" x2="28" y2="5"/>
+                        <rect x="1" y="4" width="10" height="9" rx="4.5" />
+                        <rect x="17" y="4" width="10" height="9" rx="4.5" />
+                        <line x1="11" y1="8.5" x2="17" y2="8.5" />
+                        <line x1="1" y1="8.5" x2="0" y2="5" />
+                        <line x1="27" y1="8.5" x2="28" y2="5" />
                     </svg>
                 </div>
                 <h3>Frame Management</h3>
@@ -384,24 +970,20 @@
             <div class="feat-spark-row">
                 <div class="feat-spark">
                     <svg viewBox="0 0 120 40" preserveAspectRatio="none">
-                        <polyline points="0,32 15,25 30,28 45,18 60,22 75,15 90,18 105,10 120,14"
-                                  fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+                        <polyline points="0,32 15,25 30,28 45,18 60,22 75,15 90,18 105,10 120,14" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" />
                     </svg>
                 </div>
-                <span class="feat-stat">12 new frames added <span class="stat-arrow">↗</span></span>
+                <span class="feat-stat">12 new frames <span class="stat-arrow">↗</span></span>
             </div>
-            <a href="/Frames" class="feat-btn">
-                Manage Frames <span class="btn-arrow">→</span>
-            </a>
+            <a href="/Frames" class="feat-btn">Manage Frames <span class="btn-arrow">→</span></a>
         </div>
 
-        <!-- ③ Order Management -->
         <div class="feat-card">
             <div class="feat-card-top">
                 <div class="feat-icon dkgreen">
                     <svg width="24" height="26" viewBox="0 0 24 26" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 7h16l-2 15H6L4 7z"/>
-                        <path d="M9 7V5a3 3 0 0 1 6 0v2"/>
+                        <path d="M4 7h16l-2 15H6L4 7z" />
+                        <path d="M9 7V5a3 3 0 0 1 6 0v2" />
                     </svg>
                 </div>
                 <h3>Order Management</h3>
@@ -411,24 +993,20 @@
             <div class="feat-spark-row">
                 <div class="feat-spark">
                     <svg viewBox="0 0 120 40" preserveAspectRatio="none">
-                        <polyline points="0,30 15,24 30,27 45,16 60,20 75,12 90,15 105,7 120,10"
-                                  fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+                        <polyline points="0,30 15,24 30,27 45,16 60,20 75,12 90,15 105,7 120,10" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" />
                     </svg>
                 </div>
-                <span class="feat-stat">15 New Orders Today <span class="stat-arrow">↗</span></span>
+                <span class="feat-stat">@Model.OrderToday New Today <span class="stat-arrow">↗</span></span>
             </div>
-            <a href="/Admin/Orders" class="feat-btn">
-                Manage Orders <span class="btn-arrow">→</span>
-            </a>
+            <a href="/Admin/Orders" class="feat-btn">Manage Orders <span class="btn-arrow">→</span></a>
         </div>
 
-        <!-- ④ User Management -->
         <div class="feat-card">
             <div class="feat-card-top">
                 <div class="feat-icon blue">
                     <svg width="24" height="26" viewBox="0 0 24 26" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="8" r="4"/>
-                        <path d="M4 22c0-4 3.6-7 8-7s8 3 8 7"/>
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M4 22c0-4 3.6-7 8-7s8 3 8 7" />
                     </svg>
                 </div>
                 <h3>User Management</h3>
@@ -438,20 +1016,15 @@
             <div class="feat-spark-row">
                 <div class="feat-spark">
                     <svg viewBox="0 0 120 40" preserveAspectRatio="none">
-                        <polyline points="0,34 15,27 30,30 45,21 60,25 75,17 90,21 105,13 120,16"
-                                  fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+                        <polyline points="0,34 15,27 30,30 45,21 60,25 75,17 90,21 105,13 120,16" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" />
                     </svg>
                 </div>
                 <span class="feat-stat">3 new registrations <span class="stat-arrow">↗</span></span>
             </div>
-            <a href="/Admin/Users" class="feat-btn">
-                Manage Users <span class="btn-arrow">→</span>
-            </a>
+            <a href="/Admin/Users" class="feat-btn">Manage Users <span class="btn-arrow">→</span></a>
         </div>
+    </div>
 
-    </div><!-- /feat-grid -->
-
-    <!-- ALERTS -->
     @if (Model.Alerts.Any())
     {
         <div class="alert-list">
@@ -459,9 +1032,9 @@
             {
                 var (ico, cls) = a.Type switch
                 {
-                    "ok"   => ("bi-check-circle-fill", "ok"),
+                    "ok" => ("bi-check-circle-fill", "ok"),
                     "warn" => ("bi-exclamation-triangle-fill", "warn"),
-                    _      => ("bi-info-circle-fill", "info")
+                    _ => ("bi-info-circle-fill", "info")
                 };
                 <a href="@a.Link" class="al @cls">
                     <i class="bi @ico"></i>
@@ -472,34 +1045,146 @@
         </div>
     }
 
-    @* ══════════════════════════════════════════════════════════════
-       💰 REVENUE SECTION — Admin Only (RBAC)
-       Manager role will NEVER see this block.
-       ══════════════════════════════════════════════════════════════ *@
     @if (Model.IsAdmin)
     {
-        <div class="sec-lbl" style="margin-top:8px">💰 Revenue</div>
-        <div class="stats-g" style="grid-template-columns:repeat(2,1fr)">
-            <div class="sc">
-                <div class="sc-ico i-gold"><i class="bi bi-cash-stack"></i></div>
+        <div class="sec-lbl" style="margin-top:8px">💰 Tài chính & Doanh thu</div>
+
+        <div class="kpi-grid">
+            <div class="kpi">
+                <div class="kpi-ico ico-gold">
+                    <i class="bi bi-cash-stack" style="font-size:18px"></i>
+                </div>
                 <div>
-                    <div class="sc-lbl">Total Revenue</div>
-                    <div class="sc-val">@Model.Revenue.ToString("N0") ₫</div>
-                    <div class="sc-sub">All non-cancelled orders</div>
+                    <div class="kpi-lbl">Tổng doanh thu</div>
+                    <div class="kpi-val">
+                        @(Model.Revenue >= 1_000_000
+                                            ? (Model.Revenue / 1_000_000M).ToString("N1") + "M"
+                                            : Model.Revenue.ToString("N0")) ₫
+                                                                       </div>
+                                                                       <div class="kpi-sub">Tất cả đơn không huỷ</div>
+                                                                       <div class="kpi-delta delta-up">↑ Tổng tích lũy</div>
+                                                                   </div>
+                                                               </div>
+
+            <div class="kpi">
+                <div class="kpi-ico ico-teal">
+                    <i class="bi bi-graph-up-arrow" style="font-size:18px"></i>
+                </div>
+                <div>
+                    <div class="kpi-lbl">Hôm nay</div>
+                    <div class="kpi-val">
+                        @(Model.RevenueToday >= 1_000_000
+                                            ? (Model.RevenueToday / 1_000_000M).ToString("N1") + "M"
+                                            : Model.RevenueToday.ToString("N0")) ₫
+                                                                            </div>
+                                                                            <div class="kpi-sub">Doanh thu trong ngày</div>
+                                                                            <div class="kpi-delta delta-up" id="today-badge">Đang cập nhật...</div>
+                                                                        </div>
+                                                                    </div>
+
+            <div class="kpi">
+                <div class="kpi-ico ico-blue">
+                    <i class="bi bi-bag-fill" style="font-size:18px"></i>
+                </div>
+                <div>
+                    <div class="kpi-lbl">Tổng đơn hàng</div>
+                    <div class="kpi-val">@Model.OrderTotal.ToString("N0")</div>
+                    <div class="kpi-sub">@Model.OrderToday mới hôm nay</div>
+                    <div class="kpi-delta delta-up">↑ Hoạt động</div>
                 </div>
             </div>
-            <div class="sc">
-                <div class="sc-ico i-ok"><i class="bi bi-graph-up-arrow"></i></div>
-                <div>
-                    <div class="sc-lbl">Today's Revenue</div>
-                    <div class="sc-val">@Model.RevenueToday.ToString("N0") ₫</div>
-                    <div class="sc-sub">Revenue earned today</div>
+
+            <div class="kpi">
+                <div class="kpi-ico ico-purple">
+                    <i class="bi bi-receipt" style="font-size:18px"></i>
                 </div>
+                <div>
+                    <div class="kpi-lbl">Giá trị TB / đơn</div>
+                    <div class="kpi-val">
+                        @(Model.OrderTotal > 0
+                                            ? ((Model.Revenue / Model.OrderTotal) / 1_000M).ToString("N0") + "K"
+                                            : "0") ₫
+                </div>
+                <div class="kpi-sub">Average order value</div>
+                <div class="kpi-delta delta-up">AOV</div>
+            </div>
+        </div>
+    </div>
+
+        <div class="charts-row">
+            <div class="ch-card">
+                <div class="ch-hdr">
+                    <div>
+                        <div class="ch-title">Doanh thu theo thời gian</div>
+                        <div class="ch-sub">Sản phẩm & Dịch vụ</div>
+                    </div>
+                    <div class="ch-tabs">
+                        <button class="ch-tab active" onclick="switchPeriod('7d', this)">7 ngày</button>
+                        <button class="ch-tab" onclick="switchPeriod('30d', this)">30 ngày</button>
+                    </div>
+                </div>
+                <div class="ch-wrap" style="height:200px"><canvas id="revLine"></canvas></div>
+                <div class="legend-row">
+                    <span class="leg-item"><span class="leg-dot" style="background:#185FA5"></span>Sản phẩm</span>
+                    <span class="leg-item"><span class="leg-dot" style="background:#0F6E56"></span>Dịch vụ</span>
+                </div>
+            </div>
+
+            <div class="ch-card">
+                <div class="ch-hdr">
+                    <div>
+                        <div class="ch-title">Cơ cấu doanh thu</div>
+                        <div class="ch-sub">Theo danh mục</div>
+                    </div>
+                </div>
+                <div class="ch-wrap" style="height:140px"><canvas id="revDonut"></canvas></div>
+
+                <div class="breakdown">
+                @{
+                        var totalBreakdown = breakdownValues.Sum();
+                    }
+                    @for (int i = 0; i < breakdownLabels.Count && i < breakdownValues.Count; i++)
+                    {
+                        var pct = totalBreakdown > 0 ? (breakdownValues[i] / totalBreakdown * 100m) : 0m;
+                        <div>
+                            <div class="bk-row">
+                                <span class="bk-lbl">
+                                    <span class="leg-dot" style="background:@breakdownColors[i];width:8px;height:8px"></span>
+                                    @breakdownLabels[i]
+                                </span>
+                                <span class="bk-val">@pct.ToString("0")%</span>
+                            </div>
+                            <div class="bk-bar">
+                                <div class="bk-fill" style="width:@pct.ToString("0")%;background:@breakdownColors[i]"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-row2">
+            <div class="ch-card">
+                <div class="ch-hdr">
+                    <div>
+                        <div class="ch-title">Doanh thu 7 ngày gần nhất</div>
+                        <div class="ch-sub">Theo ngày (triệu ₫)</div>
+                    </div>
+                </div>
+                <div class="ch-wrap" style="height:160px"><canvas id="barWeek"></canvas></div>
+            </div>
+            <div class="ch-card">
+                <div class="ch-hdr">
+                    <div>
+                        <div class="ch-title">Top sản phẩm bán chạy</div>
+                        <div class="ch-sub">Theo doanh thu (triệu ₫)</div>
+                    </div>
+                </div>
+                <div class="ch-wrap" style="height:160px"><canvas id="barProd"></canvas></div>
             </div>
         </div>
     }
 
-    <!-- STATS ROW 1: Orders -->
     <div class="sec-lbl" style="margin-top:8px">📦 Orders</div>
     <div class="stats-g">
         <a class="sc" href="/Admin/Orders">
@@ -536,7 +1221,6 @@
         </a>
     </div>
 
-    <!-- STATS ROW 2: Appointments -->
     <div class="sec-lbl" style="margin-top:20px">📅 Eye Exam Appointments</div>
     <div class="stats-g">
         <a class="sc" href="/Appointments">
@@ -573,9 +1257,7 @@
         </a>
     </div>
 
-    <!-- LOWER 2-COL -->
     <div class="two-col">
-        <!-- Recent orders -->
         <div class="card">
             <div class="card-hdr">
                 <h3><i class="bi bi-bag" style="color:#2563eb"></i> Recent Orders</h3>
@@ -602,7 +1284,6 @@
             }
         </div>
 
-        <!-- Right col: upcoming appointments + pending service orders -->
         <div style="display:flex;flex-direction:column;gap:18px">
             <div class="card">
                 <div class="card-hdr">
@@ -614,8 +1295,7 @@
                     @foreach (var a in Model.UpcomingAppts)
                     {
                         bool isToday = a.AppointmentDate == DateOnly.FromDateTime(DateTime.Today);
-                        var ini = string.Concat(a.FullName.Split(' ').Take(2)
-                        .Select(w => char.ToUpper(w.FirstOrDefault())));
+                        var ini = string.Concat(a.FullName.Split(' ').Take(2).Select(w => char.ToUpper(w.FirstOrDefault())));
                         <div class="appt-row">
                             <div class="av">@ini</div>
                             <div>
@@ -667,3 +1347,228 @@
     </div>
 
 </div>
+
+@section Scripts {
+    @if (Model.IsAdmin)
+    {
+        <script>
+            const _revenueByDay = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RevenueByDay ?? new List<decimal>()));
+            const _serviceRevenueByDay = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ServiceRevenueByDay ?? new List<decimal>()));
+            const _dayLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RevenueByDayLabels ?? new List<string>()));
+            const _topProducts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopProducts ?? new List<decimal>()));
+            const _topProdNames = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopProductNames ?? new List<string>()));
+            const _breakdownLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(breakdownLabels));
+            const _breakdownValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(breakdownValues));
+            const _todayRevPct = "@Model.TodayVsYesterdayPct";
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+        <script>
+            (function () {
+                var gc = '#e2e8f0', tc = '#94a3b8';
+
+                var base = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                };
+
+                function zeroSeries(n) {
+                    return Array.from({ length: n }, function () { return 0; });
+                }
+
+                var data7d = {
+                    labels: _dayLabels.length ? _dayLabels : ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                    prod: _revenueByDay.length ? _revenueByDay.map(function (v) { return +(v / 1e6).toFixed(1); }) : zeroSeries(_dayLabels.length || 7),
+                    svc: _serviceRevenueByDay.length ? _serviceRevenueByDay.map(function (v) { return +(v / 1e6).toFixed(1); }) : zeroSeries(_dayLabels.length || 7)
+                };
+
+                var data30d = {
+                    labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'],
+                    prod: zeroSeries(4),
+                    svc: zeroSeries(4)
+                };
+
+                var lineCtx = document.getElementById('revLine');
+                var lineChart;
+
+                function buildLine(d) {
+                    if (lineChart) lineChart.destroy();
+                    lineChart = new Chart(lineCtx, {
+                        type: 'line',
+                        data: {
+                            labels: d.labels,
+                            datasets: [
+                                {
+                                    label: 'Sản phẩm',
+                                    data: d.prod,
+                                    borderColor: '#185FA5',
+                                    backgroundColor: 'rgba(24,95,165,0.08)',
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointRadius: 3,
+                                    pointHoverRadius: 6,
+                                    borderWidth: 2.5,
+                                    pointBackgroundColor: '#185FA5'
+                                },
+                                {
+                                    label: 'Dịch vụ',
+                                    data: d.svc,
+                                    borderColor: '#0F6E56',
+                                    backgroundColor: 'rgba(15,110,86,0.06)',
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointRadius: 3,
+                                    pointHoverRadius: 6,
+                                    borderWidth: 2.5,
+                                    pointBackgroundColor: '#0F6E56'
+                                }
+                            ]
+                        },
+                        options: {
+                            ...base,
+                            interaction: { mode: 'index', intersect: false },
+                            scales: {
+                                x: { grid: { color: gc }, ticks: { color: tc, font: { size: 11 } } },
+                                y: {
+                                    grid: { color: gc },
+                                    beginAtZero: true,
+                                    ticks: { color: tc, font: { size: 11 }, callback: function (v) { return v + 'M'; } }
+                                }
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (ctx) {
+                                            return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + 'M ₫';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                buildLine(data7d);
+
+                window.switchPeriod = function (p, btn) {
+                    document.querySelectorAll('.ch-tab').forEach(function (t) { t.classList.remove('active'); });
+                    btn.classList.add('active');
+                    buildLine(p === '7d' ? data7d : data30d);
+                };
+
+                new Chart(document.getElementById('revDonut'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: _breakdownLabels,
+                        datasets: [{
+                            data: _breakdownValues,
+                            backgroundColor: ['#185FA5', '#0F6E56', '#BA7517'],
+                            borderWidth: 0,
+                            hoverOffset: 6
+                        }]
+                    },
+                    options: {
+                        ...base,
+                        cutout: '70%',
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (ctx) {
+                                        return ctx.label + ': ' + Number(ctx.parsed).toLocaleString('vi-VN') + ' ₫';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                var dayData = _revenueByDay.length
+                    ? _revenueByDay.map(function (v) { return +(v / 1e6).toFixed(1); })
+                    : zeroSeries(_dayLabels.length || 7);
+
+                var dayLbls = _dayLabels.length ? _dayLabels : ['01/04', '02/04', '03/04', '04/04', '05/04', '06/04', '07/04'];
+
+                new Chart(document.getElementById('barWeek'), {
+                    type: 'bar',
+                    data: {
+                        labels: dayLbls,
+                        datasets: [{
+                            label: 'Doanh thu (M₫)',
+                            data: dayData,
+                            backgroundColor: function (ctx) {
+                                var max = Math.max.apply(null, dayData);
+                                return ctx.parsed.y === max ? '#185FA5' : 'rgba(24,95,165,0.45)';
+                            },
+                            borderRadius: 6,
+                            barPercentage: 0.65
+                        }]
+                    },
+                    options: {
+                        ...base,
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: tc, font: { size: 10 } } },
+                            y: {
+                                grid: { color: gc },
+                                beginAtZero: true,
+                                ticks: { color: tc, font: { size: 10 }, callback: function (v) { return v + 'M'; } }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: function (ctx) { return ctx.parsed.y.toFixed(1) + 'M ₫'; } } }
+                        }
+                    }
+                });
+
+                var prodData = _topProducts.length ? _topProducts.map(function (v) { return +(v / 1e6).toFixed(1); }) : [];
+                var prodNames = _topProdNames.length ? _topProdNames : [];
+                var prodColors = ['#185FA5', '#0F6E56', '#BA7517', '#534AB7', '#7c3aed'];
+
+                new Chart(document.getElementById('barProd'), {
+                    type: 'bar',
+                    data: {
+                        labels: prodNames,
+                        datasets: [{
+                            label: 'Doanh thu (M₫)',
+                            data: prodData,
+                            backgroundColor: prodColors,
+                            borderRadius: 5,
+                            barPercentage: 0.65
+                        }]
+                    },
+                    options: {
+                        ...base,
+                        indexAxis: 'y',
+                        scales: {
+                            x: {
+                                grid: { color: gc },
+                                beginAtZero: true,
+                                ticks: { color: tc, font: { size: 10 }, callback: function (v) { return v + 'M'; } }
+                            },
+                            y: {
+                                grid: { display: false },
+                                ticks: { color: tc, font: { size: 10 }, maxTicksLimit: 5 }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: function (ctx) { return ctx.parsed.x.toFixed(1) + 'M ₫'; } } }
+                        }
+                    }
+                });
+
+                var todayBadge = document.getElementById('today-badge');
+                if (todayBadge) {
+                    var pct = parseFloat(_todayRevPct);
+                    if (!isNaN(pct)) {
+                        todayBadge.textContent = (pct >= 0 ? '↑ +' : '↓ ') + Math.abs(pct).toFixed(1) + '% so hôm qua';
+                        todayBadge.className = 'kpi-delta ' + (pct >= 0 ? 'delta-up' : 'delta-dn');
+                    }
+                }
+            })();
+        </script>
+    }
+}

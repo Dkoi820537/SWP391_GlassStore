@@ -253,12 +253,11 @@ public class CartService : ICartService
     }
 
     // ── GetCartTotalsBreakdownAsync ──────────────────────────────────────────
-
-    public async Task<(decimal SubtotalBase, decimal PrescriptionFeesTotal, decimal GrandTotal)>
+    public async Task<(decimal SubtotalBase, decimal PrescriptionFeesTotal, decimal ShippingFee, decimal GrandTotal)>
         GetCartTotalsBreakdownAsync(int userId)
     {
         var cart = await GetCartByUserIdAsync(userId);
-        if (cart == null) return (0m, 0m, 0m);
+        if (cart == null) return (0m, 0m, 0m, 0m);
 
         // Lấy tất cả lensProductId cần load thêm giá
         var lensIds = cart.CartItems
@@ -277,6 +276,7 @@ public class CartService : ICartService
 
         decimal subtotalBase = 0m;
         decimal prescriptionFeesTotal = 0m;
+        bool hasCustomItems = false;
 
         foreach (var ci in cart.CartItems)
         {
@@ -285,9 +285,12 @@ public class CartService : ICartService
             // Nếu là đơn gia công, cộng thêm giá Lens
             var lensId = ExtractLensProductId(ci.TempPrescriptionJson);
             if (lensId.HasValue && lensPrices.TryGetValue(lensId.Value, out var lensPrice))
+            {
                 baseUnit += lensPrice;
+                hasCustomItems = true;
+            }
 
-            // Cộng phí gia công
+            // Cộng phí gia công / service
             if (ci.Service != null)
                 baseUnit += ci.Service.Price;
 
@@ -295,7 +298,10 @@ public class CartService : ICartService
             prescriptionFeesTotal += ci.PrescriptionFee * ci.Quantity;
         }
 
-        return (subtotalBase, prescriptionFeesTotal, subtotalBase + prescriptionFeesTotal);
+        // Tính phí vận chuyển
+        var shippingFee = ShippingService.CalculateForMixedCart(subtotalBase, hasCustomItems);
+
+        return (subtotalBase, prescriptionFeesTotal, shippingFee, subtotalBase + prescriptionFeesTotal + shippingFee);
     }
 
     // ── Các method còn lại giữ nguyên ────────────────────────────────────────
@@ -379,10 +385,9 @@ public class CartService : ICartService
 
     public async Task<decimal> CalculateCartTotalAsync(int userId)
     {
-        var (_, _, grandTotal) = await GetCartTotalsBreakdownAsync(userId);
+        var (_, _, _, grandTotal) = await GetCartTotalsBreakdownAsync(userId);
         return grandTotal;
     }
-
     // ── Private helpers ──────────────────────────────────────────────────────
 
     private async Task<Cart> GetOrCreateCartAsync(int userId)

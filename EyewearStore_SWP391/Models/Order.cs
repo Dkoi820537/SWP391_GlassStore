@@ -71,7 +71,8 @@ public partial class Order
     /// </summary>
     [Column("pending_balance")]
     public decimal PendingBalance { get; set; }
-
+    [Column("shipping_fee")]
+    public decimal ShippingFee { get; set; } = 0m;
     /// <summary>
     /// "Pending" → "DepositPaid_AwaitingCOD" → "FullyPaid"
     /// </summary>

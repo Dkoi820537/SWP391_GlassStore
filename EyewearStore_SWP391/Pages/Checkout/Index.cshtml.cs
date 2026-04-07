@@ -32,6 +32,12 @@ namespace EyewearStore_SWP391.Pages.Checkout
         public decimal Total { get; set; }
         public decimal SubtotalBase { get; set; }
         public decimal PrescriptionFeesTotal { get; set; }
+
+        // ── MỚI: phí ship ────────────────────────────────────────────────────
+        public decimal ShippingFee { get; set; }
+        public bool IsFreeShipping => ShippingFee == 0m;
+        public decimal FreeShippingThreshold => ShippingService.FreeShippingThreshold;
+
         public List<Address> Addresses { get; set; } = new();
         public Address? DefaultAddress { get; set; }
 
@@ -58,9 +64,13 @@ namespace EyewearStore_SWP391.Pages.Checkout
 
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             Cart = await _cartService.GetCartByUserIdAsync(userId);
-            var (subtotalBase, prescriptionFees, grandTotal) = await _cartService.GetCartTotalsBreakdownAsync(userId);
+
+            var (subtotalBase, prescriptionFees, shippingFee, grandTotal) =
+                await _cartService.GetCartTotalsBreakdownAsync(userId);
+
             SubtotalBase = subtotalBase;
             PrescriptionFeesTotal = prescriptionFees;
+            ShippingFee = shippingFee;
             Total = grandTotal;
 
             if (Cart == null || !Cart.CartItems.Any())
@@ -69,7 +79,6 @@ namespace EyewearStore_SWP391.Pages.Checkout
                 return RedirectToPage("/Cart/Index");
             }
 
-            // Load lens products để hiển thị tên trên checkout page
             await LoadLensProductsAsync(Cart);
             await LoadAddressesAsync(userId);
 
@@ -118,18 +127,16 @@ namespace EyewearStore_SWP391.Pages.Checkout
             if (selectedAddress == null)
             {
                 TempData["ErrorMessage"] = "Please select or add a shipping address.";
-                Cart = await _cartService.GetCartByUserIdAsync(userId);
-                var (sb, pf, gt) = await _cartService.GetCartTotalsBreakdownAsync(userId);
-                SubtotalBase = sb; PrescriptionFeesTotal = pf; Total = gt;
-                await LoadLensProductsAsync(Cart);
-                await LoadAddressesAsync(userId);
+                await ReloadPageDataAsync(userId);
                 return Page();
             }
 
             try
             {
                 var cart = await _cartService.GetCartByUserIdAsync(userId);
-                var (subtotalBase, prescriptionFeesTotal, total) = await _cartService.GetCartTotalsBreakdownAsync(userId);
+
+                var (subtotalBase, prescriptionFeesTotal, shippingFee, total) =
+                    await _cartService.GetCartTotalsBreakdownAsync(userId);
 
                 if (cart == null || !cart.CartItems.Any())
                 {
@@ -148,7 +155,7 @@ namespace EyewearStore_SWP391.Pages.Checkout
                         .ToDictionaryAsync(p => p.ProductId)
                     : new Dictionary<int, Product>();
 
-                // ── STEP: Group cart items by type ────────────────────────────
+                // ── Group cart items by type ──────────────────────────────────
                 var customItems = new List<CartItem>();
                 var standardItems = new List<CartItem>();
 
@@ -161,18 +168,16 @@ namespace EyewearStore_SWP391.Pages.Checkout
                         standardItems.Add(ci);
                 }
 
-                // Generate a shared group ID if we have both types
                 bool hasBothTypes = customItems.Any() && standardItems.Any();
                 string? orderGroupId = hasBothTypes ? Guid.NewGuid().ToString("N") : null;
 
                 var createdOrders = new List<Order>();
 
-                // ── Helper: create an order for a group of items ─────────────
-                async Task<Order> CreateOrderForGroup(
-                    List<CartItem> items, string orderType)
+                // ── Helper: create an order for a group of items ──────────────
+                async Task<Order> CreateOrderForGroup(List<CartItem> items, string orderType)
                 {
-                    // Calculate group total
-                    decimal groupTotal = 0m;
+                    // Tính subtotal của group này
+                    decimal groupSubtotal = 0m;
                     foreach (var ci in items)
                     {
                         var lid = CartService.ExtractLensProductId(ci.TempPrescriptionJson);
@@ -180,8 +185,13 @@ namespace EyewearStore_SWP391.Pages.Checkout
                         if (lid.HasValue && lensProducts.TryGetValue(lid.Value, out var lp))
                             up += lp.Price;
                         if (ci.Service != null) up += ci.Service.Price;
-                        groupTotal += (up + ci.PrescriptionFee) * ci.Quantity;
+                        groupSubtotal += (up + ci.PrescriptionFee) * ci.Quantity;
                     }
+
+                    // Phí ship cho riêng group này
+                    bool isCustomGroup = string.Equals(orderType, "Custom", StringComparison.OrdinalIgnoreCase);
+                    decimal groupShipping = ShippingService.Calculate(groupSubtotal, orderType);
+                    decimal groupTotal = groupSubtotal + groupShipping;
 
                     var order = new Order
                     {
@@ -191,7 +201,8 @@ namespace EyewearStore_SWP391.Pages.Checkout
                         AddressLine = selectedAddress.AddressLine,
                         AddressId = selectedAddress.AddressId,
                         TotalAmount = groupTotal,
-                        Status = "Pending",  // Both COD and Stripe start as Pending (payment via Stripe)
+                        ShippingFee = groupShipping,          // ← cột mới
+                        Status = "Pending",
                         PaymentMethod = PaymentMethod == "COD" ? "COD" : "Stripe",
                         OrderType = orderType,
                         OrderGroupId = orderGroupId,
@@ -255,7 +266,7 @@ namespace EyewearStore_SWP391.Pages.Checkout
                     return order;
                 }
 
-                // ── Create order(s) ──────────────────────────────────────────
+                // ── Create order(s) ───────────────────────────────────────────
                 if (standardItems.Any())
                     createdOrders.Add(await CreateOrderForGroup(standardItems, "Standard"));
 
@@ -265,16 +276,14 @@ namespace EyewearStore_SWP391.Pages.Checkout
                 // ── COD PATH — 50% deposit via Stripe ────────────────────────
                 if (PaymentMethod == "COD")
                 {
-                    // Set deposit = 50% of each order's total
                     foreach (var ord in createdOrders)
                     {
                         ord.DepositAmount = Math.Ceiling(ord.TotalAmount * 0.5m);
                         ord.PendingBalance = ord.TotalAmount - ord.DepositAmount;
-                        ord.PaymentStatus = "Pending";  // will become DepositPaid_AwaitingCOD after Stripe payment
+                        ord.PaymentStatus = "Pending";
                     }
                     await _context.SaveChangesAsync();
 
-                    // Build Stripe line items for deposit amounts only
                     var depositLineItems = new List<StripeLineItemDto>();
                     foreach (var ord in createdOrders)
                     {
@@ -292,10 +301,8 @@ namespace EyewearStore_SWP391.Pages.Checkout
                     var baseUrlCod = $"{Request.Scheme}://{Request.Host}";
                     var successUrlCod = $"{baseUrlCod}/Checkout/Success";
                     var cancelUrlCod = $"{baseUrlCod}/Checkout/Cancel";
-
                     var userEmailCod = User.FindFirst(ClaimTypes.Email)?.Value
-                                     ?? User.FindFirst(ClaimTypes.Name)?.Value
-                                     ?? "";
+                                      ?? User.FindFirst(ClaimTypes.Name)?.Value ?? "";
 
                     var codOrderIds = createdOrders.Select(o => o.OrderId).ToList();
                     var stripeUrlCod = await _stripeService.CreateCheckoutSessionAsync(
@@ -304,13 +311,12 @@ namespace EyewearStore_SWP391.Pages.Checkout
                     return Redirect(stripeUrlCod);
                 }
 
-                // ── STRIPE (FULL PAYMENT) PATH ──────────────────────────────
-                // Set deposit = full amount (no balance due)
+                // ── STRIPE (FULL PAYMENT) PATH ────────────────────────────────
                 foreach (var ord in createdOrders)
                 {
                     ord.DepositAmount = ord.TotalAmount;
                     ord.PendingBalance = 0;
-                    ord.PaymentStatus = "Pending"; // will become FullyPaid after Stripe payment
+                    ord.PaymentStatus = "Pending";
                 }
                 await _context.SaveChangesAsync();
 
@@ -355,13 +361,23 @@ namespace EyewearStore_SWP391.Pages.Checkout
                     });
                 }
 
+                // Thêm shipping fee vào Stripe line items (mỗi order group)
+                foreach (var ord in createdOrders.Where(o => o.ShippingFee > 0))
+                {
+                    lineItems.Add(new StripeLineItemDto
+                    {
+                        ProductName = $"Shipping fee — {ord.OrderType} order",
+                        UnitAmountInSmallestUnit = (long)ord.ShippingFee,
+                        Quantity = 1,
+                        ImageUrl = null
+                    });
+                }
+
                 var baseUrl = $"{Request.Scheme}://{Request.Host}";
                 var successUrl = $"{baseUrl}/Checkout/Success";
                 var cancelUrl = $"{baseUrl}/Checkout/Cancel";
-
                 var userEmail = User.FindFirst(ClaimTypes.Email)?.Value
-                             ?? User.FindFirst(ClaimTypes.Name)?.Value
-                             ?? "";
+                              ?? User.FindFirst(ClaimTypes.Name)?.Value ?? "";
 
                 var allOrderIds = createdOrders.Select(o => o.OrderId).ToList();
                 var stripeUrl = await _stripeService.CreateCheckoutSessionAsync(
@@ -372,13 +388,23 @@ namespace EyewearStore_SWP391.Pages.Checkout
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
-                Cart = await _cartService.GetCartByUserIdAsync(userId);
-                var (sb, pf, gt) = await _cartService.GetCartTotalsBreakdownAsync(userId);
-                SubtotalBase = sb; PrescriptionFeesTotal = pf; Total = gt;
-                await LoadLensProductsAsync(Cart);
-                await LoadAddressesAsync(userId);
+                await ReloadPageDataAsync(userId);
                 return Page();
             }
+        }
+
+        // ── Helpers ──────────────────────────────────────────────────────────
+
+        private async Task ReloadPageDataAsync(int userId)
+        {
+            Cart = await _cartService.GetCartByUserIdAsync(userId);
+            var (sb, pf, sf, gt) = await _cartService.GetCartTotalsBreakdownAsync(userId);
+            SubtotalBase = sb;
+            PrescriptionFeesTotal = pf;
+            ShippingFee = sf;
+            Total = gt;
+            await LoadLensProductsAsync(Cart);
+            await LoadAddressesAsync(userId);
         }
 
         private async Task LoadLensProductsAsync(Models.Cart? cart)

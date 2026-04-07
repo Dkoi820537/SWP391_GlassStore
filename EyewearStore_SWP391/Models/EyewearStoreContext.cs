@@ -58,6 +58,7 @@ public partial class EyewearStoreContext : DbContext
     // Wishlist
     public virtual DbSet<Wishlist> Wishlists { get; set; }
     public virtual DbSet<EyeExamAppointment> EyeExamAppointments { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         // Connection string is configured via appsettings.json and DI in Program.cs
@@ -272,8 +273,8 @@ public partial class EyewearStoreContext : DbContext
                 .HasColumnType("decimal(18,2)")
                 .HasColumnName("prescription_fee");
             entity.Property(e => e.Brand)
-    .HasMaxLength(100)
-    .HasColumnName("brand");
+                .HasMaxLength(100)
+                .HasColumnName("brand");
             entity.Property(e => e.Origin)
                 .HasMaxLength(100)
                 .HasColumnName("origin");
@@ -388,9 +389,10 @@ public partial class EyewearStoreContext : DbContext
             entity.Property(e => e.UpdatedAt)
                 .HasColumnName("updated_at");
             entity.Property(e => e.ServiceCategory)
-             .HasMaxLength(50)
-            .HasColumnName("service_category");
+                .HasMaxLength(50)
+                .HasColumnName("service_category");
         });
+
         // =========================
         // PRODUCT IMAGES
         // =========================
@@ -552,54 +554,97 @@ public partial class EyewearStoreContext : DbContext
         // =========================
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.ToTable("orders");
+            entity.ToTable("orders", "dbo");
             entity.HasKey(e => e.OrderId);
 
             entity.HasIndex(e => e.UserId).HasDatabaseName("IX_orders_user");
             entity.HasIndex(e => e.StripeSessionId).HasDatabaseName("IX_orders_stripe_session");
+            entity.HasIndex(e => e.OrderGroupId).HasDatabaseName("IX_orders_order_group");
 
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.AddressId).HasColumnName("address_id");
+
+            entity.Property(e => e.ReceiverName)
+                .HasMaxLength(100)
+                .IsRequired()
+                .HasColumnName("receiver_name");
+
+            entity.Property(e => e.Phone)
+                .HasMaxLength(20)
+                .IsRequired()
+                .HasColumnName("phone");
+
+            entity.Property(e => e.AddressLine)
+                .HasMaxLength(500)
+                .IsRequired()
+                .HasColumnName("address_line");
+
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .IsRequired()
                 .HasColumnName("status");
+
             entity.Property(e => e.TotalAmount)
                 .HasColumnType("decimal(18,2)")
                 .IsRequired()
                 .HasColumnName("total_amount");
+
             entity.Property(e => e.PaymentMethod)
                 .HasMaxLength(50)
                 .HasColumnName("payment_method");
-            entity.Property(e => e.StripeSessionId)
-                .HasMaxLength(255)
-                .HasColumnName("stripe_session_id");
-            entity.Property(e => e.StripePaymentIntentId)
-                .HasMaxLength(255)
-                .HasColumnName("stripe_payment_intent_id");
-            entity.Property(e => e.OrderGroupId)
-                .HasMaxLength(36)
-                .HasColumnName("order_group_id");
-            entity.Property(e => e.OrderType)
-                .HasMaxLength(20)
-                .HasDefaultValue("Standard")
-                .HasColumnName("order_type");
+
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("SYSDATETIME()")
                 .HasColumnName("created_at");
 
-            // ── Cancellation / Refund columns ────────────────────────────
+            entity.Property(e => e.StripeSessionId)
+                .HasMaxLength(255)
+                .HasColumnName("stripe_session_id");
+
+            entity.Property(e => e.StripePaymentIntentId)
+                .HasMaxLength(255)
+                .HasColumnName("stripe_payment_intent_id");
+
+            entity.Property(e => e.OrderGroupId)
+                .HasMaxLength(36)
+                .HasColumnName("order_group_id");
+
+            entity.Property(e => e.OrderType)
+                .HasMaxLength(20)
+                .HasDefaultValue("Standard")
+                .HasColumnName("order_type");
+
+            entity.Property(e => e.DepositAmount)
+                .HasColumnType("decimal(18,2)")
+                .HasDefaultValue(0m)
+                .HasColumnName("deposit_amount");
+
+            entity.Property(e => e.PendingBalance)
+                .HasColumnType("decimal(18,2)")
+                .HasDefaultValue(0m)
+                .HasColumnName("pending_balance");
+
+            entity.Property(e => e.ShippingFee)
+                .HasColumnType("decimal(18,2)")
+                .HasDefaultValue(0m)
+                .HasColumnName("shipping_fee");
+
+            entity.Property(e => e.PaymentStatus)
+                .HasMaxLength(50)
+                .HasDefaultValue("Pending")
+                .HasColumnName("payment_status");
+
             entity.Property(e => e.CancellationIdempotencyKey)
                 .HasMaxLength(36)
                 .HasColumnName("cancellation_idempotency_key");
+
             entity.Property(e => e.RefundAmount)
                 .HasColumnType("decimal(18,2)")
                 .HasColumnName("refund_amount");
+
             entity.Property(e => e.CancelledAt)
                 .HasColumnName("cancelled_at");
-
-            entity.HasIndex(e => e.OrderGroupId).HasDatabaseName("IX_orders_order_group");
 
             entity.HasOne(d => d.User)
                 .WithMany(p => p.Orders)
@@ -869,6 +914,7 @@ public partial class EyewearStoreContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_wishlist_product");
         });
+
         modelBuilder.Entity<EyeExamAppointment>(entity =>
         {
             entity.ToTable("EyeExamAppointments");

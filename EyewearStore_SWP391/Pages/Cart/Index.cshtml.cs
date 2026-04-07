@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using EyewearStore_SWP391.Models;
 using EyewearStore_SWP391.Services;
@@ -19,26 +19,33 @@ namespace EyewearStore_SWP391.Pages.Cart
         }
 
         public Models.Cart? Cart { get; set; }
+
         public decimal Total { get; set; }
         public decimal SubtotalBase { get; set; }
         public decimal PrescriptionFeesTotal { get; set; }
+        public decimal ShippingFee { get; set; }
+
         public List<PrescriptionProfile> Prescriptions { get; set; } = new();
 
         /// <summary>
-        /// Dictionary lensProductId → Product, dùng để hiển thị tên + giá Lens
+        /// Dictionary lensProductId -> Product, dùng để hiển thị tên + giá Lens
         /// trong các CartItem của đơn gia công.
         /// </summary>
         public Dictionary<int, Product> LensProducts { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync()
         {
-            if (!User.Identity!.IsAuthenticated) return Challenge();
-            var uid = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            if (User.Identity?.IsAuthenticated != true)
+                return Challenge();
+
+            var uidValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(uidValue, out var uid))
+                return Challenge();
 
             Cart = await _cartService.GetCartByUserIdAsync(uid);
 
             // Load Lens products cho các đơn gia công
-            if (Cart != null)
+            if (Cart?.CartItems != null)
             {
                 var lensIds = Cart.CartItems
                     .Select(ci => CartService.ExtractLensProductId(ci.TempPrescriptionJson))
@@ -55,11 +62,12 @@ namespace EyewearStore_SWP391.Pages.Cart
                 }
             }
 
-            var (subtotalBase, prescriptionFees, grandTotal) =
+            var (subtotalBase, prescriptionFees, shippingFee, grandTotal) =
                 await _cartService.GetCartTotalsBreakdownAsync(uid);
 
             SubtotalBase = subtotalBase;
             PrescriptionFeesTotal = prescriptionFees;
+            ShippingFee = shippingFee;
             Total = grandTotal;
 
             await LoadPrescriptionsAsync(uid);
@@ -81,22 +89,48 @@ namespace EyewearStore_SWP391.Pages.Cart
                 await _cartService.UpdateQuantityAsync(cartItemId, quantity);
                 TempData["SuccessMessage"] = "Cart updated successfully";
             }
-            catch (Exception ex) { TempData["ErrorMessage"] = ex.Message; }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
             return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostRemoveAsync(int cartItemId)
         {
-            await _cartService.RemoveItemAsync(cartItemId);
-            TempData["SuccessMessage"] = "Item removed from cart";
+            try
+            {
+                await _cartService.RemoveItemAsync(cartItemId);
+                TempData["SuccessMessage"] = "Item removed from cart";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
             return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostClearAsync()
         {
-            var uid = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            await _cartService.ClearCartAsync(uid);
-            TempData["SuccessMessage"] = "Cart has been cleared";
+            try
+            {
+                if (User.Identity?.IsAuthenticated != true)
+                    return Challenge();
+
+                var uidValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(uidValue, out var uid))
+                    return Challenge();
+
+                await _cartService.ClearCartAsync(uid);
+                TempData["SuccessMessage"] = "Cart has been cleared";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
             return RedirectToPage();
         }
 
@@ -107,7 +141,11 @@ namespace EyewearStore_SWP391.Pages.Cart
                 await _cartService.UpdateItemPrescriptionAsync(cartItemId, tempPrescriptionJson);
                 TempData["SuccessMessage"] = "Prescription updated successfully";
             }
-            catch (Exception ex) { TempData["ErrorMessage"] = ex.Message; }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
             return RedirectToPage();
         }
 
@@ -115,11 +153,21 @@ namespace EyewearStore_SWP391.Pages.Cart
         {
             try
             {
-                var uid = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+                if (User.Identity?.IsAuthenticated != true)
+                    return Challenge();
+
+                var uidValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(uidValue, out var uid))
+                    return Challenge();
+
                 await _cartService.UpdateItemPrescriptionByIdAsync(cartItemId, prescriptionId, uid);
                 TempData["SuccessMessage"] = "Prescription updated for this item.";
             }
-            catch (Exception ex) { TempData["ErrorMessage"] = ex.Message; }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
             return RedirectToPage();
         }
     }

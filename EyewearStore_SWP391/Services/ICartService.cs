@@ -1,4 +1,3 @@
-// Services/ICartService.cs
 using System.Threading.Tasks;
 using EyewearStore_SWP391.Models;
 using System.Collections.Generic;
@@ -27,6 +26,15 @@ namespace EyewearStore_SWP391.Services
         Task RemoveItemAsync(int cartItemId);
         Task ClearCartAsync(int userId);
         Task<decimal> CalculateCartTotalAsync(int userId);
-        Task<(decimal SubtotalBase, decimal PrescriptionFeesTotal, decimal GrandTotal)> GetCartTotalsBreakdownAsync(int userId);
+
+        /// <summary>
+        /// Trả về breakdown chi tiết:
+        ///   SubtotalBase        — tổng tiền hàng (frame + lens + service)
+        ///   PrescriptionFeesTotal — tổng phí Rx
+        ///   ShippingFee         — phí vận chuyển (0 nếu đủ ngưỡng miễn phí)
+        ///   GrandTotal          — SubtotalBase + PrescriptionFeesTotal + ShippingFee
+        /// </summary>
+        Task<(decimal SubtotalBase, decimal PrescriptionFeesTotal, decimal ShippingFee, decimal GrandTotal)>
+            GetCartTotalsBreakdownAsync(int userId);
     }
 }

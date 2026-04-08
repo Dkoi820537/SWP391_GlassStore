@@ -168,8 +168,10 @@ namespace EyewearStore_SWP391.Pages.Checkout
                         standardItems.Add(ci);
                 }
 
-                bool hasBothTypes = customItems.Any() && standardItems.Any();
-                string? orderGroupId = hasBothTypes ? Guid.NewGuid().ToString("N") : null;
+                // Each custom item gets its own order, so total orders =
+                // (1 if standard items exist) + (number of custom items)
+                int totalOrderCount = (standardItems.Any() ? 1 : 0) + customItems.Count;
+                string? orderGroupId = totalOrderCount > 1 ? Guid.NewGuid().ToString("N") : null;
 
                 var createdOrders = new List<Order>();
 
@@ -267,11 +269,13 @@ namespace EyewearStore_SWP391.Pages.Checkout
                 }
 
                 // ── Create order(s) ───────────────────────────────────────────
+                // Standard items → one combined order (unchanged behaviour)
                 if (standardItems.Any())
                     createdOrders.Add(await CreateOrderForGroup(standardItems, "Standard"));
 
-                if (customItems.Any())
-                    createdOrders.Add(await CreateOrderForGroup(customItems, "Custom"));
+                // Custom items → one separate order per item
+                foreach (var customItem in customItems)
+                    createdOrders.Add(await CreateOrderForGroup(new List<CartItem> { customItem }, "Custom"));
 
                 // ── COD PATH — 50% deposit via Stripe ────────────────────────
                 if (PaymentMethod == "COD")

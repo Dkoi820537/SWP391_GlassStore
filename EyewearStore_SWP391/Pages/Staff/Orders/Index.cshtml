@@ -1,888 +1,1076 @@
 ﻿@page
-@model EyewearStore_SWP391.Pages.Staff.Orders.IndexModel
+@model EyewearStore_SWP391.Pages.Orders.IndexModel
 @{
-    ViewData["Title"] = "Operations Dashboard";
+    ViewData["Title"] = "My Orders";
+
+    string[] steps = { "Pending", "Confirmed", "Processing", "Shipped", "Delivered" };
+
+    int StepIndex(string status) => status switch
+    {
+        "Confirmed" => 1,
+        "Processing" => 2,
+        var s when s.StartsWith("Processing") => 2,
+        "Shipped" => 3,
+        "Delivered" => 4,
+        "Completed" => 4,
+        "Cancelled" => -1,
+        _ => 0
+    };
+
+    string StepIcon(string status) => status switch
+    {
+        "Pending" or "Pending Confirmation" => "bi-hourglass-split",
+        "Confirmed" => "bi-check-circle-fill",
+        var s when s.StartsWith("Processing") => "bi-gear-fill",
+        "Shipped" => "bi-truck",
+        "Delivered" => "bi-box-seam-fill",
+        "Completed" => "bi-patch-check-fill",
+        "Cancelled" or "Cancellation_Pending" => "bi-x-circle-fill",
+        _ => "bi-box"
+    };
+
+    string StatusMsg(string status) => status switch
+    {
+        "Pending" => "Received — awaiting payment confirmation.",
+        "Pending Confirmation" => "Payment received — we're reviewing your order.",
+        "Confirmed" => "Confirmed! We'll begin processing soon.",
+        "Processing" => "We're preparing your items.",
+        "Processing - Lens Ordered" => "Lenses have been ordered for your frame.",
+        "Processing - Lens Received" => "Lenses received — preparing to fit.",
+        "Processing - Fitting" => "Technicians are fitting your lenses.",
+        "Processing - QC" => "Undergoing quality control checks.",
+        "Processing - Packed" => "Packed and ready to ship.",
+        "Shipped" => "On the way! Your order has been shipped.",
+        "Delivered" => "Successfully delivered. Enjoy!",
+        "Completed" => "Order completed. Thank you for choosing OptiPlus!",
+        "Cancelled" => "This order has been cancelled.",
+        "Cancellation_Pending" => "Cancellation in progress...",
+        _ => ""
+    };
+
+    string StatusClass(string status)
+    {
+        if (status.StartsWith("Processing")) return "Processing";
+        if (status.StartsWith("Pending")) return "Pending";
+        if (status is "Completed" or "Delivered") return "Done";
+        if (status is "Cancelled" or "Cancellation_Pending") return "Cancelled";
+        if (status == "Confirmed") return "Confirmed";
+        if (status == "Shipped") return "Shipped";
+        return "Pending";
+    }
+
+    string GetImageUrl(EyewearStore_SWP391.Models.Order order)
+    {
+        var fi = order.OrderItems.FirstOrDefault();
+        return fi?.Product?.ProductImages?.FirstOrDefault(i => i.IsPrimary && i.IsActive)?.ImageUrl
+            ?? fi?.Product?.ProductImages?.FirstOrDefault(i => i.IsActive)?.ImageUrl
+            ?? "";
+    }
+
+    int total = Model.Orders.Count;
+    int pending = Model.Orders.Count(o => o.Status is "Pending" or "Pending Confirmation");
+    int confirmed = Model.Orders.Count(o => o.Status == "Confirmed");
+    int inprog = Model.Orders.Count(o => o.Status != null && o.Status.StartsWith("Processing"));
+    int shipped = Model.Orders.Count(o => o.Status == "Shipped");
+    int delivered = Model.Orders.Count(o => o.Status is "Delivered" or "Completed");
+    int cancelled = Model.Orders.Count(o => o.Status is "Cancelled" or "Cancellation_Pending");
 }
 
 @section Styles {
     <style>
         :root {
+            --bg: #f4f5fb;
+            --surf: #ffffff;
+            --surf2: #f0f2f8;
+            --bdr: rgba(99,102,141,.12);
             --navy: #0d1b2a;
             --navy2: #1a2f54;
-            --teal: #0f766e;
-            --teal2: #0d9488;
-            --red: #dc2626;
-            --red-s: rgba(220,38,38,.08);
+            --gold: #b8862a;
+            --gold2: #d4a74a;
             --ok: #059669;
-            --ok-s: rgba(5,150,105,.08);
+            --ok-bg: rgba(5,150,105,.08);
+            --ok-bdr: rgba(5,150,105,.2);
             --warn: #d97706;
-            --purp: #7c3aed;
-            --txt: #0f172a;
-            --txt2: #475569;
-            --muted: #94a3b8;
-            --surf: #fff;
-            --bg: #f1f5f9;
-            --bg2: #e8edf4;
-            --bdr: #e2e8f0;
-            --bdr2: #cbd5e1;
-            --sh: 0 1px 4px rgba(0,0,0,.06), 0 2px 10px rgba(0,0,0,.04);
-            --sh-md: 0 4px 20px rgba(0,0,0,.09);
-            --r: 12px;
+            --warn-bg: rgba(217,119,6,.09);
+            --warn-bdr: rgba(217,119,6,.24);
+            --info: #2563eb;
+            --info-bg: rgba(37,99,235,.08);
+            --info-bdr: rgba(37,99,235,.2);
+            --teal: #0d9488;
+            --teal-bg: rgba(13,148,136,.08);
+            --teal-bdr: rgba(13,148,136,.2);
+            --err: #dc2626;
+            --err-bg: rgba(220,38,38,.08);
+            --err-bdr: rgba(220,38,38,.2);
+            --muted: #8b8da8;
+            --txt: #12132a;
+            --sh: 0 1px 6px rgba(18,19,42,.06);
+            --sh-md: 0 4px 24px rgba(18,19,42,.09);
+            --sh-lg: 0 8px 40px rgba(18,19,42,.13);
         }
 
         *, *::before, *::after {
-            box-sizing: border-box
+            box-sizing: border-box;
         }
 
         body {
             background: var(--bg);
-            font-family: 'Segoe UI', system-ui, sans-serif
+            color: var(--txt);
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
 
-        .ops-pg {
-            max-width: 1320px;
+        .st-wrap {
+            max-width: 900px;
             margin: 0 auto;
-            padding: 28px 20px 80px
+            padding: 40px 20px 90px;
         }
 
-        .ops-hdr {
-            background: linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);
-            border-radius: 16px;
-            padding: 24px 28px;
-            margin-bottom: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            flex-wrap: wrap
+        /* ── HERO ── */
+        .hero {
+            background: linear-gradient(135deg, #07101e 0%, #13243d 55%, #0c2240 100%);
+            border-radius: 22px;
+            padding: 40px 38px 32px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .ops-hdr-left h1 {
-            font-size: 1.55rem;
-            font-weight: 900;
-            color: #fff;
-            margin: 0 0 3px;
-            letter-spacing: -.5px
-        }
-
-        .ops-hdr-left p {
-            font-size: 13px;
-            color: rgba(255,255,255,.45);
-            margin: 0
-        }
-
-        .hdr-actions {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap
-        }
-
-        .btn-refresh {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255,255,255,.1);
-            border: 1px solid rgba(255,255,255,.18);
-            color: rgba(255,255,255,.85);
-            padding: 10px 18px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all .22s
-        }
-
-            .btn-refresh:hover {
-                background: rgba(255,255,255,.18);
-                color: #fff
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: -60px;
+                right: -60px;
+                width: 300px;
+                height: 300px;
+                border-radius: 50%;
+                background: radial-gradient(circle, rgba(184,134,42,.12) 0%, transparent 70%);
+                pointer-events: none;
             }
 
-        .al {
+            .hero::after {
+                content: '';
+                position: absolute;
+                bottom: -30px;
+                left: 50px;
+                width: 160px;
+                height: 160px;
+                border-radius: 50%;
+                background: radial-gradient(circle, rgba(37,99,235,.08) 0%, transparent 70%);
+                pointer-events: none;
+            }
+
+        .hero-eyebrow {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: rgba(255,255,255,.3);
+            text-transform: uppercase;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 8px;
-            border-radius: 10px;
-            padding: 11px 16px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 16px
         }
 
-        .al-ok {
-            background: var(--ok-s);
-            border: 1px solid rgba(5,150,105,.2);
-            color: var(--ok);
-            animation: sIn .3s ease
-        }
-
-        .al-err {
-            background: var(--red-s);
-            border: 1px solid rgba(220,38,38,.2);
-            color: var(--red)
-        }
-
-        @@keyframes sIn {
-            from {
-                opacity: 0;
-                transform: translateY(-4px)
+            .hero-eyebrow::before {
+                content: '✦';
+                color: var(--gold2);
             }
 
-            to {
-                opacity: 1;
-                transform: translateY(0)
-            }
-        }
-
-        /* Stats — now 3 cards (removed ServiceCount) */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(3,1fr);
-            gap: 14px;
-            margin-bottom: 22px
-        }
-
-        .stat-card {
-            background: var(--surf);
-            border: 1px solid var(--bdr);
-            border-radius: var(--r);
-            padding: 18px 20px;
-            box-shadow: var(--sh);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            gap: 14px
-        }
-
-            .stat-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 3px
-            }
-
-        .stat-c1::before {
-            background: var(--warn)
-        }
-
-        .stat-c2::before {
-            background: var(--teal)
-        }
-
-        .stat-c4::before {
-            background: var(--ok)
-        }
-
-        .stat-ico {
-            width: 44px;
-            height: 44px;
-            border-radius: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            flex-shrink: 0
-        }
-
-        .ico-warn {
-            background: rgba(217,119,6,.1);
-            color: var(--warn)
-        }
-
-        .ico-teal {
-            background: var(--ok-s);
-            color: var(--teal)
-        }
-
-        .ico-ok {
-            background: var(--ok-s);
-            color: var(--ok)
-        }
-
-        .stat-lbl {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: .8px;
-            margin-bottom: 4px
-        }
-
-        .stat-val {
-            font-size: 1.9rem;
+        .hero h1 {
+            font-size: 2.2rem;
             font-weight: 900;
-            color: var(--navy);
-            line-height: 1
+            color: #fff;
+            margin: 0 0 6px;
+            letter-spacing: -.6px;
         }
 
-        .stat-sub {
-            font-size: 11px;
-            color: var(--muted);
-            margin-top: 3px
+        .hero p {
+            font-size: 14px;
+            color: rgba(255,255,255,.45);
+            margin: 0 0 28px;
         }
 
-        .filter-card {
-            background: var(--surf);
-            border: 1px solid var(--bdr);
-            border-radius: var(--r);
-            padding: 16px 18px;
-            margin-bottom: 16px;
-            box-shadow: var(--sh)
-        }
-
-            .filter-card h6 {
-                font-size: 11px;
-                font-weight: 800;
-                text-transform: uppercase;
-                letter-spacing: .8px;
-                color: var(--muted);
-                margin: 0 0 12px
-            }
-
-        .filter-row {
+        .hero-stats {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
-            align-items: flex-end
         }
 
-        .fi {
-            background: var(--bg);
-            border: 1.5px solid var(--bdr);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 13px;
-            color: var(--txt);
-            font-family: inherit;
-            transition: border-color .2s;
-            flex: 1;
-            min-width: 150px
+        .stat-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,.07);
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 100px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(255,255,255,.75);
         }
 
-            .fi:focus {
-                outline: none;
-                border-color: var(--teal);
-                box-shadow: 0 0 0 3px rgba(15,118,110,.1)
+            .stat-pill .sp-dot {
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
             }
 
-        .fi-search {
-            flex: 2;
-            min-width: 220px
-        }
+            .stat-pill .sp-num {
+                font-size: 15px;
+                font-weight: 900;
+                color: #fff;
+            }
 
-        .fi-sm {
-            width: 90px;
-            flex: none
-        }
-
-        .btn-filter {
-            padding: 9px 20px;
-            background: linear-gradient(135deg,var(--navy),var(--navy2));
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all .2s;
+        /* ── ALERTS ── */
+        .alert-custom {
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin-bottom: 18px;
             display: flex;
             align-items: center;
-            gap: 6px
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 600;
         }
 
-            .btn-filter:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(13,27,42,.25)
+        .alert-success-c {
+            background: var(--ok-bg);
+            color: #065f46;
+            border: 1px solid var(--ok-bdr);
+        }
+
+        .alert-error-c {
+            background: var(--err-bg);
+            color: #991b1b;
+            border: 1px solid var(--err-bdr);
+        }
+
+        .alert-custom .al-close {
+            margin-left: auto;
+            cursor: pointer;
+            opacity: .5;
+            font-size: 16px;
+            background: none;
+            border: none;
+            color: inherit;
+            padding: 0;
+        }
+
+            .alert-custom .al-close:hover {
+                opacity: 1;
             }
 
-        .qf-row {
+        /* ── FILTER TABS ── */
+        .filter-bar {
             display: flex;
-            gap: 7px;
+            gap: 8px;
+            margin-bottom: 22px;
             flex-wrap: wrap;
-            margin-top: 10px
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: 14px;
+            padding: 8px;
+            box-shadow: var(--sh);
         }
 
-        .qf {
+        .f-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 9px;
+            border: none;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            background: transparent;
+            color: var(--muted);
+            transition: all .18s;
+            white-space: nowrap;
+        }
+
+            .f-tab:hover {
+                background: var(--surf2);
+                color: var(--txt);
+            }
+
+            .f-tab.active {
+                background: var(--navy);
+                color: #fff;
+                box-shadow: 0 2px 8px rgba(13,27,42,.25);
+            }
+
+            .f-tab .ft-count {
+                border-radius: 100px;
+                padding: 1px 7px;
+                font-size: 10px;
+            }
+
+            .f-tab.active .ft-count {
+                background: rgba(255,255,255,.18);
+            }
+
+            .f-tab:not(.active) .ft-count {
+                background: var(--surf2);
+                color: var(--muted);
+            }
+
+        /* ── ORDER CARD ── */
+        .order-card {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--sh-md);
+            margin-bottom: 16px;
+            transition: transform .2s, box-shadow .2s, border-color .2s;
+            position: relative;
+        }
+
+            .order-card:hover {
+                transform: translateY(-3px);
+                box-shadow: var(--sh-lg);
+                color: inherit;
+            }
+
+                .order-card:hover .card-arrow {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+
+            /* left accent bar */
+            .order-card::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 4px;
+                border-radius: 20px 0 0 20px;
+            }
+
+            .order-card.cls-Pending::before {
+                background: var(--warn);
+            }
+
+            .order-card.cls-Confirmed::before {
+                background: var(--info);
+            }
+
+            .order-card.cls-Processing::before {
+                background: var(--navy);
+            }
+
+            .order-card.cls-Shipped::before {
+                background: var(--teal);
+            }
+
+            .order-card.cls-Done::before {
+                background: var(--ok);
+            }
+
+            .order-card.cls-Cancelled::before {
+                background: var(--err);
+            }
+
+        /* ── CARD LAYOUT ── */
+        .card-top {
+            padding: 20px 24px 16px 28px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .prod-img {
+            width: 76px;
+            height: 76px;
+            border-radius: 14px;
+            object-fit: cover;
+            background: var(--surf2);
+            flex-shrink: 0;
+            border: 1px solid var(--bdr);
+        }
+
+        .prod-img-ph {
+            width: 76px;
+            height: 76px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--surf2), #e8eaf5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            border: 1px solid var(--bdr);
+            flex-shrink: 0;
+        }
+
+        .card-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-oid {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--txt);
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .st-badge {
             display: inline-flex;
             align-items: center;
             gap: 5px;
             padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            text-decoration: none;
-            border: 1.5px solid;
-            transition: all .15s
-        }
-
-        .qf-navy {
-            color: var(--navy);
-            border-color: var(--navy)
-        }
-
-            .qf-navy:hover {
-                background: var(--navy);
-                color: #fff
-            }
-
-        .qf-teal {
-            color: var(--teal);
-            border-color: var(--teal)
-        }
-
-            .qf-teal:hover {
-                background: var(--teal);
-                color: #fff
-            }
-
-        .qf-warn {
-            color: var(--warn);
-            border-color: var(--warn)
-        }
-
-            .qf-warn:hover {
-                background: var(--warn);
-                color: #fff
-            }
-
-        .tbl-card {
-            background: var(--surf);
-            border: 1px solid var(--bdr);
-            border-radius: var(--r);
-            overflow: hidden;
-            box-shadow: var(--sh-md)
-        }
-
-        .tbl-top {
-            padding: 14px 20px;
-            background: linear-gradient(135deg,var(--navy),var(--navy2));
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px
-        }
-
-            .tbl-top h5 {
-                font-size: 13px;
-                font-weight: 800;
-                color: #fff;
-                margin: 0;
-                display: flex;
-                align-items: center;
-                gap: 8px
-            }
-
-        .tbl-badge {
-            background: rgba(255,255,255,.15);
-            border-radius: 6px;
-            padding: 2px 10px;
-            font-size: 11px;
-            font-weight: 700
-        }
-
-        .tbl-info {
-            font-size: 12px;
-            color: rgba(255,255,255,.55)
-        }
-
-            .tbl-info strong {
-                color: rgba(255,255,255,.9)
-            }
-
-        .ops-tbl {
-            width: 100%;
-            border-collapse: collapse
-        }
-
-            .ops-tbl th {
-                font-size: 10px;
-                font-weight: 800;
-                text-transform: uppercase;
-                letter-spacing: .9px;
-                color: var(--muted);
-                padding: 11px 16px;
-                background: var(--bg2);
-                border-bottom: 1px solid var(--bdr);
-                text-align: left;
-                white-space: nowrap
-            }
-
-            .ops-tbl td {
-                padding: 13px 16px;
-                border-bottom: 1px solid var(--bdr);
-                font-size: 13px;
-                color: var(--txt2);
-                vertical-align: middle
-            }
-
-            .ops-tbl tbody tr:last-child td {
-                border-bottom: none
-            }
-
-            .ops-tbl tbody tr:hover td {
-                background: rgba(15,118,110,.025)
-            }
-
-            .ops-tbl tbody tr.urgent-row td {
-                background: rgba(220,38,38,.018)
-            }
-
-        .cell-id {
-            font-weight: 800;
-            color: var(--navy);
-            font-size: 14px
-        }
-
-        .cell-sub {
-            font-size: 11px;
-            color: var(--muted);
-            margin-top: 2px
-        }
-
-        .cust-name {
-            font-weight: 700;
-            color: var(--txt);
-            font-size: 13px
-        }
-
-        .cust-email {
-            font-size: 11px;
-            color: var(--muted)
-        }
-
-        .price-val {
-            font-size: 14px;
-            font-weight: 800;
-            color: var(--red)
-        }
-
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 10px;
             border-radius: 100px;
             font-size: 11px;
-            font-weight: 700
-        }
-
-        .p-pending {
-            background: rgba(217,119,6,.1);
-            color: #b45309;
-            border: 1px solid rgba(217,119,6,.2)
-        }
-
-        .p-confirmed {
-            background: rgba(15,118,110,.1);
-            color: var(--teal);
-            border: 1px solid rgba(15,118,110,.2)
-        }
-
-        .p-processing {
-            background: rgba(13,27,42,.08);
-            color: var(--navy2);
-            border: 1px solid rgba(13,27,42,.15)
-        }
-
-        .p-shipped {
-            background: var(--ok-s);
-            color: #065f46;
-            border: 1px solid rgba(15,118,110,.15)
-        }
-
-        .p-delivered {
-            background: var(--ok-s);
-            color: #065f46;
-            border: 1px solid rgba(15,118,110,.15)
-        }
-
-        .p-completed {
-            background: rgba(13,27,42,.07);
-            color: var(--navy);
-            border: 1px solid rgba(13,27,42,.12)
-        }
-
-        .p-cancelled {
-            background: var(--red-s);
-            color: var(--red);
-            border: 1px solid rgba(220,38,38,.2)
-        }
-
-        .p-rx {
-            background: rgba(13,27,42,.07);
-            color: var(--navy2);
-            border: 1px solid rgba(13,27,42,.12)
-        }
-
-        .p-pre {
-            background: var(--bg2);
-            color: var(--txt2);
-            border: 1px solid var(--bdr)
-        }
-
-        .p-std {
-            background: var(--ok-s);
-            color: var(--teal);
-            border: 1px solid rgba(15,118,110,.15)
-        }
-
-        .p-urgent {
-            background: var(--red-s);
-            color: var(--red);
-            border: 1px solid rgba(220,38,38,.2)
-        }
-
-        .btn-process {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 7px 16px;
-            background: linear-gradient(135deg,var(--teal),var(--teal2));
-            color: #fff;
-            border-radius: 8px;
-            font-size: 12px;
             font-weight: 700;
-            text-decoration: none;
-            transition: all .2s;
-            white-space: nowrap
         }
 
-            .btn-process:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(15,118,110,.3);
-                color: #fff
+            .st-badge i {
+                font-size: 11px;
             }
 
-        .empty {
-            text-align: center;
-            padding: 60px 20px
+        .sb-Pending {
+            background: var(--warn-bg);
+            color: var(--warn);
+            border: 1px solid var(--warn-bdr);
         }
 
-        .empty-icon {
-            font-size: 52px;
+        .sb-Confirmed {
+            background: var(--info-bg);
+            color: var(--info);
+            border: 1px solid var(--info-bdr);
+        }
+
+        .sb-Processing {
+            background: rgba(13,27,42,.07);
+            color: var(--navy2);
+            border: 1px solid rgba(13,27,42,.15);
+        }
+
+        .sb-Shipped {
+            background: var(--teal-bg);
+            color: var(--teal);
+            border: 1px solid var(--teal-bdr);
+        }
+
+        .sb-Done {
+            background: var(--ok-bg);
+            color: var(--ok);
+            border: 1px solid var(--ok-bdr);
+        }
+
+        .sb-Cancelled {
+            background: var(--err-bg);
+            color: var(--err);
+            border: 1px solid var(--err-bdr);
+        }
+
+        .card-right {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .card-price {
+            font-size: 17px;
+            font-weight: 900;
+            color: var(--gold);
+        }
+
+        .card-date {
+            font-size: 11px;
             color: var(--muted);
-            opacity: .25;
-            margin-bottom: 16px
+            margin-top: 3px;
         }
 
-        .empty h4 {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--txt2);
-            margin: 0 0 6px
-        }
-
-        .empty p {
-            font-size: 13px;
+        .card-items {
+            font-size: 11px;
             color: var(--muted);
-            margin: 0
+            margin-top: 2px;
         }
 
-        .pag-row {
+        .card-arrow {
+            margin-top: 8px;
+            font-size: 18px;
+            color: var(--info);
+            opacity: 0;
+            transform: translateX(-4px);
+            transition: all .2s;
+        }
+
+        /* ── STATUS MSG BAR ── */
+        .status-bar {
+            margin: 0 28px 14px;
+            padding: 9px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .smb-Pending {
+            background: var(--warn-bg);
+            color: var(--warn);
+            border: 1px solid var(--warn-bdr);
+        }
+
+        .smb-Confirmed {
+            background: var(--info-bg);
+            color: var(--info);
+            border: 1px solid var(--info-bdr);
+        }
+
+        .smb-Processing {
+            background: rgba(13,27,42,.05);
+            color: var(--navy2);
+            border: 1px solid rgba(13,27,42,.12);
+        }
+
+        .smb-Shipped {
+            background: var(--teal-bg);
+            color: var(--teal);
+            border: 1px solid var(--teal-bdr);
+        }
+
+        .smb-Done {
+            background: var(--ok-bg);
+            color: var(--ok);
+            border: 1px solid var(--ok-bdr);
+        }
+
+        .smb-Cancelled {
+            background: var(--err-bg);
+            color: var(--err);
+            border: 1px solid var(--err-bdr);
+        }
+
+        /* ── TIMELINE STRIP ── */
+        .tl-strip {
+            padding: 14px 28px 18px;
+            border-top: 1px solid var(--bdr);
+            background: linear-gradient(to bottom, var(--surf2), #eef0f8);
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 13px 18px;
-            border-top: 1px solid var(--bdr);
-            background: var(--bg2)
+            align-items: flex-start;
         }
 
-        .pag-info {
-            font-size: 12px;
-            color: var(--muted);
-            font-weight: 600
-        }
-
-        .pag {
+        .tl-steps {
             display: flex;
-            gap: 4px;
-            list-style: none;
-            margin: 0;
-            padding: 0
+            align-items: center;
+            flex: 1;
         }
 
-        .pag-item a, .pag-item span {
+        .tl-step {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+            .tl-step:not(:last-child)::after {
+                content: '';
+                position: absolute;
+                top: 15px;
+                left: 50%;
+                width: 100%;
+                height: 2px;
+                background: #dde0f0;
+                z-index: 0;
+            }
+
+            .tl-step.done:not(:last-child)::after {
+                background: var(--ok);
+            }
+
+            .tl-step.active:not(:last-child)::after {
+                background: linear-gradient(90deg, var(--ok), #dde0f0);
+            }
+
+        .tl-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 34px;
-            height: 34px;
-            padding: 0 8px;
-            border-radius: 8px;
             font-size: 12px;
-            font-weight: 700;
-            text-decoration: none;
-            border: 1.5px solid var(--bdr);
-            color: var(--txt2);
-            background: var(--surf);
-            transition: all .15s
+            border: 2px solid #dde0f0;
+            background: #fff;
+            position: relative;
+            z-index: 2;
+            transition: all .3s;
         }
 
-            .pag-item a:hover {
-                border-color: var(--teal);
-                color: var(--teal)
-            }
+        .tl-step.done .tl-circle {
+            background: var(--ok);
+            border-color: var(--ok);
+            color: #fff;
+        }
 
-        .pag-item.active span {
+        .tl-step.active .tl-circle {
             background: var(--navy);
             border-color: var(--navy);
-            color: #fff
+            color: #fff;
+            box-shadow: 0 0 0 4px rgba(13,27,42,.1);
         }
 
-        .pag-item.disabled span {
-            opacity: .35;
-            pointer-events: none
+        .tl-label {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: var(--muted);
+            margin-top: 6px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: .4px;
         }
 
-        @@media(max-width:960px) {
-            .stats-row {
-                grid-template-columns: 1fr 1fr
-            }
+        .tl-step.done .tl-label {
+            color: var(--ok);
         }
 
-        @@media(max-width:600px) {
-            .filter-row {
-                flex-direction: column
+        .tl-step.active .tl-label {
+            color: var(--navy);
+            font-weight: 900;
+        }
+
+        /* view detail hint */
+        .view-hint {
+            flex-shrink: 0;
+            margin-left: 16px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--info);
+            background: var(--info-bg);
+            border: 1px solid var(--info-bdr);
+            border-radius: 8px;
+            padding: 6px 12px;
+            white-space: nowrap;
+            align-self: center;
+        }
+
+        /* ── PAYMENT TAG ── */
+        .pay-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .pay-cod {
+            background: var(--warn-bg);
+            color: var(--warn);
+            border: 1px solid var(--warn-bdr);
+        }
+
+        .pay-paid {
+            background: var(--ok-bg);
+            color: var(--ok);
+            border: 1px solid var(--ok-bdr);
+        }
+
+        /* ── EMPTY ── */
+        .empty-state {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: 22px;
+            text-align: center;
+            padding: 80px 30px;
+            box-shadow: var(--sh-md);
+        }
+
+        .empty-icon {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--surf2), #e8eaf5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 44px;
+            margin: 0 auto 24px;
+            border: 2px solid var(--bdr);
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            font-weight: 800;
+            margin: 0 0 8px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            color: var(--muted);
+            margin: 0 0 28px;
+        }
+
+        .btn-go {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--navy), var(--navy2));
+            color: #fff;
+            text-decoration: none;
+            border-radius: 12px;
+            padding: 13px 30px;
+            font-size: 14px;
+            font-weight: 800;
+            box-shadow: 0 4px 16px rgba(13,27,42,.25);
+            transition: all .2s;
+        }
+
+            .btn-go:hover {
+                color: #fff;
+                opacity: .88;
+                transform: translateY(-2px);
             }
 
-            .fi {
-                min-width: 100%
-            }
+        @@media(max - width:600px) {
+            .hero
+
+        {
+            padding: 28px 22px 24px;
+        }
+
+        .hero h1 {
+            font-size: 1.6rem;
+        }
+
+        .card-top {
+            padding: 16px 18px 12px 22px;
+            flex-wrap: wrap;
+        }
+
+        .tl-strip {
+            padding: 14px 18px 16px;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .view-hint {
+            align-self: flex-start;
+        }
+
         }
     </style>
 }
 
-<div class="ops-pg">
+<div class="st-wrap">
 
-    <div class="ops-hdr">
-        <div class="ops-hdr-left">
-            <h1><i class="bi bi-box-seam me-2"></i>Operations Dashboard</h1>
-            <p>Packaging · Shipping · Tracking Updates · Prescription Order Processing</p>
-        </div>
-        <div class="hdr-actions">
-            <button class="btn-refresh" onclick="window.location.reload()">
-                <i class="bi bi-arrow-clockwise"></i> Refresh
-            </button>
-        </div>
-    </div>
-
-    @if (TempData["Success"] is string ok)
+    @if (TempData["SuccessMessage"] != null)
     {
-        <div class="al al-ok"><i class="bi bi-check-circle-fill"></i> @ok</div>
+        <div class="alert-custom alert-success-c" id="alertSuccess">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>@TempData["SuccessMessage"]</span>
+            <button class="al-close" onclick="this.closest('.alert-custom').remove()">✕</button>
+        </div>
     }
-    @if (TempData["Error"] is string err)
+    @if (TempData["ErrorMessage"] != null)
     {
-        <div class="al al-err"><i class="bi bi-exclamation-circle-fill"></i> @err</div>
+        <div class="alert-custom alert-error-c" id="alertError">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>@TempData["ErrorMessage"]</span>
+            <button class="al-close" onclick="this.closest('.alert-custom').remove()">✕</button>
+        </div>
     }
 
-    <!-- Stats: 3 cards — ServiceCount removed -->
-    <div class="stats-row">
-        <div class="stat-card stat-c1">
-            <div class="stat-ico ico-warn"><i class="bi bi-hourglass-split"></i></div>
-            <div>
-                <div class="stat-lbl">Processing</div>
-                <div class="stat-val">@Model.Stats.ProcessingCount</div>
-                <div class="stat-sub">Awaiting packaging</div>
-            </div>
-        </div>
-        <div class="stat-card stat-c2">
-            <div class="stat-ico ico-teal"><i class="bi bi-truck"></i></div>
-            <div>
-                <div class="stat-lbl">Shipped Today</div>
-                <div class="stat-val">@Model.Stats.ShippedTodayCount</div>
-                <div class="stat-sub">Dispatched today</div>
-            </div>
-        </div>
-        <div class="stat-card stat-c4">
-            <div class="stat-ico ico-ok"><i class="bi bi-eyeglasses"></i></div>
-            <div>
-                <div class="stat-lbl">Prescription</div>
-                <div class="stat-val">@Model.Stats.PrescriptionCount</div>
-                <div class="stat-sub">Prescription orders</div>
-            </div>
-        </div>
-    </div>
+    <!-- ── HERO ── -->
+    <div class="hero">
+        <div class="hero-eyebrow">OptiPlus</div>
+        <h1>My Orders</h1>
+        <p>Track and manage all your standard orders in one place.</p>
 
-    <div class="filter-card">
-        <h6><i class="bi bi-funnel me-1"></i>Search & Filter</h6>
-        <form method="get" class="filter-row">
-            <input type="text" class="fi fi-search" name="Search" value="@Model.Search" placeholder="Order ID, email, customer name…" />
-            <select class="fi" name="StatusFilter">
-                <option value="">All statuses</option>
-                @foreach (var s in Model.Statuses)
+        @if (total > 0)
+        {
+            <div class="hero-stats">
+                <div class="stat-pill">
+                    <span class="sp-num">@total</span>
+                    <span>Total</span>
+                </div>
+                @if (inprog > 0)
                 {
-                    <option value="@s" selected="@(Model.StatusFilter == s)">@s</option>
+                    <div class="stat-pill">
+                        <span class="sp-dot" style="background:#93c5fd;"></span>
+                        <span class="sp-num">@inprog</span>
+                        <span>Processing</span>
+                    </div>
                 }
-            </select>
-            <select class="fi" name="TypeFilter">
-                <option value="">All types</option>
-                <option value="Prescription" selected="@(Model.TypeFilter == "Prescription")">Prescription (Rx)</option>
-                <option value="PreOrder" selected="@(Model.TypeFilter == "PreOrder")">Pre-Order</option>
-                <option value="Standard" selected="@(Model.TypeFilter == "Standard")">Standard</option>
-            </select>
-            <select class="fi" name="PriorityFilter">
-                <option value="">All priorities</option>
-                <option value="High" selected="@(Model.PriorityFilter == "High")">High priority</option>
-                <option value="Normal" selected="@(Model.PriorityFilter == "Normal")">Normal</option>
-            </select>
-            <select class="fi fi-sm" name="pageSize">
-                <option value="10" selected="@(Model.PageSize == 10)">10</option>
-                <option value="25" selected="@(Model.PageSize == 25)">25</option>
-                <option value="50" selected="@(Model.PageSize == 50)">50</option>
-            </select>
-            <input type="hidden" name="pageNumber" value="1" />
-            <button type="submit" class="btn-filter"><i class="bi bi-funnel-fill"></i> Filter</button>
-        </form>
-        <div class="qf-row">
-            <a href="?StatusFilter=Processing" class="qf qf-warn"><i class="bi bi-hourglass-split"></i> Processing</a>
-            <a href="?StatusFilter=Shipped" class="qf qf-teal"><i class="bi bi-truck"></i> Shipped</a>
-            <a href="?TypeFilter=Prescription" class="qf qf-navy"><i class="bi bi-eyeglasses"></i> Prescription</a>
-        </div>
-    </div>
-
-    <div class="tbl-card">
-        <div class="tbl-top">
-            <h5>
-                <i class="bi bi-list-check"></i> Operations Queue
-                <span class="tbl-badge">@Model.TotalOrders orders</span>
-            </h5>
-            <div class="tbl-info">Showing <strong>@Model.FirstItemIndex–@Model.LastItemIndex</strong> / <strong>@Model.TotalOrders</strong></div>
-        </div>
-
-        @if (!Model.Orders.Any())
-        {
-            <div class="empty">
-                <div class="empty-icon"><i class="bi bi-inbox"></i></div>
-                <h4>No orders found</h4>
-                <p>No orders match the current filters.</p>
+                @if (shipped > 0)
+                {
+                    <div class="stat-pill">
+                        <span class="sp-dot" style="background:#5eead4;"></span>
+                        <span class="sp-num">@shipped</span>
+                        <span>Shipped</span>
+                    </div>
+                }
+                @if (delivered > 0)
+                {
+                    <div class="stat-pill">
+                        <span class="sp-dot" style="background:#34d399;"></span>
+                        <span class="sp-num">@delivered</span>
+                        <span>Delivered</span>
+                    </div>
+                }
+                @if (pending > 0)
+                {
+                    <div class="stat-pill">
+                        <span class="sp-dot" style="background:#fbbf24;"></span>
+                        <span class="sp-num">@pending</span>
+                        <span>Pending</span>
+                    </div>
+                }
             </div>
         }
-        else
-        {
-            <div style="overflow-x:auto">
-                <table class="ops-tbl">
-                    <thead>
-                        <tr>
-                            <th>Order</th>
-                            <th>Customer</th>
-                            <th>Created Date</th>
-                            <th>Status</th>
-                            <th>Order Type</th>
-                            <th>Shipping</th>
-                            <th style="text-align:right">Total</th>
-                            <th style="text-align:center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var o in Model.Orders)
+    </div>
+
+    @if (!Model.Orders.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon">📦</div>
+            <h3>No orders yet</h3>
+            <p>You haven't placed any orders yet. Start browsing our collection!</p>
+            <a href="/Index" class="btn-go">
+                <i class="bi bi-shop"></i> Start Shopping
+            </a>
+        </div>
+    }
+    else
+    {
+        <!-- ── FILTER TABS ── -->
+        <div class="filter-bar" id="filterBar">
+            <button class="f-tab active" data-filter="all">
+                All <span class="ft-count">@total</span>
+            </button>
+            @if (pending > 0)
+            {
+                <button class="f-tab" data-filter="Pending">
+                    ⏳ Pending <span class="ft-count">@pending</span>
+                </button>
+            }
+            @if (confirmed > 0)
+            {
+                <button class="f-tab" data-filter="Confirmed">
+                    ✅ Confirmed <span class="ft-count">@confirmed</span>
+                </button>
+            }
+            @if (inprog > 0)
+            {
+                <button class="f-tab" data-filter="Processing">
+                    ⚙️ Processing <span class="ft-count">@inprog</span>
+                </button>
+            }
+            @if (shipped > 0)
+            {
+                <button class="f-tab" data-filter="Shipped">
+                    🚚 Shipped <span class="ft-count">@shipped</span>
+                </button>
+            }
+            @if (delivered > 0)
+            {
+                <button class="f-tab" data-filter="Done">
+                    🎉 Delivered <span class="ft-count">@delivered</span>
+                </button>
+            }
+            @if (cancelled > 0)
+            {
+                <button class="f-tab" data-filter="Cancelled">
+                    ❌ Cancelled <span class="ft-count">@cancelled</span>
+                </button>
+            }
+        </div>
+
+        <!-- ── CARDS ── -->
+        <div id="cardList">
+            @foreach (var o in Model.Orders.OrderByDescending(x => x.CreatedAt))
+            {
+                int stepIdx = StepIndex(o.Status ?? "");
+                bool isCancelled = o.Status is "Cancelled" or "Cancellation_Pending";
+                string cssClass = StatusClass(o.Status ?? "");
+                string display = o.Status == "Cancellation_Pending" ? "Cancelling..." : (o.Status ?? "Unknown");
+                string imageUrl = GetImageUrl(o);
+                int itemCount = o.OrderItems?.Sum(i => i.Quantity) ?? 0;
+                string firstName = o.OrderItems?.FirstOrDefault()?.Product?.Name ?? "Items";
+                if (o.OrderItems != null && o.OrderItems.Count > 1)
+                    firstName += $" +{o.OrderItems.Count - 1} more";
+
+                // data-filter attr
+                string filterAttr = cssClass switch
+                {
+                    "Confirmed" => "Confirmed",
+                    "Processing" => "Processing",
+                    "Shipped" => "Shipped",
+                    "Done" => "Done",
+                    "Cancelled" => "Cancelled",
+                    _ => "Pending"
+                };
+
+                <a href="/Orders/Detail?id=@o.OrderId"
+                   class="order-card cls-@cssClass"
+                   data-filter="@filterAttr">
+
+                    <!-- TOP ROW -->
+                    <div class="card-top">
+                        @if (!string.IsNullOrEmpty(imageUrl))
                         {
-                            bool isUrgent = o.HasPrescription || o.CreatedAt < DateTime.UtcNow.AddDays(-2);
-                            string sCss = o.Status switch
-                            {
-                                "Pending Confirmation" => "p-pending",
-                                "Confirmed" => "p-confirmed",
-                                "Processing" => "p-processing",
-                                "Shipped" => "p-shipped",
-                                "Delivered" => "p-delivered",
-                                "Completed" => "p-completed",
-                                "Cancelled" => "p-cancelled",
-                                _ => ""
-                            };
-                            <tr class="@(isUrgent ? "urgent-row" : "")">
-                                <td>
-                                    <div class="cell-id">#@o.OrderId</div>
-                                    @if (isUrgent)
-                                    {
-                                        <span class="pill p-urgent" style="font-size:10px;margin-top:3px"><i class="bi bi-exclamation-triangle"></i> Urgent</span>
-                                    }
-                                </td>
-                                <td>
-                                    <div class="cust-name">@o.UserFullName</div>
-                                    <div class="cust-email">@o.UserEmail</div>
-                                </td>
-                                <td>
-                                    <div style="font-size:13px;color:var(--txt)">@o.CreatedAt.ToString("dd/MM/yyyy")</div>
-                                    <div class="cell-sub">@o.CreatedAt.ToString("HH:mm")</div>
-                                </td>
-                                <td><span class="pill @sCss">@o.Status</span></td>
-                                <td>
-                                    @if (o.HasPrescription)
-                                    {
-                                        <span class="pill p-rx"><i class="bi bi-eyeglasses"></i> Rx</span>
-                                    }
-                                    else if (o.IsPreOrder)
-                                    {
-                                        <span class="pill p-pre"><i class="bi bi-hourglass-split"></i> Pre-Order</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="pill p-std"><i class="bi bi-check-circle"></i> Standard</span>
-                                    }
-                                </td>
-                                <td>
-                                    @if (!string.IsNullOrWhiteSpace(o.TrackingNumber))
-                                    {
-                                        <div style="font-size:13px;font-weight:600;color:var(--txt)">
-                                            <i class="bi bi-box-seam me-1" style="color:var(--teal)"></i>@o.TrackingNumber
-                                        </div>
-                                        <div class="cell-sub">@o.Carrier</div>
-                                    }
-                                    else
-                                    {
-                                        <span style="color:var(--muted);font-size:12px">Not available</span>
-                                    }
-                                </td>
-                                <td style="text-align:right">
-                                    <span class="price-val">@o.TotalAmount.ToString("N0") ₫</span>
-                                </td>
-                                <td style="text-align:center">
-                                    <a asp-page="./Details" asp-route-id="@o.OrderId" class="btn-process">
-                                        <i class="bi bi-arrow-right-circle"></i> Process
-                                    </a>
-                                </td>
-                            </tr>
+                            <img class="prod-img" src="@imageUrl" alt="Product" />
                         }
-                    </tbody>
-                </table>
-            </div>
-            <div class="pag-row">
-                <div class="pag-info">Page @Model.PageNumber / @Model.TotalPages</div>
-                <ul class="pag">
-                    <li class="pag-item @(Model.PageNumber == 1 ? "disabled" : "")"><a asp-page="./Index" asp-route-pageNumber="1" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">«</a></li>
-                    <li class="pag-item @(Model.PageNumber == 1 ? "disabled" : "")"><a asp-page="./Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">‹</a></li>
-                    @foreach (var p in Model.DisplayPageNumbers)
-                    {
-                        <li class="pag-item @(p == Model.PageNumber ? "active" : "")">
-                            @if (p == Model.PageNumber)
+                        else
+                        {
+                            <div class="prod-img-ph">📦</div>
+                        }
+
+                        <div class="card-info">
+                            <div class="card-oid">
+                                <i class="bi bi-hash"></i> Order @o.OrderId
+                                @if (!string.IsNullOrEmpty(o.OrderType))
+                                {
+                                    <span style="opacity:.4;">·</span>
+                                    <span>@o.OrderType</span>
+                                }
+                            </div>
+                            <div class="card-title">@firstName</div>
+                            <div class="card-sub">
+                                @itemCount item(s) &nbsp;·&nbsp;
+                                @if (!string.IsNullOrEmpty(o.PaymentMethod))
+                                {
+                                    <span class="pay-tag @(o.PaymentMethod == "COD" ? "pay-cod" : "pay-paid")">
+                                        <i class="bi @(o.PaymentMethod == "COD" ? "bi-cash-coin" : "bi-credit-card")"></i>
+                                        @(o.PaymentMethod == "COD" ? "COD" : "Online")
+                                    </span>
+                                }
+                            </div>
+                            <span class="st-badge sb-@cssClass">
+                                <i class="bi @StepIcon(o.Status ?? "")"></i>
+                                @display
+                            </span>
+                        </div>
+
+                        <div class="card-right">
+                            <div class="card-price">@o.TotalAmount.ToString("N0") ₫</div>
+                            <div class="card-date">
+                                <i class="bi bi-calendar3" style="font-size:10px;"></i>
+                                @o.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                            </div>
+                            @if (o.PaymentMethod == "COD" && o.DepositAmount > 0)
                             {
-                                <span>@p</span>
+                                <div class="card-items" style="color:var(--warn);font-weight:700;">
+                                    Deposit: @o.DepositAmount.ToString("N0") ₫
+                                </div>
                             }
-                            else
-                            {
-                                <a asp-page="./Index" asp-route-pageNumber="@p" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">@p</a>
-                            }
-                        </li>
-                    }
-                    <li class="pag-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")"><a asp-page="./Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">›</a></li>
-                    <li class="pag-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")"><a asp-page="./Index" asp-route-pageNumber="@Model.TotalPages" asp-route-pageSize="@Model.PageSize" asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter" asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">»</a></li>
-                </ul>
-            </div>
-        }
-    </div>
+                            <div class="card-arrow"><i class="bi bi-arrow-right-circle-fill"></i></div>
+                        </div>
+                    </div>
+
+                    <!-- STATUS MSG -->
+                    <div class="status-bar smb-@cssClass">
+                        <i class="bi @StepIcon(o.Status ?? "")"></i>
+                        <span>@StatusMsg(o.Status ?? "")</span>
+                    </div>
+
+                    <!-- TIMELINE STRIP -->
+                    <div class="tl-strip">
+                        @if (!isCancelled)
+                        {
+                            <div class="tl-steps">
+                                @for (int i = 0; i < steps.Length; i++)
+                                {
+                                    string cls = i < stepIdx ? "done" : i == stepIdx ? "active" : "";
+                                    string icon = i < stepIdx ? "✓" : i == stepIdx ? "●" : (i + 1).ToString();
+                                    <div class="tl-step @cls">
+                                        <div class="tl-circle">@icon</div>
+                                        <div class="tl-label">@steps[i]</div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div style="display:flex;align-items:center;gap:10px;color:var(--err);flex:1;">
+                                <i class="bi bi-x-circle-fill" style="font-size:20px;"></i>
+                                <div>
+                                    <div style="font-size:13px;font-weight:800;">
+                                        @(o.Status == "Cancellation_Pending" ? "Cancellation in progress..." : "Order Cancelled")
+                                    </div>
+                                    @if (o.RefundAmount > 0)
+                                    {
+                                        <div style="font-size:11px;color:var(--ok);margin-top:2px;">
+                                            <i class="bi bi-arrow-counterclockwise"></i>
+                                            Refund: @o.RefundAmount?.ToString("N0") ₫
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <div class="view-hint">
+                            <i class="bi bi-eye"></i> View Detail
+                        </div>
+                    </div>
+
+                </a>
+            }
+        </div>
+
+        <div id="noResults" style="display:none;text-align:center;padding:48px 20px;color:var(--muted);">
+            <i class="bi bi-funnel" style="font-size:32px;display:block;margin-bottom:12px;opacity:.3;"></i>
+            No orders match this filter.
+        </div>
+    }
 </div>
 
-@section Scripts {
-    <script>
-        setTimeout(() => {
-            document.querySelectorAll('.al-ok').forEach(a => {
-                a.style.transition = 'opacity .5s';
-                setTimeout(() => a.style.opacity = '0', 3500);
+<script>
+    (function () {
+        const bar   = document.getElementById('filterBar');
+        const list  = document.getElementById('cardList');
+        const empty = document.getElementById('noResults');
+        if (!bar || !list) return;
+
+        bar.addEventListener('click', function (e) {
+            const btn = e.target.closest('.f-tab');
+            if (!btn) return;
+            bar.querySelectorAll('.f-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const filter = btn.dataset.filter;
+            let visible  = 0;
+            list.querySelectorAll('.order-card').forEach(card => {
+                const show = filter === 'all' || card.dataset.filter === filter;
+                card.style.display = show ? 'block' : 'none';
+                if (show) visible++;
             });
-        }, 100);
-    </script>
-}
+            if (empty) empty.style.display = visible === 0 ? 'block' : 'none';
+        });
+    })();
+</script>

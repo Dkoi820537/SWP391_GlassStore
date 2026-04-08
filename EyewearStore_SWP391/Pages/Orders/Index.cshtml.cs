@@ -31,30 +31,4 @@ public class IndexModel : PageModel
         Orders = allOrders.Where(o => o.OrderType != "Custom").ToList();
         return Page();
     }
-
-    public string GetStatusBadgeClass(string status) => status switch
-    {
-        "Pending" => "bg-warning text-dark",
-        "Confirmed" => "bg-info text-dark",
-        "Processing" => "bg-primary text-white",
-        "Shipped" => "bg-secondary text-white",
-        "Delivered" => "bg-success text-white",
-        "Completed" => "bg-success text-white",
-        "Cancelled" => "bg-danger text-white",
-        "Pending Confirmation" => "bg-warning text-dark",
-        _ => "bg-secondary text-white"
-    };
-
-    public string GetStatusIcon(string status) => status switch
-    {
-        "Pending" => "bi-hourglass-split",
-        "Pending Confirmation" => "bi-hourglass-split",
-        "Confirmed" => "bi-check-circle",
-        "Processing" => "bi-gear",
-        "Shipped" => "bi-truck",
-        "Delivered" => "bi-box-seam",
-        "Completed" => "bi-check-all",
-        "Cancelled" => "bi-x-circle",
-        _ => "bi-question-circle"
-    };
 }

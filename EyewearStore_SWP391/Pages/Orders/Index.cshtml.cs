@@ -26,7 +26,9 @@ public class IndexModel : PageModel
             return RedirectToPage("/Account/Login");
 
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-        Orders = await _orderService.GetOrdersByUserIdAsync(userId);
+        var allOrders = await _orderService.GetOrdersByUserIdAsync(userId);
+        // Custom orders belong to "My Service Orders" — exclude them here.
+        Orders = allOrders.Where(o => o.OrderType != "Custom").ToList();
         return Page();
     }
 

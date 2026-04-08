@@ -74,33 +74,6 @@
         <div class="row g-4">
             @foreach (var order in Model.Orders)
             {
-                bool isCustom = order.OrderType == "Custom"
-                || order.OrderItems.Any(oi =>
-                !string.IsNullOrEmpty(oi.SnapshotJson)
-                && oi.SnapshotJson.Contains("\"isServiceOrder\":true"));
-
-                string? svcStatus = null;
-                string? svcAssignedTo = null;
-
-                if (isCustom)
-                {
-                    var svcItem = order.OrderItems.FirstOrDefault(oi =>
-                    !string.IsNullOrEmpty(oi.SnapshotJson)
-                    && oi.SnapshotJson.Contains("\"isServiceOrder\":true"));
-
-                    if (svcItem != null)
-                    {
-                        try
-                        {
-                            var d = System.Text.Json.JsonDocument.Parse(svcItem.SnapshotJson!);
-                            if (d.RootElement.TryGetProperty("serviceStatus", out var sv))
-                                svcStatus = sv.GetString();
-                            if (d.RootElement.TryGetProperty("assignedTo", out var at))
-                                svcAssignedTo = at.GetString();
-                        }
-                        catch { }
-                    }
-                }
 
                 <div class="col-12">
                     <div class="card"
@@ -108,28 +81,6 @@
                          onclick="window.location='/Orders/Detail?id=@order.OrderId'"
                          onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 25px rgba(0,0,0,.12)'"
                          onmouseout="this.style.transform='none';this.style.boxShadow='var(--shadow-md)'">
-
-                        @if (isCustom)
-                        {
-                            <div style="background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(124,58,237,.14));border-bottom:1px solid rgba(124,58,237,.18);padding:.45rem 1.5rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                                <span style="font-size:13px;">🔭</span>
-                                <span style="font-size:.78rem;font-weight:700;color:#7c3aed;">Custom Glasses Order</span>
-
-                                @if (!string.IsNullOrEmpty(svcAssignedTo))
-                                {
-                                    <span style="font-size:.72rem;color:#6d28d9;font-weight:600;">
-                                        <i class="bi bi-person-fill" style="font-size:.68rem;"></i> @svcAssignedTo
-                                    </span>
-                                }
-
-                                @if (!string.IsNullOrEmpty(svcStatus))
-                                {
-                                    <span style="margin-left:auto;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.22);color:#7c3aed;border-radius:100px;padding:2px 10px;font-size:.72rem;font-weight:700;">
-                                        <i class="bi bi-wrench me-1"></i>Workshop: @svcStatus
-                                    </span>
-                                }
-                            </div>
-                        }
 
                         <div style="padding:1.25rem 1.5rem;">
                             <div class="row align-items-center g-3">
@@ -149,12 +100,6 @@
                                 <div class="col-sm-3">
                                     <div style="font-size:.8rem;color:var(--secondary-warm-gray);margin-bottom:.25rem;">Items</div>
                                     <div style="font-weight:600;color:var(--primary-navy);">@order.OrderItems.Count item(s)</div>
-                                    @if (isCustom)
-                                    {
-                                        <div style="font-size:.75rem;color:#7c3aed;font-weight:600;margin-top:2px;">
-                                            <i class="bi bi-wrench" style="font-size:.7rem;"></i> Includes assembly
-                                        </div>
-                                    }
                                 </div>
                                 <div class="col-sm-3 text-sm-end">
                                     <div style="font-size:.8rem;color:var(--secondary-warm-gray);margin-bottom:.25rem;">Total</div>

@@ -297,6 +297,16 @@
                 color: #fff
             }
 
+        .ql-servicejob {
+            color: var(--teal);
+            border-color: var(--teal)
+        }
+
+            .ql-servicejob:hover {
+                background: var(--teal);
+                color: #fff
+            }
+
         .ps-sel {
             width: 90px;
             flex: none
@@ -766,11 +776,13 @@
             <input type="hidden" name="pageNumber" value="1" />
             <button type="submit" class="btn-apply"><i class="bi bi-funnel-fill"></i> Filter</button>
         </form>
+
         <div class="quick-links">
             <a href="?StatusFilter=Pending+Confirmation" class="ql ql-navy"><i class="bi bi-exclamation-circle"></i> Pending</a>
             <a href="?StatusFilter=Confirmed" class="ql ql-teal"><i class="bi bi-check-circle"></i> Confirmed</a>
             <a href="?TypeFilter=Prescription" class="ql ql-teal"><i class="bi bi-eyeglasses"></i> Prescription</a>
             <a href="?TypeFilter=PreOrder" class="ql ql-navy"><i class="bi bi-hourglass"></i> Pre-Orders</a>
+            <a asp-page="/Staff/ServiceOrders/Index" class="ql ql-servicejob"><i class="bi bi-tools"></i> Service Job</a>
             <a asp-page="/Support/Returns/Index" class="ql ql-red"><i class="bi bi-arrow-return-left"></i> Returns</a>
         </div>
     </div>

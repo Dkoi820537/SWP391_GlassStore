@@ -36,5 +36,11 @@ namespace EyewearStore_SWP391.Services
         /// </summary>
         Task<(decimal SubtotalBase, decimal PrescriptionFeesTotal, decimal ShippingFee, decimal GrandTotal)>
             GetCartTotalsBreakdownAsync(int userId);
+
+        /// <summary>
+        /// Trả về breakdown chi tiết (dùng chung cho trường hợp đã có sẵn đối tượng Cart trong bộ nhớ để tránh N+1).
+        /// </summary>
+        Task<(decimal SubtotalBase, decimal PrescriptionFeesTotal, decimal ShippingFee, decimal GrandTotal)>
+            GetCartTotalsBreakdownAsync(Cart cart);
     }
 }

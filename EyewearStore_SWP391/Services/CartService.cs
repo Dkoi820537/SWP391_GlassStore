@@ -44,45 +44,16 @@ public class CartService : ICartService
 
     public async Task<Cart?> GetCartByUserIdAsync(int userId)
     {
-        try
-        {
-            var log = JsonSerializer.Serialize(new
-            {
-                location = "GetCartByUserIdAsync",
-                userId,
-                timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-            }) + "\n";
-            await System.IO.File.AppendAllTextAsync(DebugLogPath, log);
-        }
-        catch { }
-
-        try
-        {
-            return await _context.Carts
-                .Include(c => c.CartItems)
-                    .ThenInclude(ci => ci.Product)
-                        .ThenInclude(p => p.ProductImages)
-                .Include(c => c.CartItems)
-                    .ThenInclude(ci => ci.Service)
-                .Include(c => c.CartItems)
-                    .ThenInclude(ci => ci.Prescription)
-                .FirstOrDefaultAsync(c => c.UserId == userId);
-        }
-        catch (SqlException ex)
-        {
-            try
-            {
-                var err = JsonSerializer.Serialize(new
-                {
-                    location = "GetCartByUserIdAsync",
-                    ex.Message,
-                    ex.Number
-                }) + "\n";
-                await System.IO.File.AppendAllTextAsync(DebugLogPath, err);
-            }
-            catch { }
-            throw;
-        }
+        return await _context.Carts
+            .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Product)
+                    .ThenInclude(p => p.ProductImages)
+            .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Service)
+            .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Prescription)
+            .AsSplitQuery()
+            .FirstOrDefaultAsync(c => c.UserId == userId);
     }
 
     // ── AddToCartAsync (đơn thường — giữ nguyên) ────────────────────────────
@@ -257,6 +228,12 @@ public class CartService : ICartService
         GetCartTotalsBreakdownAsync(int userId)
     {
         var cart = await GetCartByUserIdAsync(userId);
+        return await GetCartTotalsBreakdownAsync(cart);
+    }
+
+    public async Task<(decimal SubtotalBase, decimal PrescriptionFeesTotal, decimal ShippingFee, decimal GrandTotal)>
+        GetCartTotalsBreakdownAsync(Cart? cart)
+    {
         if (cart == null) return (0m, 0m, 0m, 0m);
 
         // Lấy tất cả lensProductId cần load thêm giá

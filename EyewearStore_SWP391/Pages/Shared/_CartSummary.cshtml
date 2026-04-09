@@ -1,4 +1,4 @@
-﻿@using System.Security.Claims
+@using System.Security.Claims
 @using EyewearStore_SWP391.Models
 @using Microsoft.EntityFrameworkCore
 @inject EyewearStore_SWP391.Services.ICartService CartService
@@ -38,7 +38,7 @@
 
                 // ── Use CartService for correct total (includes lens + service + prescription) ──
                 var (subtotalBase, prescriptionFees, _, _) =
-                    await CartService.GetCartTotalsBreakdownAsync(uid);
+                    await CartService.GetCartTotalsBreakdownAsync(cart);
                 subtotal = subtotalBase + prescriptionFees;
             }
         }

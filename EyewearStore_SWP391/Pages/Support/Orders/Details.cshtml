@@ -1,4 +1,4 @@
-﻿@page "{id:int}"
+@page "{id:int}"
 @model EyewearStore_SWP391.Pages.Support.Orders.DetailsModel
 @using System.Text.Json
 @{
@@ -1017,7 +1017,7 @@
                         ("Processing",          "Processing", "Sale/Support", "rb-sale"),
                         ("Shipped",             "Shipped",    "Operations",   "rb-ops"),
                         ("Delivered",           "Delivered",  "Operations",   "rb-ops"),
-                        ("Completed",           "Completed",  "Manager",      "rb-manager"),
+                        ("Completed",           "Completed",  "Operations",   "rb-manager"),
                 };
                 int curIdx = Array.FindIndex(pipeline, p => p.Status == Model.Order.Status);
             }

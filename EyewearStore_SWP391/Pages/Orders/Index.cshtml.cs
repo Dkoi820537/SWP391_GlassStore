@@ -34,9 +34,11 @@ public class IndexModel : PageModel
             return RedirectToPage("/Account/Login");
 
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
         if (PageIndex < 1) PageIndex = 1;
 
         var allOrders = await _orderService.GetOrdersByUserIdAsync(userId);
+
         // Custom orders belong to "My Service Orders" — exclude them here.
         var filteredOrders = allOrders.Where(o => o.OrderType != "Custom").ToList();
 
@@ -44,16 +46,12 @@ public class IndexModel : PageModel
         if (!string.IsNullOrWhiteSpace(SearchQuery))
         {
             var term = SearchQuery.Trim();
-
             filteredOrders = filteredOrders.Where(o =>
-                // Match by Order ID
                 o.OrderId.ToString().Contains(term, StringComparison.OrdinalIgnoreCase) ||
-                // Match by product name in order items
                 (o.OrderItems != null && o.OrderItems.Any(oi =>
                     oi.Product != null &&
                     oi.Product.Name != null &&
                     oi.Product.Name.Contains(term, StringComparison.OrdinalIgnoreCase))) ||
-                // Match by status
                 (o.Status != null && o.Status.Contains(term, StringComparison.OrdinalIgnoreCase))
             ).ToList();
         }
@@ -61,7 +59,10 @@ public class IndexModel : PageModel
         TotalPages = (int)Math.Ceiling(filteredOrders.Count / (double)PageSize);
         if (TotalPages == 0) TotalPages = 1;
 
-        Orders = filteredOrders.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToList();
+        Orders = filteredOrders
+            .Skip((PageIndex - 1) * PageSize)
+            .Take(PageSize)
+            .ToList();
 
         return Page();
     }

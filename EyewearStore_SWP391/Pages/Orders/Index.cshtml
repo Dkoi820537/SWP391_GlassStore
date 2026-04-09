@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "My Orders";
 
-    string[] steps = { "Pending", "Confirmed", "Processing", "Shipped", "Delivered" };
+    string[] steps = { "Pending", "Confirmed", "Processing", "Shipped", "Delivered", "Completed" };
 
     int StepIndex(string status) => status switch
     {
@@ -16,7 +16,7 @@
         "Processing - Packed" => 2,
         "Shipped" => 3,
         "Delivered" => 4,
-        "Completed" => 4,
+        "Completed" => 5,
         "Cancelled" => -1,
         _ => 0
     };
@@ -33,7 +33,7 @@
         "Processing - QC" => "⚙️",
         "Processing - Packed" => "⚙️",
         "Shipped" => "🚚",
-        "Delivered" => "🎉",
+        "Delivered" => "📦",
         "Completed" => "🎉",
         "Cancelled" => "❌",
         _ => "📋"
@@ -56,16 +56,15 @@
         "Cancelled" => "This order has been cancelled.",
         _ => ""
     };
-    
-    // Convert status to class name suffix (e.g. st-Pending)
+
     string StatusClass(string status)
     {
         if (status.StartsWith("Processing")) return "Processing";
         if (status.StartsWith("Pending")) return "Pending";
         if (status == "Completed" || status == "Delivered") return "Done";
         if (status == "Cancelled" || status == "Cancellation_Pending") return "Cancelled";
-        if (status == "Confirmed") return "Ready"; // Match the green color for confirmed
-        if (status == "Shipped") return "Ready";   // green
+        if (status == "Confirmed") return "Ready";
+        if (status == "Shipped") return "Ready";
         return "Pending";
     }
 
@@ -166,7 +165,7 @@
             margin: 0
         }
 
-        /* ── SEARCH BAR ── */
+        /* SEARCH BAR */
         .search-card {
             background: var(--surf);
             border: 1px solid var(--bdr);
@@ -550,7 +549,7 @@
         }
 
         .tl-label {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 700;
             color: var(--muted);
             margin-top: 7px;
@@ -656,7 +655,9 @@
                     font-size: 1.5rem
                 }
 
-            .search-btn span { display: none; }
+            .search-btn span {
+                display: none;
+            }
         }
     </style>
 }
@@ -686,12 +687,10 @@
         <p>View and track your order history in real time</p>
     </div>
 
-    <!-- ── SEARCH BAR ── -->
+    <!-- SEARCH BAR -->
     <form method="get" class="search-card" id="searchForm">
         <div class="search-inner">
-            <div class="search-icon">
-                <i class="bi bi-search"></i>
-            </div>
+            <div class="search-icon"><i class="bi bi-search"></i></div>
             <input type="text"
                    class="search-input"
                    name="SearchQuery"
@@ -758,7 +757,8 @@
             string imageUrl = GetImageUrl(o);
             int totalItems = o.OrderItems?.Sum(i => i.Quantity) ?? 0;
             string firstItemName = o.OrderItems?.FirstOrDefault()?.Product?.Name ?? "Items";
-            if (o.OrderItems != null && o.OrderItems.Count > 1) {
+            if (o.OrderItems != null && o.OrderItems.Count > 1)
+            {
                 firstItemName += $" + {o.OrderItems.Count - 1} more";
             }
 
@@ -857,24 +857,34 @@
         }
     }
 
-    <!-- Pagination Controls -->
+    <!-- Pagination -->
     @if (Model.TotalPages > 1)
     {
         <nav aria-label="Page navigation" class="mt-4">
             <ul class="pagination justify-content-center" style="gap: 5px;">
                 <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
-                    <a class="page-link" asp-page="./Index" asp-route-pageIndex="@(Model.PageIndex - 1)" asp-route-searchQuery="@Model.SearchQuery" style="border-radius: 8px; border: 1px solid var(--bdr); color: var(--txt);">Previous</a>
+                    <a class="page-link" asp-page="./Index"
+                       asp-route-pageIndex="@(Model.PageIndex - 1)"
+                       asp-route-searchQuery="@Model.SearchQuery"
+                       style="border-radius:8px;border:1px solid var(--bdr);color:var(--txt);">Previous</a>
                 </li>
                 @for (int i = 1; i <= Model.TotalPages; i++)
                 {
                     <li class="page-item @(Model.PageIndex == i ? "active" : "")">
-                        <a class="page-link" asp-page="./Index" asp-route-pageIndex="@i" asp-route-searchQuery="@Model.SearchQuery" style="border-radius: 8px; @(Model.PageIndex == i ? "background: var(--navy); border-color: var(--navy); color: #fff;" : "border: 1px solid var(--bdr); color: var(--txt);")">@i</a>
+                        <a class="page-link" asp-page="./Index"
+                           asp-route-pageIndex="@i"
+                           asp-route-searchQuery="@Model.SearchQuery"
+                           style="border-radius:8px; @(Model.PageIndex == i ? "background:var(--navy);border-color:var(--navy);color:#fff;" : "border:1px solid var(--bdr);color:var(--txt);")">@i</a>
                     </li>
                 }
                 <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
-                    <a class="page-link" asp-page="./Index" asp-route-pageIndex="@(Model.PageIndex + 1)" asp-route-searchQuery="@Model.SearchQuery" style="border-radius: 8px; border: 1px solid var(--bdr); color: var(--txt);">Next</a>
+                    <a class="page-link" asp-page="./Index"
+                       asp-route-pageIndex="@(Model.PageIndex + 1)"
+                       asp-route-searchQuery="@Model.SearchQuery"
+                       style="border-radius:8px;border:1px solid var(--bdr);color:var(--txt);">Next</a>
                 </li>
             </ul>
         </nav>
     }
+
 </div>

@@ -12,7 +12,7 @@
     }
 
     string[] svcSteps = { "Pending", "Processing", "Ready", "Done" };
-    string[] orderSteps = { "Pending", "Confirmed", "Processing", "Shipped", "Delivered" };
+    string[] orderSteps = { "Pending", "Confirmed", "Processing", "Shipped", "Delivered", "Completed" };
 
     int SvcStepIndex(string s) => s switch
     {
@@ -28,7 +28,7 @@
         var x when x.StartsWith("Processing") => 2,
         "Shipped" => 3,
         "Delivered" => 4,
-        "Completed" => 4,
+        "Completed" => 5,   
         "Cancelled" => -1,
         _ => 0
     };

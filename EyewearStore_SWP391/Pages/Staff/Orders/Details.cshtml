@@ -164,6 +164,7 @@
             font-weight: 800
         }
 
+        /* WORKFLOW TRACKER */
         .wf-track {
             background: var(--surf);
             border: 1px solid var(--bdr);
@@ -290,11 +291,7 @@
             color: var(--ok)
         }
 
-        .rb-manager {
-            background: rgba(13,27,42,.1);
-            color: var(--navy2)
-        }
-
+        /* ADVANCE CARD */
         .advance-card {
             background: var(--surf);
             border: 1px solid var(--bdr);
@@ -427,6 +424,7 @@
             color: var(--txt2)
         }
 
+        /* SERVICE BANNER */
         .svc-banner {
             background: linear-gradient(135deg,#7c3aed,#4f46e5);
             border-radius: var(--r);
@@ -492,6 +490,7 @@
                 transform: translateY(-1px)
             }
 
+        /* GRID & CARD */
         .det-grid {
             display: grid;
             grid-template-columns: 1fr 340px;
@@ -816,12 +815,6 @@
                 grid-column: 1/-1
             }
 
-        .divider {
-            height: 1px;
-            background: var(--bdr);
-            margin: 14px 0
-        }
-
         .back-l {
             display: flex;
             align-items: center;
@@ -907,11 +900,7 @@
         }
 
         @@media(max-width:600px) {
-            .info-g {
-                grid-template-columns: 1fr
-            }
-
-            .act-grid {
+            .info-g, .act-grid {
                 grid-template-columns: 1fr
             }
         }
@@ -955,7 +944,7 @@
                     "Processing" => ("rgba(13,27,42,.07)", "#1a2f54", "rgba(13,27,42,.2)"),
                     "Shipped" => ("rgba(15,118,110,.08)", "#065f46", "rgba(15,118,110,.25)"),
                     "Delivered" => ("rgba(15,118,110,.06)", "#065f46", "rgba(15,118,110,.18)"),
-                    "Completed" => ("rgba(13,27,42,.07)", "var(--navy)", "rgba(13,27,42,.15)"),
+                    "Completed" => ("rgba(5,150,105,.08)", "#065f46", "rgba(5,150,105,.22)"),
                     "Cancelled" => ("var(--red-s)", "var(--red)", "rgba(220,38,38,.22)"),
                     _ => ("var(--bg2)", "var(--txt2)", "var(--bdr)")
                 };
@@ -965,18 +954,19 @@
             </span>
         </div>
 
+        <!-- WORKFLOW TRACKER — all Operations, no Manager role -->
         <div class="wf-track">
             <div class="wf-track-title"><i class="bi bi-signpost-2 me-1"></i>Order Workflow Pipeline</div>
             <div class="wf-steps">
                 @{
                     var pipeline = new (string Status, string Label, string Role, string RoleCss)[]
                     {
-                        ("Pending Confirmation", "Pending",   "Sale/Support", "rb-sale"),
-                        ("Confirmed",           "Confirmed",  "Sale/Support", "rb-sale"),
-                        ("Processing",          "Processing", "Operations",   "rb-ops"),
-                        ("Shipped",             "Shipped",    "Operations",   "rb-ops"),
-                        ("Delivered",           "Delivered",  "Operations",   "rb-ops"),
-                        ("Completed",           "Completed",  "Manager",      "rb-manager"),
+                        ("Pending Confirmation", "Pending",    "Sale/Support", "rb-sale"),
+                        ("Confirmed",            "Confirmed",  "Sale/Support", "rb-sale"),
+                        ("Processing",           "Processing", "Operations",   "rb-ops"),
+                        ("Shipped",              "Shipped",    "Operations",   "rb-ops"),
+                        ("Delivered",            "Delivered",  "Operations",   "rb-ops"),
+                        ("Completed",            "Completed",  "Operations",   "rb-ops"),
                     };
                     int curIdx = Array.FindIndex(pipeline, p => p.Status == order.Status);
                 }
@@ -1016,6 +1006,7 @@
 
         <div class="det-grid">
             <div>
+                <!-- Order Items -->
                 <div class="dc">
                     <div class="dc-hdr navy">
                         <i class="bi bi-cart3" style="color:rgba(255,255,255,.7)"></i>
@@ -1037,18 +1028,16 @@
                                     oi.SnapshotJson.Contains("\"lensProductId\":"));
                                     bool isPrescItem = oi.PrescriptionId != null;
                                     string? svcName = null;
-
                                     if (isService && !string.IsNullOrEmpty(oi.SnapshotJson))
                                     {
                                         try
                                         {
-                                            using var doc = JsonDocument.Parse(oi.SnapshotJson);
-                                            if (doc.RootElement.TryGetProperty("serviceName", out var sn))
+                                            using var doc2 = JsonDocument.Parse(oi.SnapshotJson);
+                                            if (doc2.RootElement.TryGetProperty("serviceName", out var sn))
                                                 svcName = sn.GetString();
                                         }
                                         catch { }
                                     }
-
                                     var firstImg = oi.Product?.ProductImages?.FirstOrDefault()?.ImageUrl;
 
                                     <div class="oi-card">
@@ -1081,7 +1070,6 @@
                                     </div>
                                 }
                             </div>
-
                             <div class="oi-total">
                                 <div class="oi-total-lbl">Order Total</div>
                                 <div class="oi-total-val">@order.TotalAmount.ToString("N0") ₫</div>
@@ -1090,6 +1078,7 @@
                     </div>
                 </div>
 
+                <!-- Customer & Shipping -->
                 <div class="dc">
                     <div class="dc-hdr teal">
                         <i class="bi bi-person-fill" style="color:rgba(255,255,255,.7)"></i>
@@ -1116,13 +1105,11 @@
                                 <div class="ii-v" style="color:var(--red)">@order.TotalAmount.ToString("N0") ₫</div>
                             </div>
                         </div>
-
                         @{
                             var addrLine = order.Address?.AddressLine ?? order.AddressLine;
                             var recvName = order.Address?.ReceiverName ?? order.ReceiverName;
                             var phone = order.Address?.Phone ?? order.Phone;
                         }
-
                         @if (!string.IsNullOrEmpty(addrLine))
                         {
                             <div class="ii" style="margin-top:9px">
@@ -1161,8 +1148,11 @@
                 }
             </div>
 
+            <!-- RIGHT COLUMN -->
             <div>
                 <div style="position:sticky;top:80px">
+
+                    <!-- ADVANCE CARD -->
                     <div class="advance-card">
                         <div class="advance-hdr">
                             <i class="bi bi-arrow-right-circle-fill" style="color:rgba(255,255,255,.8)"></i>
@@ -1184,8 +1174,8 @@
                                 <div class="handoff-card">
                                     <i class="bi bi-check-circle-fill"></i>
                                     <div>
-                                        <div class="handoff-card-title">Order Completed</div>
-                                        <div class="handoff-card-sub">This order has already reached the final stage.</div>
+                                        <div class="handoff-card-title">🎉 Order Completed</div>
+                                        <div class="handoff-card-sub">This order has reached the final stage. Inventory has been finalised.</div>
                                     </div>
                                 </div>
                             }
@@ -1203,10 +1193,7 @@
                             {
                                 <div class="lock-hint">
                                     <i class="bi bi-truck"></i>
-                                    <div>
-                                        Tracking number is required before moving to
-                                        <strong>Shipped</strong>. Enter shipment details below and save them first.
-                                    </div>
+                                    <div>Tracking number is required before moving to <strong>Shipped</strong>. Enter shipment details below and save first.</div>
                                 </div>
                             }
                             else if (canAdvance && nextStatus != null)
@@ -1223,6 +1210,14 @@
                                     Current: <span style="color:var(--txt2);font-weight:700">@order.Status</span>
                                     &nbsp;→&nbsp; Next: <strong>@nextStatus</strong>
                                 </div>
+
+                                @if (nextStatus == "Completed")
+                                {
+                                    <div style="margin-top:10px;background:rgba(5,150,105,.06);border:1px solid rgba(5,150,105,.18);border-radius:9px;padding:10px 13px;font-size:12px;color:#065f46;line-height:1.6;">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Completing this order will <strong>finalise inventory deduction</strong> and close the order.
+                                    </div>
+                                }
                             }
                             else
                             {
@@ -1234,6 +1229,7 @@
                         </div>
                     </div>
 
+                    <!-- Shipment form -->
                     @if (order.Status == "Processing" || order.Status == "Shipped")
                     {
                         <div class="shipment-section">
@@ -1266,6 +1262,7 @@
                         </div>
                     }
 
+                    <!-- Operations Actions -->
                     <div class="dc">
                         <div class="dc-hdr dark">
                             <i class="bi bi-tools" style="color:rgba(255,255,255,.7)"></i>
@@ -1306,24 +1303,20 @@
 @section Scripts {
     <script>
         function cancelOrder() {
-            if (confirm('Cancel Order #@(order?.OrderId)?\n\nThis action will restore inventory and cannot be undone.')) {
+            if (confirm('Cancel Order #@(order?.OrderId)?\n\nThis action will restore inventory and cannot be undone.'))
                 document.getElementById('cancelForm').submit();
-            }
         }
-
         function toggleShipment() {
-            const body = document.getElementById('shipmentBody');
+            const body    = document.getElementById('shipmentBody');
             const chevron = document.getElementById('shipChevron');
             body.classList.toggle('open');
             chevron.classList.toggle('bi-chevron-down');
             chevron.classList.toggle('bi-chevron-up');
         }
-
         @if (needsTracking)
         {
-                <text>document.getElementById('shipmentBody')?.classList.add('open');</text>
+            <text>document.getElementById('shipmentBody')?.classList.add('open');</text>
         }
-
         var alOk = document.querySelector('.al-ok');
         if (alOk) setTimeout(() => { alOk.style.transition = 'opacity .5s'; alOk.style.opacity = '0'; }, 4000);
     </script>

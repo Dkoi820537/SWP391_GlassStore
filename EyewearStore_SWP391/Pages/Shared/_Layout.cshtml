@@ -267,8 +267,8 @@
         }
 
         /* ══════════════════════════════════════
-                   NAV SEARCH BAR
-                ══════════════════════════════════════ */
+                           NAV SEARCH BAR
+                        ══════════════════════════════════════ */
         .nav-search-wrap {
             flex: 1;
             max-width: 400px;
@@ -453,6 +453,35 @@
                 display: none;
             }
         }
+
+        /* Page layout fix */
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            flex-shrink: 0;
+        }
+
+        main {
+            flex: 1 0 auto;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            background: transparent;
+        }
+
+        footer {
+            flex-shrink: 0;
+            margin-top: auto;
+        }
     </style>
 </head>
 <body>
@@ -473,7 +502,6 @@
                             </a>
                         </li>
 
-                        <!-- ══ SHOP DROPDOWN ══ -->
                         <li class="dropdown">
                             <button class="stitch-menu-link" id="shopDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 <span class="material-symbols-outlined icon">shopping_bag</span>
@@ -516,7 +544,6 @@
                             </ul>
                         </li>
 
-                        <!-- ══ SERVICES DROPDOWN ══ -->
                         <li class="dropdown">
                             <button class="stitch-menu-link" id="servicesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 <span class="material-symbols-outlined icon">construction</span>
@@ -711,12 +738,8 @@
                     </ul>
                 </div>
 
-                <!-- ══════════════════════════════════════
-                     SEARCH BAR - nằm giữa nav-left và nav-right
-                ══════════════════════════════════════ -->
                 <div class="nav-search-wrap">
                     <div class="nav-search-inner">
-                        <!-- Filter dropdown: All / Frames / Lenses -->
                         <select class="nav-search-filter" id="navSearchFilter" title="Filter by type">
                             <option value="">All</option>
                             <option value="Frame">Frames</option>
@@ -725,7 +748,6 @@
 
                         <div class="nav-search-divider"></div>
 
-                        <!-- Text input -->
                         <input class="nav-search-input"
                                id="navSearchInput"
                                type="text"
@@ -733,15 +755,12 @@
                                autocomplete="off"
                                aria-label="Search products" />
 
-                        <!-- Search button -->
                         <button class="nav-search-btn" id="navSearchBtn" type="button" title="Search">
                             <i class="bi bi-search"></i>
                         </button>
                     </div>
 
-                    <!-- Quick-suggestion dropdown -->
                     <div class="nav-search-suggestions" id="navSearchSuggestions">
-                        <!-- Frame suggestions -->
                         <div class="nss-label" data-group="Frame">Frames</div>
                         <a class="nss-item" data-type="Frame" data-q="Titanium" href="/Products?ProductTypeFilter=Frame&SearchTerm=Titanium">
                             <i class="bi bi-eyeglasses"></i>
@@ -759,7 +778,6 @@
                             <span class="nss-tag nss-tag-frame">Frame</span>
                         </a>
 
-                        <!-- Lens suggestions -->
                         <div class="nss-label" data-group="Lens">Lenses</div>
                         <a class="nss-item" data-type="Lens" data-q="Progressive" href="/Products?ProductTypeFilter=Lens&SearchTerm=Progressive">
                             <i class="bi bi-circle"></i>
@@ -777,11 +795,9 @@
                             <span class="nss-tag nss-tag-lens">Lens</span>
                         </a>
 
-                        <!-- Empty state -->
                         <div class="nss-empty" id="navSearchEmpty">No suggestions found</div>
                     </div>
                 </div>
-                <!-- ══ END SEARCH BAR ══ -->
 
                 <div class="stitch-nav-right">
                     @if (User.Identity.IsAuthenticated)
@@ -805,17 +821,14 @@
                                 <span class="material-symbols-outlined" style="font-size:12px;">expand_more</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end user-menu" aria-labelledby="userDropdown">
-                                <!-- BEGIN: TopBar -->
                                 <li class="profile-topbar">
                                     <div class="profile-avatar-small">
                                         <svg class="icon-svg-small" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path></svg>
                                     </div>
                                     <span class="text-white fw-bold fs-5">@User.Identity.Name</span>
                                 </li>
-                                <!-- END: TopBar -->
 
                                 <li class="profile-main">
-                                    <!-- BEGIN: ProfileHeader -->
                                     <div class="profile-header">
                                         <div class="profile-avatar-large">
                                             <svg class="icon-svg-large" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path></svg>
@@ -828,11 +841,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- END: ProfileHeader -->
 
                                     <hr class="border-gray-300 mb-4 mt-0" />
 
-                                    <!-- BEGIN: NavMenu -->
                                     <nav class="d-flex flex-column gap-2 mb-4">
                                         <a class="profile-nav-link" asp-page="/Profile/Index">
                                             <div class="profile-nav-icon">
@@ -877,7 +888,6 @@
                                             <span>My Refunds</span>
                                         </a>
                                     </nav>
-                                    <!-- END: NavMenu -->
 
                                     <hr class="border-gray-300 my-4" />
 
@@ -958,7 +968,6 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @Html.AntiForgeryToken()
     <script src="~/js/shop-cart.js" asp-append-version="true"></script>
     <script src="~/js/recently-viewed.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
@@ -979,55 +988,49 @@
                     if (dropBadge) { dropBadge.textContent = count > 99 ? '99+' : count; dropBadge.style.display = 'inline-flex'; }
                     const heartIcon = document.querySelector('.nav-wishlist-btn i');
                     if (heartIcon) heartIcon.className = 'bi bi-heart-fill';
-                } catch {}
+                } catch { }
             })();
         </script>
     }
 
-    <!-- ══ SEARCH BAR SCRIPT ══ -->
     <script>
         (function () {
-            const input  = document.getElementById('navSearchInput');
+            const input = document.getElementById('navSearchInput');
             const filter = document.getElementById('navSearchFilter');
-            const btn    = document.getElementById('navSearchBtn');
-            const sugg   = document.getElementById('navSearchSuggestions');
-            const empty  = document.getElementById('navSearchEmpty');
+            const btn = document.getElementById('navSearchBtn');
+            const sugg = document.getElementById('navSearchSuggestions');
+            const empty = document.getElementById('navSearchEmpty');
             if (!input || !btn || !sugg) return;
 
-            /* Navigate to Products page with filters */
             function doSearch() {
-                const q    = input.value.trim();
+                const q = input.value.trim();
                 const type = filter.value;
                 const params = new URLSearchParams();
                 if (type) params.set('ProductTypeFilter', type);
-                if (q)    params.set('SearchTerm', q);
+                if (q) params.set('SearchTerm', q);
                 window.location.href = '/Products?' + params.toString();
             }
 
-            /* Show / hide suggestion dropdown */
             function openSugg() { sugg.classList.add('show'); filterSugg(); }
             function closeSugg() { setTimeout(() => sugg.classList.remove('show'), 160); }
 
-            /* Filter suggestion items by typed text + selected type */
             function filterSugg() {
-                const q    = input.value.toLowerCase().trim();
-                const type = filter.value; // '' | 'Frame' | 'Lens'
-                const items  = sugg.querySelectorAll('.nss-item');
+                const q = input.value.toLowerCase().trim();
+                const type = filter.value;
+                const items = sugg.querySelectorAll('.nss-item');
                 const labels = sugg.querySelectorAll('.nss-label');
                 let anyVisible = false;
 
                 items.forEach(el => {
                     const matchType = !type || el.dataset.type === type;
-                    const matchText = !q    || el.dataset.q.toLowerCase().includes(q)
-                                             || el.querySelector('span:first-of-type')
-                                                  .textContent.toLowerCase().includes(q);
+                    const matchText = !q || el.dataset.q.toLowerCase().includes(q)
+                        || el.querySelector('span:first-of-type').textContent.toLowerCase().includes(q);
                     el.style.display = (matchType && matchText) ? 'flex' : 'none';
                     if (matchType && matchText) anyVisible = true;
                 });
 
-                /* Hide section labels if all items in that group are hidden */
                 labels.forEach(lbl => {
-                    const group = lbl.dataset.group; // 'Frame' | 'Lens'
+                    const group = lbl.dataset.group;
                     const visible = [...items].some(el =>
                         el.dataset.type === group && el.style.display !== 'none');
                     lbl.style.display = visible ? 'block' : 'none';
@@ -1036,14 +1039,13 @@
                 empty.style.display = anyVisible ? 'none' : 'block';
             }
 
-            input.addEventListener('focus',  openSugg);
-            input.addEventListener('blur',   closeSugg);
-            input.addEventListener('input',  filterSugg);
+            input.addEventListener('focus', openSugg);
+            input.addEventListener('blur', closeSugg);
+            input.addEventListener('input', filterSugg);
             filter.addEventListener('change', filterSugg);
             btn.addEventListener('click', doSearch);
             input.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
 
-            /* If current page is /Products, pre-fill from URL params */
             const urlParams = new URLSearchParams(window.location.search);
             const st = urlParams.get('SearchTerm');
             const pt = urlParams.get('ProductTypeFilter');

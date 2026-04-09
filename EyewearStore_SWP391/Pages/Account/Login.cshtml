@@ -4,77 +4,655 @@
     ViewData["Title"] = "Login";
 }
 
-<div class="row justify-content-center" style="min-height: 70vh; align-items: center; padding: 2rem 0;">
-    <div class="col-md-6 col-lg-5">
-        <div class="card" style="border-radius:20px; overflow:hidden; box-shadow: 0 8px 32px rgba(74,124,126,0.15); border:none;">
-            <div style="background: linear-gradient(135deg, var(--color-teal) 0%, var(--color-teal-light) 100%); padding:3rem 2rem; text-align:center; position:relative;">
-                <div style="position:absolute; top:-30px; right:-30px; width:120px; height:120px; background: rgba(245,230,211,0.15); border-radius:50%;"></div>
-                <div style="position:relative; z-index:1;">
-                    <div style="font-size:3.5rem; margin-bottom:1rem;">👓</div>
-                    <h3 style="color:white; margin-bottom:0.75rem; font-family:'Playfair Display', serif; font-weight:600; font-size:2rem;">Welcome Back</h3>
-                    <p style="color:rgba(255,255,255,0.9); margin:0; font-size:1rem;">Sign in to your OptiPlus account</p>
-                </div>
-            </div>
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --teal-900: #042f2e;
+            --teal-800: #134e4a;
+            --teal-700: #115e59;
+            --teal-600: #0d9488;
+            --teal-500: #14b8a6;
+            --teal-400: #2dd4bf;
+            --teal-100: #ccfbf1;
+            --teal-50: #f0fdfa;
+            --gold: #c9a96e;
+            --gold-lt: #e8d5b0;
+            --cream: #faf8f5;
+            --ink: #0f172a;
+            --muted: #64748b;
+        }
 
-            <div class="card-body" style="padding:2.5rem 2rem; background:white;">
-                @if (!string.IsNullOrEmpty(Model.SuccessMessage))
-                {
-                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius:10px; padding:1rem 1.25rem;">
-                        <strong>✓</strong> @Model.SuccessMessage
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1 0 auto;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            background: linear-gradient(145deg, var(--teal-900) 0%, var(--teal-800) 55%, #0c3b37 100%);
+        }
+
+        .op-page {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem 1rem;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(145deg, var(--teal-900) 0%, var(--teal-800) 55%, #0c3b37 100%);
+        }
+
+            .op-page::before {
+                content: '';
+                position: fixed;
+                inset: 0;
+                background-image: linear-gradient(rgba(45,212,191,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(45,212,191,.04) 1px, transparent 1px);
+                background-size: 52px 52px;
+                animation: gridDrift 25s linear infinite;
+                pointer-events: none;
+                z-index: 0;
+            }
+
+        @@keyframes gridDrift {
+            from {
+                background-position: 0 0;
+            }
+
+            to {
+                background-position: 52px 52px;
+            }
+        }
+
+        .op-blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(90px);
+            pointer-events: none;
+            z-index: 0;
+            animation: blobPulse ease-in-out infinite alternate;
+        }
+
+        .op-blob-1 {
+            width: 480px;
+            height: 480px;
+            top: -120px;
+            left: -120px;
+            background: radial-gradient(circle,rgba(13,148,136,.24),transparent 70%);
+            animation-duration: 11s;
+        }
+
+        .op-blob-2 {
+            width: 360px;
+            height: 360px;
+            bottom: -80px;
+            right: -80px;
+            background: radial-gradient(circle,rgba(20,184,166,.18),transparent 70%);
+            animation-duration: 14s;
+            animation-delay: -5s;
+        }
+
+        .op-blob-3 {
+            width: 220px;
+            height: 220px;
+            top: 45%;
+            left: 62%;
+            background: radial-gradient(circle,rgba(201,169,110,.12),transparent 70%);
+            animation-duration: 9s;
+            animation-delay: -3s;
+        }
+
+        @@keyframes blobPulse {
+            from {
+                transform: translate(0,0) scale(1);
+            }
+
+            to {
+                transform: translate(22px,-18px) scale(1.07);
+            }
+        }
+
+        .op-glass {
+            position: fixed;
+            bottom: -80px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+            animation: glassRise linear infinite;
+        }
+
+        @@keyframes glassRise {
+            0% {
+                transform: translateY(0) rotate(-4deg);
+                opacity: 0;
+            }
+
+            8% {
+                opacity: .18;
+            }
+
+            88% {
+                opacity: .08;
+            }
+
+            100% {
+                transform: translateY(-115vh) rotate(14deg);
+                opacity: 0;
+            }
+        }
+
+        .op-card {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 430px;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 32px 80px rgba(4,47,46,.5), 0 0 0 1px rgba(45,212,191,.14);
+            animation: cardIn .65s cubic-bezier(.22,1,.36,1) forwards;
+        }
+
+        @@keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .op-header {
+            background: linear-gradient(145deg, var(--teal-800) 0%, var(--teal-700) 55%, var(--teal-600) 100%);
+            padding: 2.75rem 2.25rem 2.25rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .op-header::before,
+            .op-header::after {
+                content: '';
+                position: absolute;
+                border-radius: 50%;
+                border: 1px solid rgba(255,255,255,.08);
+                pointer-events: none;
+            }
+
+            .op-header::before {
+                width: 200px;
+                height: 200px;
+                top: -70px;
+                right: -50px;
+            }
+
+            .op-header::after {
+                width: 120px;
+                height: 120px;
+                bottom: -40px;
+                left: -30px;
+            }
+
+        .op-brand-icon {
+            width: 68px;
+            height: 68px;
+            margin: 0 auto 1.25rem;
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.22);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: iconPop .7s cubic-bezier(.22,1,.36,1) .15s both;
+        }
+
+        @@keyframes iconPop {
+            from {
+                opacity: 0;
+                transform: scale(.6) rotate(-12deg);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .op-brand-icon::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,.15);
+            pointer-events: none;
+        }
+
+        .op-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: .3rem;
+            letter-spacing: -.01em;
+            animation: fadeUp .6s ease .22s both;
+        }
+
+        .op-subtitle {
+            color: rgba(255,255,255,.65);
+            font-size: .875rem;
+            font-family: 'DM Sans', sans-serif;
+            animation: fadeUp .6s ease .32s both;
+        }
+
+        @@keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .op-body {
+            padding: 2.25rem 2.25rem 2.5rem;
+            background: #fff;
+        }
+
+        .op-alert-ok {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            background: #ecfdf5;
+            border: 1px solid #6ee7b7;
+            border-radius: 10px;
+            padding: .75rem 1rem;
+            margin-bottom: 1.5rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: #065f46;
+        }
+
+        .op-error-box:not(:empty) {
+            background: #fff5f5;
+            border: 1px solid #fc8181;
+            border-radius: 10px;
+            padding: .75rem 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 13px;
+            color: #c53030;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .op-field {
+            margin-bottom: 1.3rem;
+        }
+
+        .op-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11.5px;
+            font-weight: 600;
+            letter-spacing: .7px;
+            text-transform: uppercase;
+            color: var(--teal-700);
+            margin-bottom: .45rem;
+        }
+
+        .op-input {
+            width: 100%;
+            padding: .875rem 1.1rem;
+            background: var(--teal-50);
+            border: 1.5px solid #d1fae5;
+            border-radius: 11px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14.5px;
+            color: var(--ink);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s, background .2s;
+        }
+
+            .op-input::placeholder {
+                color: #94a3b8;
+            }
+
+            .op-input:focus {
+                border-color: var(--teal-500);
+                background: #fff;
+                box-shadow: 0 0 0 3px rgba(20,184,166,.15);
+            }
+
+        .op-validation {
+            display: block;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            color: #e53e3e;
+            margin-top: 4px;
+        }
+
+        .op-check-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .op-check {
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            border: 1.5px solid #cbd5e0;
+            background: var(--teal-50);
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            flex-shrink: 0;
+            position: relative;
+            transition: all .2s;
+        }
+
+            .op-check:checked {
+                background: var(--teal-600);
+                border-color: var(--teal-600);
+            }
+
+                .op-check:checked::after {
+                    content: '';
+                    position: absolute;
+                    left: 4px;
+                    top: 1px;
+                    width: 5px;
+                    height: 9px;
+                    border: 2px solid white;
+                    border-top: none;
+                    border-left: none;
+                    transform: rotate(45deg);
                 }
 
-                <form method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" style="padding:1rem; background:#f8d7da; border-radius:8px;"></div>
+        .op-check-label {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13.5px;
+            color: var(--muted);
+            cursor: pointer;
+        }
 
-                    <div class="mb-4">
-                        <label class="form-label" style="font-weight:600; color:var(--color-teal); display:flex; gap:0.5rem; align-items:center;">
-                            <span style="font-size:1.1rem;">📧</span> Email Address
-                        </label>
-                        <input asp-for="Input.Email" class="form-control" placeholder="your.email@example.com" style="padding:1rem 1.25rem; border-radius:10px; border:2px solid #e0e0e0; font-size:1rem; transition:all .2s;" />
-                        <span asp-validation-for="Input.Email" class="text-danger" style="font-size:0.875rem; margin-top:0.25rem;"></span>
-                    </div>
+        .op-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--teal-600) 0%, var(--teal-800) 100%);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13.5px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform .2s, box-shadow .2s;
+        }
 
-                    <div class="mb-4">
-                        <label class="form-label" style="font-weight:600; color:var(--color-teal); display:flex; gap:0.5rem; align-items:center;">
-                            <span style="font-size:1.1rem;">🔐</span> Password
-                        </label>
-                        <input asp-for="Input.Password" type="password" class="form-control" placeholder="Enter your password" style="padding:1rem 1.25rem; border-radius:10px; border:2px solid #e0e0e0; font-size:1rem; transition:all .2s;" />
-                        <span asp-validation-for="Input.Password" class="text-danger" style="font-size:0.875rem; margin-top:0.25rem;"></span>
-                    </div>
+            .op-btn::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(180deg, rgba(255,255,255,.1) 0%, transparent 50%);
+                pointer-events: none;
+            }
 
-                    <div class="mb-4">
-                        <div class="form-check" style="padding-left:0; display:flex; align-items:center;">
-                            <input asp-for="Input.RememberMe" class="form-check-input" type="checkbox" id="rememberMe" style="width:1.25rem; height:1.25rem; margin-right:0.75rem; border-radius:5px; border:2px solid #e0e0e0; accent-color:var(--color-blue-cta);" />
-                            <label class="form-check-label" for="rememberMe" style="cursor:pointer; color:#666666; font-size:0.95rem; margin:0;">Remember me for 8 hours</label>
-                        </div>
-                    </div>
+            .op-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 28px rgba(13,148,136,.4);
+            }
 
-                    <div class="d-grid gap-2 mb-4">
-                        <button type="submit" class="btn btn-primary" style="padding:1.125rem 2rem; font-size:1.05rem; font-weight:600; border-radius:10px; background:linear-gradient(135deg, var(--color-blue-cta) 0%, var(--color-blue-cta-hover) 100%); border:none; text-transform:uppercase; letter-spacing:1px; transition:all .2s;">Sign In</button>
-                    </div>
+            .op-btn:active {
+                transform: translateY(0);
+            }
 
-                    <div style="text-align:center; margin:2rem 0; position:relative;">
-                        <span style="background:white; padding:0 1rem; color:#999; font-size:0.9rem; position:relative; z-index:1; font-weight:500;">or</span>
-                        <div style="position:absolute; top:50%; left:0; right:0; height:1px; background:#e0e0e0; z-index:0;"></div>
-                    </div>
+        .op-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 1.6rem 0;
+        }
 
-                    <div style="text-align:center; padding:1.5rem; background:linear-gradient(135deg, var(--color-peach) 0%, var(--color-peach-light) 100%); border-radius:10px; border:1px solid #e0e0e0;">
-                        <span style="color:#4A4A4A; margin-right:0.5rem; font-size:0.95rem;">New to OptiPlus?</span>
-                        <a asp-page="/Account/Register" class="text-decoration-none fw-semibold" style="color:var(--color-teal); font-weight:700; font-size:0.95rem;">Create an account →</a>
-                    </div>
-                </form>
+            .op-divider::before,
+            .op-divider::after {
+                content: '';
+                flex: 1;
+                height: 1px;
+                background: #e2e8f0;
+            }
+
+            .op-divider span {
+                font-family: 'DM Sans', sans-serif;
+                font-size: 11px;
+                color: #94a3b8;
+                letter-spacing: .3px;
+            }
+
+        .op-cta {
+            background: linear-gradient(135deg, var(--teal-50) 0%, #ecfdf5 100%);
+            border: 1px solid #d1fae5;
+            border-radius: 12px;
+            padding: 1.1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+            .op-cta span {
+                font-family: 'DM Sans', sans-serif;
+                font-size: 13.5px;
+                color: var(--muted);
+            }
+
+            .op-cta a {
+                font-family: 'DM Sans', sans-serif;
+                font-size: 13.5px;
+                font-weight: 700;
+                color: var(--teal-600);
+                text-decoration: none;
+                white-space: nowrap;
+                transition: color .2s;
+            }
+
+                .op-cta a:hover {
+                    color: var(--teal-800);
+                }
+
+        .op-card-foot {
+            background: var(--teal-50);
+            border-top: 1px solid #d1fae5;
+            padding: 1rem 2.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .op-secure {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .op-secure-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--teal-500);
+            animation: dotPulse 2.2s ease-in-out infinite;
+        }
+
+        @@keyframes dotPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(20,184,166,.5);
+            }
+
+            50% {
+                box-shadow: 0 0 0 4px rgba(20,184,166,0);
+            }
+        }
+    </style>
+}
+
+<div class="op-blob op-blob-1"></div>
+<div class="op-blob op-blob-2"></div>
+<div class="op-blob op-blob-3"></div>
+<div id="glassLayer"></div>
+
+<div class="op-page">
+    <div class="op-card">
+        <div class="op-header">
+            <div class="op-brand-icon">
+                <svg width="44" height="24" viewBox="0 0 48 24" fill="none">
+                    <rect x="1" y="4" width="18" height="16" rx="8" stroke="rgba(255,255,255,.9)" stroke-width="2" fill="rgba(255,255,255,.1)" />
+                    <rect x="29" y="4" width="18" height="16" rx="8" stroke="rgba(255,255,255,.9)" stroke-width="2" fill="rgba(255,255,255,.1)" />
+                    <ellipse cx="6.5" cy="9" rx="4" ry="2.5" fill="rgba(255,255,255,.18)" transform="rotate(-15 6.5 9)" />
+                    <ellipse cx="34.5" cy="9" rx="4" ry="2.5" fill="rgba(255,255,255,.18)" transform="rotate(-15 34.5 9)" />
+                    <path d="M19 12 L29 12" stroke="rgba(255,255,255,.9)" stroke-width="2" stroke-linecap="round" />
+                    <path d="M1 12 L-4 9" stroke="rgba(255,255,255,.75)" stroke-width="1.8" stroke-linecap="round" />
+                    <path d="M47 12 L52 9" stroke="rgba(255,255,255,.75)" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
             </div>
+            <h1 class="op-title">Welcome Back</h1>
+            <p class="op-subtitle">Sign in to your OptiPlus account</p>
         </div>
 
-        <div style="text-align:center; margin-top:1.5rem; color:#666; font-size:0.875rem; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
-            <span style="font-size:1.1rem;">🔒</span>
-            <span>Your data is secure and encrypted</span>
+        <div class="op-body">
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="op-alert-ok">
+                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                        <circle cx="7.5" cy="7.5" r="6.5" stroke="#059669" stroke-width="1.3" />
+                        <path d="M4.5 7.5l2 2 4-4" stroke="#059669" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    @Model.SuccessMessage
+                </div>
+            }
+
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="op-error-box"></div>
+
+                <div class="op-field">
+                    <label class="op-label">
+                        <svg width="13" height="11" viewBox="0 0 13 11" fill="none">
+                            <rect x=".5" y=".5" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.25" />
+                            <path d="M.5 3l6 4 6-4" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round" />
+                        </svg>
+                        Email Address
+                    </label>
+                    <input asp-for="Input.Email" class="op-input" placeholder="your.email@example.com" autocomplete="email" />
+                    <span asp-validation-for="Input.Email" class="op-validation"></span>
+                </div>
+
+                <div class="op-field">
+                    <label class="op-label">
+                        <svg width="12" height="13" viewBox="0 0 12 13" fill="none">
+                            <rect x=".5" y="5.5" width="11" height="7" rx="1.5" stroke="currentColor" stroke-width="1.25" />
+                            <path d="M3 5.5V3.5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" />
+                            <circle cx="6" cy="9" r="1" fill="currentColor" />
+                        </svg>
+                        Password
+                    </label>
+                    <input asp-for="Input.Password" type="password" class="op-input" placeholder="Enter your password" autocomplete="current-password" />
+                    <span asp-validation-for="Input.Password" class="op-validation"></span>
+                </div>
+
+                <div class="op-check-row">
+                    <input asp-for="Input.RememberMe" type="checkbox" class="op-check" id="rememberMe" />
+                    <label class="op-check-label" for="rememberMe">Remember me for 8 hours</label>
+                </div>
+
+                <button type="submit" class="op-btn">Sign In →</button>
+
+                <div class="op-divider"><span>or</span></div>
+
+                <div class="op-cta">
+                    <span>New to OptiPlus?</span>
+                    <a asp-page="/Account/Register">Create an account →</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="op-card-foot">
+            <div class="op-secure">
+                <div class="op-secure-dot"></div>
+                SSL Encrypted &nbsp;·&nbsp; Your data is protected
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const layer = document.getElementById('glassLayer');
+
+            const frames = [
+                (op) => `<svg width="56" height="28" viewBox="0 0 48 24" fill="none">
+                    <rect x="1"  y="4" width="18" height="16" rx="8" stroke="rgba(45,212,191,${op})" stroke-width="1.8" fill="none"/>
+                    <rect x="29" y="4" width="18" height="16" rx="8" stroke="rgba(45,212,191,${op})" stroke-width="1.8" fill="none"/>
+                    <path d="M19 12L29 12" stroke="rgba(45,212,191,${op})" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M1 12L-4 9"   stroke="rgba(45,212,191,${op})" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M47 12L52 9"  stroke="rgba(45,212,191,${op})" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>`,
+                (op) => `<svg width="52" height="26" viewBox="0 0 48 24" fill="none">
+                    <circle cx="11" cy="12" r="9" stroke="rgba(201,169,110,${op})" stroke-width="1.8" fill="none"/>
+                    <circle cx="37" cy="12" r="9" stroke="rgba(201,169,110,${op})" stroke-width="1.8" fill="none"/>
+                    <path d="M20 12L28 12" stroke="rgba(201,169,110,${op})" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M2 12L-3 9"   stroke="rgba(201,169,110,${op})" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M46 12L51 9"  stroke="rgba(201,169,110,${op})" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>`,
+                (op) => `<svg width="58" height="24" viewBox="0 0 50 20" fill="none">
+                    <path d="M1 15Q1 3 10 2Q18 1 19 10Q18 17 10 16Z" stroke="rgba(255,255,255,${op})" stroke-width="1.8" fill="none"/>
+                    <path d="M31 15Q31 3 40 2Q48 1 49 10Q48 17 40 16Z" stroke="rgba(255,255,255,${op})" stroke-width="1.8" fill="none"/>
+                    <path d="M19 10L31 10" stroke="rgba(255,255,255,${op})" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M1 15L-3 12"  stroke="rgba(255,255,255,${op})" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M49 10L53 7"  stroke="rgba(255,255,255,${op})" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>`,
+            ];
+
+            for (let i = 0; i < 16; i++) {
+                const d = document.createElement('div');
+                d.className = 'op-glass';
+                const scale = (.55 + Math.random() * 1.1).toFixed(2);
+                const op = (.07 + Math.random() * .11).toFixed(2);
+                d.style.cssText =
+                    `left:${2 + Math.random() * 92}%;` +
+                    `bottom:-80px;` +
+                    `transform:scale(${scale});` +
+                    `animation-duration:${10 + Math.random() * 16}s;` +
+                    `animation-delay:${Math.random() * 15}s;`;
+                d.innerHTML = frames[i % 3](op);
+                layer.appendChild(d);
+            }
+        })();
+    </script>
 }

@@ -7,6 +7,17 @@ using System.Security.Claims;
 
 namespace EyewearStore_SWP391.Pages.Cart
 {
+    public class UpdateQuantityRequest
+    {
+        public int CartItemId { get; set; }
+        public int Quantity { get; set; }
+    }
+
+    public class RemoveItemRequest
+    {
+        public int CartItemId { get; set; }
+    }
+
     public class IndexModel : PageModel
     {
         private readonly ICartService _cartService;
@@ -82,6 +93,7 @@ namespace EyewearStore_SWP391.Pages.Cart
                 .ToListAsync();
         }
 
+        // Standard forms (fallback)
         public async Task<IActionResult> OnPostUpdateQuantityAsync(int cartItemId, int quantity)
         {
             try
@@ -169,6 +181,82 @@ namespace EyewearStore_SWP391.Pages.Cart
             }
 
             return RedirectToPage();
+        }
+
+        // AJAX handlers for frontend Fetch updates
+        public async Task<IActionResult> OnPostUpdateQuantityAjaxAsync([FromBody] UpdateQuantityRequest request)
+        {
+            try
+            {
+                var uidValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(uidValue, out var uid))
+                    return new JsonResult(new { success = false, message = "Unauthorized" });
+
+                await _cartService.UpdateQuantityAsync(request.CartItemId, request.Quantity);
+
+                // Recalculate totals
+                var (subtotalBase, prescriptionFees, shippingFee, grandTotal) = await _cartService.GetCartTotalsBreakdownAsync(uid);
+                
+                var cart = await _cartService.GetCartByUserIdAsync(uid);
+                var item = cart?.CartItems?.FirstOrDefault(c => c.CartItemId == request.CartItemId);
+                
+                decimal itemTotal = 0;
+                if (item != null)
+                {
+                    var lensId = CartService.ExtractLensProductId(item.TempPrescriptionJson);
+                    bool isServiceOrder = lensId.HasValue;
+                    var baseUnit = item.Product != null ? item.Product.Price : 0m;
+                    if (isServiceOrder && lensId.HasValue)
+                    {
+                        var lensProduct = await _context.Products.FindAsync(lensId.Value);
+                        if (lensProduct != null) baseUnit += lensProduct.Price;
+                    }
+                    if (item.Service != null) baseUnit += item.Service.Price;
+                    itemTotal = (baseUnit + item.PrescriptionFee) * item.Quantity;
+                }
+
+                return new JsonResult(new { 
+                    success = true, 
+                    subtotal = subtotalBase,
+                    prescriptionFees = prescriptionFees,
+                    shippingFee = shippingFee,
+                    total = grandTotal,
+                    itemTotal = itemTotal
+                });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { success = false, message = ex.Message });
+            }
+        }
+
+        public async Task<IActionResult> OnPostRemoveItemAjaxAsync([FromBody] RemoveItemRequest request)
+        {
+            try
+            {
+                var uidValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(uidValue, out var uid))
+                    return new JsonResult(new { success = false, message = "Unauthorized" });
+
+                await _cartService.RemoveItemAsync(request.CartItemId);
+                
+                var (subtotalBase, prescriptionFees, shippingFee, grandTotal) = await _cartService.GetCartTotalsBreakdownAsync(uid);
+                var cart = await _cartService.GetCartByUserIdAsync(uid);
+                int itemCount = cart?.CartItems?.Sum(x => x.Quantity) ?? 0;
+
+                return new JsonResult(new { 
+                    success = true, 
+                    subtotal = subtotalBase,
+                    prescriptionFees = prescriptionFees,
+                    shippingFee = shippingFee,
+                    total = grandTotal,
+                    itemCount = cart?.CartItems?.Count ?? 0
+                });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { success = false, message = ex.Message });
+            }
         }
     }
 }

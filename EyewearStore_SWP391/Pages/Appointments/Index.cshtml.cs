@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EyewearStore_SWP391.Pages.Admin.Appointments
 {
-    [Authorize(Roles = "admin,manager")]
+    [Authorize(Roles = "sale,admin,manager")]
     public class IndexModel : PageModel
     {
         private readonly EyewearStoreContext _db;

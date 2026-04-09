@@ -1,7 +1,7 @@
 ﻿@page
-@model EyewearStore_SWP391.Pages.Support.Orders.IndexModel
+@model EyewearStore_SWP391.Pages.Staff.Orders.IndexModel
 @{
-    ViewData["Title"] = "Support Staff - Order Management";
+    ViewData["Title"] = "Operations Dashboard";
 }
 
 @section Styles {
@@ -13,6 +13,10 @@
             --teal2: #0d9488;
             --red: #dc2626;
             --red-s: rgba(220,38,38,.08);
+            --ok: #059669;
+            --ok-s: rgba(5,150,105,.08);
+            --warn: #d97706;
+            --purp: #7c3aed;
             --txt: #0f172a;
             --txt2: #475569;
             --muted: #94a3b8;
@@ -20,73 +24,104 @@
             --bg: #f1f5f9;
             --bg2: #e8edf4;
             --bdr: #e2e8f0;
-            --r: 12px;
+            --bdr2: #cbd5e1;
             --sh: 0 1px 4px rgba(0,0,0,.06), 0 2px 10px rgba(0,0,0,.04);
+            --sh-md: 0 4px 20px rgba(0,0,0,.09);
+            --r: 12px;
         }
 
         *, *::before, *::after {
-            box-sizing: border-box
+            box-sizing: border-box;
         }
 
         body {
             background: var(--bg);
-            font-family: 'Segoe UI', system-ui, sans-serif
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
 
-        .sp-pg {
-            max-width: 1280px;
+        .ops-pg {
+            max-width: 1320px;
             margin: 0 auto;
-            padding: 28px 20px 80px
+            padding: 28px 20px 80px;
         }
 
-        .bc {
+        .ops-hdr {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 22px;
             display: flex;
-            gap: 6px;
             align-items: center;
-            font-size: 12px;
-            color: var(--muted);
-            margin-bottom: 20px
-        }
-
-            .bc a {
-                color: var(--muted);
-                text-decoration: none;
-                font-weight: 600
-            }
-
-                .bc a:hover {
-                    color: var(--teal)
-                }
-
-        .pg-hdr {
-            display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            gap: 16px;
             flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 24px
         }
 
-            .pg-hdr h1 {
-                font-size: 1.5rem;
-                font-weight: 900;
-                color: var(--navy);
-                margin: 0 0 4px;
-                letter-spacing: -.4px
-            }
+        .ops-hdr-left h1 {
+            font-size: 1.55rem;
+            font-weight: 900;
+            color: #fff;
+            margin: 0 0 3px;
+            letter-spacing: -.5px;
+        }
 
-            .pg-hdr p {
-                font-size: 13px;
-                color: var(--txt2);
-                margin: 0
-            }
+        .ops-hdr-left p {
+            font-size: 13px;
+            color: rgba(255,255,255,.55);
+            margin: 0;
+        }
 
         .hdr-actions {
             display: flex;
-            gap: 8px;
+            gap: 10px;
+            align-items: center;
             flex-wrap: wrap;
-            align-items: center
         }
+
+        .btn-svc-jobs {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--teal), var(--teal2));
+            color: #fff !important;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(15,118,110,.35);
+            transition: all .22s;
+            white-space: nowrap;
+            border: 1px solid rgba(255,255,255,.12);
+        }
+
+            .btn-svc-jobs:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(15,118,110,.45);
+                color: #fff !important;
+            }
+
+        .btn-refresh {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,.1);
+            border: 1px solid rgba(255,255,255,.18);
+            color: rgba(255,255,255,.85) !important;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .22s;
+            white-space: nowrap;
+        }
+
+            .btn-refresh:hover {
+                background: rgba(255,255,255,.18);
+                color: #fff !important;
+                border-color: rgba(255,255,255,.3);
+            }
 
         .al {
             display: flex;
@@ -96,37 +131,52 @@
             padding: 11px 16px;
             font-size: 13px;
             font-weight: 600;
-            margin-bottom: 16px
+            margin-bottom: 16px;
         }
 
         .al-ok {
-            background: rgba(5,150,105,.08);
+            background: var(--ok-s);
             border: 1px solid rgba(5,150,105,.2);
-            color: #059669
+            color: var(--ok);
+            animation: sIn .3s ease;
         }
 
         .al-err {
             background: var(--red-s);
             border: 1px solid rgba(220,38,38,.2);
-            color: var(--red)
+            color: var(--red);
         }
 
-        /* Stats */
+        @@keyframes sIn {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .stats-row {
             display: grid;
             grid-template-columns: repeat(4,1fr);
             gap: 14px;
-            margin-bottom: 22px
+            margin-bottom: 22px;
         }
 
         .stat-card {
             background: var(--surf);
             border: 1px solid var(--bdr);
             border-radius: var(--r);
-            padding: 16px 18px;
+            padding: 18px 20px;
             box-shadow: var(--sh);
             position: relative;
-            overflow: hidden
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 14px;
         }
 
             .stat-card::before {
@@ -135,55 +185,85 @@
                 top: 0;
                 left: 0;
                 right: 0;
-                height: 3px
+                height: 3px;
             }
 
-            .stat-card.c1::before {
-                background: var(--navy)
-            }
+        .stat-c1::before {
+            background: var(--warn);
+        }
 
-            .stat-card.c2::before {
-                background: var(--teal)
-            }
+        .stat-c2::before {
+            background: var(--teal);
+        }
 
-            .stat-card.c3::before {
-                background: var(--red)
-            }
+        .stat-c3::before {
+            background: var(--purp);
+        }
 
-            .stat-card.c4::before {
-                background: var(--navy2)
-            }
+        .stat-c4::before {
+            background: var(--ok);
+        }
 
-        .stat-label {
+        .stat-ico {
+            width: 44px;
+            height: 44px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .ico-warn {
+            background: rgba(217,119,6,.1);
+            color: var(--warn);
+        }
+
+        .ico-teal {
+            background: var(--ok-s);
+            color: var(--teal);
+        }
+
+        .ico-purp {
+            background: rgba(124,58,237,.1);
+            color: var(--purp);
+        }
+
+        .ico-ok {
+            background: var(--ok-s);
+            color: var(--ok);
+        }
+
+        .stat-lbl {
             font-size: 11px;
             font-weight: 700;
             color: var(--muted);
             text-transform: uppercase;
             letter-spacing: .8px;
-            margin-bottom: 6px
+            margin-bottom: 4px;
         }
 
-        .stat-value {
-            font-size: 2rem;
+        .stat-val {
+            font-size: 1.9rem;
             font-weight: 900;
             color: var(--navy);
-            line-height: 1
+            line-height: 1;
         }
 
         .stat-sub {
             font-size: 11px;
             color: var(--muted);
-            margin-top: 4px
+            margin-top: 3px;
         }
 
-        /* Filter */
         .filter-card {
             background: var(--surf);
             border: 1px solid var(--bdr);
             border-radius: var(--r);
             padding: 16px 18px;
             margin-bottom: 16px;
-            box-shadow: var(--sh)
+            box-shadow: var(--sh);
         }
 
             .filter-card h6 {
@@ -192,14 +272,14 @@
                 text-transform: uppercase;
                 letter-spacing: .8px;
                 color: var(--muted);
-                margin: 0 0 12px
+                margin: 0 0 12px;
             }
 
         .filter-row {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
-            align-items: flex-end
+            align-items: flex-end;
         }
 
         .fi {
@@ -212,23 +292,28 @@
             font-family: inherit;
             transition: border-color .2s;
             flex: 1;
-            min-width: 160px
+            min-width: 150px;
         }
 
             .fi:focus {
                 outline: none;
                 border-color: var(--teal);
-                box-shadow: 0 0 0 3px rgba(15,118,110,.1)
+                box-shadow: 0 0 0 3px rgba(15,118,110,.1);
             }
 
         .fi-search {
             flex: 2;
-            min-width: 220px
+            min-width: 220px;
         }
 
-        .btn-apply {
+        .fi-sm {
+            width: 90px;
+            flex: none;
+        }
+
+        .btn-filter {
             padding: 9px 20px;
-            background: linear-gradient(135deg,var(--navy),var(--navy2));
+            background: linear-gradient(135deg, var(--navy), var(--navy2));
             color: #fff;
             border: none;
             border-radius: 8px;
@@ -239,188 +324,196 @@
             transition: all .2s;
             display: flex;
             align-items: center;
-            gap: 6px
+            gap: 6px;
         }
 
-            .btn-apply:hover {
+            .btn-filter:hover {
                 transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(13,27,42,.25)
+                box-shadow: 0 4px 12px rgba(13,27,42,.25);
             }
 
-        .quick-links {
+        .qf-row {
             display: flex;
-            gap: 8px;
+            gap: 7px;
             flex-wrap: wrap;
-            margin-top: 10px
+            margin-top: 10px;
         }
 
-        .ql {
+        .qf {
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            padding: 5px 12px;
+            padding: 4px 12px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: 700;
             text-decoration: none;
             border: 1.5px solid;
-            transition: all .15s
+            transition: all .15s;
         }
 
-        .ql-navy {
+        .qf-navy {
             color: var(--navy);
-            border-color: var(--navy)
+            border-color: var(--navy);
         }
 
-            .ql-navy:hover {
+            .qf-navy:hover {
                 background: var(--navy);
-                color: #fff
+                color: #fff;
             }
 
-        .ql-teal {
+        .qf-teal {
             color: var(--teal);
-            border-color: var(--teal)
+            border-color: var(--teal);
         }
 
-            .ql-teal:hover {
+            .qf-teal:hover {
                 background: var(--teal);
-                color: #fff
+                color: #fff;
             }
 
-        .ql-red {
-            color: var(--red);
-            border-color: var(--red)
+        .qf-purp {
+            color: var(--purp);
+            border-color: var(--purp);
         }
 
-            .ql-red:hover {
-                background: var(--red);
-                color: #fff
+            .qf-purp:hover {
+                background: var(--purp);
+                color: #fff;
             }
 
-        .ql-servicejob {
-            color: var(--teal);
-            border-color: var(--teal)
+        .qf-warn {
+            color: var(--warn);
+            border-color: var(--warn);
         }
 
-            .ql-servicejob:hover {
-                background: var(--teal);
-                color: #fff
+            .qf-warn:hover {
+                background: var(--warn);
+                color: #fff;
             }
 
-        .ps-sel {
-            width: 90px;
-            flex: none
+        .qf-svc {
+            color: var(--purp);
+            border-color: var(--purp);
         }
 
-        /* Table */
+            .qf-svc:hover {
+                background: var(--purp);
+                color: #fff;
+            }
+
         .tbl-card {
             background: var(--surf);
             border: 1px solid var(--bdr);
             border-radius: var(--r);
             overflow: hidden;
-            box-shadow: var(--sh)
+            box-shadow: var(--sh-md);
         }
 
-        .tbl-hdr {
-            padding: 13px 18px;
-            background: linear-gradient(135deg,var(--navy),var(--navy2));
+        .tbl-top {
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--navy), var(--navy2));
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 8px
+            gap: 8px;
         }
 
-            .tbl-hdr h5 {
+            .tbl-top h5 {
                 font-size: 13px;
                 font-weight: 800;
                 color: #fff;
                 margin: 0;
                 display: flex;
                 align-items: center;
-                gap: 7px
+                gap: 8px;
             }
 
-        .tbl-hdr-info {
+        .tbl-badge {
+            background: rgba(255,255,255,.15);
+            border-radius: 6px;
+            padding: 2px 10px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .tbl-info {
             font-size: 12px;
-            color: rgba(255,255,255,.6)
+            color: rgba(255,255,255,.55);
         }
 
-            .tbl-hdr-info strong {
-                color: rgba(255,255,255,.9)
+            .tbl-info strong {
+                color: rgba(255,255,255,.9);
             }
 
-        .sp-tbl {
+        .ops-tbl {
             width: 100%;
-            border-collapse: collapse
+            border-collapse: collapse;
         }
 
-            .sp-tbl th {
+            .ops-tbl th {
                 font-size: 10px;
                 font-weight: 800;
                 text-transform: uppercase;
-                letter-spacing: .8px;
+                letter-spacing: .9px;
                 color: var(--muted);
-                padding: 10px 14px;
+                padding: 11px 16px;
                 background: var(--bg2);
                 border-bottom: 1px solid var(--bdr);
-                text-align: left
+                text-align: left;
+                white-space: nowrap;
             }
 
-            .sp-tbl td {
-                padding: 12px 14px;
+            .ops-tbl td {
+                padding: 13px 16px;
                 border-bottom: 1px solid var(--bdr);
                 font-size: 13px;
                 color: var(--txt2);
-                vertical-align: middle
+                vertical-align: middle;
             }
 
-            .sp-tbl tbody tr:last-child td {
-                border-bottom: none
+            .ops-tbl tbody tr:last-child td {
+                border-bottom: none;
             }
 
-            .sp-tbl tbody tr:hover td {
-                background: rgba(15,118,110,.03)
+            .ops-tbl tbody tr:hover td {
+                background: rgba(15,118,110,.025);
             }
 
-            .sp-tbl tbody tr.high-priority td {
-                background: rgba(220,38,38,.025)
+            .ops-tbl tbody tr.urgent-row td {
+                background: rgba(220,38,38,.018);
             }
 
-        .order-id {
+        .cell-id {
             font-weight: 800;
             color: var(--navy);
-            font-size: 14px
+            font-size: 14px;
+        }
+
+        .cell-sub {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px;
         }
 
         .cust-name {
             font-weight: 700;
             color: var(--txt);
-            font-size: 13px
+            font-size: 13px;
         }
 
         .cust-email {
             font-size: 11px;
-            color: var(--muted)
+            color: var(--muted);
         }
 
-        .date-main {
-            font-size: 13px;
-            color: var(--txt)
-        }
-
-        .date-sub {
-            font-size: 11px;
-            color: var(--muted)
-        }
-
-        .total-val {
+        .price-val {
             font-size: 14px;
             font-weight: 800;
-            color: var(--red)
+            color: var(--red);
         }
 
-        /* Pills */
         .pill {
             display: inline-flex;
             align-items: center;
@@ -428,162 +521,156 @@
             padding: 3px 10px;
             border-radius: 100px;
             font-size: 11px;
-            font-weight: 700
+            font-weight: 700;
         }
 
-        .pill-pending {
+        .p-pending {
             background: rgba(217,119,6,.1);
             color: #b45309;
-            border: 1px solid rgba(217,119,6,.2)
+            border: 1px solid rgba(217,119,6,.2);
         }
 
-        .pill-confirmed {
+        .p-confirmed {
             background: rgba(15,118,110,.1);
             color: var(--teal);
-            border: 1px solid rgba(15,118,110,.2)
+            border: 1px solid rgba(15,118,110,.2);
         }
 
-        .pill-processing {
+        .p-processing {
             background: rgba(13,27,42,.08);
             color: var(--navy2);
-            border: 1px solid rgba(13,27,42,.15)
+            border: 1px solid rgba(13,27,42,.15);
         }
 
-        .pill-shipped {
-            background: rgba(15,118,110,.08);
+        .p-shipped {
+            background: var(--ok-s);
             color: #065f46;
-            border: 1px solid rgba(15,118,110,.15)
+            border: 1px solid rgba(15,118,110,.15);
         }
 
-        .pill-delivered {
-            background: rgba(15,118,110,.08);
+        .p-delivered {
+            background: var(--ok-s);
             color: #065f46;
-            border: 1px solid rgba(15,118,110,.15)
+            border: 1px solid rgba(15,118,110,.15);
         }
 
-        .pill-completed {
-            background: rgba(13,27,42,.08);
+        .p-completed {
+            background: rgba(13,27,42,.07);
             color: var(--navy);
-            border: 1px solid rgba(13,27,42,.12)
+            border: 1px solid rgba(13,27,42,.12);
         }
 
-        .pill-cancelled {
+        .p-cancelled {
             background: var(--red-s);
             color: var(--red);
-            border: 1px solid rgba(220,38,38,.2)
+            border: 1px solid rgba(220,38,38,.2);
         }
 
-        .pill-rx {
+        .p-rx {
             background: rgba(13,27,42,.07);
             color: var(--navy2);
-            border: 1px solid rgba(13,27,42,.12)
+            border: 1px solid rgba(13,27,42,.12);
         }
 
-        .pill-preorder {
+        .p-pre {
             background: var(--bg2);
             color: var(--txt2);
-            border: 1px solid var(--bdr)
+            border: 1px solid var(--bdr);
         }
 
-        .pill-ready {
-            background: rgba(15,118,110,.08);
+        .p-std {
+            background: var(--ok-s);
             color: var(--teal);
-            border: 1px solid rgba(15,118,110,.15)
+            border: 1px solid rgba(15,118,110,.15);
         }
 
-        .pill-urgent {
+        .p-urgent {
             background: var(--red-s);
             color: var(--red);
-            border: 1px solid rgba(220,38,38,.2)
+            border: 1px solid rgba(220,38,38,.2);
         }
 
-        .pill-return {
-            background: rgba(217,119,6,.08);
-            color: #b45309;
-            border: 1px solid rgba(217,119,6,.15)
-        }
-
-        /* Action btns */
-        .act-process {
+        .btn-process {
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            padding: 6px 14px;
-            background: linear-gradient(135deg,var(--teal),var(--teal2));
+            padding: 7px 16px;
+            background: linear-gradient(135deg, var(--teal), var(--teal2));
             color: #fff;
-            border-radius: 7px;
+            border-radius: 8px;
             font-size: 12px;
             font-weight: 700;
             text-decoration: none;
-            border: none;
-            cursor: pointer;
-            transition: all .2s
+            transition: all .2s;
+            white-space: nowrap;
         }
 
-            .act-process:hover {
+            .btn-process:hover {
                 transform: translateY(-1px);
-                box-shadow: 0 4px 10px rgba(15,118,110,.3)
+                box-shadow: 0 4px 12px rgba(15,118,110,.3);
+                color: #fff;
             }
 
-        .act-confirm-quick {
+        .btn-svc-mini {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 30px;
-            height: 30px;
-            background: rgba(15,118,110,.1);
-            border: 1.5px solid rgba(15,118,110,.25);
-            color: var(--teal);
+            width: 32px;
+            height: 32px;
+            background: rgba(124,58,237,.08);
+            border: 1.5px solid rgba(124,58,237,.2);
+            color: #6d28d9;
             border-radius: 7px;
-            font-size: 14px;
-            cursor: pointer;
+            font-size: 13px;
+            text-decoration: none;
             transition: all .15s;
-            margin-left: 4px
+            margin-left: 4px;
         }
 
-            .act-confirm-quick:hover {
-                background: var(--teal);
-                color: #fff
+            .btn-svc-mini:hover {
+                background: #6d28d9;
+                color: #fff;
+                border-color: #6d28d9;
             }
 
-        /* Empty */
         .empty {
             text-align: center;
-            padding: 60px 20px
+            padding: 60px 20px;
         }
 
         .empty-icon {
-            font-size: 56px;
+            font-size: 52px;
             color: var(--muted);
-            opacity: .3;
-            margin-bottom: 16px
+            opacity: .25;
+            margin-bottom: 16px;
         }
 
         .empty h4 {
             font-size: 16px;
             font-weight: 700;
             color: var(--txt2);
-            margin: 0 0 6px
+            margin: 0 0 6px;
         }
 
         .empty p {
             font-size: 13px;
             color: var(--muted);
-            margin: 0
+            margin: 0;
         }
 
-        /* Pagination */
         .pag-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 18px;
-            border-top: 1px solid var(--bdr)
+            padding: 13px 18px;
+            border-top: 1px solid var(--bdr);
+            background: var(--bg2);
         }
 
         .pag-info {
             font-size: 12px;
-            color: var(--muted)
+            color: var(--muted);
+            font-weight: 600;
         }
 
         .pag {
@@ -591,7 +678,7 @@
             gap: 4px;
             list-style: none;
             margin: 0;
-            padding: 0
+            padding: 0;
         }
 
         .pag-item a, .pag-item span {
@@ -608,92 +695,62 @@
             border: 1.5px solid var(--bdr);
             color: var(--txt2);
             background: var(--surf);
-            transition: all .15s
+            transition: all .15s;
         }
 
             .pag-item a:hover {
                 border-color: var(--teal);
-                color: var(--teal)
+                color: var(--teal);
             }
 
         .pag-item.active span {
             background: var(--navy);
             border-color: var(--navy);
-            color: #fff
+            color: #fff;
         }
 
         .pag-item.disabled span {
-            opacity: .4;
-            pointer-events: none
+            opacity: .35;
+            pointer-events: none;
         }
-
-        .btn-returns {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            background: rgba(220,38,38,.08);
-            border: 1.5px solid rgba(220,38,38,.2);
-            color: var(--red);
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all .15s
-        }
-
-            .btn-returns:hover {
-                background: var(--red);
-                color: #fff
-            }
-
-        .btn-refresh {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            background: var(--bg2);
-            border: 1.5px solid var(--bdr);
-            color: var(--txt2);
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all .15s
-        }
-
-            .btn-refresh:hover {
-                background: var(--bg);
-                color: var(--txt)
-            }
 
         @@media(max-width:960px) {
             .stats-row {
-                grid-template-columns: 1fr 1fr
+                grid-template-columns: 1fr 1fr;
             }
         }
 
         @@media(max-width:600px) {
-            .stats-row {
-                grid-template-columns: 1fr 1fr
+            .ops-hdr {
+                padding: 20px 16px;
             }
 
             .filter-row {
-                flex-direction: column
+                flex-direction: column;
             }
 
             .fi {
-                min-width: 100%
+                min-width: 100%;
             }
         }
     </style>
 }
 
-<div class="sp-pg">
-    <div class="bc">
-        <a asp-page="/Index">Home</a>
-        <span style="opacity:.4">›</span>
-        <span>Support Dashboard</span>
+<div class="ops-pg">
+    <div class="ops-hdr">
+        <div class="ops-hdr-left">
+            <h1><i class="bi bi-box-seam me-2"></i>Operations Dashboard</h1>
+            <p>Đóng gói · Vận chuyển · Cập nhật tracking · Xử lý đơn kính thuốc</p>
+        </div>
+
+        <div class="hdr-actions">
+            <a asp-page="/Staff/ServiceOrders/Index" class="btn-svc-jobs">
+                <i class="bi bi-nut"></i> Service Jobs
+            </a>
+            <button class="btn-refresh" onclick="window.location.reload()">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+        </div>
     </div>
 
     @if (TempData["Success"] is string ok)
@@ -705,93 +762,91 @@
         <div class="al al-err"><i class="bi bi-exclamation-circle-fill"></i> @err</div>
     }
 
-    <div class="pg-hdr">
-        <div>
-            <h1><i class="bi bi-chat-dots me-2"></i>Support Dashboard</h1>
-            <p>Process orders, verify prescriptions, and handle customer requests</p>
-        </div>
-        <div class="hdr-actions">
-            <button class="btn-refresh" onclick="window.location.reload()">
-                <i class="bi bi-arrow-clockwise"></i> Refresh
-            </button>
-            <a asp-page="/Support/Returns/Index" class="btn-returns">
-                <i class="bi bi-arrow-return-left"></i> Returns Queue
-            </a>
-        </div>
-    </div>
-
     <div class="stats-row">
-        <div class="stat-card c1">
-            <div class="stat-label">Pending Confirmation</div>
-            <div class="stat-value">@Model.Stats.PendingCount</div>
-            <div class="stat-sub">Requires attention</div>
+        <div class="stat-card stat-c1">
+            <div class="stat-ico ico-warn"><i class="bi bi-hourglass-split"></i></div>
+            <div>
+                <div class="stat-lbl">Processing</div>
+                <div class="stat-val">@Model.Stats.ProcessingCount</div>
+                <div class="stat-sub">Chờ đóng gói</div>
+            </div>
         </div>
-        <div class="stat-card c2">
-            <div class="stat-label">Prescription Orders</div>
-            <div class="stat-value">@Model.Stats.PrescriptionCount</div>
-            <div class="stat-sub">Need verification</div>
-            <div class="stat-label">Confirmed</div>
-            <div class="stat-value">@Model.Stats.ConfirmedCount</div>
-            <div class="stat-sub">Ready for processing</div>
+
+        <div class="stat-card stat-c2">
+            <div class="stat-ico ico-teal"><i class="bi bi-truck"></i></div>
+            <div>
+                <div class="stat-lbl">Shipped Today</div>
+                <div class="stat-val">@Model.Stats.ShippedTodayCount</div>
+                <div class="stat-sub">Đã giao hôm nay</div>
+            </div>
         </div>
-        <div class="stat-card c3">
-            <div class="stat-label">Returns Queue</div>
-            <div class="stat-value">@Model.Stats.ReturnCount</div>
-            <div class="stat-sub">Pending processing</div>
+
+        <div class="stat-card stat-c3">
+            <div class="stat-ico ico-purp"><i class="bi bi-eyeglasses"></i></div>
+            <div>
+                <div class="stat-lbl">Prescription</div>
+                <div class="stat-val">@Model.Stats.PrescriptionCount</div>
+                <div class="stat-sub">Đơn kính thuốc</div>
+            </div>
         </div>
-        <div class="stat-card c4">
-            <div class="stat-label">Today's Confirmed</div>
-            <div class="stat-value">@Model.Stats.TodayConfirmedCount</div>
-            <div class="stat-sub">Orders processed</div>
+
+        <div class="stat-card stat-c4">
+            <div class="stat-ico ico-ok"><i class="bi bi-list-check"></i></div>
+            <div>
+                <div class="stat-lbl">Total Orders</div>
+                <div class="stat-val">@Model.TotalOrders</div>
+                <div class="stat-sub">Trong danh sách hiện tại</div>
+            </div>
         </div>
     </div>
 
     <div class="filter-card">
-        <h6><i class="bi bi-funnel me-1"></i> Search & Filter</h6>
+        <h6><i class="bi bi-funnel me-1"></i>Tìm kiếm & Lọc</h6>
         <form method="get" class="filter-row">
-            <input type="text" class="fi fi-search" name="Search" value="@Model.Search" placeholder="Order ID, email, customer name…" />
+            <input type="text" class="fi fi-search" name="Search" value="@Model.Search" placeholder="Order ID, email, tên khách hàng…" />
             <select class="fi" name="StatusFilter">
-                <option value="">All Statuses</option>
+                <option value="">Tất cả trạng thái</option>
                 @foreach (var s in Model.Statuses)
                 {
                     <option value="@s" selected="@(Model.StatusFilter == s)">@s</option>
                 }
             </select>
             <select class="fi" name="TypeFilter">
-                <option value="">All Types</option>
-                <option value="Prescription" selected="@(Model.TypeFilter == "Prescription")">Prescription</option>
-                <option value="ReadyStock" selected="@(Model.TypeFilter == "ReadyStock")">Ready Stock</option>
+                <option value="">Tất cả loại</option>
+                <option value="Prescription" selected="@(Model.TypeFilter == "Prescription")">Prescription (Rx)</option>
                 <option value="PreOrder" selected="@(Model.TypeFilter == "PreOrder")">Pre-Order</option>
+                <option value="Standard" selected="@(Model.TypeFilter == "Standard")">Standard</option>
             </select>
             <select class="fi" name="PriorityFilter">
-                <option value="">All Priority</option>
-                <option value="High" selected="@(Model.PriorityFilter == "High")">High Priority</option>
-                <option value="Normal" selected="@(Model.PriorityFilter == "Normal")">Normal</option>
+                <option value="">Tất cả ưu tiên</option>
+                <option value="High" selected="@(Model.PriorityFilter == "High")">Ưu tiên cao</option>
+                <option value="Normal" selected="@(Model.PriorityFilter == "Normal")">Bình thường</option>
             </select>
-            <select class="fi ps-sel" name="pageSize">
+            <select class="fi fi-sm" name="pageSize">
                 <option value="10" selected="@(Model.PageSize == 10)">10</option>
                 <option value="25" selected="@(Model.PageSize == 25)">25</option>
                 <option value="50" selected="@(Model.PageSize == 50)">50</option>
             </select>
             <input type="hidden" name="pageNumber" value="1" />
-            <button type="submit" class="btn-apply"><i class="bi bi-funnel-fill"></i> Filter</button>
+            <button type="submit" class="btn-filter"><i class="bi bi-funnel-fill"></i> Lọc</button>
         </form>
 
-        <div class="quick-links">
-            <a href="?StatusFilter=Pending+Confirmation" class="ql ql-navy"><i class="bi bi-exclamation-circle"></i> Pending</a>
-            <a href="?StatusFilter=Confirmed" class="ql ql-teal"><i class="bi bi-check-circle"></i> Confirmed</a>
-            <a href="?TypeFilter=Prescription" class="ql ql-teal"><i class="bi bi-eyeglasses"></i> Prescription</a>
-            <a href="?TypeFilter=PreOrder" class="ql ql-navy"><i class="bi bi-hourglass"></i> Pre-Orders</a>
-            <a asp-page="/Staff/ServiceOrders/Index" class="ql ql-servicejob"><i class="bi bi-tools"></i> Service Job</a>
-            <a asp-page="/Support/Returns/Index" class="ql ql-red"><i class="bi bi-arrow-return-left"></i> Returns</a>
+        <div class="qf-row">
+            <a href="?StatusFilter=Processing" class="qf qf-warn"><i class="bi bi-hourglass-split"></i> Processing</a>
+            <a href="?StatusFilter=Shipped" class="qf qf-teal"><i class="bi bi-truck"></i> Shipped</a>
+            <a href="?TypeFilter=Prescription" class="qf qf-navy"><i class="bi bi-eyeglasses"></i> Prescription</a>
+            <a asp-page="/Staff/ServiceOrders/Index" class="qf qf-svc"><i class="bi bi-tools"></i> Service Job</a>
         </div>
     </div>
 
     <div class="tbl-card">
-        <div class="tbl-hdr">
-            <h5><i class="bi bi-list-check"></i> Support Queue (@Model.TotalOrders orders)</h5>
-            <div class="tbl-hdr-info">
-                Showing <strong>@Model.FirstItemIndex–@Model.LastItemIndex</strong> of <strong>@Model.TotalOrders</strong>
+        <div class="tbl-top">
+            <h5>
+                <i class="bi bi-list-check"></i> Hàng đợi Operations
+                <span class="tbl-badge">@Model.TotalOrders đơn</span>
+            </h5>
+            <div class="tbl-info">
+                Hiển thị <strong>@Model.FirstItemIndex–@Model.LastItemIndex</strong> / <strong>@Model.TotalOrders</strong>
             </div>
         </div>
 
@@ -799,92 +854,100 @@
         {
             <div class="empty">
                 <div class="empty-icon"><i class="bi bi-inbox"></i></div>
-                <h4>No Orders in Queue</h4>
-                <p>All caught up! Great job.</p>
+                <h4>Không có đơn hàng</h4>
+                <p>Không có đơn nào khớp với bộ lọc hiện tại.</p>
             </div>
         }
         else
         {
             <div style="overflow-x:auto">
-                <table class="sp-tbl">
+                <table class="ops-tbl">
                     <thead>
                         <tr>
-                            <th>Order</th>
-                            <th>Customer</th>
-                            <th>Created</th>
-                            <th>Status</th>
-                            <th>Type</th>
-                            <th style="text-align:right">Total</th>
-                            <th style="text-align:center">Actions</th>
+                            <th>Đơn hàng</th>
+                            <th>Khách hàng</th>
+                            <th>Ngày tạo</th>
+                            <th>Trạng thái</th>
+                            <th>Loại đơn</th>
+                            <th>Vận chuyển</th>
+                            <th style="text-align:right">Tổng tiền</th>
+                            <th style="text-align:center">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var order in Model.Orders)
+                        @foreach (var o in Model.Orders)
                         {
-                            bool isHighPriority = order.HasPrescription
-                            || order.CreatedAt < DateTime.UtcNow.AddDays(-2)
-                            || order.HasReturn;
+                            var isUrgent = o.HasPrescription || o.CreatedAt < DateTime.UtcNow.AddDays(-2);
 
-                            string statusPill = order.Status switch
+                            string statusCss = o.Status switch
                             {
-                                "Pending Confirmation" => "pill-pending",
-                                "Confirmed" => "pill-confirmed",
-                                "Processing" => "pill-processing",
-                                "Shipped" => "pill-shipped",
-                                "Delivered" => "pill-delivered",
-                                "Completed" => "pill-completed",
-                                "Cancelled" => "pill-cancelled",
+                                "Pending Confirmation" => "p-pending",
+                                "Confirmed" => "p-confirmed",
+                                "Processing" => "p-processing",
+                                "Shipped" => "p-shipped",
+                                "Delivered" => "p-delivered",
+                                "Completed" => "p-completed",
+                                "Cancelled" => "p-cancelled",
                                 _ => ""
                             };
 
-                            <tr class="@(isHighPriority ? "high-priority" : "")">
+                            <tr class="@(isUrgent ? "urgent-row" : "")">
                                 <td>
-                                    <div class="order-id">#@order.OrderId</div>
-                                    @if (isHighPriority)
-                                    {
-                                        <span class="pill pill-urgent" style="margin-top:3px"><i class="bi bi-exclamation-triangle"></i> Urgent</span>
-                                    }
-                                    @if (order.HasReturn)
-                                    {
-                                        <span class="pill pill-return" style="margin-top:3px"><i class="bi bi-arrow-return-left"></i> Return</span>
-                                    }
+                                    <div class="cell-id">#@o.OrderId</div>
+                                    <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:3px">
+                                        @if (isUrgent)
+                                        {
+                                            <span class="pill p-urgent" style="font-size:10px">
+                                                <i class="bi bi-exclamation-triangle"></i> Urgent
+                                            </span>
+                                        }
+                                    </div>
                                 </td>
                                 <td>
-                                    <div class="cust-name">@order.UserFullName</div>
-                                    <div class="cust-email">@order.UserEmail</div>
+                                    <div class="cust-name">@o.UserFullName</div>
+                                    <div class="cust-email">@o.UserEmail</div>
                                 </td>
                                 <td>
-                                    <div class="date-main">@order.CreatedAt.ToString("MMM dd, yyyy")</div>
-                                    <div class="date-sub">@order.CreatedAt.ToString("HH:mm")</div>
+                                    <div style="font-size:13px;color:var(--txt)">@o.CreatedAt.ToString("dd/MM/yyyy")</div>
+                                    <div class="cell-sub">@o.CreatedAt.ToString("HH:mm")</div>
                                 </td>
-                                <td><span class="pill @statusPill">@order.Status</span></td>
+                                <td><span class="pill @statusCss">@o.Status</span></td>
                                 <td>
-                                    @if (order.HasPrescription)
+                                    @if (o.HasPrescription)
                                     {
-                                        <span class="pill pill-rx"><i class="bi bi-eyeglasses"></i> Rx</span>
+                                        <span class="pill p-rx"><i class="bi bi-eyeglasses"></i> Rx</span>
                                     }
-                                    else if (order.IsLowStock)
+                                    else if (o.IsPreOrder)
                                     {
-                                        <span class="pill pill-preorder"><i class="bi bi-hourglass-split"></i> Pre-Order</span>
+                                        <span class="pill p-pre"><i class="bi bi-hourglass-split"></i> Pre-Order</span>
                                     }
                                     else
                                     {
-                                        <span class="pill pill-ready"><i class="bi bi-check-circle"></i> Ready</span>
+                                        <span class="pill p-std"><i class="bi bi-check-circle"></i> Standard</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(o.TrackingNumber))
+                                    {
+                                        <div style="font-size:13px;font-weight:600;color:var(--txt)">
+                                            <i class="bi bi-box-seam me-1" style="color:var(--teal)"></i>@o.TrackingNumber
+                                        </div>
+                                        <div class="cell-sub">@o.Carrier</div>
+                                    }
+                                    else
+                                    {
+                                        <span style="color:var(--muted);font-size:12px">Chưa có</span>
                                     }
                                 </td>
                                 <td style="text-align:right">
-                                    <span class="total-val">@order.TotalAmount.ToString("N0") ₫</span>
+                                    <span class="price-val">@o.TotalAmount.ToString("N0") ₫</span>
                                 </td>
                                 <td style="text-align:center">
-                                    <a asp-page="./Details" asp-route-id="@order.OrderId" class="act-process">
-                                        <i class="bi bi-eye"></i> Process
-                                    </a>
-                                    @if (order.Status == "Pending Confirmation")
-                                    {
-                                        <button type="button" class="act-confirm-quick" onclick="quickConfirm(@order.OrderId)" title="Quick confirm">
-                                            <i class="bi bi-check-lg"></i>
-                                        </button>
-                                    }
+                                    <div style="display:flex;gap:5px;justify-content:center;align-items:center">
+                                        <a asp-page="./Details" asp-route-id="@o.OrderId" class="btn-process">
+                                            <i class="bi bi-arrow-right-circle"></i> Xử lý
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -893,7 +956,7 @@
             </div>
 
             <div class="pag-row">
-                <div class="pag-info">Page @Model.PageNumber of @Model.TotalPages</div>
+                <div class="pag-info">Trang @Model.PageNumber / @Model.TotalPages</div>
                 <ul class="pag">
                     <li class="pag-item @(Model.PageNumber == 1 ? "disabled" : "")">
                         <a asp-page="./Index" asp-route-pageNumber="1" asp-route-pageSize="@Model.PageSize"
@@ -905,6 +968,7 @@
                            asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
                            asp-route-TypeFilter="@Model.TypeFilter" asp-route-PriorityFilter="@Model.PriorityFilter">‹</a>
                     </li>
+
                     @foreach (var p in Model.DisplayPageNumbers)
                     {
                         <li class="pag-item @(p == Model.PageNumber ? "active" : "")">
@@ -920,6 +984,7 @@
                             }
                         </li>
                     }
+
                     <li class="pag-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
                         <a asp-page="./Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize"
                            asp-route-Search="@Model.Search" asp-route-StatusFilter="@Model.StatusFilter"
@@ -936,20 +1001,14 @@
     </div>
 </div>
 
-<form id="quickConfirmForm" method="post" asp-page-handler="QuickConfirm" style="display:none">
-    @Html.AntiForgeryToken()
-    <input type="hidden" name="orderId" id="quickConfirmOrderId" />
-</form>
-
 @section Scripts {
     <script>
-        function quickConfirm(orderId) {
-            if (!confirm(`Quick confirm Order #${orderId}?`)) return;
-            document.getElementById('quickConfirmOrderId').value = orderId;
-            document.getElementById('quickConfirmForm').submit();
-        }
-
-        // Auto-refresh every 2 min
-        setTimeout(() => location.reload(), 120000);
+        setTimeout(() => {
+            document.querySelectorAll('.al-ok, .al-err').forEach(a => {
+                a.style.transition = 'opacity .5s';
+                a.style.opacity = '0';
+                setTimeout(() => a.remove(), 500);
+            });
+        }, 4000);
     </script>
 }

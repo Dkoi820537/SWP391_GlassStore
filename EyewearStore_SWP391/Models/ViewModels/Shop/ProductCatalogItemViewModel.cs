@@ -41,7 +41,7 @@ public class ProductCatalogItemViewModel
     /// <summary>
     /// Inventory quantity — dùng để hiện wishlist button khi hết hàng
     /// </summary>
-    public int? InventoryQty { get; set; }
+    public int? QuantityOnHand { get; set; }
     // Frame-specific properties (nullable for Lens products)
     /// <summary>
     /// Frame material (e.g., "Metal", "Plastic", "Titanium")

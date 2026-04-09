@@ -12,7 +12,7 @@ public class LensViewModel
     public string ProductType { get; set; } = "Lens";
     public decimal Price { get; set; }
     public string Currency { get; set; } = null!;
-    public int? InventoryQty { get; set; }
+    public int? QuantityOnHand { get; set; }
     public string? Attributes { get; set; }
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }

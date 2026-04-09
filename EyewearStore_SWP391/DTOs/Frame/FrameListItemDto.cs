@@ -33,7 +33,7 @@ public class FrameListItemDto
     /// <summary>
     /// The inventory quantity
     /// </summary>
-    public int? InventoryQty { get; set; }
+    public int? QuantityOnHand { get; set; }
 
     /// <summary>
     /// The material of the frame (e.g., Titanium, Acetate, Metal)

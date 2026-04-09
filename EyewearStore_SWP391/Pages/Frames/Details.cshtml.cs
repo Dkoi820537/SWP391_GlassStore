@@ -37,7 +37,7 @@ public class DetailsModel : PageModel
             ProductType = frame.ProductType,
             Price = frame.Price,
             Currency = frame.Currency,
-            InventoryQty = frame.InventoryQty,
+            QuantityOnHand = frame.QuantityOnHand,
             Attributes = frame.Attributes,
             IsActive = frame.IsActive,
             CreatedAt = frame.CreatedAt,

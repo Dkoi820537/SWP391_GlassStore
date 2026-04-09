@@ -12,7 +12,7 @@ public class LensDetailsViewModel
     public string? Description { get; set; }
     public decimal Price { get; set; }
     public string Currency { get; set; } = null!;
-    public int? InventoryQty { get; set; }
+    public int? QuantityOnHand { get; set; }
     public DateTime CreatedAt { get; set; }
 
     // ── Brand & identity ──────────────────────────────────────────────────────
@@ -48,14 +48,14 @@ public class LensDetailsViewModel
     public string? CareInstructions { get; set; }
 
     // ── Computed stock ────────────────────────────────────────────────────────
-    public bool IsInStock => InventoryQty.HasValue && InventoryQty.Value > 0;
+    public bool IsInStock => QuantityOnHand.HasValue && QuantityOnHand.Value > 0;
 
     public string StockStatus
     {
         get
         {
-            if (!InventoryQty.HasValue || InventoryQty.Value <= 0) return "OutOfStock";
-            if (InventoryQty.Value <= 10) return "LowStock";
+            if (!QuantityOnHand.HasValue || QuantityOnHand.Value <= 0) return "OutOfStock";
+            if (QuantityOnHand.Value <= 10) return "LowStock";
             return "InStock";
         }
     }
@@ -63,7 +63,7 @@ public class LensDetailsViewModel
     public string StockMessage => StockStatus switch
     {
         "OutOfStock" => "Out of Stock",
-        "LowStock" => $"Only {InventoryQty} left",
-        _ => $"In Stock ({InventoryQty} available)"
+        "LowStock" => $"Only {QuantityOnHand} left",
+        _ => $"In Stock ({QuantityOnHand} available)"
     };
 }

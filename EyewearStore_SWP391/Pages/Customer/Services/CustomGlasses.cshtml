@@ -1322,7 +1322,7 @@
                          data-style-tags="@(f.StyleTags ?? "")"
                          data-uv="@(f.HasUvProtection.HasValue ? (f.HasUvProtection.Value ? "true" : "false") : "")"
                          data-polarized="@(f.IsPolarized.HasValue ? (f.IsPolarized.Value ? "true" : "false") : "")"
-                         data-stock="@(f.InventoryQty?.ToString() ?? "")"
+                         data-stock="@(f.QuantityOnHand?.ToString() ?? "")"
                          onclick="selectFrame(this)">
                         <button class="btn-view-detail" onclick="openFrameDetail(event, this.closest('.prod-card'))">
                             <i class="bi bi-eye"></i> Detail
@@ -1396,7 +1396,7 @@
                          data-uv-protection=""
                          data-anti-reflect=""
                          data-blue-light=""
-                         data-stock="@(l.InventoryQty?.ToString() ?? "")"
+                         data-stock="@(l.QuantityOnHand?.ToString() ?? "")"
                          onclick="selectLens(this)">
                         <button class="btn-view-detail" onclick="openLensDetail(event, this.closest('.prod-card'))">
                             <i class="bi bi-eye"></i> Detail

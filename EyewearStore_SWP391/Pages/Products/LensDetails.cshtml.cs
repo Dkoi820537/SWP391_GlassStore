@@ -63,9 +63,9 @@ public class LensDetailsModel : PageModel
 
         if (AddToCartInput.Quantity < 1) { ErrorMessage = "Quantity must be at least 1."; return Page(); }
         if (!Lens.IsInStock) { ErrorMessage = "Sorry, this lens is out of stock."; return Page(); }
-        if (Lens.InventoryQty.HasValue && AddToCartInput.Quantity > Lens.InventoryQty.Value)
+        if (Lens.QuantityOnHand.HasValue && AddToCartInput.Quantity > Lens.QuantityOnHand.Value)
         {
-            ErrorMessage = $"Only {Lens.InventoryQty} items available.";
+            ErrorMessage = $"Only {Lens.QuantityOnHand} items available.";
             return Page();
         }
 
@@ -102,9 +102,9 @@ public class LensDetailsModel : PageModel
 
         if (AddToCartInput.Quantity < 1) { ErrorMessage = "Quantity must be at least 1."; return Page(); }
         if (!Lens.IsInStock) { ErrorMessage = "Sorry, this lens is out of stock."; return Page(); }
-        if (Lens.InventoryQty.HasValue && AddToCartInput.Quantity > Lens.InventoryQty.Value)
+        if (Lens.QuantityOnHand.HasValue && AddToCartInput.Quantity > Lens.QuantityOnHand.Value)
         {
-            ErrorMessage = $"Only {Lens.InventoryQty} items available.";
+            ErrorMessage = $"Only {Lens.QuantityOnHand} items available.";
             return Page();
         }
 
@@ -141,7 +141,7 @@ public class LensDetailsModel : PageModel
             Description = lens.Description,
             Price = lens.Price,
             Currency = lens.Currency,
-            InventoryQty = lens.InventoryQty,
+            QuantityOnHand = lens.AvailableStock,
             CreatedAt = lens.CreatedAt,
             // Brand & identity
             Brand = lens.Brand,

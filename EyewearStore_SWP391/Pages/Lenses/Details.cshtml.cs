@@ -33,7 +33,7 @@ public class DetailsModel : PageModel
             ProductType = lens.ProductType,
             Price = lens.Price,
             Currency = lens.Currency,
-            InventoryQty = lens.InventoryQty,
+            QuantityOnHand = lens.QuantityOnHand,
             Attributes = lens.Attributes,
             IsActive = lens.IsActive,
             CreatedAt = lens.CreatedAt,

@@ -362,7 +362,7 @@
                     <dt>Inventory</dt>
                     <dd>
                         @{
-                            var sv = Model.Lens.InventoryQty ?? 0;
+                            var sv = Model.Lens.QuantityOnHand ?? 0;
                             var sc = sv == 0 ? "stock-out" : sv < 10 ? "stock-low" : "stock-in";
                         }
                         <span class="stock-value @sc">@sv units</span>

@@ -593,7 +593,7 @@
                                 </td>
                                 <td>
                                     @{
-                                        var sv = lens.InventoryQty ?? 0;
+                                        var sv = lens.QuantityOnHand ?? 0;
                                         var sc = sv == 0 ? "badge-danger" : sv < 10 ? "badge-warning" : "badge-success";
                                     }
                                     <span class="badge-modern @sc">@sv in stock</span>

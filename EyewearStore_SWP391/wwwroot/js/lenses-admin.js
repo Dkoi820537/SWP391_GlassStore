@@ -193,7 +193,7 @@ const LensAdmin = (function () {
                 description: lens.description,
                 price: lens.price,
                 currency: lens.currency,
-                inventoryQty: lens.inventoryQty,
+                quantityOnHand: lens.quantityOnHand,
                 isActive: true,
                 lensType: lens.lensType,
                 lensIndex: lens.lensIndex,
@@ -465,7 +465,7 @@ const LensAdmin = (function () {
             description: formData.get('description') || null,
             price: parseFloat(formData.get('price')),
             currency: formData.get('currency') || 'VND',
-            inventoryQty: formData.get('inventoryQty') ? parseInt(formData.get('inventoryQty')) : null,
+            quantityOnHand: formData.get('quantityOnHand') ? parseInt(formData.get('quantityOnHand')) : null,
             isActive: formData.get('isActive') === 'true',
             lensType: formData.get('lensType') || null,
             lensIndex: formData.get('lensIndex') ? parseFloat(formData.get('lensIndex')) : null,
@@ -535,7 +535,7 @@ const LensAdmin = (function () {
         form.querySelector('[name="description"]').value = lens.description || '';
         form.querySelector('[name="price"]').value = lens.price || '';
         form.querySelector('[name="currency"]').value = lens.currency || 'VND';
-        form.querySelector('[name="inventoryQty"]').value = lens.inventoryQty || '';
+        form.querySelector('[name="quantityOnHand"]').value = lens.quantityOnHand || '';
         form.querySelector('[name="isActive"]').value = lens.isActive ? 'true' : 'false';
         form.querySelector('[name="lensType"]').value = lens.lensType || '';
         form.querySelector('[name="lensIndex"]').value = lens.lensIndex || '';
@@ -743,7 +743,7 @@ const LensAdmin = (function () {
                 </div>
                 <div class="details-spec-row">
                     <span class="details-spec-label">Inventory</span>
-                    <span class="details-spec-value">${lens.inventoryQty !== null ? lens.inventoryQty : 'N/A'}</span>
+                    <span class="details-spec-value">${lens.quantityOnHand !== null ? lens.quantityOnHand : 'N/A'}</span>
                 </div>
                 <div class="details-spec-row">
                     <span class="details-spec-label">Created</span>

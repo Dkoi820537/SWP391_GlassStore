@@ -121,6 +121,6 @@ public class FrameListViewModel
         "CreatedAt",
         "FrameMaterial",
         "FrameType",
-        "InventoryQty"
+        "QuantityOnHand"
     };
 }

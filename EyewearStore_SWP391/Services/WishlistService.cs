@@ -1,4 +1,4 @@
-﻿using EyewearStore_SWP391.Models;
+using EyewearStore_SWP391.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -29,7 +29,7 @@ namespace EyewearStore_SWP391.Services
         public decimal Price { get; set; }
         public string? PrimaryImageUrl { get; set; }
         public bool IsInStock { get; set; }
-        public int? InventoryQty { get; set; }
+        public int? QuantityOnHand { get; set; }
         public bool NotifyOnRestock { get; set; }
         public DateTime AddedAt { get; set; }
     }
@@ -58,7 +58,7 @@ namespace EyewearStore_SWP391.Services
             if (product == null)
                 return (false, "Product not found or inactive.");
 
-            if (product.InventoryQty > 0)
+            if (product.QuantityOnHand != null && (product.QuantityOnHand - product.AllocatedQuantity) > 0)
                 return (false, "This product is currently in stock. You can add it to your cart!");
 
             var exists = await _context.Wishlists
@@ -114,8 +114,8 @@ namespace EyewearStore_SWP391.Services
                         .Where(i => i.IsPrimary && i.IsActive)
                         .Select(i => i.ImageUrl)
                         .FirstOrDefault(),
-                    IsInStock = w.Product.InventoryQty > 0,
-                    InventoryQty = w.Product.InventoryQty,
+                    IsInStock = w.Product.QuantityOnHand != null && (w.Product.QuantityOnHand - w.Product.AllocatedQuantity) > 0,
+                    QuantityOnHand = w.Product.QuantityOnHand,
                     NotifyOnRestock = w.NotifyOnRestock,
                     AddedAt = w.CreatedAt
                 })

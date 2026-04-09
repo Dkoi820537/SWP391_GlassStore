@@ -44,7 +44,7 @@ public class UpdateFrameDto
     /// The inventory quantity (optional)
     /// </summary>
     [Range(0, int.MaxValue, ErrorMessage = "Inventory quantity cannot be negative")]
-    public int? InventoryQty { get; set; }
+    public int? QuantityOnHand { get; set; }
 
     /// <summary>
     /// Whether the product is active

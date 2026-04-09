@@ -23,7 +23,7 @@ public class CreateFrameDto
     public string Currency { get; set; } = "VND";
 
     [Range(0, int.MaxValue)]
-    public int? InventoryQty { get; set; }
+    public int? QuantityOnHand { get; set; }
 
     public bool IsActive { get; set; } = true;
 

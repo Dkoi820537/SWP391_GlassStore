@@ -64,9 +64,9 @@ public class FrameDetailsModel : PageModel
 
         if (AddToCartInput.Quantity < 1) { ErrorMessage = "Quantity must be at least 1."; return Page(); }
         if (!Frame.IsInStock) { ErrorMessage = "This product is out of stock."; return Page(); }
-        if (Frame.InventoryQty.HasValue && AddToCartInput.Quantity > Frame.InventoryQty)
+        if (Frame.QuantityOnHand.HasValue && AddToCartInput.Quantity > Frame.QuantityOnHand)
         {
-            ErrorMessage = $"Only {Frame.InventoryQty} unit(s) available.";
+            ErrorMessage = $"Only {Frame.QuantityOnHand} unit(s) available.";
             return Page();
         }
 
@@ -100,9 +100,9 @@ public class FrameDetailsModel : PageModel
 
         if (AddToCartInput.Quantity < 1) { ErrorMessage = "Quantity must be at least 1."; return Page(); }
         if (!Frame.IsInStock) { ErrorMessage = "This product is out of stock."; return Page(); }
-        if (Frame.InventoryQty.HasValue && AddToCartInput.Quantity > Frame.InventoryQty)
+        if (Frame.QuantityOnHand.HasValue && AddToCartInput.Quantity > Frame.QuantityOnHand)
         {
-            ErrorMessage = $"Only {Frame.InventoryQty} unit(s) available.";
+            ErrorMessage = $"Only {Frame.QuantityOnHand} unit(s) available.";
             return Page();
         }
 
@@ -136,7 +136,7 @@ public class FrameDetailsModel : PageModel
             Description = frame.Description,
             Price = frame.Price,
             Currency = frame.Currency,
-            InventoryQty = frame.InventoryQty,
+            QuantityOnHand = frame.AvailableStock,
             CreatedAt = frame.CreatedAt,
             CareInstructions = GetCareInstructions(frame.FrameMaterial),
             // Frame specs

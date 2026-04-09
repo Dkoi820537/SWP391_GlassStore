@@ -1013,8 +1013,8 @@
                 @{
                     var sc = Model.Lens.StockStatus == "OutOfStock" ? "out" : Model.Lens.StockStatus == "LowStock" ? "low" : "in";
                     var stockMsg = Model.Lens.StockStatus == "OutOfStock" ? "Out of Stock"
-                    : Model.Lens.StockStatus == "LowStock" ? $"Low Stock ({Model.Lens.InventoryQty} left)"
-                    : $"In Stock ({Model.Lens.InventoryQty} available)";
+                    : Model.Lens.StockStatus == "LowStock" ? $"Low Stock ({Model.Lens.QuantityOnHand} left)"
+                    : $"In Stock ({Model.Lens.QuantityOnHand} available)";
                 }
                 <div class="stock-row">
                     <div class="stock-badge @sc">
@@ -1081,7 +1081,7 @@
                             <div class="qty-ctrl">
                                 <button type="button" class="qty-btn" id="qMinus" onclick="chQty(-1)">&#8722;</button>
                                 <input type="number" asp-for="AddToCartInput.Quantity" class="qty-inp" id="qInput"
-                                       min="1" max="@(Model.Lens.InventoryQty ?? 99)" value="1" />
+                                       min="1" max="@(Model.Lens.QuantityOnHand ?? 99)" value="1" />
                                 <button type="button" class="qty-btn" id="qPlus" onclick="chQty(1)">+</button>
                             </div>
                         </div>

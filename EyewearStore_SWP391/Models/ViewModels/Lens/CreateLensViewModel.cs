@@ -75,7 +75,7 @@ public class CreateLensViewModel
 
     [Range(0, int.MaxValue)]
     [Display(Name = "Inventory Quantity")]
-    public int? InventoryQty { get; set; }
+    public int? QuantityOnHand { get; set; }
 
     public string? Attributes { get; set; }
     public bool IsActive { get; set; } = true;

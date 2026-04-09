@@ -101,7 +101,7 @@ public class CartService : ICartService
             var product = await _context.Products.FindAsync(productId);
             if (product == null) throw new InvalidOperationException("Product does not exist");
             if (!product.IsActive) throw new InvalidOperationException("Product is no longer active");
-            if (product.InventoryQty.HasValue && product.InventoryQty < quantity)
+            if (product.AvailableStock < quantity)
                 throw new InvalidOperationException("Quantity exceeds available stock");
 
             if (serviceId.HasValue)
@@ -183,14 +183,14 @@ public class CartService : ICartService
             var frame = await _context.Products.FindAsync(frameProductId);
             if (frame == null || !frame.IsActive)
                 throw new InvalidOperationException("Frame product is unavailable");
-            if (frame.InventoryQty.HasValue && frame.InventoryQty < quantity)
+            if (frame.AvailableStock < quantity)
                 throw new InvalidOperationException("Frame quantity exceeds available stock");
 
             // Validate Lens
             var lens = await _context.Products.FindAsync(lensProductId);
             if (lens == null || !lens.IsActive)
                 throw new InvalidOperationException("Lens product is unavailable");
-            if (lens.InventoryQty.HasValue && lens.InventoryQty < quantity)
+            if (lens.AvailableStock < quantity)
                 throw new InvalidOperationException("Lens quantity exceeds available stock");
 
             // Validate Frame-Lens Compatibility (Category-based)
@@ -317,7 +317,7 @@ public class CartService : ICartService
             _context.CartItems.Remove(item);
         else
         {
-            if (item.Product.InventoryQty.HasValue && item.Product.InventoryQty < newQuantity)
+            if (item.Product.AvailableStock < newQuantity)
                 throw new InvalidOperationException("Quantity exceeds available stock");
             item.Quantity = newQuantity;
             _context.CartItems.Update(item);

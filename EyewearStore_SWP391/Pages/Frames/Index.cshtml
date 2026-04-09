@@ -534,7 +534,7 @@
                                 </td>
                                 <td>
                                     @{
-                                        var stockVal = frame.InventoryQty ?? 0;
+                                        var stockVal = frame.QuantityOnHand ?? 0;
                                         var stockCls = stockVal == 0 ? "badge-danger" : stockVal < 10 ? "badge-warning" : "badge-success";
                                     }
                                     <span class="badge-modern @stockCls">@stockVal in stock</span>

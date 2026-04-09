@@ -108,7 +108,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
                     HasReturn = o.OrderItems.Any(oi => oi.Returns.Any()),
                     IsLowStock = o.OrderItems.Any(oi =>
                         oi.Product != null &&
-                        oi.Product.InventoryQty < oi.Quantity &&
+                        oi.Product.QuantityOnHand < oi.Quantity &&
                         (oi.SnapshotJson == null ||
                          (!oi.SnapshotJson.Contains("\"isServiceOrder\":true") &&
                           !oi.SnapshotJson.Contains("\"lensProductId\":"))))

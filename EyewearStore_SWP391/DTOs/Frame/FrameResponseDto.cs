@@ -38,7 +38,7 @@ public class FrameResponseDto
     /// <summary>
     /// The inventory quantity
     /// </summary>
-    public int? InventoryQty { get; set; }
+    public int? QuantityOnHand { get; set; }
 
     /// <summary>
     /// Whether the product is active

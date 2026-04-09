@@ -13,7 +13,7 @@ public class FrameDetailsViewModel
     public string? Description { get; set; }
     public decimal Price { get; set; }
     public string Currency { get; set; } = null!;
-    public int? InventoryQty { get; set; }
+    public int? QuantityOnHand { get; set; }
     public DateTime CreatedAt { get; set; }
 
     // ── Frame specs ───────────────────────────────────────────────────────────
@@ -56,14 +56,14 @@ public class FrameDetailsViewModel
     public List<ProductCatalogItemViewModel> RelatedProducts { get; set; } = new();
 
     // ── Computed ──────────────────────────────────────────────────────────────
-    public bool IsInStock => InventoryQty.HasValue && InventoryQty.Value > 0;
+    public bool IsInStock => QuantityOnHand.HasValue && QuantityOnHand.Value > 0;
 
     public string StockStatus
     {
         get
         {
-            if (!InventoryQty.HasValue || InventoryQty.Value <= 0) return "OutOfStock";
-            if (InventoryQty.Value <= 10) return "LowStock";
+            if (!QuantityOnHand.HasValue || QuantityOnHand.Value <= 0) return "OutOfStock";
+            if (QuantityOnHand.Value <= 10) return "LowStock";
             return "InStock";
         }
     }
@@ -71,8 +71,8 @@ public class FrameDetailsViewModel
     public string StockMessage => StockStatus switch
     {
         "OutOfStock" => "Hết hàng",
-        "LowStock" => $"Còn ít ({InventoryQty} sản phẩm)",
-        _ => $"Còn hàng ({InventoryQty} sản phẩm)"
+        "LowStock" => $"Còn ít ({QuantityOnHand} sản phẩm)",
+        _ => $"Còn hàng ({QuantityOnHand} sản phẩm)"
     };
 
     public string SizeLabel

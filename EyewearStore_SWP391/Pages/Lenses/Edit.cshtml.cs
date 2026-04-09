@@ -50,7 +50,7 @@ public class EditModel : PageModel
             Description = lens.Description,
             Price = lens.Price,
             Currency = lens.Currency,
-            InventoryQty = lens.InventoryQty,
+            QuantityOnHand = lens.QuantityOnHand,
             Attributes = lens.Attributes,
             IsActive = lens.IsActive,
             LensType = lens.LensType,
@@ -102,16 +102,16 @@ public class EditModel : PageModel
             }
         }
 
-        var previousQty = lens.InventoryQty ?? 0;
+        var previousQty = lens.QuantityOnHand ?? 0;
         var wasOutOfStock = previousQty <= 0;
-        var newQty = Input.InventoryQty ?? 0;
+        var newQty = Input.QuantityOnHand ?? 0;
 
         lens.Sku = Input.Sku;
         lens.Name = Input.Name;
         lens.Description = Input.Description;
         lens.Price = Input.Price;
         lens.Currency = Input.Currency;
-        lens.InventoryQty = Input.InventoryQty;
+        lens.QuantityOnHand = Input.QuantityOnHand;
         lens.Attributes = Input.Attributes;
         lens.IsActive = Input.IsActive;
         lens.UpdatedAt = DateTime.UtcNow;

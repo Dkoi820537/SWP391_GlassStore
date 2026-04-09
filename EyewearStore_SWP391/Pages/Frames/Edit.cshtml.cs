@@ -85,7 +85,7 @@ namespace EyewearStore_SWP391.Pages.Frames
                 Description = frame.Description,
                 Price = frame.Price,
                 Currency = frame.Currency,
-                InventoryQty = frame.InventoryQty,
+                QuantityOnHand = frame.QuantityOnHand,
                 Attributes = frame.Attributes,
                 IsActive = frame.IsActive,
                 // Frame specs
@@ -161,9 +161,9 @@ namespace EyewearStore_SWP391.Pages.Frames
                 }
             }
 
-            var previousQty = frame.InventoryQty ?? 0;
+            var previousQty = frame.QuantityOnHand ?? 0;
             var wasOutOfStock = previousQty <= 0;
-            var newQty = Input.InventoryQty ?? 0;
+            var newQty = Input.QuantityOnHand ?? 0;
             var isNowInStock = newQty > 0;
 
             // Update all fields
@@ -172,7 +172,7 @@ namespace EyewearStore_SWP391.Pages.Frames
             frame.Description = Input.Description;
             frame.Price = Input.Price;
             frame.Currency = Input.Currency;
-            frame.InventoryQty = Input.InventoryQty;
+            frame.QuantityOnHand = Input.QuantityOnHand;
             frame.Attributes = Input.Attributes;
             frame.IsActive = Input.IsActive;
             // Frame specs

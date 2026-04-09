@@ -7,7 +7,7 @@ public class LensItemViewModel
     public string Name { get; set; } = null!;
     public decimal Price { get; set; }
     public string Currency { get; set; } = null!;
-    public int? InventoryQty { get; set; }
+    public int? QuantityOnHand { get; set; }
     public string? Brand { get; set; }
     public string? Origin { get; set; }
     public string? LensType { get; set; }

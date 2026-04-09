@@ -68,7 +68,7 @@ public class CreateModel : PageModel
             Description = Input.Description,
             Price = Input.Price,
             Currency = Input.Currency,
-            InventoryQty = Input.InventoryQty,
+            QuantityOnHand = Input.QuantityOnHand,
             Attributes = Input.Attributes,
             ProductType = "Frame",
             IsActive = Input.IsActive,

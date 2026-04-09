@@ -1276,7 +1276,7 @@
                                     <div class="product-image-placeholder"><i class="bi bi-eyeglasses"></i></div>
                                 }
                                 <span class="product-badge @product.ProductType.ToLower()">@product.ProductType</span>
-                                @if (product.InventoryQty <= 0)
+                                @if (product.QuantityOnHand <= 0)
                                 {
                                     <div class="oos-overlay">
                                         <span class="oos-label"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
@@ -1326,7 +1326,7 @@
                                     }
                                 </div>
                                 <div class="product-actions">
-                                    @if (product.InventoryQty <= 0)
+                                    @if (product.QuantityOnHand <= 0)
                                     {
                                         @if (product.ProductType == "Frame")
                                         {

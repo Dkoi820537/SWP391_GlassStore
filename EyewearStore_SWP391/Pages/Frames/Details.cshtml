@@ -431,7 +431,7 @@
                     <dt>Inventory</dt>
                     <dd>
                         @{
-                            var stockValue = Model.Frame.InventoryQty ?? 0;
+                            var stockValue = Model.Frame.QuantityOnHand ?? 0;
                             var stockClass = stockValue == 0 ? "stock-out" : stockValue < 10 ? "stock-low" : "stock-in";
                         }
                         <span class="stock-value @stockClass">@stockValue units</span>

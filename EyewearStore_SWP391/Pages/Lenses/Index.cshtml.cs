@@ -68,7 +68,7 @@ public class IndexModel : PageModel
             Name = l.Name,
             Price = l.Price,
             Currency = l.Currency,
-            InventoryQty = l.InventoryQty,
+            QuantityOnHand = l.QuantityOnHand,
             Brand = l.Brand,
             Origin = l.Origin,
             LensType = l.LensType,

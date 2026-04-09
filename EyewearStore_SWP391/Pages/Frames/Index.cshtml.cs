@@ -136,7 +136,7 @@ public class IndexModel : PageModel
             Name = f.Name,
             Price = f.Price,
             Currency = f.Currency,
-            InventoryQty = f.InventoryQty,
+            QuantityOnHand = f.QuantityOnHand,
             FrameMaterial = f.FrameMaterial,
             FrameType = f.FrameType,
             IsActive = f.IsActive,

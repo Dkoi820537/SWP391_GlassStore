@@ -154,7 +154,7 @@ namespace EyewearStore_SWP391.Pages.Admin.Orders
             {
                 if (item.Product != null)
                 {
-                    item.Product.InventoryQty = (item.Product.InventoryQty ?? 0) + item.Quantity;
+                    item.Product.QuantityOnHand = (item.Product.QuantityOnHand ?? 0) + item.Quantity;
                     _context.Products.Update(item.Product);
                 }
             }

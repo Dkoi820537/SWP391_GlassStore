@@ -79,7 +79,7 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                     TotalAmount = o.TotalAmount,
                     HasPrescription = o.OrderItems.Any(oi => oi.PrescriptionId != null),
                     IsPreOrder = o.OrderItems.Any(oi =>
-                        oi.Product != null && oi.Product.InventoryQty < oi.Quantity),
+                        oi.Product != null && oi.Product.QuantityOnHand < oi.Quantity),
                     TrackingNumber = o.Shipments.Any()
                         ? o.Shipments.OrderByDescending(s => s.ShipmentId).Select(s => s.TrackingNumber).FirstOrDefault()
                         : null,

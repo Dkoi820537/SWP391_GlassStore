@@ -115,6 +115,6 @@ public class LensListViewModel
         "Price",
         "CreatedAt",
         "LensType",
-        "InventoryQty"
+        "QuantityOnHand"
     };
 }

@@ -46,7 +46,7 @@ public class CreateFrameViewModel
 
     [Range(0, int.MaxValue)]
     [Display(Name = "Inventory Quantity")]
-    public int? InventoryQty { get; set; }
+    public int? QuantityOnHand { get; set; }
 
     [Display(Name = "Additional Attributes (JSON)")]
     public string? Attributes { get; set; }

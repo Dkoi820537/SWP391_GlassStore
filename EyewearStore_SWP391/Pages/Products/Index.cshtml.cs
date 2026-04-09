@@ -120,7 +120,7 @@ public class IndexModel : PageModel
                 Description = f.Description,
                 Price = f.Price,
                 Currency = f.Currency,
-                InventoryQty = f.InventoryQty,
+                QuantityOnHand = f.AvailableStock,
                 PrimaryImageUrl = f.ProductImages?.FirstOrDefault(i => i.IsPrimary && i.IsActive)?.ImageUrl
                                ?? f.ProductImages?.FirstOrDefault(i => i.IsActive)?.ImageUrl,
                 FrameMaterial = f.FrameMaterial,
@@ -166,7 +166,7 @@ public class IndexModel : PageModel
                 Description = l.Description,
                 Price = l.Price,
                 Currency = l.Currency,
-                InventoryQty = l.InventoryQty,
+                QuantityOnHand = l.AvailableStock,
                 PrimaryImageUrl = l.ProductImages?.FirstOrDefault(i => i.IsPrimary && i.IsActive)?.ImageUrl
                                ?? l.ProductImages?.FirstOrDefault(i => i.IsActive)?.ImageUrl,
                 LensType = l.LensType,
@@ -331,13 +331,13 @@ public class IndexModel : PageModel
 
         try
         {
-            int? inventoryQty = 0;
+            int? QuantityOnHand = 0;
             bool isStockManaged = false;
 
             var frame = await _context.Frames.FindAsync(request.ProductId);
             if (frame != null)
             {
-                inventoryQty = frame.InventoryQty;
+                QuantityOnHand = frame.AvailableStock;
                 isStockManaged = true;
             }
             else
@@ -345,7 +345,7 @@ public class IndexModel : PageModel
                 var lens = await _context.Lenses.FindAsync(request.ProductId);
                 if (lens != null)
                 {
-                    inventoryQty = lens.InventoryQty;
+                    QuantityOnHand = lens.AvailableStock;
                     isStockManaged = true;
                 }
                 else
@@ -354,8 +354,8 @@ public class IndexModel : PageModel
                 }
             }
 
-            if (isStockManaged && inventoryQty.HasValue && inventoryQty.Value < request.Quantity)
-                return new JsonResult(new { success = false, message = $"Only {inventoryQty} items left in stock." });
+            if (isStockManaged && QuantityOnHand.HasValue && QuantityOnHand.Value < request.Quantity)
+                return new JsonResult(new { success = false, message = $"Only {QuantityOnHand} items left in stock." });
 
             await _cartService.AddToCartAsync(userId, request.ProductId, request.Quantity, prescriptionId: request.PrescriptionId);
 

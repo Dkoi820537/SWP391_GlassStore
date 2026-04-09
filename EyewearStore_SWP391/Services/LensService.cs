@@ -32,7 +32,7 @@ public class LensService : ILensService
             ProductType = "Lens",
             Price = createDto.Price,
             Currency = createDto.Currency,
-            InventoryQty = createDto.InventoryQty,
+            QuantityOnHand = createDto.QuantityOnHand,
             IsActive = createDto.IsActive,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
@@ -174,7 +174,7 @@ public class LensService : ILensService
         lens.Description = updateDto.Description;
         lens.Price = updateDto.Price;
         lens.Currency = updateDto.Currency;
-        lens.InventoryQty = updateDto.InventoryQty;
+        lens.QuantityOnHand = updateDto.QuantityOnHand;
         lens.IsActive = updateDto.IsActive;
         lens.UpdatedAt = DateTime.UtcNow;
 
@@ -232,7 +232,7 @@ public class LensService : ILensService
             Description = lens.Description,
             Price = lens.Price,
             Currency = lens.Currency,
-            InventoryQty = lens.InventoryQty,
+            QuantityOnHand = lens.QuantityOnHand,
             IsActive = lens.IsActive,
             CreatedAt = lens.CreatedAt,
             UpdatedAt = lens.UpdatedAt,

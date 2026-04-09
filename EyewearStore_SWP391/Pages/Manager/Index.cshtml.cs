@@ -84,7 +84,7 @@ namespace EyewearStore_SWP391.Pages.Manager
                 : (Stats.TotalOrders > 0 ? 100 : 0);
 
             Stats.ActiveProducts = await _context.Products.CountAsync(p => p.IsActive);
-            Stats.LowStockCount = await _context.Products.CountAsync(p => p.IsActive && p.InventoryQty < 10);
+            Stats.LowStockCount = await _context.Products.CountAsync(p => p.IsActive && p.QuantityOnHand < 10);
             Stats.TotalStaff = await _context.Users.CountAsync(u => u.Role != "customer" && u.IsActive);
             Stats.ActiveStaff = Stats.TotalStaff;
             Stats.PendingReturns = await _context.Returns.CountAsync(r => r.Status == "Pending");

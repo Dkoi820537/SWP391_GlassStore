@@ -38,13 +38,13 @@ namespace EyewearStore_SWP391.Pages.Customer.Services
 
             Frames = await _context.Set<Frame>()
                 .Include(f => f.ProductImages)
-                .Where(f => f.IsActive && (f.InventoryQty == null || f.InventoryQty > 0))
+                .Where(f => f.IsActive && (f.QuantityOnHand == null || (f.QuantityOnHand - f.AllocatedQuantity) > 0))
                 .OrderBy(f => f.Name)
                 .ToListAsync();
 
             Lenses = await _context.Set<Lens>()
                 .Include(l => l.ProductImages)
-                .Where(l => l.IsActive && (l.InventoryQty == null || l.InventoryQty > 0))
+                .Where(l => l.IsActive && (l.QuantityOnHand == null || (l.QuantityOnHand - l.AllocatedQuantity) > 0))
                 .OrderBy(l => l.Name)
                 .ToListAsync();
 

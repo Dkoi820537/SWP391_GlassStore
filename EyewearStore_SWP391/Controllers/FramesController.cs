@@ -122,7 +122,7 @@ public class FramesController : ControllerBase
 
     /// <summary>
     /// Updates an existing frame product.
-    /// ✅ If InventoryQty changes from 0 → positive, automatically sends
+    /// ✅ If QuantityOnHand changes from 0 → positive, automatically sends
     /// restock email notifications to all users who wishlisted this frame.
     /// </summary>
     [HttpPut("{id:int}")]
@@ -145,7 +145,7 @@ public class FramesController : ControllerBase
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.ProductId == id);
 
-            var wasOutOfStock = currentFrame != null && currentFrame.InventoryQty <= 0;
+            var wasOutOfStock = currentFrame != null && currentFrame.QuantityOnHand <= 0;
 
             // ── Perform the actual update ──────────────────────────────────────
             var responseDto = await _frameService.UpdateFrameAsync(id, updateDto);
@@ -154,7 +154,7 @@ public class FramesController : ControllerBase
                 return NotFound($"Frame with ID {id} not found");
 
             // ── Check if restocked → trigger email notifications ───────────────
-            var isNowInStock = responseDto.InventoryQty > 0;
+            var isNowInStock = responseDto.QuantityOnHand > 0;
 
             if (wasOutOfStock && isNowInStock)
             {

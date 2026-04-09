@@ -32,7 +32,7 @@ public class FrameService : IFrameService
             ProductType = "Frame",
             Price = createDto.Price,
             Currency = createDto.Currency,
-            InventoryQty = createDto.InventoryQty,
+            QuantityOnHand = createDto.QuantityOnHand,
             IsActive = createDto.IsActive,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
@@ -176,7 +176,7 @@ public class FrameService : IFrameService
         frame.Description = updateDto.Description;
         frame.Price = updateDto.Price;
         frame.Currency = updateDto.Currency;
-        frame.InventoryQty = updateDto.InventoryQty;
+        frame.QuantityOnHand = updateDto.QuantityOnHand;
         frame.IsActive = updateDto.IsActive;
         frame.UpdatedAt = DateTime.UtcNow;
 
@@ -235,7 +235,7 @@ public class FrameService : IFrameService
             Description = frame.Description,
             Price = frame.Price,
             Currency = frame.Currency,
-            InventoryQty = frame.InventoryQty,
+            QuantityOnHand = frame.QuantityOnHand,
             IsActive = frame.IsActive,
             CreatedAt = frame.CreatedAt,
             UpdatedAt = frame.UpdatedAt,

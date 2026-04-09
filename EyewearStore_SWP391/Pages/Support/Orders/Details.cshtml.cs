@@ -327,7 +327,7 @@ namespace EyewearStore_SWP391.Pages.Support.Orders
                     RightAxis = oi.Prescription.RightAxis
                 } : null,
                 IsPrescriptionVerified = oi.Prescription?.IsActive ?? false,
-                ProductInventory = oi.Product?.InventoryQty,
+                ProductInventory = oi.Product?.QuantityOnHand,
                 HasReturn = oi.Returns.Any(),
                 SnapshotJson = oi.SnapshotJson ?? ""
             }).ToList();

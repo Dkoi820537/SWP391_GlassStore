@@ -19,7 +19,7 @@ namespace EyewearStore_SWP391.Pages.Customer.Services
             Frames = await _context.Products
                 .Include(p => p.ProductImages)
                 .Where(p => p.IsActive && p.ProductType.ToLower() == "frame"
-                         && (p.InventoryQty == null || p.InventoryQty > 0))
+                         && (p.QuantityOnHand == null || p.QuantityOnHand > 0))
                 .OrderBy(p => p.Name)
                 .ToListAsync();
 

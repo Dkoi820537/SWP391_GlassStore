@@ -61,10 +61,13 @@ namespace EyewearStore_SWP391.Services
         public async Task<Order> CreatePendingOrderAsync(
             int userId, int addressId, int? prescriptionId = null)
         {
-            using var tx = await _context.Database.BeginTransactionAsync();
-            try
+            int maxRetries = 3;
+            for (int attempt = 0; attempt < maxRetries; attempt++)
             {
-                var cart = await _context.Carts
+                using var tx = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    var cart = await _context.Carts
                     .Include(c => c.CartItems)
                         .ThenInclude(ci => ci.Product)
                             .ThenInclude(p => p.ProductImages)
@@ -97,8 +100,13 @@ namespace EyewearStore_SWP391.Services
                     if (ci.Product == null) continue;
                     if (!ci.Product.IsActive)
                         throw new InvalidOperationException($"Product \"{ci.Product.Name}\" is no longer available.");
-                    if (ci.Product.InventoryQty.HasValue && ci.Product.InventoryQty < ci.Quantity)
-                        throw new InvalidOperationException($"Insufficient stock for \"{ci.Product.Name}\".");
+                    if ((ci.Product.QuantityOnHand ?? 0) - ci.Product.AllocatedQuantity < ci.Quantity)
+                    {
+                        var available = (ci.Product.QuantityOnHand ?? 0) - ci.Product.AllocatedQuantity;
+                        throw new InvalidOperationException($"Out of stock: \"{ci.Product.Name}\". Only {Math.Max(0, available)} available.");
+                    }
+                    
+                    ci.Product.AllocatedQuantity += ci.Quantity;
                 }
 
                 var lensIds = cart.CartItems
@@ -229,11 +237,22 @@ namespace EyewearStore_SWP391.Services
 
                 return order;
             }
-            catch
-            {
-                await tx.RollbackAsync();
-                throw;
+                catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException ex)
+                {
+                    await tx.RollbackAsync();
+                    _logger.LogWarning(ex, "Concurrency conflict checking out order for user {UserId}. Attempt {Attempt}", userId, attempt + 1);
+                    if (attempt == maxRetries - 1) throw new InvalidOperationException("High traffic prevented your checkout. Please try again.");
+                    
+                    await Task.Delay(150);
+                    _context.ChangeTracker.Clear();
+                }
+                catch
+                {
+                    await tx.RollbackAsync();
+                    throw;
+                }
             }
+            throw new InvalidOperationException("Could not complete the order due to a concurrency issue.");
         }
 
         // ── MarkOrderPaidAsync ───────────────────────────────────────────────
@@ -273,17 +292,10 @@ namespace EyewearStore_SWP391.Services
                     order.PendingBalance = 0;
                 }
 
-                foreach (var oi in order.OrderItems)
-                {
-                    var product = await _context.Products.FindAsync(oi.ProductId);
-                    if (product?.InventoryQty != null)
-                    {
-                        product.InventoryQty -= oi.Quantity;
-                        if (product.InventoryQty < 0) product.InventoryQty = 0;
-                        var prop = product.GetType().GetProperty("UpdatedAt");
-                        prop?.SetValue(product, DateTime.UtcNow);
-                    }
-                }
+                // ── Soft Allocation Note: ──────────────────────────────────────
+                // Hard stock deduction is no longer performed here.
+                // It was previously softly allocated in CreatePendingOrderAsync.
+                // Actual physical deduction (QuantityOnHand) occurs when order is Completed.
 
                 // ── Record status history ────────────────────────────────────
                 var historyNote = order.PaymentMethod == "COD"
@@ -433,13 +445,16 @@ namespace EyewearStore_SWP391.Services
                         ? $"Order cancelled — {refundAmount:N0} VND refunded"
                         : "Order cancelled by customer (no payment to refund)");
 
-                // ── Restore inventory ────────────────────────────────────
+                // ── Restore inventory (Soft Allocation) ─────────────────
                 foreach (var oi in order.OrderItems)
                 {
                     var product = await _context.Products.FindAsync(oi.ProductId);
-                    if (product?.InventoryQty != null)
+                    if (product != null)
                     {
-                        product.InventoryQty += oi.Quantity;
+                        // Release the reserved stock
+                        product.AllocatedQuantity -= oi.Quantity;
+                        if (product.AllocatedQuantity < 0) product.AllocatedQuantity = 0;
+                        
                         var prop = product.GetType().GetProperty("UpdatedAt");
                         prop?.SetValue(product, DateTime.UtcNow);
                     }

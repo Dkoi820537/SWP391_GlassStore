@@ -56,8 +56,12 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
         // ── POST: Advance Status ─────────────────────────────────────────────
         public async Task<IActionResult> OnPostAdvanceStatusAsync(int orderId)
         {
+            // Load order items + products only when finalising to Completed,
+            // so we avoid the join overhead on every other status advance.
             var order = await _context.Orders
                 .Include(o => o.Shipments)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
                 .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
             if (order == null) return NotFound();
@@ -89,6 +93,25 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
             var prevStatus = order.Status;
             order.Status = nextStatus;
 
+            // ── Soft Allocation → Hard Deduction on Completion ─────────────
+            // When the order is physically delivered (Completed), we:
+            //   1. Deduct QuantityOnHand  — the physical box has left the warehouse.
+            //   2. Deduct AllocatedQuantity — release the reservation that was set
+            //      at checkout. Net effect on AvailableStock is zero; it was already
+            //      invisible to buyers. We simply clear the accounting entries.
+            if (nextStatus == "Completed")
+            {
+                foreach (var item in order.OrderItems)
+                {
+                    var product = item.Product;
+                    if (product == null) continue;
+
+                    product.QuantityOnHand = Math.Max(0, (product.QuantityOnHand ?? 0) - item.Quantity);
+                    product.AllocatedQuantity = Math.Max(0, product.AllocatedQuantity - item.Quantity);
+                    product.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
             // ── Record status history ──────────────────────────────────────
             _context.OrderStatusHistories.Add(new OrderStatusHistory
             {
@@ -99,14 +122,16 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                     ? "Order packed and handed to carrier"
                     : nextStatus == "Delivered"
                         ? "Delivery confirmed by Operations"
-                        : $"Advanced from {prevStatus} to {nextStatus}",
+                        : nextStatus == "Completed"
+                            ? "Order completed — physical stock deducted"
+                            : $"Advanced from {prevStatus} to {nextStatus}",
                 CreatedAt = DateTime.UtcNow
             });
 
             await _context.SaveChangesAsync();
 
             TempData["Success"] = nextStatus == "Completed"
-                ? $"Order #{orderId} has been completed successfully!"
+                ? $"Order #{orderId} has been completed and inventory finalised!"
                 : $"Order #{orderId} updated to: {nextStatus}";
 
             return RedirectToPage(new { id = orderId });
@@ -214,10 +239,15 @@ namespace EyewearStore_SWP391.Pages.Staff.Orders
                 return RedirectToPage(new { id = orderId });
             }
 
+            // ── Soft Allocation: release the reservation ───────────────
+            // QuantityOnHand is NOT touched — the goods are still in the warehouse.
             foreach (var item in order.OrderItems)
             {
                 if (item.Product != null)
-                    item.Product.InventoryQty = (item.Product.InventoryQty ?? 0) + item.Quantity;
+                {
+                    item.Product.AllocatedQuantity = Math.Max(0, item.Product.AllocatedQuantity - item.Quantity);
+                    item.Product.UpdatedAt = DateTime.UtcNow;
+                }
             }
 
             order.Status = "Cancelled";

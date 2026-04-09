@@ -174,8 +174,15 @@ public partial class EyewearStoreContext : DbContext
                 .HasMaxLength(3)
                 .IsRequired()
                 .HasColumnName("currency");
-            entity.Property(e => e.InventoryQty)
-                .HasColumnName("inventory_qty");
+            entity.Property(e => e.QuantityOnHand)
+                .HasColumnName("quantity_on_hand");
+            entity.Property(e => e.AllocatedQuantity)
+                .HasDefaultValue(0)
+                .HasColumnName("allocated_quantity");
+            entity.Property(e => e.RowVersion)
+                .IsRowVersion()
+                .HasColumnName("row_version");
+            entity.Ignore(e => e.AvailableStock);
             entity.Property(e => e.Attributes)
                 .HasColumnName("attributes");
             entity.Property(e => e.IsActive)

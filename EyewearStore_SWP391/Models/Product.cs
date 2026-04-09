@@ -24,8 +24,15 @@ public class Product
 
     public string Currency { get; set; } = null!;
 
-    [ConcurrencyCheck]
-    public int? InventoryQty { get; set; }
+    public int? QuantityOnHand { get; set; }
+
+    public int AllocatedQuantity { get; set; } = 0;
+
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public int AvailableStock => (QuantityOnHand ?? 0) - AllocatedQuantity;
+
+    [Timestamp]
+    public byte[] RowVersion { get; set; } = null!;
 
     public string? Attributes { get; set; }
 

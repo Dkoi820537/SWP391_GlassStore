@@ -25,6 +25,9 @@ public class IndexModel : PageModel
     public int TotalPages { get; set; }
     public int PageSize { get; set; } = 5;
 
+    [BindProperty(SupportsGet = true)]
+    public string? SearchQuery { get; set; }
+
     public async Task<IActionResult> OnGetAsync()
     {
         if (!User.Identity?.IsAuthenticated ?? true)
@@ -36,6 +39,24 @@ public class IndexModel : PageModel
         var allOrders = await _orderService.GetOrdersByUserIdAsync(userId);
         // Custom orders belong to "My Service Orders" — exclude them here.
         var filteredOrders = allOrders.Where(o => o.OrderType != "Custom").ToList();
+
+        // Apply search filter
+        if (!string.IsNullOrWhiteSpace(SearchQuery))
+        {
+            var term = SearchQuery.Trim();
+
+            filteredOrders = filteredOrders.Where(o =>
+                // Match by Order ID
+                o.OrderId.ToString().Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                // Match by product name in order items
+                (o.OrderItems != null && o.OrderItems.Any(oi =>
+                    oi.Product != null &&
+                    oi.Product.Name != null &&
+                    oi.Product.Name.Contains(term, StringComparison.OrdinalIgnoreCase))) ||
+                // Match by status
+                (o.Status != null && o.Status.Contains(term, StringComparison.OrdinalIgnoreCase))
+            ).ToList();
+        }
 
         TotalPages = (int)Math.Ceiling(filteredOrders.Count / (double)PageSize);
         if (TotalPages == 0) TotalPages = 1;

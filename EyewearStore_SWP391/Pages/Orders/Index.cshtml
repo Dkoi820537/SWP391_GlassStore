@@ -166,6 +166,135 @@
             margin: 0
         }
 
+        /* ── SEARCH BAR ── */
+        .search-card {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: 16px;
+            padding: 6px;
+            margin-bottom: 24px;
+            box-shadow: var(--sh);
+            transition: box-shadow .2s, border-color .2s;
+        }
+
+            .search-card:focus-within {
+                box-shadow: var(--sh-md);
+                border-color: rgba(37,99,235,.25);
+            }
+
+        .search-inner {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+
+        .search-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            flex-shrink: 0;
+            color: var(--muted);
+            font-size: 16px;
+            transition: color .2s;
+        }
+
+        .search-card:focus-within .search-icon {
+            color: var(--info);
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--txt);
+            padding: 12px 0;
+            font-family: inherit;
+        }
+
+            .search-input::placeholder {
+                color: var(--muted);
+                font-weight: 400;
+            }
+
+        .search-btn {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 22px;
+            background: linear-gradient(135deg, var(--navy), #1a2f54);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s;
+            font-family: inherit;
+        }
+
+            .search-btn:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 16px rgba(13,27,42,.3);
+            }
+
+        .search-clear {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            font-size: 14px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all .15s;
+            margin-right: 4px;
+        }
+
+            .search-clear:hover {
+                background: var(--err-bg);
+                color: var(--err);
+            }
+
+        .search-result-info {
+            padding: 0 6px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+            .search-result-info .sri-term {
+                color: var(--txt);
+                font-weight: 800;
+                background: var(--info-bg);
+                padding: 2px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+            }
+
+            .search-result-info a {
+                color: var(--info);
+                text-decoration: none;
+                font-weight: 700;
+                font-size: 12px;
+            }
+
+                .search-result-info a:hover {
+                    text-decoration: underline;
+                }
+
         /* CARD */
         .order-card {
             background: var(--surf);
@@ -526,6 +655,8 @@
                 .hero h1 {
                     font-size: 1.5rem
                 }
+
+            .search-btn span { display: none; }
         }
     </style>
 }
@@ -555,16 +686,63 @@
         <p>View and track your order history in real time</p>
     </div>
 
+    <!-- ── SEARCH BAR ── -->
+    <form method="get" class="search-card" id="searchForm">
+        <div class="search-inner">
+            <div class="search-icon">
+                <i class="bi bi-search"></i>
+            </div>
+            <input type="text"
+                   class="search-input"
+                   name="SearchQuery"
+                   value="@Model.SearchQuery"
+                   placeholder="Search by order ID, product name, or status..."
+                   autocomplete="off"
+                   id="searchInput" />
+            @if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
+            {
+                <a href="/Orders/Index" class="search-clear" title="Clear search">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            }
+            <button type="submit" class="search-btn">
+                <i class="bi bi-search"></i>
+                <span>Search</span>
+            </button>
+        </div>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
+    {
+        <div class="search-result-info">
+            <i class="bi bi-funnel-fill" style="font-size:12px;"></i>
+            Showing results for <span class="sri-term">@Model.SearchQuery</span>
+            <span style="opacity:.4;">·</span>
+            <a href="/Orders/Index">Clear filter</a>
+        </div>
+    }
+
     @if (!Model.Orders.Any())
     {
         <div class="order-card" style="display:block;cursor:default;">
             <div class="empty">
                 <span class="ei">📦</span>
-                <h3>No orders yet</h3>
-                <p>You haven't placed any standard orders yet. Start shopping to see your history.</p>
-                <a href="/Index" class="btn-go">
-                    <i class="bi bi-shop"></i> Start Shopping
-                </a>
+                @if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
+                {
+                    <h3>No orders found</h3>
+                    <p>No orders match "<strong>@Model.SearchQuery</strong>". Try a different search term.</p>
+                    <a href="/Orders/Index" class="btn-go">
+                        <i class="bi bi-arrow-left"></i> View All Orders
+                    </a>
+                }
+                else
+                {
+                    <h3>No orders yet</h3>
+                    <p>You haven't placed any standard orders yet. Start shopping to see your history.</p>
+                    <a href="/Index" class="btn-go">
+                        <i class="bi bi-shop"></i> Start Shopping
+                    </a>
+                }
             </div>
         </div>
     }
@@ -685,16 +863,16 @@
         <nav aria-label="Page navigation" class="mt-4">
             <ul class="pagination justify-content-center" style="gap: 5px;">
                 <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
-                    <a class="page-link" asp-page="./Index" asp-route-pageIndex="@(Model.PageIndex - 1)" style="border-radius: 8px; border: 1px solid var(--bdr); color: var(--txt);">Previous</a>
+                    <a class="page-link" asp-page="./Index" asp-route-pageIndex="@(Model.PageIndex - 1)" asp-route-searchQuery="@Model.SearchQuery" style="border-radius: 8px; border: 1px solid var(--bdr); color: var(--txt);">Previous</a>
                 </li>
                 @for (int i = 1; i <= Model.TotalPages; i++)
                 {
                     <li class="page-item @(Model.PageIndex == i ? "active" : "")">
-                        <a class="page-link" asp-page="./Index" asp-route-pageIndex="@i" style="border-radius: 8px; @(Model.PageIndex == i ? "background: var(--navy); border-color: var(--navy); color: #fff;" : "border: 1px solid var(--bdr); color: var(--txt);")">@i</a>
+                        <a class="page-link" asp-page="./Index" asp-route-pageIndex="@i" asp-route-searchQuery="@Model.SearchQuery" style="border-radius: 8px; @(Model.PageIndex == i ? "background: var(--navy); border-color: var(--navy); color: #fff;" : "border: 1px solid var(--bdr); color: var(--txt);")">@i</a>
                     </li>
                 }
                 <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
-                    <a class="page-link" asp-page="./Index" asp-route-pageIndex="@(Model.PageIndex + 1)" style="border-radius: 8px; border: 1px solid var(--bdr); color: var(--txt);">Next</a>
+                    <a class="page-link" asp-page="./Index" asp-route-pageIndex="@(Model.PageIndex + 1)" asp-route-searchQuery="@Model.SearchQuery" style="border-radius: 8px; border: 1px solid var(--bdr); color: var(--txt);">Next</a>
                 </li>
             </ul>
         </nav>

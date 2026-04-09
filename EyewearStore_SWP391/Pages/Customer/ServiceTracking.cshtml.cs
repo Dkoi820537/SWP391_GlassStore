@@ -32,6 +32,9 @@ namespace EyewearStore_SWP391.Pages.Customer
         public int TotalPages { get; set; }
         public int PageSize { get; set; } = 5;
 
+        [BindProperty(SupportsGet = true)]
+        public string? SearchQuery { get; set; }
+
         public async Task OnGetAsync()
         {
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -80,6 +83,19 @@ namespace EyewearStore_SWP391.Pages.Customer
                         InternalNote = snap.InternalNote
                     });
                 }
+            }
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                var term = SearchQuery.Trim();
+                Orders = Orders.Where(o =>
+                    o.OrderId.ToString().Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    o.FrameName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    o.LensName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    o.ServiceName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    o.ServiceStatus.Contains(term, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
             }
 
             TotalCount = Orders.Count;

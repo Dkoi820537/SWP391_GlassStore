@@ -260,7 +260,7 @@ namespace EyewearStore_SWP391.Pages.Admin
                 Alerts.Add(new AlertItem(
                     "warn",
                     $"{ApptPending} eye exam appointment{(ApptPending > 1 ? "s" : "")} awaiting confirmation",
-                    "/Admin/Appointments"));
+                    "/Appointments"));
             }
 
             if (SvcPending > 0)
@@ -268,7 +268,7 @@ namespace EyewearStore_SWP391.Pages.Admin
                 Alerts.Add(new AlertItem(
                     "info",
                     $"{SvcPending} service order{(SvcPending > 1 ? "s" : "")} pending — assign a technician",
-                    "/Admin/ServiceOrders"));
+                    "/Staff/ServiceOrders"));
             }
 
             if (SvcReady > 0)
@@ -276,7 +276,7 @@ namespace EyewearStore_SWP391.Pages.Admin
                 Alerts.Add(new AlertItem(
                     "ok",
                     $"{SvcReady} service order{(SvcReady > 1 ? "s" : "")} ready for customer pickup",
-                    "/Admin/ServiceOrders"));
+                    "/Staff/ServiceOrders"));
             }
 
             if (OrderPending > 0)

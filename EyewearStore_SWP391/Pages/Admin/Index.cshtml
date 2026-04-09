@@ -1203,7 +1203,7 @@
                 <div class="sc-sub">Need fulfillment</div>
             </div>
         </a>
-        <a class="sc" href="/Admin/ServiceOrders">
+        <a class="sc" href="/Staff/ServiceOrders">
             <div class="sc-ico i-info"><i class="bi bi-tools"></i></div>
             <div>
                 <div class="sc-lbl">Service Orders</div>
@@ -1211,7 +1211,7 @@
                 <div class="sc-sub">@Model.SvcPending pending · @Model.SvcReady ready</div>
             </div>
         </a>
-        <a class="sc" href="/Admin/ServiceOrders?StatusFilter=Processing">
+        <a class="sc" href="/Staff/ServiceOrders?StatusFilter=Processing">
             <div class="sc-ico i-gold"><i class="bi bi-wrench-adjustable"></i></div>
             <div>
                 <div class="sc-lbl">In Progress</div>
@@ -1321,7 +1321,7 @@
             <div class="card">
                 <div class="card-hdr">
                     <h3><i class="bi bi-tools" style="color:#d97706"></i> Pending Service Jobs</h3>
-                    <a href="/Admin/ServiceOrders">View all →</a>
+                    <a href="/Staff/ServiceOrders">View all →</a>
                 </div>
                 @if (Model.PendingSvcOrders.Any())
                 {
@@ -1332,7 +1332,7 @@
                                 <div class="svc-name">@(string.IsNullOrEmpty(s.FrameName) ? $"Order #{s.OrderId}" : s.FrameName)</div>
                                 <div class="svc-sub">@s.ServiceName · #@s.OrderId</div>
                             </div>
-                            <a href="/Admin/ServiceOrders/Detail/@s.OrderId" class="btn-sm">
+                            <a href="/Staff/ServiceOrders/Detail/@s.OrderId" class="btn-sm">
                                 <i class="bi bi-arrow-right"></i> Assign
                             </a>
                         </div>

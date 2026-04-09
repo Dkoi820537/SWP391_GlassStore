@@ -30,11 +30,10 @@
         .rp-page {
             min-height: 100vh;
             background: var(--cream);
-            font-family: 'DM Sans',sans-serif;
+            font-family: 'DM Sans', sans-serif;
             color: var(--ink);
         }
 
-        /* ── HERO STRIP ── */
         .rp-hero {
             background: var(--ink);
             padding: 56px 32px 48px;
@@ -81,8 +80,8 @@
             }
 
         .rp-hero-title {
-            font-family: 'Cormorant Garamond',serif;
-            font-size: clamp(2.4rem,6vw,4rem);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.4rem, 6vw, 4rem);
             font-weight: 700;
             color: #fff;
             line-height: 1.05;
@@ -103,7 +102,7 @@
         }
 
         .rp-price-badge {
-            background: linear-gradient(135deg,var(--amber),#9e6228);
+            background: linear-gradient(135deg, var(--amber), #9e6228);
             border-radius: 12px;
             padding: 16px 24px;
             text-align: right;
@@ -118,14 +117,13 @@
             }
 
             .rp-price-badge .pb-val {
-                font-family: 'Cormorant Garamond',serif;
+                font-family: 'Cormorant Garamond', serif;
                 font-size: 2rem;
                 font-weight: 700;
                 color: #fff;
                 margin-top: 2px;
             }
 
-        /* ── STEPPER ── */
         .rp-stepper-wrap {
             background: #fff;
             border-bottom: 1px solid var(--bdr);
@@ -185,9 +183,6 @@
             color: #fff;
         }
 
-        .rp-step-info {
-        }
-
         .rp-step-label {
             font-size: 11px;
             font-weight: 600;
@@ -219,14 +214,12 @@
             flex-shrink: 0;
         }
 
-        /* ── MAIN LAYOUT ── */
         .rp-main {
             max-width: 1000px;
             margin: 0 auto;
             padding: 40px 32px 80px;
         }
 
-        /* ── PANELS ── */
         .rp-panel {
             display: none;
         }
@@ -240,7 +233,7 @@
         }
 
             .panel-head h2 {
-                font-family: 'Cormorant Garamond',serif;
+                font-family: 'Cormorant Garamond', serif;
                 font-size: 1.9rem;
                 font-weight: 600;
                 color: var(--ink);
@@ -254,10 +247,56 @@
                 line-height: 1.55;
             }
 
-        /* ── FRAME GRID ── */
+        /* Search bar */
+        .search-wrap {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-inner {
+            position: relative;
+            flex: 1;
+            max-width: 420px;
+        }
+
+            .search-inner i {
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--steel);
+                font-size: 14px;
+                pointer-events: none;
+            }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            border: 1.5px solid var(--bdr);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: var(--ink);
+            background: #fff;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+            .search-input:focus {
+                border-color: var(--amber);
+            }
+
+        .search-count {
+            font-size: 12px;
+            color: var(--steel);
+            white-space: nowrap;
+        }
+
         .frame-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill,minmax(175px,1fr));
+            grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
             gap: 16px;
             margin-bottom: 8px;
         }
@@ -346,7 +385,6 @@
             padding: 2px 7px;
         }
 
-        /* ── REPAIR LIST ── */
         .repair-list {
             display: flex;
             flex-direction: column;
@@ -431,7 +469,7 @@
         }
 
         .repair-price {
-            font-family: 'Cormorant Garamond',serif;
+            font-family: 'Cormorant Garamond', serif;
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--amber);
@@ -443,7 +481,6 @@
             letter-spacing: .5px;
         }
 
-        /* ── SUMMARY ── */
         .summary-box {
             background: #fff;
             border: 1px solid var(--bdr);
@@ -462,7 +499,7 @@
         }
 
         .sum-hdr-title {
-            font-family: 'Cormorant Garamond',serif;
+            font-family: 'Cormorant Garamond', serif;
             font-size: 1.1rem;
             font-weight: 600;
             color: #fff;
@@ -493,7 +530,7 @@
             }
 
             .sum-row.total {
-                background: linear-gradient(135deg,rgba(193,127,58,.06),rgba(193,127,58,.02));
+                background: linear-gradient(135deg, rgba(193,127,58,.06), rgba(193,127,58,.02));
             }
 
         .sum-thumb {
@@ -535,7 +572,7 @@
 
         .sum-price {
             margin-left: auto;
-            font-family: 'Cormorant Garamond',serif;
+            font-family: 'Cormorant Garamond', serif;
             font-size: 1.25rem;
             font-weight: 700;
             color: var(--amber);
@@ -550,13 +587,12 @@
 
         .sum-total-val {
             margin-left: auto;
-            font-family: 'Cormorant Garamond',serif;
+            font-family: 'Cormorant Garamond', serif;
             font-size: 2rem;
             font-weight: 700;
             color: var(--amber);
         }
 
-        /* ── MINI SELECTION ── */
         .mini-sel {
             display: flex;
             gap: 8px;
@@ -589,7 +625,6 @@
                 font-weight: 600;
             }
 
-        /* ── BUTTONS ── */
         .nav-btns {
             display: flex;
             gap: 10px;
@@ -608,7 +643,7 @@
             padding: 12px 20px;
             font-size: 13px;
             font-weight: 500;
-            font-family: 'DM Sans',sans-serif;
+            font-family: 'DM Sans', sans-serif;
             cursor: pointer;
             transition: all .2s;
             text-decoration: none;
@@ -624,14 +659,14 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: linear-gradient(135deg,var(--amber),#9e6228);
+            background: linear-gradient(135deg, var(--amber), #9e6228);
             color: #fff;
             border: none;
             border-radius: 10px;
             padding: 13px 28px;
             font-size: 13.5px;
             font-weight: 600;
-            font-family: 'DM Sans',sans-serif;
+            font-family: 'DM Sans', sans-serif;
             cursor: pointer;
             transition: all .22s;
             box-shadow: 0 4px 18px rgba(193,127,58,.3);
@@ -653,14 +688,14 @@
             display: inline-flex;
             align-items: center;
             gap: 9px;
-            background: linear-gradient(135deg,#1a3a2a,var(--ok));
+            background: linear-gradient(135deg, #1a3a2a, var(--ok));
             color: #fff;
             border: none;
             border-radius: 10px;
             padding: 14px 34px;
             font-size: 14px;
             font-weight: 600;
-            font-family: 'DM Sans',sans-serif;
+            font-family: 'DM Sans', sans-serif;
             cursor: pointer;
             transition: all .22s;
             box-shadow: 0 4px 18px rgba(45,122,95,.3);
@@ -671,7 +706,6 @@
                 box-shadow: 0 8px 26px rgba(45,122,95,.38);
             }
 
-        /* ── EMPTY ── */
         .empty-state {
             text-align: center;
             padding: 60px 24px;
@@ -692,7 +726,6 @@
                 font-size: 14px;
             }
 
-        /* ── TRUST BADGES ── */
         .trust-row {
             display: flex;
             gap: 12px;
@@ -717,7 +750,6 @@
                 color: var(--amber);
             }
 
-        /* ── PAGINATION ── */
         .pager {
             display: flex;
             align-items: center;
@@ -784,7 +816,7 @@
             }
 
             .frame-grid {
-                grid-template-columns: repeat(auto-fill,minmax(140px,1fr))
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr))
             }
 
             .rp-stepper-wrap {
@@ -852,6 +884,17 @@
 
             @if (Model.Frames.Any())
             {
+                <!-- SEARCH BAR -->
+                <div class="search-wrap">
+                    <div class="search-inner">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="frameSearch" class="search-input"
+                               placeholder="Search frames…"
+                               oninput="rFilterFrames(this.value)" />
+                    </div>
+                    <span id="frameCount" class="search-count"></span>
+                </div>
+
                 <div class="frame-grid" id="frameGrid">
                     @foreach (var f in Model.Frames)
                     {
@@ -906,6 +949,17 @@
 
             @if (Model.Services.Any())
             {
+                <!-- SEARCH BAR -->
+                <div class="search-wrap">
+                    <div class="search-inner">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="serviceSearch" class="search-input"
+                               placeholder="Search repair services…"
+                               oninput="rFilterServices(this.value)" />
+                    </div>
+                    <span id="serviceCount" class="search-count"></span>
+                </div>
+
                 <div class="repair-list" id="repairGrid">
                     @foreach (var s in Model.Services)
                     {
@@ -979,7 +1033,7 @@
         function rInitPager(gridId, pagerId) {
             const allCards = Array.from(document.querySelectorAll(
                 '#' + gridId + ' .frame-card, #' + gridId + ' .repair-row'
-            ));
+            )).filter(c => c.getAttribute('data-hidden') !== '1');
             rPagers[gridId] = { allCards, currentPage: 1, pagerId };
             rRenderPage(gridId);
         }
@@ -991,9 +1045,14 @@
             const tp = Math.ceil(total / R_PAGE_SIZE) || 1;
             if (state.currentPage > tp) state.currentPage = 1;
 
-            state.allCards.forEach(c => c.style.display = 'none');
+            // Hide all cards in grid first
+            document.querySelectorAll('#' + gridId + ' .frame-card, #' + gridId + ' .repair-row')
+                .forEach(c => c.style.display = 'none');
+
+            // Show only current page from filtered set
             const start = (state.currentPage - 1) * R_PAGE_SIZE;
             state.allCards.slice(start, start + R_PAGE_SIZE).forEach(c => c.style.display = '');
+
             rBuildPagerUI(gridId, tp, total);
         }
 
@@ -1027,6 +1086,34 @@
             rRenderPage(gridId);
         }
 
+        /* ── Search filters ── */
+        function rFilterFrames(q) {
+            const kw = q.trim().toLowerCase();
+            const all = Array.from(document.querySelectorAll('#frameGrid .frame-card'));
+            all.forEach(c => {
+                const name = (c.dataset.name || '').toLowerCase();
+                c.setAttribute('data-hidden', (!kw || name.includes(kw)) ? '' : '1');
+            });
+            const visible = all.filter(c => c.getAttribute('data-hidden') !== '1');
+            rPagers['frameGrid'] = { allCards: visible, currentPage: 1, pagerId: 'frameGridPager' };
+            rRenderPage('frameGrid');
+            document.getElementById('frameCount').textContent = q ? `${visible.length} result${visible.length !== 1 ? 's' : ''}` : '';
+        }
+
+        function rFilterServices(q) {
+            const kw = q.trim().toLowerCase();
+            const all = Array.from(document.querySelectorAll('#repairGrid .repair-row'));
+            all.forEach(c => {
+                const name = (c.dataset.name || '').toLowerCase();
+                const desc = (c.querySelector('.repair-desc')?.textContent || '').toLowerCase();
+                c.setAttribute('data-hidden', (!kw || name.includes(kw) || desc.includes(kw)) ? '' : '1');
+            });
+            const visible = all.filter(c => c.getAttribute('data-hidden') !== '1');
+            rPagers['repairGrid'] = { allCards: visible, currentPage: 1, pagerId: 'repairGridPager' };
+            rRenderPage('repairGrid');
+            document.getElementById('serviceCount').textContent = q ? `${visible.length} result${visible.length !== 1 ? 's' : ''}` : '';
+        }
+
         /* ── Step navigation ── */
         function rGoStep(n) {
             if (n > 1 && !rSel.frame) { rShake('rp1'); return; }
@@ -1035,17 +1122,23 @@
                 document.getElementById('rp'+i)?.classList.toggle('active', i===n);
             });
             updateRStepper(n);
-            if (n===2) { renderMini('miniSel2'); rInitPager('repairGrid', 'repairGridPager'); }
-            if (n===3) rBuildSummary();
-            window.scrollTo({top:0,behavior:'smooth'});
+            if (n === 2) {
+                renderMini('miniSel2');
+                // Reset service search when entering step 2
+                const si = document.getElementById('serviceSearch');
+                if (si) { si.value = ''; rFilterServices(''); }
+                rInitPager('repairGrid', 'repairGridPager');
+            }
+            if (n === 3) rBuildSummary();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function updateRStepper(cur) {
             [1,2,3].forEach(i => {
                 const step = document.getElementById('rs'+i);
                 const num  = document.getElementById('rn'+i);
-                if(!step) return;
-                step.classList.remove('active','done');
+                if (!step) return;
+                step.classList.remove('active', 'done');
                 if (i < cur) {
                     step.classList.add('done');
                     num.innerHTML = '<i class="bi bi-check-lg" style="font-size:12px"></i>';
@@ -1067,14 +1160,14 @@
         }
 
         function rSelectFrame(card) {
-            document.querySelectorAll('#frameGrid .frame-card').forEach(c=>c.classList.remove('sel'));
+            document.querySelectorAll('#frameGrid .frame-card').forEach(c => c.classList.remove('sel'));
             card.classList.add('sel');
             rSel.frame = { id: card.dataset.id, name: card.dataset.name, img: card.dataset.img };
             document.getElementById('rBtn1').disabled = false;
         }
 
         function rSelectService(card) {
-            document.querySelectorAll('#repairGrid .repair-row').forEach(c=>c.classList.remove('sel'));
+            document.querySelectorAll('#repairGrid .repair-row').forEach(c => c.classList.remove('sel'));
             card.classList.add('sel');
             rSel.svc = { id: card.dataset.id, name: card.dataset.name, price: +card.dataset.price };
             document.getElementById('rBtn2').disabled = false;

@@ -30,12 +30,12 @@
         .lr-page {
             min-height: 100vh;
             background: var(--cream);
-            font-family: 'DM Sans',sans-serif;
+            font-family: 'DM Sans', sans-serif;
             color: var(--ink);
         }
 
         .lr-hero {
-            background: linear-gradient(135deg,#062b24 0%,#0d4a3d 50%,#0e5c4d 100%);
+            background: linear-gradient(135deg, #062b24 0%, #0d4a3d 50%, #0e5c4d 100%);
             padding: 56px 32px 48px;
             position: relative;
             overflow: hidden;
@@ -101,7 +101,7 @@
         }
 
         .lr-hero-title {
-            font-family: 'Cormorant Garamond',serif;
+            font-family: 'Cormorant Garamond', serif;
             font-size: clamp(2.4rem,6vw,4.2rem);
             font-weight: 700;
             color: #fff;
@@ -143,7 +143,6 @@
                 margin-top: 2px;
             }
 
-        /* STEPPER */
         .lr-stepper-wrap {
             background: #fff;
             border-bottom: 1px solid var(--bdr);
@@ -233,7 +232,6 @@
             flex-shrink: 0;
         }
 
-        /* MAIN */
         .lr-main {
             max-width: 1000px;
             margin: 0 auto;
@@ -253,7 +251,7 @@
         }
 
             .panel-head h2 {
-                font-family: 'Cormorant Garamond',serif;
+                font-family: 'Cormorant Garamond', serif;
                 font-size: 1.9rem;
                 font-weight: 600;
                 color: var(--ink);
@@ -267,10 +265,56 @@
                 line-height: 1.55;
             }
 
-        /* LENS GRID */
+        /* Search bar */
+        .search-wrap {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-inner {
+            position: relative;
+            flex: 1;
+            max-width: 420px;
+        }
+
+            .search-inner i {
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--steel);
+                font-size: 14px;
+                pointer-events: none;
+            }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            border: 1.5px solid var(--bdr);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: var(--ink);
+            background: #fff;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+            .search-input:focus {
+                border-color: var(--teal);
+            }
+
+        .search-count {
+            font-size: 12px;
+            color: var(--steel);
+            white-space: nowrap;
+        }
+
         .lens-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill,minmax(185px,1fr));
+            grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
             gap: 16px;
             margin-bottom: 8px;
         }
@@ -345,7 +389,7 @@
         }
 
         .lens-card-price {
-            font-family: 'Cormorant Garamond',serif;
+            font-family: 'Cormorant Garamond', serif;
             font-size: 1.2rem;
             font-weight: 700;
             color: var(--teal);
@@ -365,7 +409,6 @@
             padding: 2px 7px;
         }
 
-        /* SERVICE LIST */
         .svc-list {
             display: flex;
             flex-direction: column;
@@ -463,13 +506,12 @@
         }
 
         .svc-price {
-            font-family: 'Cormorant Garamond',serif;
+            font-family: 'Cormorant Garamond', serif;
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--teal);
         }
 
-        /* SUMMARY */
         .summary-box {
             background: #fff;
             border: 1px solid var(--bdr);
@@ -480,7 +522,7 @@
         }
 
         .sum-hdr {
-            background: linear-gradient(135deg,#062b24,#0d4a3d);
+            background: linear-gradient(135deg, #062b24, #0d4a3d);
             padding: 16px 24px;
             display: flex;
             align-items: center;
@@ -488,7 +530,7 @@
         }
 
         .sum-hdr-title {
-            font-family: 'Cormorant Garamond',serif;
+            font-family: 'Cormorant Garamond', serif;
             font-size: 1.1rem;
             font-weight: 600;
             color: #fff;
@@ -519,7 +561,7 @@
             }
 
             .sum-row.total {
-                background: linear-gradient(135deg,rgba(14,122,104,.06),rgba(14,122,104,.02));
+                background: linear-gradient(135deg, rgba(14,122,104,.06), rgba(14,122,104,.02));
             }
 
         .sum-thumb {
@@ -561,7 +603,7 @@
 
         .sum-price {
             margin-left: auto;
-            font-family: 'Cormorant Garamond',serif;
+            font-family: 'Cormorant Garamond', serif;
             font-size: 1.25rem;
             font-weight: 700;
             color: var(--teal);
@@ -576,13 +618,12 @@
 
         .sum-total-val {
             margin-left: auto;
-            font-family: 'Cormorant Garamond',serif;
+            font-family: 'Cormorant Garamond', serif;
             font-size: 2rem;
             font-weight: 700;
             color: var(--teal);
         }
 
-        /* MINI */
         .mini-sel {
             display: flex;
             gap: 8px;
@@ -615,7 +656,6 @@
                 font-weight: 600;
             }
 
-        /* BUTTONS */
         .nav-btns {
             display: flex;
             gap: 10px;
@@ -634,7 +674,7 @@
             padding: 12px 20px;
             font-size: 13px;
             font-weight: 500;
-            font-family: 'DM Sans',sans-serif;
+            font-family: 'DM Sans', sans-serif;
             cursor: pointer;
             transition: all .2s;
             text-decoration: none;
@@ -650,14 +690,14 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: linear-gradient(135deg,var(--teal),var(--teal-deep));
+            background: linear-gradient(135deg, var(--teal), var(--teal-deep));
             color: #fff;
             border: none;
             border-radius: 10px;
             padding: 13px 28px;
             font-size: 13.5px;
             font-weight: 600;
-            font-family: 'DM Sans',sans-serif;
+            font-family: 'DM Sans', sans-serif;
             cursor: pointer;
             transition: all .22s;
             box-shadow: 0 4px 18px rgba(14,122,104,.28);
@@ -679,14 +719,14 @@
             display: inline-flex;
             align-items: center;
             gap: 9px;
-            background: linear-gradient(135deg,#0a0a0f,#1a1a2e);
+            background: linear-gradient(135deg, #0a0a0f, #1a1a2e);
             color: #fff;
             border: none;
             border-radius: 10px;
             padding: 14px 34px;
             font-size: 14px;
             font-weight: 600;
-            font-family: 'DM Sans',sans-serif;
+            font-family: 'DM Sans', sans-serif;
             cursor: pointer;
             transition: all .22s;
             box-shadow: 0 4px 18px rgba(10,10,15,.3);
@@ -697,7 +737,6 @@
                 box-shadow: 0 8px 26px rgba(10,10,15,.38);
             }
 
-        /* TRUST */
         .trust-row {
             display: flex;
             gap: 12px;
@@ -742,7 +781,6 @@
                 font-size: 14px;
             }
 
-        /* ── PAGINATION ── */
         .pager {
             display: flex;
             align-items: center;
@@ -809,7 +847,7 @@
             }
 
             .lens-grid {
-                grid-template-columns: repeat(auto-fill,minmax(145px,1fr))
+                grid-template-columns: repeat(auto-fill, minmax(145px, 1fr))
             }
 
             .lr-stepper-wrap {
@@ -867,6 +905,17 @@
 
             @if (Model.Lenses.Any())
             {
+                <!-- SEARCH BAR -->
+                <div class="search-wrap">
+                    <div class="search-inner">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="lensSearch" class="search-input"
+                               placeholder="Search lenses…"
+                               oninput="lFilterLenses(this.value)" />
+                    </div>
+                    <span id="lensCount" class="search-count"></span>
+                </div>
+
                 <div class="lens-grid" id="lensGrid">
                     @foreach (var l in Model.Lenses)
                     {
@@ -921,6 +970,17 @@
 
             @if (Model.Services.Any())
             {
+                <!-- SEARCH BAR -->
+                <div class="search-wrap">
+                    <div class="search-inner">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="svcSearch" class="search-input"
+                               placeholder="Search fitting services…"
+                               oninput="lFilterServices(this.value)" />
+                    </div>
+                    <span id="svcCount" class="search-count"></span>
+                </div>
+
                 <div class="svc-list" id="svcGrid">
                     @foreach (var s in Model.Services)
                     {
@@ -992,7 +1052,7 @@
         function lInitPager(gridId, pagerId) {
             const allCards = Array.from(document.querySelectorAll(
                 '#' + gridId + ' .lens-card, #' + gridId + ' .svc-row'
-            ));
+            )).filter(c => c.getAttribute('data-hidden') !== '1');
             lPagers[gridId] = { allCards, currentPage: 1, pagerId };
             lRenderPage(gridId);
         }
@@ -1004,9 +1064,14 @@
             const tp = Math.ceil(total / L_PAGE_SIZE) || 1;
             if (state.currentPage > tp) state.currentPage = 1;
 
-            state.allCards.forEach(c => c.style.display = 'none');
+            // Hide all first
+            document.querySelectorAll('#' + gridId + ' .lens-card, #' + gridId + ' .svc-row')
+                .forEach(c => c.style.display = 'none');
+
+            // Show current page from filtered set
             const start = (state.currentPage - 1) * L_PAGE_SIZE;
             state.allCards.slice(start, start + L_PAGE_SIZE).forEach(c => c.style.display = '');
+
             lBuildPagerUI(gridId, tp, total);
         }
 
@@ -1040,23 +1105,57 @@
             lRenderPage(gridId);
         }
 
+        /* ── Search filters ── */
+        function lFilterLenses(q) {
+            const kw = q.trim().toLowerCase();
+            const all = Array.from(document.querySelectorAll('#lensGrid .lens-card'));
+            all.forEach(c => {
+                const name = (c.dataset.name || '').toLowerCase();
+                c.setAttribute('data-hidden', (!kw || name.includes(kw)) ? '' : '1');
+            });
+            const visible = all.filter(c => c.getAttribute('data-hidden') !== '1');
+            lPagers['lensGrid'] = { allCards: visible, currentPage: 1, pagerId: 'lensGridPager' };
+            lRenderPage('lensGrid');
+            document.getElementById('lensCount').textContent = q ? `${visible.length} result${visible.length !== 1 ? 's' : ''}` : '';
+        }
+
+        function lFilterServices(q) {
+            const kw = q.trim().toLowerCase();
+            const all = Array.from(document.querySelectorAll('#svcGrid .svc-row'));
+            all.forEach(c => {
+                const name = (c.dataset.name || '').toLowerCase();
+                const desc = (c.querySelector('.svc-desc')?.textContent || '').toLowerCase();
+                c.setAttribute('data-hidden', (!kw || name.includes(kw) || desc.includes(kw)) ? '' : '1');
+            });
+            const visible = all.filter(c => c.getAttribute('data-hidden') !== '1');
+            lPagers['svcGrid'] = { allCards: visible, currentPage: 1, pagerId: 'svcGridPager' };
+            lRenderPage('svcGrid');
+            document.getElementById('svcCount').textContent = q ? `${visible.length} result${visible.length !== 1 ? 's' : ''}` : '';
+        }
+
         /* ── Step navigation ── */
         function lGoStep(n) {
             if (n > 1 && !lSel.lens) { lShake('lp1'); return; }
             if (n > 2 && !lSel.svc)  { lShake('lp2'); return; }
             [1,2,3].forEach(i => document.getElementById('lp'+i)?.classList.toggle('active', i===n));
             updateLStepper(n);
-            if (n===2) { renderMini2(); lInitPager('svcGrid', 'svcGridPager'); }
-            if (n===3) lBuildSummary();
-            window.scrollTo({top:0,behavior:'smooth'});
+            if (n === 2) {
+                renderMini2();
+                // Reset service search when entering step 2
+                const si = document.getElementById('svcSearch');
+                if (si) { si.value = ''; lFilterServices(''); }
+                lInitPager('svcGrid', 'svcGridPager');
+            }
+            if (n === 3) lBuildSummary();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function updateLStepper(cur) {
             [1,2,3].forEach(i => {
                 const step = document.getElementById('ls'+i);
                 const num  = document.getElementById('ln'+i);
-                if(!step) return;
-                step.classList.remove('active','done');
+                if (!step) return;
+                step.classList.remove('active', 'done');
                 if (i < cur) {
                     step.classList.add('done');
                     num.innerHTML = '<i class="bi bi-check-lg" style="font-size:12px"></i>';
@@ -1077,22 +1176,22 @@
         }
 
         function lSelectLens(card) {
-            document.querySelectorAll('#lensGrid .lens-card').forEach(c=>c.classList.remove('sel'));
+            document.querySelectorAll('#lensGrid .lens-card').forEach(c => c.classList.remove('sel'));
             card.classList.add('sel');
-            lSel.lens = { id:card.dataset.id, name:card.dataset.name, price:+card.dataset.price, img:card.dataset.img };
+            lSel.lens = { id: card.dataset.id, name: card.dataset.name, price: +card.dataset.price, img: card.dataset.img };
             document.getElementById('lBtn1').disabled = false;
         }
 
         function lSelectService(card) {
-            document.querySelectorAll('#svcGrid .svc-row').forEach(c=>c.classList.remove('sel'));
+            document.querySelectorAll('#svcGrid .svc-row').forEach(c => c.classList.remove('sel'));
             card.classList.add('sel');
-            lSel.svc = { id:card.dataset.id, name:card.dataset.name, price:+card.dataset.price };
+            lSel.svc = { id: card.dataset.id, name: card.dataset.name, price: +card.dataset.price };
             document.getElementById('lBtn2').disabled = false;
         }
 
         function renderMini2() {
             const el = document.getElementById('miniSel2');
-            if(!el) return;
+            if (!el) return;
             el.innerHTML = `<div class="mini-pill"><span class="mp-dot"></span> Lens: <strong>${lSel.lens.name}</strong> &nbsp;·&nbsp; <strong>${lSel.lens.price.toLocaleString('vi-VN')} ₫</strong></div>`;
         }
 

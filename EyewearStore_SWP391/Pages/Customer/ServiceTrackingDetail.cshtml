@@ -1,0 +1,1027 @@
+﻿@page "/Customer/ServiceTrackingDetail"
+@model EyewearStore_SWP391.Pages.Customer.ServiceTrackingDetailModel
+@{
+    ViewData["Title"] = $"Service Order #{Model.Item?.OrderId}";
+    Layout = "_Layout";
+
+    var o = Model.Item;
+    if (o == null)
+    {
+        <div class="alert alert-danger m-4">Item not found. <a href="/Customer/ServiceTracking">Back to Service Orders</a></div>
+        return;
+    }
+
+    string[] svcSteps = { "Pending", "Processing", "Ready", "Done" };
+    string[] orderSteps = { "Pending", "Confirmed", "Processing", "Shipped", "Delivered" };
+
+    int SvcStepIndex(string s) => s switch
+    {
+        "Processing" => 1,
+        "Ready" => 2,
+        "Done" => 3,
+        _ => 0
+    };
+    int OrderStepIndex(string s) => s switch
+    {
+        "Confirmed" => 1,
+        "Processing" => 2,
+        var x when x.StartsWith("Processing") => 2,
+        "Shipped" => 3,
+        "Delivered" => 4,
+        "Completed" => 4,
+        "Cancelled" => -1,
+        _ => 0
+    };
+
+    int svcIdx = SvcStepIndex(o.ServiceStatus);
+    int orderIdx = OrderStepIndex(o.OrderStatus);
+    bool isCancelled = o.OrderStatus is "Cancelled" or "Cancellation_Pending";
+
+    string SvcDesc(string s) => s switch
+    {
+        "Pending" => "Your glasses are queued for assembly.",
+        "Processing" => "Our technicians are actively assembling your custom glasses.",
+        "Ready" => "Your glasses are ready! Awaiting collection or shipment.",
+        "Done" => "Assembly complete — glasses have been handed off.",
+        _ => "Status will update as work progresses."
+    };
+    string SvcEmoji(string s) => s switch
+    {
+        "Pending" => "⏳",
+        "Processing" => "⚙️",
+        "Ready" => "✅",
+        "Done" => "🎉",
+        _ => "🔭"
+    };
+
+    int pct = o.ServiceStatus switch
+    {
+        "Pending" => 15,
+        "Processing" => 50,
+        "Ready" => 85,
+        "Done" => 100,
+        _ => 0
+    };
+}
+
+@section Styles {
+    <style>
+        :root {
+            --bg: #f4f5fb;
+            --surf: #fff;
+            --surf2: #f0f2f8;
+            --bdr: rgba(99,102,141,.12);
+            --navy: #0d1b2a;
+            --navy2: #1a2f54;
+            --gold: #b8862a;
+            --gold2: #d4a74a;
+            --ok: #059669;
+            --ok-bg: rgba(5,150,105,.08);
+            --ok-bdr: rgba(5,150,105,.2);
+            --warn: #d97706;
+            --warn-bg: rgba(217,119,6,.09);
+            --warn-bdr: rgba(217,119,6,.24);
+            --info: #2563eb;
+            --info-bg: rgba(37,99,235,.08);
+            --info-bdr: rgba(37,99,235,.2);
+            --err: #dc2626;
+            --err-bg: rgba(220,38,38,.08);
+            --err-bdr: rgba(220,38,38,.2);
+            --purple: #7c3aed;
+            --pur-bg: rgba(124,58,237,.08);
+            --pur-bdr: rgba(124,58,237,.2);
+            --muted: #8b8da8;
+            --txt: #12132a;
+            --sh: 0 1px 6px rgba(18,19,42,.06);
+            --sh-md: 0 4px 24px rgba(18,19,42,.09);
+            --sh-lg: 0 8px 40px rgba(18,19,42,.13);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--txt);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .sd-wrap {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 36px 20px 90px;
+        }
+
+        .sd-grid {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 24px;
+        }
+
+        @@media(max-width:860px) {
+            .sd-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* breadcrumb */
+        .bc {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+
+            .bc a {
+                color: var(--gold);
+                text-decoration: none;
+                font-weight: 700;
+            }
+
+                .bc a:hover {
+                    text-decoration: underline;
+                }
+
+        /* back btn */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: 10px;
+            padding: 9px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--txt);
+            text-decoration: none;
+            margin-bottom: 20px;
+            box-shadow: var(--sh);
+            transition: all .2s;
+        }
+
+            .back-btn:hover {
+                background: var(--surf2);
+                color: var(--txt);
+                transform: translateX(-2px);
+            }
+
+        /* hero */
+        .hero {
+            background: linear-gradient(135deg,#07101e 0%,#13243d 55%,#0c2240 100%);
+            border-radius: 22px;
+            padding: 36px 36px 28px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: -60px;
+                right: -60px;
+                width: 300px;
+                height: 300px;
+                border-radius: 50%;
+                background: radial-gradient(circle,rgba(184,134,42,.12) 0%,transparent 70%);
+                pointer-events: none;
+            }
+
+        .hero-eyebrow {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: rgba(255,255,255,.3);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .hero-title {
+            font-size: 1.7rem;
+            font-weight: 900;
+            color: #fff;
+            margin: 0 0 4px;
+            letter-spacing: -.5px;
+        }
+
+        .hero-sub {
+            font-size: 13px;
+            color: rgba(255,255,255,.45);
+            margin: 0 0 18px;
+        }
+
+        .hero-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .os-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 14px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1.5px solid;
+        }
+
+        .osb-Pending {
+            background: rgba(217,119,6,.15);
+            color: #fbbf24;
+            border-color: rgba(251,191,36,.3);
+        }
+
+        .osb-Processing {
+            background: rgba(37,99,235,.15);
+            color: #93c5fd;
+            border-color: rgba(147,197,253,.3);
+        }
+
+        .osb-Ready {
+            background: rgba(5,150,105,.15);
+            color: #6ee7b7;
+            border-color: rgba(110,231,183,.3);
+        }
+
+        .osb-Done {
+            background: rgba(255,255,255,.08);
+            color: rgba(255,255,255,.7);
+            border-color: rgba(255,255,255,.15);
+        }
+
+        .osb-Cancelled {
+            background: rgba(220,38,38,.15);
+            color: #fca5a5;
+            border-color: rgba(252,165,165,.3);
+        }
+
+        .prog-bar {
+            height: 5px;
+            border-radius: 5px;
+            background: rgba(255,255,255,.1);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .prog-fill {
+            height: 100%;
+            border-radius: 5px;
+            background: linear-gradient(90deg,var(--gold),var(--gold2));
+        }
+
+        /* panel card */
+        .panel {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: var(--sh-md);
+            margin-bottom: 20px;
+        }
+
+        .panel-hdr {
+            padding: 13px 20px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            border-bottom: 1px solid var(--bdr);
+        }
+
+            .panel-hdr.dark {
+                background: linear-gradient(135deg,var(--navy),var(--navy2));
+            }
+
+            .panel-hdr.purple {
+                background: linear-gradient(135deg,#5b21b6,#7c3aed);
+            }
+
+            .panel-hdr.ok {
+                background: linear-gradient(135deg,#065f46,var(--ok));
+            }
+
+        .ph-title {
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            flex: 1;
+            color: #fff;
+        }
+
+        .ph-badge {
+            background: rgba(255,255,255,.15);
+            border-radius: 6px;
+            padding: 2px 9px;
+            font-size: 10px;
+            font-weight: 700;
+            color: rgba(255,255,255,.85);
+        }
+
+        .panel-body {
+            padding: 20px 22px;
+        }
+
+        /* stepper */
+        .stepper {
+            display: flex;
+            align-items: center;
+        }
+
+        .step-node {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+            .step-node:not(:last-child)::after {
+                content: '';
+                position: absolute;
+                top: 15px;
+                left: 50%;
+                width: 100%;
+                height: 2px;
+                background: #e0e2f0;
+                z-index: 0;
+            }
+
+            .step-node.done:not(:last-child)::after {
+                background: var(--ok);
+            }
+
+            .step-node.active:not(:last-child)::after {
+                background: linear-gradient(90deg,var(--ok),#e0e2f0);
+            }
+
+            .step-node.pur-active:not(:last-child)::after {
+                background: linear-gradient(90deg,var(--ok),#e0e2f0);
+            }
+
+        .step-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            border: 2px solid #dde1f0;
+            background: #fff;
+            position: relative;
+            z-index: 2;
+            transition: all .3s;
+        }
+
+        .step-node.done .step-circle {
+            background: var(--ok);
+            border-color: var(--ok);
+            color: #fff;
+        }
+
+        .step-node.active .step-circle {
+            background: var(--navy);
+            border-color: var(--navy);
+            color: #fff;
+            box-shadow: 0 0 0 4px rgba(13,27,42,.1);
+        }
+
+        .step-node.pur-active .step-circle {
+            background: var(--purple);
+            border-color: var(--purple);
+            color: #fff;
+            box-shadow: 0 0 0 4px var(--pur-bg);
+        }
+
+        .step-lbl {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: var(--muted);
+            margin-top: 6px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+
+        .step-node.done .step-lbl {
+            color: var(--ok);
+        }
+
+        .step-node.active .step-lbl {
+            color: var(--navy);
+            font-weight: 900;
+        }
+
+        .step-node.pur-active .step-lbl {
+            color: var(--purple);
+            font-weight: 900;
+        }
+
+        /* vertical timeline */
+        .tl-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .tl-item {
+            display: flex;
+            gap: 14px;
+            padding-bottom: 22px;
+            position: relative;
+        }
+
+            .tl-item:not(:last-child)::before {
+                content: '';
+                position: absolute;
+                left: 17px;
+                top: 34px;
+                bottom: 0;
+                width: 2px;
+                background: var(--bdr);
+            }
+
+        .tl-dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            position: relative;
+            z-index: 1;
+            border: 2px solid transparent;
+        }
+
+        .d-pending {
+            background: var(--warn-bg);
+            border-color: var(--warn-bdr);
+            color: var(--warn);
+        }
+
+        .d-info {
+            background: var(--info-bg);
+            border-color: var(--info-bdr);
+            color: var(--info);
+        }
+
+        .d-ok {
+            background: var(--ok-bg);
+            border-color: var(--ok-bdr);
+            color: var(--ok);
+        }
+
+        .d-err {
+            background: var(--err-bg);
+            border-color: var(--err-bdr);
+            color: var(--err);
+        }
+
+        .d-purple {
+            background: var(--pur-bg);
+            border-color: var(--pur-bdr);
+            color: var(--purple);
+        }
+
+        .d-muted {
+            background: var(--surf2);
+            border-color: var(--bdr);
+            color: var(--muted);
+        }
+
+        .tl-content {
+            flex: 1;
+            min-width: 0;
+            padding-top: 4px;
+        }
+
+        .tl-lbl {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--txt);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tl-note {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 3px;
+            line-height: 1.5;
+        }
+
+        .tl-ts {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .latest-pill {
+            background: rgba(5,150,105,.1);
+            border: 1px solid rgba(5,150,105,.25);
+            color: var(--ok);
+            border-radius: 100px;
+            padding: 2px 9px;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        /* right col utils */
+        .sum-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: .45rem 0;
+            border-bottom: 1px solid var(--bdr);
+            font-size: .9rem;
+        }
+
+            .sum-row:last-child {
+                border-bottom: none;
+            }
+
+        .sum-lbl {
+            color: #64748b;
+        }
+
+        .sum-val {
+            font-weight: 700;
+            color: var(--txt);
+        }
+
+        .note-box {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            border-radius: 0 10px 10px 0;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #92400e;
+            line-height: 1.55;
+        }
+
+        .tracking-code {
+            background: var(--surf2);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-family: monospace;
+            font-size: 13px;
+            font-weight: 700;
+            word-break: break-all;
+        }
+
+        .empty-tl {
+            text-align: center;
+            padding: 28px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+            .empty-tl i {
+                font-size: 28px;
+                display: block;
+                margin-bottom: 8px;
+                opacity: .25;
+            }
+
+        @@media(max-width:600px) {
+            .hero {
+                padding: 28px 22px 22px;
+            }
+
+            .hero-title {
+                font-size: 1.45rem;
+            }
+
+            .sd-grid {
+                gap: 16px;
+            }
+        }
+    </style>
+}
+
+<div class="sd-wrap">
+    <!-- breadcrumb -->
+    <nav class="bc">
+        <a href="/Index"><i class="bi bi-house"></i> Home</a>
+        <span>›</span>
+        <a href="/Customer/ServiceTracking">Service Orders</a>
+        <span>›</span>
+        <span>Order #@o.OrderId · Item #@o.OrderItemId</span>
+    </nav>
+
+    <a href="/Customer/ServiceTracking" class="back-btn">
+        <i class="bi bi-arrow-left"></i> Back to Service Orders
+    </a>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-eyebrow">✦ OptiPlus · Custom Assembly</div>
+        <div class="hero-title">@o.FrameName</div>
+        <div class="hero-sub">
+            @o.ServiceName
+            @if (!string.IsNullOrEmpty(o.LensName) && o.LensName != "N/A")
+            {
+                <text> · Lens: @o.LensName</text>
+            }
+            &nbsp;·&nbsp; Placed @o.CreatedAt.ToString("dd/MM/yyyy")
+        </div>
+        <div class="hero-badges">
+            @{
+                string svcBadgeCls = "osb-" + o.ServiceStatus;
+            }
+            <span class="os-badge @svcBadgeCls">
+                <i class="bi bi-wrench"></i> Workshop: @o.ServiceStatus
+            </span>
+            <span class="os-badge" style="background:rgba(255,255,255,.07);color:rgba(255,255,255,.55);border-color:rgba(255,255,255,.12);">
+                <i class="bi bi-hash"></i> Order #@o.OrderId &nbsp;·&nbsp; Item #@o.OrderItemId
+            </span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" style="width:@pct%"></div></div>
+    </div>
+
+    <!-- GRID -->
+    <div class="sd-grid">
+
+        <!-- ══ LEFT ══ -->
+        <div>
+
+            <!-- 1. Workshop Stepper -->
+            <div class="panel">
+                <div class="panel-hdr purple">
+                    <i class="bi bi-wrench-adjustable" style="color:rgba(255,255,255,.8);font-size:15px;"></i>
+                    <span class="ph-title">Workshop Progress</span>
+                </div>
+                <div class="panel-body">
+                    <div class="stepper">
+                        @for (int i = 0; i < svcSteps.Length; i++)
+                        {
+                            string cls = i < svcIdx ? "done" : i == svcIdx ? "pur-active" : "";
+                            string icon = i < svcIdx ? "✓" : i == svcIdx ? "●" : (i + 1).ToString();
+                            <div class="step-node @cls">
+                                <div class="step-circle">@icon</div>
+                                <div class="step-lbl">@svcSteps[i]</div>
+                            </div>
+                        }
+                    </div>
+
+                    <div style="margin-top:18px;background:var(--pur-bg);border:1px solid var(--pur-bdr);border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;">
+                        <span style="font-size:24px;line-height:1;margin-top:2px;">@SvcEmoji(o.ServiceStatus)</span>
+                        <div>
+                            <div style="font-size:14px;font-weight:800;color:var(--purple);">@o.ServiceStatus</div>
+                            <div style="font-size:12px;color:#6d28d9;margin-top:3px;">@SvcDesc(o.ServiceStatus)</div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(o.AssignedTo))
+                    {
+                        <div style="margin-top:12px;display:flex;align-items:center;gap:8px;background:var(--info-bg);border:1px solid var(--info-bdr);border-radius:8px;padding:9px 14px;">
+                            <i class="bi bi-person-check-fill" style="color:var(--info);font-size:16px;"></i>
+                            <span style="font-size:13px;font-weight:700;color:var(--info);">Technician: <strong>@o.AssignedTo</strong></span>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(o.InternalNote))
+                    {
+                        <div class="note-box" style="margin-top:12px;">
+                            💬 <strong>Note from our team:</strong> @o.InternalNote
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- 2. Order Pipeline Stepper -->
+            @if (!isCancelled)
+            {
+                <div class="panel">
+                    <div class="panel-hdr dark">
+                        <i class="bi bi-signpost-2" style="color:rgba(255,255,255,.75);font-size:15px;"></i>
+                        <span class="ph-title">Order Status Pipeline</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="stepper">
+                            @for (int i = 0; i < orderSteps.Length; i++)
+                            {
+                                string cls = i < orderIdx ? "done" : i == orderIdx ? "active" : "";
+                                string icon = i < orderIdx ? "✓" : i == orderIdx ? "●" : (i + 1).ToString();
+                                <div class="step-node @cls">
+                                    <div class="step-circle">@icon</div>
+                                    <div class="step-lbl">@orderSteps[i]</div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="panel">
+                    <div class="panel-body">
+                        <div style="display:flex;align-items:center;gap:12px;padding:4px;">
+                            <div style="width:42px;height:42px;border-radius:50%;background:var(--err-bg);border:2px solid var(--err-bdr);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--err);flex-shrink:0;">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </div>
+                            <div>
+                                <div style="font-size:14px;font-weight:800;color:var(--err);">Order Cancelled</div>
+                                @if (o.CancelledAt.HasValue)
+                                {
+                                    <div style="font-size:12px;color:var(--muted);margin-top:2px;">
+                                        Cancelled on @o.CancelledAt.Value.ToString("dd MMMM yyyy 'at' HH:mm")
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- 3. Workshop Timeline -->
+            <div class="panel">
+                <div class="panel-hdr purple">
+                    <i class="bi bi-clock-history" style="color:rgba(255,255,255,.8);font-size:15px;"></i>
+                    <span class="ph-title">Workshop Timeline</span>
+                    @if (o.ServiceTimeline.Any())
+                    {
+                        <span class="ph-badge">@o.ServiceTimeline.Count updates</span>
+                    }
+                </div>
+                <div class="panel-body">
+                    @if (o.ServiceTimeline.Any())
+                    {
+                        var sorted = o.ServiceTimeline.OrderByDescending(t => t.Timestamp).ToList();
+                        <ul class="tl-list">
+                            @for (int i = 0; i < sorted.Count; i++)
+                            {
+                                var ent = sorted[i];
+                                string dc = ent.Status switch
+                                {
+                                    "Processing" => "d-info",
+                                    "Ready" => "d-ok",
+                                    "Done" => "d-ok",
+                                    _ => "d-pending"
+                                };
+                                string di = ent.Status switch
+                                {
+                                    "Processing" => "bi-gear-fill",
+                                    "Ready" => "bi-check-circle-fill",
+                                    "Done" => "bi-bag-check-fill",
+                                    _ => "bi-hourglass-split"
+                                };
+                                <li class="tl-item">
+                                    <div class="tl-dot @dc"><i class="bi @di"></i></div>
+                                    <div class="tl-content">
+                                        <div class="tl-lbl">
+                                            @ent.Status
+                                            @if (i == 0)
+                                            {
+                                                <span class="latest-pill">LATEST</span>
+                                            }
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(ent.AssignedTo))
+                                        {
+                                            <div style="font-size:12px;color:var(--purple);font-weight:700;margin-top:2px;">
+                                                <i class="bi bi-person-fill" style="font-size:11px;"></i> @ent.AssignedTo
+                                            </div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(ent.Note))
+                                        {
+                                            <div class="tl-note">@ent.Note</div>
+                                        }
+                                        <div class="tl-ts">
+                                            <i class="bi bi-clock" style="font-size:10px;"></i>
+                                            @ent.Timestamp.ToLocalTime().ToString("dddd, dd MMMM yyyy 'at' HH:mm")
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="empty-tl">
+                            <i class="bi bi-clock-history"></i>
+                            Workshop updates will appear here as your order progresses.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- 4. Order Status History -->
+            @if (o.OrderStatusHistories.Any())
+            {
+                <div class="panel">
+                    <div class="panel-hdr dark">
+                        <i class="bi bi-list-check" style="color:rgba(255,255,255,.75);font-size:15px;"></i>
+                        <span class="ph-title">Order Timeline</span>
+                        <span class="ph-badge">@o.OrderStatusHistories.Count events</span>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="tl-list">
+                            @for (int i = 0; i < o.OrderStatusHistories.Count; i++)
+                            {
+                                var h = o.OrderStatusHistories[i];
+                                string dc = h.Status switch
+                                {
+                                    "Pending" or "Pending Confirmation" => "d-pending",
+                                    "Confirmed" => "d-info",
+                                    var s when s.StartsWith("Processing") => "d-muted",
+                                    "Shipped" => "d-info",
+                                    "Delivered" or "Completed" => "d-ok",
+                                    "Cancelled" or "Cancellation_Pending" => "d-err",
+                                    _ => "d-muted"
+                                };
+                                string di = h.Status switch
+                                {
+                                    "Pending" or "Pending Confirmation" => "bi-hourglass-split",
+                                    "Confirmed" => "bi-check-circle-fill",
+                                    var s when s.StartsWith("Processing") => "bi-gear-fill",
+                                    "Shipped" => "bi-truck",
+                                    "Delivered" => "bi-box-seam-fill",
+                                    "Completed" => "bi-patch-check-fill",
+                                    "Cancelled" or "Cancellation_Pending" => "bi-x-circle-fill",
+                                    _ => "bi-info-circle-fill"
+                                };
+                                string lbl = h.Status switch
+                                {
+                                    "Pending Confirmation" => "Payment Confirmed — Awaiting Review",
+                                    "Confirmed" => "Order Confirmed",
+                                    "Processing" => "Order Being Processed",
+                                    "Shipped" => "Order Shipped",
+                                    "Delivered" => "Order Delivered",
+                                    "Completed" => "Order Completed",
+                                    "Cancelled" => "Order Cancelled",
+                                    "Cancellation_Pending" => "Cancellation Requested",
+                                    _ => h.Status
+                                };
+                                <li class="tl-item">
+                                    <div class="tl-dot @dc"><i class="bi @di"></i></div>
+                                    <div class="tl-content">
+                                        <div class="tl-lbl">
+                                            @lbl
+                                            @if (i == 0)
+                                            {
+                                                <span class="latest-pill">LATEST</span>
+                                            }
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(h.Note))
+                                        {
+                                            <div class="tl-note">@h.Note</div>
+                                        }
+                                        <div class="tl-ts">
+                                            <i class="bi bi-clock" style="font-size:10px;"></i>
+                                            @h.CreatedAt.ToString("dddd, dd MMMM yyyy 'at' HH:mm")
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+
+        </div><!-- /left -->
+        <!-- ══ RIGHT ══ -->
+        <div>
+
+            <!-- Product image + name -->
+            <div class="panel">
+                @if (!string.IsNullOrEmpty(o.ImageUrl))
+                {
+                    <img src="@o.ImageUrl" alt="@o.FrameName"
+                         style="width:100%;height:210px;object-fit:cover;display:block;border-radius:17px 17px 0 0;" />
+                }
+                else
+                {
+                    <div style="height:130px;background:linear-gradient(135deg,var(--surf2),#e8eaf5);display:flex;align-items:center;justify-content:center;font-size:52px;border-radius:17px 17px 0 0;">🔭</div>
+                }
+                <div class="panel-body" style="padding:16px 20px;">
+                    <div style="font-size:16px;font-weight:800;color:var(--txt);margin-bottom:2px;">@o.FrameName</div>
+                    <div style="font-size:12px;color:var(--muted);">
+                        @o.ServiceName
+                        @if (!string.IsNullOrEmpty(o.LensName) && o.LensName != "N/A")
+                        {
+                            <text> · @o.LensName</text>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price breakdown -->
+            <div class="panel">
+                <div class="panel-hdr dark">
+                    <i class="bi bi-receipt" style="color:rgba(255,255,255,.75);font-size:15px;"></i>
+                    <span class="ph-title">Price Breakdown</span>
+                </div>
+                <div class="panel-body">
+                    <div class="sum-row"><span class="sum-lbl">🕶 Frame</span><span class="sum-val">@o.FramePrice.ToString("N0") ₫</span></div>
+                    @if (o.LensPrice > 0)
+                    {
+                        <div class="sum-row"><span class="sum-lbl">⭕ Lens (@o.LensName)</span><span class="sum-val">@o.LensPrice.ToString("N0") ₫</span></div>
+                    }
+                    <div class="sum-row"><span class="sum-lbl">⚙️ Service</span><span class="sum-val">@o.ServicePrice.ToString("N0") ₫</span></div>
+                    <div class="sum-row" style="border-top:2px solid var(--bdr);padding-top:12px;margin-top:4px;">
+                        <span style="font-weight:900;font-size:15px;">Total</span>
+                        <span style="font-weight:900;font-size:19px;color:var(--gold);">@o.Total.ToString("N0") ₫</span>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(o.PaymentMethod))
+                    {
+                        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--bdr);">
+                            <div class="sum-row">
+                                <span class="sum-lbl">Payment</span>
+                                <span class="sum-val">@(o.PaymentMethod == "COD" ? "COD (50% Deposit)" : o.PaymentMethod)</span>
+                            </div>
+                            @if (o.PaymentMethod == "COD" && o.DepositAmount > 0)
+                            {
+                                <div class="sum-row"><span class="sum-lbl" style="color:var(--ok);">✓ Deposit Paid</span><span class="sum-val" style="color:var(--ok);">@o.DepositAmount.ToString("N0") ₫</span></div>
+                                <div class="sum-row"><span class="sum-lbl" style="color:var(--warn);">Balance on Delivery</span><span class="sum-val" style="color:var(--warn);">@((o.TotalAmount - o.DepositAmount).ToString("N0")) ₫</span></div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Refund -->
+            @if (isCancelled && o.RefundAmount.HasValue && o.RefundAmount > 0)
+            {
+                <div class="panel">
+                    <div class="panel-hdr ok">
+                        <i class="bi bi-arrow-counterclockwise" style="color:rgba(255,255,255,.9);font-size:15px;"></i>
+                        <span class="ph-title">Refund Issued</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="sum-row">
+                            <span class="sum-lbl">Refund Amount</span>
+                            <span style="font-weight:900;font-size:17px;color:var(--ok);">@o.RefundAmount.Value.ToString("N0") ₫</span>
+                        </div>
+                        <div style="margin-top:12px;background:var(--ok-bg);border-radius:8px;padding:10px 14px;font-size:12px;color:#166534;line-height:1.6;">
+                            <i class="bi bi-info-circle me-1"></i> Refund will appear in your original payment method within 5–10 business days.
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Shipment -->
+            @if (o.Shipment != null && !string.IsNullOrEmpty(o.Shipment.TrackingNumber))
+            {
+                <div class="panel">
+                    <div class="panel-hdr dark">
+                        <i class="bi bi-truck" style="color:rgba(255,255,255,.75);font-size:15px;"></i>
+                        <span class="ph-title">Shipment Tracking</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="sum-row"><span class="sum-lbl">Carrier</span><span class="sum-val">@o.Shipment.Carrier</span></div>
+                        <div style="margin-top:10px;">
+                            <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Tracking Number</div>
+                            <div class="tracking-code">@o.Shipment.TrackingNumber</div>
+                        </div>
+                        @if (o.Shipment.ShippedAt.HasValue)
+                        {
+                            <div class="sum-row" style="margin-top:10px;">
+                                <span class="sum-lbl">Shipped</span>
+                                <span class="sum-val" style="font-size:12px;">@o.Shipment.ShippedAt.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Address -->
+            @if (o.Address != null)
+            {
+                <div class="panel">
+                    <div class="panel-hdr dark">
+                        <i class="bi bi-geo-alt" style="color:rgba(255,255,255,.75);font-size:15px;"></i>
+                        <span class="ph-title">Delivery Address</span>
+                    </div>
+                    <div class="panel-body" style="font-size:13px;color:#475569;line-height:2;">
+                        <strong style="color:var(--txt);">@o.Address.ReceiverName</strong><br />
+                        <i class="bi bi-telephone me-1"></i>@o.Address.Phone<br />
+                        <i class="bi bi-geo-alt me-1"></i>@o.Address.AddressLine
+                    </div>
+                </div>
+            }
+
+            <div style="text-align:center;margin-top:4px;">
+                <a href="/Customer/ServiceTracking" style="color:var(--gold);text-decoration:none;font-weight:700;font-size:13px;">
+                    ← Back to Service Orders
+                </a>
+            </div>
+        </div><!-- /right -->
+
+    </div><!-- /grid -->
+</div>

@@ -1,46 +1,22 @@
 @using System.Security.Claims
-@using EyewearStore_SWP391.Models
-@using Microsoft.EntityFrameworkCore
 @inject EyewearStore_SWP391.Services.ICartService CartService
-@inject EyewearStore_SWP391.Models.EyewearStoreContext DbContext
 
 @{
     int itemCount = 0;
     decimal subtotal = 0m;
-    List<CartItem>? items = null;
-    Dictionary<int, Product> lensProducts = new();
 
     if (User?.Identity?.IsAuthenticated ?? false)
     {
         var uidStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (int.TryParse(uidStr, out var uid))
         {
-            var cart = await CartService.GetCartByUserIdAsync(uid);
-            if (cart != null)
+            try
             {
-                items = cart.CartItems.ToList();
-                itemCount = items.Sum(i => i.Quantity);
-
-                // ── Load lens products for service orders ────────────────────
-                var lensIds = items
-                    .Select(ci => EyewearStore_SWP391.Services.CartService.ExtractLensProductId(ci.TempPrescriptionJson))
-                    .Where(id => id.HasValue)
-                    .Select(id => id!.Value)
-                    .Distinct()
-                    .ToList();
-
-                if (lensIds.Any())
-                {
-                    lensProducts = await DbContext.Products
-                        .Where(p => lensIds.Contains(p.ProductId))
-                        .ToDictionaryAsync(p => p.ProductId);
-                }
-
-                // ── Use CartService for correct total (includes lens + service + prescription) ──
-                var (subtotalBase, prescriptionFees, _, _) =
-                    await CartService.GetCartTotalsBreakdownAsync(cart);
-                subtotal = subtotalBase + prescriptionFees;
+                var (count, sub) = await CartService.GetCartSummaryAsync(uid);
+                itemCount = count;
+                subtotal = sub;
             }
+            catch { /* degrade gracefully — badge shows 0 */ }
         }
     }
 }
@@ -68,7 +44,7 @@
                             Clear All
                         </button>
                     }
-                    <small class="text-muted">@itemCount item(s)</small>
+                    <small class="text-muted cart-item-count-label">@itemCount item(s)</small>
                 </div>
             </div>
         </li>
@@ -83,130 +59,11 @@
         else
         {
             <li>
-                <div style="max-height:300px; overflow-y:auto; overflow-x:visible; padding-right:4px;">
-                    @foreach (var it in items!)
-                    {
-                        // ── Detect service/custom order (gia công) ────────────
-                        var lensId = EyewearStore_SWP391.Services.CartService.ExtractLensProductId(it.TempPrescriptionJson);
-                        bool isServiceOrder = lensId.HasValue;
-
-                        // ── Build correct unit price: Frame + Lens + Service ──
-                        decimal unit = it.Product?.Price ?? 0m;
-
-                        Product? lensProduct = null;
-                        if (isServiceOrder && lensId.HasValue && lensProducts.TryGetValue(lensId.Value, out var lp))
-                        {
-                            lensProduct = lp;
-                            unit += lp.Price;           // ← cộng giá Lens
-                        }
-                        if (it.Service != null)
-                            unit += it.Service.Price;   // ← cộng phí dịch vụ
-
-                        decimal lineTotal = unit * it.Quantity;
-                        string itemName = it.Product?.Name ?? it.Service?.Name ?? "Product";
-
-                        <div class="cart-item-row mb-2"
-                             data-cart-item-id="@it.CartItemId"
-                             data-unit-price="@unit"
-                             style="transition:opacity 0.25s ease,max-height 0.3s ease; display:flex; gap:10px; align-items:flex-start; padding:6px 0; border-bottom:1px solid #f0f0f0;">
-
-                            @* ── Image ── *@
-                            <div style="width:50px; height:50px; background:#f5f5f5; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#999; overflow:hidden; flex-shrink:0;">
-                                @{
-                                    var img = it.Product?.ProductImages?.OrderByDescending(x => x.IsPrimary).FirstOrDefault()?.ImageUrl;
-                                }
-                                @if (!string.IsNullOrEmpty(img))
-                                {
-                                    <img src="@img" alt="Product" style="width:100%;height:100%;object-fit:cover;" />
-                                }
-                                else
-                                {
-                                    <span>@(isServiceOrder ? "🔧" : "IMG")</span>
-                                }
-                            </div>
-
-                            @* ── Info + Controls ── *@
-                            <div class="flex-grow-1 min-w-0" style="display:flex; flex-direction:column; gap:2px;">
-
-                                @* Name + price + remove button *@
-                                <div style="display:flex; align-items:center; gap:6px;">
-                                    <div class="fw-semibold text-truncate" style="flex:1; font-size:13px;">
-                                        @itemName
-                                        @if (isServiceOrder)
-                                        {
-                                            <span style="font-size:10px; background:#f0f0ff; color:#5b5bdb; border-radius:4px; padding:1px 5px; font-weight:600; margin-left:3px;">Gia công</span>
-                                        }
-                                    </div>
-                                    <div class="fw-bold flex-shrink-0 cart-item-line-total" style="font-size:13px; white-space:nowrap;">
-                                        @lineTotal.ToString("N0") VND
-                                    </div>
-                                    <button type="button"
-                                            class="btn-cart-remove btn btn-sm p-0"
-                                            style="width:24px; height:24px; display:flex; align-items:center; justify-content:center; border-radius:4px; color:#9CA3AF; border:1px solid #e5e7eb; background:transparent; outline:none; box-shadow:none; flex-shrink:0;"
-                                            data-cart-item-id="@it.CartItemId"
-                                            aria-label="Remove @itemName from cart"
-                                            title="Remove">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <polyline points="3 6 5 6 21 6"></polyline>
-                                            <path d="M19 6l-1 14H6L5 6"></path>
-                                            <path d="M10 11v6M14 11v6"></path>
-                                            <path d="M9 6V4h6v2"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-
-                                @* Price breakdown row (service orders only) *@
-                                @if (isServiceOrder)
-                                {
-                                    <div style="font-size:11px; color:#6B7280; background:#f8f9fc; border-radius:4px; padding:3px 6px; margin-top:1px; line-height:1.8;">
-                                        🕶 @((it.Product?.Price ?? 0m).ToString("N0"))
-                                        @if (lensProduct != null)
-                                        {
-                                            <span> · ⭕ @lensProduct.Name: @lensProduct.Price.ToString("N0")</span>
-                                        }
-                                        @if (it.Service != null)
-                                        {
-                                            <span> · ⚙️ @it.Service.Name: @it.Service.Price.ToString("N0")</span>
-                                        }
-                                    </div>
-                                }
-
-                                @* Prescription label for plain lens items *@
-                                @if (!isServiceOrder && it.Product?.ProductType == "Lens")
-                                {
-                                    var rxName = it.Prescription?.ProfileName ?? "No prescription";
-                                    <div class="text-muted text-truncate" style="font-size:12px; color:#6B7280;" title="@rxName">@rxName</div>
-                                }
-
-                                @* Unit price *@
-                                <div class="small text-muted" style="font-size:11px;">@unit.ToString("N0") VND each</div>
-
-                                @* Quantity stepper *@
-                                <div style="display:flex; align-items:center; margin-top:2px;">
-                                    <div class="cart-qty-group" style="display:inline-flex; border:1px solid #D1D5DB; border-radius:6px; overflow:hidden; height:26px;">
-                                        <button type="button"
-                                                class="btn-cart-qty-minus"
-                                                style="width:26px; height:100%; display:flex; align-items:center; justify-content:center; border:none; background:#fff; color:#6B7280; cursor:pointer; font-size:14px; font-weight:600; transition:background .15s; outline:none; @(it.Quantity <= 1 ? "opacity:0.4; cursor:not-allowed;" : "")"
-                                                data-cart-item-id="@it.CartItemId"
-                                                @(it.Quantity <= 1 ? "disabled" : "")
-                                                aria-label="Decrease quantity of @itemName">
-                                            &minus;
-                                        </button>
-                                        <span class="cart-qty-display"
-                                              style="width:34px; height:100%; display:flex; align-items:center; justify-content:center; background:#F3F4F6; font-size:13px; font-weight:700; color:#374151; border-left:1px solid #D1D5DB; border-right:1px solid #D1D5DB; user-select:none;"
-                                              aria-label="Quantity: @it.Quantity">@it.Quantity</span>
-                                        <button type="button"
-                                                class="btn-cart-qty-plus"
-                                                style="width:26px; height:100%; display:flex; align-items:center; justify-content:center; border:none; background:#fff; color:#6B7280; cursor:pointer; font-size:14px; font-weight:600; transition:background .15s; outline:none;"
-                                                data-cart-item-id="@it.CartItemId"
-                                                aria-label="Increase quantity of @itemName">
-                                            +
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
+                <div id="cart-dropdown-items" style="max-height:300px; overflow-y:auto; overflow-x:visible; padding-right:4px;">
+                    <div class="text-center py-3 text-muted" id="cart-dropdown-loading">
+                        <div class="spinner-border spinner-border-sm me-1" role="status"></div>
+                        Loading items...
+                    </div>
                 </div>
             </li>
 
@@ -227,3 +84,29 @@
         }
     </ul>
 </li>
+
+@if (itemCount > 0)
+{
+<script>
+(function() {
+    var loaded = false;
+    var dropdown = document.getElementById('cartDropdown');
+    if (!dropdown) return;
+
+    dropdown.addEventListener('show.bs.dropdown', function() {
+        if (loaded) return;
+        loaded = true;
+        fetch('/api/cart/dropdown-items', { credentials: 'same-origin' })
+            .then(function(r) { return r.ok ? r.text() : ''; })
+            .then(function(html) {
+                var container = document.getElementById('cart-dropdown-items');
+                if (container) container.innerHTML = html || '<div class="text-center py-2 text-muted small">Could not load items</div>';
+            })
+            .catch(function() {
+                var container = document.getElementById('cart-dropdown-items');
+                if (container) container.innerHTML = '<div class="text-center py-2 text-muted small">Could not load items</div>';
+            });
+    });
+})();
+</script>
+}

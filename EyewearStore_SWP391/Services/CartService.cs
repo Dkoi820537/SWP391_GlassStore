@@ -41,6 +41,23 @@ public class CartService : ICartService
         => JsonSerializer.Serialize(new { lensProductId });
 
     // ── GetCartByUserIdAsync ─────────────────────────────────────────────────
+    // ── Lightweight summary for navbar (1 query, no includes) ─────────────
+    public async Task<(int ItemCount, decimal Subtotal)> GetCartSummaryAsync(int userId)
+    {
+        var summary = await _context.Carts
+            .Where(c => c.UserId == userId)
+            .Select(c => new
+            {
+                ItemCount = c.CartItems.Sum(ci => ci.Quantity),
+                Subtotal = c.CartItems.Sum(ci =>
+                    (ci.Product != null ? ci.Product.Price : 0m) * ci.Quantity)
+            })
+            .FirstOrDefaultAsync();
+
+        return summary == null ? (0, 0m) : (summary.ItemCount, summary.Subtotal);
+    }
+
+    // ── Full cart with all navigation properties ─────────────────────────────
 
     public async Task<Cart?> GetCartByUserIdAsync(int userId)
     {
@@ -52,7 +69,7 @@ public class CartService : ICartService
                 .ThenInclude(ci => ci.Service)
             .Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Prescription)
-            .AsSplitQuery()
+            .AsNoTracking()
             .FirstOrDefaultAsync(c => c.UserId == userId);
     }
 

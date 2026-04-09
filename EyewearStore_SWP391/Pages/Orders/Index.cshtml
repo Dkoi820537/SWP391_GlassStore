@@ -570,7 +570,7 @@
     }
     else
     {
-        @foreach (var o in Model.Orders.OrderByDescending(x => x.CreatedAt))
+        @foreach (var o in Model.Orders)
         {
             int stepIdx = StepIndex(o.Status ?? "");
             bool isCancelled = o.Status == "Cancelled" || o.Status == "Cancellation_Pending";
@@ -677,5 +677,26 @@
                 </div>
             </a>
         }
+    }
+
+    <!-- Pagination Controls -->
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center" style="gap: 5px;">
+                <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-page="./Index" asp-route-pageIndex="@(Model.PageIndex - 1)" style="border-radius: 8px; border: 1px solid var(--bdr); color: var(--txt);">Previous</a>
+                </li>
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(Model.PageIndex == i ? "active" : "")">
+                        <a class="page-link" asp-page="./Index" asp-route-pageIndex="@i" style="border-radius: 8px; @(Model.PageIndex == i ? "background: var(--navy); border-color: var(--navy); color: #fff;" : "border: 1px solid var(--bdr); color: var(--txt);")">@i</a>
+                    </li>
+                }
+                <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" asp-page="./Index" asp-route-pageIndex="@(Model.PageIndex + 1)" style="border-radius: 8px; border: 1px solid var(--bdr); color: var(--txt);">Next</a>
+                </li>
+            </ul>
+        </nav>
     }
 </div>

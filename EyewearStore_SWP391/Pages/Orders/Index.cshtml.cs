@@ -20,15 +20,28 @@ public class IndexModel : PageModel
 
     public List<Order> Orders { get; set; } = new();
 
+    [BindProperty(SupportsGet = true)]
+    public int PageIndex { get; set; } = 1;
+    public int TotalPages { get; set; }
+    public int PageSize { get; set; } = 5;
+
     public async Task<IActionResult> OnGetAsync()
     {
         if (!User.Identity?.IsAuthenticated ?? true)
             return RedirectToPage("/Account/Login");
 
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        if (PageIndex < 1) PageIndex = 1;
+
         var allOrders = await _orderService.GetOrdersByUserIdAsync(userId);
         // Custom orders belong to "My Service Orders" — exclude them here.
-        Orders = allOrders.Where(o => o.OrderType != "Custom").ToList();
+        var filteredOrders = allOrders.Where(o => o.OrderType != "Custom").ToList();
+
+        TotalPages = (int)Math.Ceiling(filteredOrders.Count / (double)PageSize);
+        if (TotalPages == 0) TotalPages = 1;
+
+        Orders = filteredOrders.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToList();
+
         return Page();
     }
 }

@@ -20,6 +20,18 @@ namespace EyewearStore_SWP391.Pages.Customer
 
         public List<TrackingRow> Orders { get; set; } = new();
 
+        public int TotalCount { get; set; }
+        public int PendingCount { get; set; }
+        public int ProcessingCount { get; set; }
+        public int ReadyCount { get; set; }
+        public int DoneCount { get; set; }
+        public int CancelledCount { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public int PageIndex { get; set; } = 1;
+        public int TotalPages { get; set; }
+        public int PageSize { get; set; } = 5;
+
         public async Task OnGetAsync()
         {
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -69,6 +81,18 @@ namespace EyewearStore_SWP391.Pages.Customer
                     });
                 }
             }
+
+            TotalCount = Orders.Count;
+            PendingCount = Orders.Count(x => x.ServiceStatus == "Pending");
+            ProcessingCount = Orders.Count(x => x.ServiceStatus == "Processing");
+            ReadyCount = Orders.Count(x => x.ServiceStatus == "Ready");
+            DoneCount = Orders.Count(x => x.ServiceStatus == "Done");
+            CancelledCount = Orders.Count(x => x.ServiceStatus == "Cancelled");
+
+            if (PageIndex < 1) PageIndex = 1;
+            TotalPages = (int)Math.Ceiling(Orders.Count / (double)PageSize);
+            if (TotalPages == 0) TotalPages = 1;
+            Orders = Orders.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToList();
         }
 
         public class TrackingRow

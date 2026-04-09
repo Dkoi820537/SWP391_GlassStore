@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model EyewearStore_SWP391.Pages.Customer.ServiceTrackingModel
 @{
     ViewData["Title"] = "My Service Orders";
@@ -43,12 +43,12 @@
     };
 
     // count by status for summary bar
-    int total = Model.Orders.Count;
-    int pending = Model.Orders.Count(x => x.ServiceStatus == "Pending");
-    int processing = Model.Orders.Count(x => x.ServiceStatus == "Processing");
-    int ready = Model.Orders.Count(x => x.ServiceStatus == "Ready");
-    int done = Model.Orders.Count(x => x.ServiceStatus == "Done");
-    int cancelled = Model.Orders.Count(x => x.ServiceStatus == "Cancelled");
+    int total = Model.TotalCount;
+    int pending = Model.PendingCount;
+    int processing = Model.ProcessingCount;
+    int ready = Model.ReadyCount;
+    int done = Model.DoneCount;
+    int cancelled = Model.CancelledCount;
 }
 
 @section Styles {
@@ -813,7 +813,7 @@
 
         <!-- ── CARDS ── -->
         <div id="cardList">
-            @foreach (var o in Model.Orders.OrderByDescending(x => x.CreatedAt))
+            @foreach (var o in Model.Orders)
             {
                 int stepIdx = StepIndex(o.ServiceStatus);
                 bool isCancelled = o.ServiceStatus == "Cancelled";
@@ -907,6 +907,27 @@
             <i class="bi bi-funnel" style="font-size:32px;display:block;margin-bottom:12px;opacity:.3;"></i>
             No orders match this filter.
         </div>
+
+        <!-- Pagination Controls -->
+        @if (Model.TotalPages > 1)
+        {
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center" style="gap: 5px;">
+                    <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-page="./ServiceTracking" asp-route-pageIndex="@(Model.PageIndex - 1)" style="border-radius: 8px; border: 1px solid var(--bdr); color: var(--txt);">Previous</a>
+                    </li>
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(Model.PageIndex == i ? "active" : "")">
+                            <a class="page-link" asp-page="./ServiceTracking" asp-route-pageIndex="@i" style="border-radius: 8px; @(Model.PageIndex == i ? "background: var(--navy); border-color: var(--navy); color: #fff;" : "border: 1px solid var(--bdr); color: var(--txt);")">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-page="./ServiceTracking" asp-route-pageIndex="@(Model.PageIndex + 1)" style="border-radius: 8px; border: 1px solid var(--bdr); color: var(--txt);">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        }
     }
 </div>
 

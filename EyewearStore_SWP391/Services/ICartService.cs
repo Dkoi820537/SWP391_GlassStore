@@ -8,6 +8,9 @@ namespace EyewearStore_SWP391.Services
     {
         Task<Cart?> GetCartByUserIdAsync(int userId);
 
+        /// <summary>Lightweight: returns only item count and subtotal (1 SQL query, no includes).</summary>
+        Task<(int ItemCount, decimal Subtotal)> GetCartSummaryAsync(int userId);
+
         /// <summary>Đơn thường — giữ nguyên signature cũ</summary>
         Task AddToCartAsync(int userId, int productId, int quantity = 1,
             int? serviceId = null, string? tempPrescriptionJson = null,

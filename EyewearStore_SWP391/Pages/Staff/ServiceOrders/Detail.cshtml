@@ -1,6 +1,7 @@
 ﻿@page "{orderId:int}"
 @model EyewearStore_SWP391.Pages.Staff.ServiceOrders.DetailModel
 @using EyewearStore_SWP391.Pages.Staff.ServiceOrders
+@using System.Text.Json
 @{
     ViewData["Title"] = $"Update Job — Order #{Model.Order?.OrderId}";
     Layout = "_Layout";
@@ -46,26 +47,48 @@
         "Cancelled" => "bi-x-circle-fill",
         _ => "bi-hourglass-split"
     };
-    string StatusEmoji(string s) => s switch
-    {
-        "Pending" => "⏳",
-        "Processing" => "⊛",
-        "Ready" => "●",
-        "Done" => "★",
-        "Cancelled" => "✕",
-        _ => "•"
-    };
 
     string[] steps = { "Pending", "Processing", "Ready", "Done" };
     int stepIdx = curStatus switch { "Processing" => 1, "Ready" => 2, "Done" => 3, _ => 0 };
     bool isCancelled = curStatus == "Cancelled";
+
+    string nextStatus = curStatus switch
+    {
+        "Pending" => "Processing",
+        "Processing" => "Ready",
+        "Ready" => "Done",
+        _ => ""
+    };
+
+    // Parse service timeline
+    var svcTimeline = new List<(string status, string assignedTo, string note, DateTime timestamp)>();
+    if (!string.IsNullOrEmpty(snap?.ServiceTimeline))
+    {
+        try
+        {
+            var tlDoc = JsonDocument.Parse(snap.ServiceTimeline);
+            foreach (var entry in tlDoc.RootElement.EnumerateArray())
+            {
+                var s = entry.TryGetProperty("status", out var sv) ? sv.GetString() ?? "" : "";
+                var a = entry.TryGetProperty("assignedTo", out var av) ? av.GetString() ?? "" : "";
+                var n = entry.TryGetProperty("note", out var nv) ? nv.GetString() ?? "" : "";
+                var ts = entry.TryGetProperty("timestamp", out var tv)
+                         && DateTime.TryParse(tv.GetString(), out var dt) ? dt : DateTime.UtcNow;
+                svcTimeline.Add((s, a, n, ts));
+            }
+        }
+        catch { }
+    }
 }
 
 @section Styles {
     <style>
         :root {
             --navy: #0d1b2a;
+            --navy2: #1a2f54;
             --acc: #2563eb;
+            --teal: #0f766e;
+            --teal2: #0d9488;
             --gold: #b8862a;
             --ok: #059669;
             --warn: #d97706;
@@ -96,6 +119,7 @@
             padding: 28px 20px 80px
         }
 
+        /* breadcrumb */
         .bc {
             display: flex;
             gap: 6px;
@@ -115,6 +139,7 @@
                     color: var(--acc)
                 }
 
+        /* page header */
         .pg-hdr {
             display: flex;
             justify-content: space-between;
@@ -149,6 +174,7 @@
             flex-shrink: 0
         }
 
+        /* alerts */
         .al-ok {
             display: flex;
             align-items: center;
@@ -190,12 +216,14 @@
             }
         }
 
+        /* layout */
         .grid {
             display: grid;
-            grid-template-columns: 1fr 370px;
+            grid-template-columns: 1fr 380px;
             gap: 18px
         }
 
+        /* card */
         .dc {
             background: var(--surf);
             border: 1px solid var(--bdr);
@@ -210,7 +238,7 @@
             }
 
         .dc-hdr {
-            background: linear-gradient(135deg,#0d1b2a,#1a2f54);
+            background: linear-gradient(135deg,var(--navy),var(--navy2));
             padding: 13px 18px;
             display: flex;
             align-items: center;
@@ -233,6 +261,7 @@
             padding: 18px
         }
 
+        /* breakdown rows */
         .bd-row {
             display: flex;
             justify-content: space-between;
@@ -304,7 +333,7 @@
             color: var(--gold)
         }
 
-        /* TIMELINE */
+        /* horizontal stepper */
         .tl {
             display: flex;
             align-items: center;
@@ -362,8 +391,8 @@
         }
 
         .tl-s.active .tl-c {
-            background: #2563eb;
-            border-color: #2563eb;
+            background: var(--acc);
+            border-color: var(--acc);
             color: #fff;
             box-shadow: 0 0 0 4px rgba(37,99,235,.15)
         }
@@ -383,9 +412,10 @@
         }
 
         .tl-s.active .tl-l {
-            color: #2563eb
+            color: var(--acc)
         }
 
+        /* info grid */
         .info-g {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -420,7 +450,7 @@
             margin-top: 2px
         }
 
-        /* RADIO */
+        /* form */
         .form-lbl {
             font-size: 11px;
             font-weight: 700;
@@ -449,183 +479,182 @@
                 box-shadow: 0 0 0 3px rgba(37,99,235,.1)
             }
 
-        .st-g {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 18px
+            .fi-inp.error {
+                border-color: var(--err)
+            }
+
+        .field-err {
+            font-size: 11px;
+            color: var(--err);
+            margin-top: 4px;
+            display: none
         }
 
-        .st-wrap {
+        /* advance button */
+        .btn-advance {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: linear-gradient(135deg,var(--navy),var(--navy2));
+            color: #fff;
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: .3px;
+            transition: all .22s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px
+        }
+
+            .btn-advance:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(13,27,42,.3)
+            }
+
+            .btn-advance:disabled {
+                opacity: .45;
+                cursor: not-allowed;
+                transform: none
+            }
+
+            .btn-advance .arrow-icon {
+                width: 30px;
+                height: 30px;
+                background: rgba(255,255,255,.18);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px
+            }
+
+        .next-status-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px
+        }
+
+        /* cancel button */
+        .btn-cancel {
+            width: 100%;
+            padding: 11px;
+            border: 1.5px solid rgba(220,38,38,.4);
+            border-radius: 10px;
+            cursor: pointer;
+            background: rgba(220,38,38,.06);
+            color: #dc2626;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: .2px;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px
+        }
+
+            .btn-cancel:hover {
+                background: rgba(220,38,38,.12);
+                border-color: #dc2626
+            }
+
+        /* back links */
+        .back-l {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px;
+            border: 1.5px solid var(--bdr);
+            border-radius: 9px;
+            color: var(--txt2);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all .18s;
+            background: var(--surf);
+            margin-top: 10px
+        }
+
+            .back-l:hover {
+                background: var(--bg2);
+                color: var(--txt)
+            }
+
+        /* done banner */
+        .done-banner {
+            background: rgba(5,150,105,.08);
+            border: 1.5px solid rgba(5,150,105,.25);
+            border-radius: 10px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px
+        }
+
+            .done-banner i {
+                color: #059669;
+                font-size: 18px;
+                flex-shrink: 0
+            }
+
+        .done-banner-txt {
+            font-size: 13px;
+            font-weight: 600;
+            color: #065f46
+        }
+
+            .done-banner-txt strong {
+                font-weight: 800
+            }
+
+        /* vertical service timeline */
+        .svc-tl-item {
+            display: flex;
+            gap: 10px;
+            padding-bottom: 14px;
             position: relative
         }
 
-            .st-wrap input[type="radio"] {
+            .svc-tl-item:not(:last-child)::before {
+                content: '';
                 position: absolute;
-                opacity: 0;
-                width: 0;
-                height: 0
+                left: 13px;
+                top: 28px;
+                bottom: 0;
+                width: 2px;
+                background: var(--bdr)
             }
 
-        .st-lbl {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            padding: 10px 13px;
-            border-radius: 9px;
-            cursor: pointer;
-            border: 2px solid var(--bdr);
-            background: var(--surf);
-            transition: all .18s;
-            user-select: none;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--txt)
-        }
-
-            .st-lbl:hover {
-                border-color: #94a3b8;
-                background: var(--bg)
-            }
-
-        .st-dot {
-            width: 7px;
-            height: 7px;
+        .svc-tl-dot {
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            flex-shrink: 0;
-            transition: transform .2s
-        }
-
-        .st-chk {
-            width: 17px;
-            height: 17px;
-            border-radius: 50%;
-            border: 2px solid #d1d5db;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            transition: all .2s;
-            font-size: 9px;
-            color: transparent;
-            margin-left: auto
+            position: relative;
+            z-index: 1;
+            border: 1.5px solid
         }
 
-        .st-wrap input:checked + .st-lbl {
-            font-weight: 800
-        }
-
-            .st-wrap input:checked + .st-lbl .st-dot {
-                transform: scale(1.4)
-            }
-
-            .st-wrap input:checked + .st-lbl .st-chk {
-                color: #fff
-            }
-
-        [data-s="Pending"] input:checked + .st-lbl {
-            background: #fef3c7;
-            border-color: #fcd34d;
-            color: #92400e
-        }
-
-            [data-s="Pending"] input:checked + .st-lbl .st-chk {
-                background: #d97706;
-                border-color: #d97706
-            }
-
-        [data-s="Processing"] input:checked + .st-lbl {
-            background: #dbeafe;
-            border-color: #93c5fd;
-            color: #1e40af
-        }
-
-            [data-s="Processing"] input:checked + .st-lbl .st-chk {
-                background: #2563eb;
-                border-color: #2563eb
-            }
-
-        [data-s="Ready"] input:checked + .st-lbl {
-            background: #d1fae5;
-            border-color: #6ee7b7;
-            color: #065f46
-        }
-
-            [data-s="Ready"] input:checked + .st-lbl .st-chk {
-                background: #059669;
-                border-color: #059669
-            }
-
-        [data-s="Done"] input:checked + .st-lbl {
-            background: #f0fdf4;
-            border-color: #86efac;
-            color: #14532d
-        }
-
-            [data-s="Done"] input:checked + .st-lbl .st-chk {
-                background: #16a34a;
-                border-color: #16a34a
-            }
-
-        [data-s="Cancelled"] input:checked + .st-lbl {
-            background: #fee2e2;
-            border-color: #fca5a5;
-            color: #991b1b
-        }
-
-            [data-s="Cancelled"] input:checked + .st-lbl .st-chk {
-                background: #dc2626;
-                border-color: #dc2626
-            }
-
-        .btn-save {
-            width: 100%;
-            padding: 12px;
-            font-size: 14px;
-            font-weight: 800;
-            border-radius: 9px;
+        /* divider */
+        .section-divider {
             border: none;
-            cursor: pointer;
-            background: linear-gradient(135deg,#0d1b2a,#1a2f54);
-            color: #fff;
-            letter-spacing: .3px;
-            transition: all .2s
+            border-top: 1px solid var(--bdr);
+            margin: 14px 0
         }
-
-            .btn-save:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 5px 16px rgba(13,27,42,.25)
-            }
-
-        .back-l {
-            display: block;
-            text-align: center;
-            margin-top: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--acc);
-            text-decoration: none
-        }
-
-            .back-l:hover {
-                text-decoration: underline
-            }
-
-        .note-box {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
-            border-left: 4px solid #f59e0b;
-            border-radius: 0 10px 10px 0;
-            padding: 12px 15px;
-            margin-top: 13px
-        }
-
-            .note-box p {
-                margin: 0;
-                font-size: 13px;
-                color: #78350f;
-                line-height: 1.6
-            }
 
         @@media(max-width:860px) {
             .grid {
@@ -646,6 +675,7 @@
 }
 
 <div class="wrap">
+    <!-- Breadcrumb -->
     <div class="bc">
         <a asp-page="/Staff/Orders/Index">Orders</a>
         <span style="opacity:.4">›</span>
@@ -681,27 +711,39 @@
         </div>
 
         <div class="grid">
-            <!-- LEFT -->
+            <!-- ── LEFT COLUMN ── -->
             <div>
-                <!-- Breakdown -->
+                <!-- Service Breakdown -->
                 <div class="dc">
                     <div class="dc-hdr"><i class="bi bi-tools"></i><h3>Service Breakdown</h3></div>
                     <div class="dc-body">
                         <div class="bd-row">
-                            <div class="bd-left"><div class="bd-ico"><i class="bi bi-eyeglasses"></i></div><div><div class="bd-lbl">Frame</div><div class="bd-val">@(snap.FrameName ?? snap.ProductName ?? "N/A")</div></div></div>
+                            <div class="bd-left">
+                                <div class="bd-ico"><i class="bi bi-eyeglasses"></i></div>
+                                <div><div class="bd-lbl">Frame</div><div class="bd-val">@(snap.FrameName ?? snap.ProductName ?? "N/A")</div></div>
+                            </div>
                             <div class="bd-prc">@snap.FramePrice.ToString("N0") ₫</div>
                         </div>
+
                         @if (!string.IsNullOrEmpty(snap.LensProductName))
                         {
                             <div class="bd-row">
-                                <div class="bd-left"><div class="bd-ico">⭕</div><div><div class="bd-lbl">Lens</div><div class="bd-val">@snap.LensProductName</div></div></div>
+                                <div class="bd-left">
+                                    <div class="bd-ico">⭕</div>
+                                    <div><div class="bd-lbl">Lens</div><div class="bd-val">@snap.LensProductName</div></div>
+                                </div>
                                 <div class="bd-prc">@snap.LensPrice.ToString("N0") ₫</div>
                             </div>
                         }
+
                         <div class="bd-row">
-                            <div class="bd-left"><div class="bd-ico"><i class="bi bi-gear"></i></div><div><div class="bd-lbl">Service</div><div class="bd-val">@(snap.ServiceName ?? "N/A")</div></div></div>
+                            <div class="bd-left">
+                                <div class="bd-ico"><i class="bi bi-gear"></i></div>
+                                <div><div class="bd-lbl">Service</div><div class="bd-val">@(snap.ServiceName ?? "N/A")</div></div>
+                            </div>
                             <div class="bd-prc">@snap.ServicePrice.ToString("N0") ₫</div>
                         </div>
+
                         <div class="bd-tot">
                             <div class="bd-tot-lbl">Total</div>
                             <div class="bd-tot-val">@((item.UnitPrice * item.Quantity).ToString("N0")) ₫</div>
@@ -709,7 +751,7 @@
                     </div>
                 </div>
 
-                <!-- Timeline -->
+                <!-- Progress stepper -->
                 <div class="dc">
                     <div class="dc-hdr"><i class="bi bi-map"></i><h3>Progress</h3></div>
                     <div class="dc-body">
@@ -737,81 +779,239 @@
                     </div>
                 </div>
 
-                <!-- Customer info -->
+                <!-- Workshop Timeline (vertical milestones) -->
+                @if (svcTimeline.Any())
+                {
+                    <div class="dc">
+                        <div class="dc-hdr">
+                            <i class="bi bi-clock-history"></i>
+                            <h3>Workshop Timeline</h3>
+                            <span style="background:rgba(255,255,255,.15);border-radius:5px;padding:2px 8px;font-size:10px;font-weight:700;color:rgba(255,255,255,.9)">
+                                @svcTimeline.Count milestone@(svcTimeline.Count > 1 ? "s" : "")
+                            </span>
+                        </div>
+                        <div class="dc-body">
+                            @foreach (var (s, a, n, ts) in svcTimeline.OrderBy(x => x.timestamp))
+                            {
+                                string dotColor = s switch
+                                {
+                                    "Processing" => "#2563eb",
+                                    "Ready" => "#059669",
+                                    "Done" => "#14532d",
+                                    "Cancelled" => "#dc2626",
+                                    _ => "#d97706"
+                                };
+                                string dotIcon = s switch
+                                {
+                                    "Processing" => "bi-gear-fill",
+                                    "Ready" => "bi-check-circle-fill",
+                                    "Done" => "bi-bag-check-fill",
+                                    "Cancelled" => "bi-x-circle-fill",
+                                    _ => "bi-hourglass-split"
+                                };
+                                <div class="svc-tl-item">
+                                    <div class="svc-tl-dot" style="background:@(dotColor)1a;border-color:@dotColor;">
+                                        <i class="bi @dotIcon" style="color:@dotColor;font-size:11px;"></i>
+                                    </div>
+                                    <div style="flex:1;padding-top:3px;">
+                                        <div style="font-weight:700;font-size:13px;color:var(--txt)">@s</div>
+                                        @if (!string.IsNullOrEmpty(a))
+                                        {
+                                            <div style="font-size:11px;color:#7c3aed;font-weight:600;margin-top:2px;">
+                                                <i class="bi bi-person-fill" style="font-size:10px;"></i> @a
+                                            </div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(n))
+                                        {
+                                            <div style="font-size:11px;color:var(--txt2);margin-top:2px;line-height:1.5">@n</div>
+                                        }
+                                        <div style="font-size:10px;color:var(--muted);margin-top:3px;">
+                                            <i class="bi bi-clock" style="font-size:9px;"></i>
+                                            @ts.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <!-- Customer Info -->
                 <div class="dc">
                     <div class="dc-hdr"><i class="bi bi-person-fill"></i><h3>Customer Info</h3></div>
                     <div class="dc-body">
                         <div class="info-g">
-                            <div class="ii"><div class="ii-l">Customer</div><div class="ii-v">@(order.User?.FullName ?? "N/A")</div><div class="ii-s">@(order.User?.Email ?? "")</div></div>
-                            <div class="ii"><div class="ii-l">Order Status</div><div class="ii-v">@order.Status</div><div class="ii-s">@order.PaymentMethod</div></div>
-                            <div class="ii"><div class="ii-l">Date</div><div class="ii-v">@order.CreatedAt.ToString("dd/MM/yyyy")</div><div class="ii-s">@order.CreatedAt.ToString("HH:mm")</div></div>
-                            <div class="ii"><div class="ii-l">Total Paid</div><div class="ii-v" style="color:var(--gold)">@order.TotalAmount.ToString("N0") ₫</div></div>
+                            <div class="ii">
+                                <div class="ii-l">Customer</div>
+                                <div class="ii-v">@(order.User?.FullName ?? "N/A")</div>
+                                <div class="ii-s">@(order.User?.Email ?? "")</div>
+                            </div>
+                            <div class="ii">
+                                <div class="ii-l">Order Status</div>
+                                <div class="ii-v">@order.Status</div>
+                                <div class="ii-s">@order.PaymentMethod</div>
+                            </div>
+                            <div class="ii">
+                                <div class="ii-l">Date</div>
+                                <div class="ii-v">@order.CreatedAt.ToString("dd/MM/yyyy")</div>
+                                <div class="ii-s">@order.CreatedAt.ToString("HH:mm")</div>
+                            </div>
+                            <div class="ii">
+                                <div class="ii-l">Total Paid</div>
+                                <div class="ii-v" style="color:var(--gold)">@order.TotalAmount.ToString("N0") ₫</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- RIGHT: form -->
+            <!-- ── RIGHT COLUMN ── -->
             <div>
                 <div class="dc" style="position:sticky;top:80px">
-                    <div class="dc-hdr"><i class="bi bi-pencil-fill"></i><h3>Update Job</h3></div>
+                    <div class="dc-hdr">
+                        <i class="bi bi-arrow-right-circle-fill"></i>
+                        <h3>Update Job</h3>
+                    </div>
                     <div class="dc-body">
-                        <form method="post" asp-page-handler="Update" asp-route-orderId="@order.OrderId">
-                            <input type="hidden" name="OrderItemId" value="@item.OrderItemId" />
 
-                            <div style="margin-bottom:18px">
-                                <span class="form-lbl"><i class="bi bi-bar-chart me-1"></i> Status</span>
-                                <div class="st-g">
-                                    @foreach (var s in DetailModel.Statuses)
-                                    {
-                                        bool isCur = curStatus == s;
-                                        <div class="st-wrap" data-s="@s">
-                                            <input type="radio" id="s_@s" name="ServiceStatus"
-                                                   value="@s" @(isCur ? "checked" : "") />
-                                            <label class="st-lbl" for="s_@s">
-                                                <span class="st-dot" style="background:@StatusFg(s)"></span>
-                                                <span style="font-size:14px">@StatusEmoji(s)</span>
-                                                <span>@s</span>
-                                                <span class="st-chk">✓</span>
-                                            </label>
-                                        </div>
-                                    }
+                        @if (isCancelled)
+                        {
+                            <div style="display:flex;align-items:center;gap:10px;color:#dc2626;padding:8px 0">
+                                <i class="bi bi-x-circle" style="font-size:1.8rem"></i>
+                                <div>
+                                    <strong style="font-size:14px">Đơn đã bị huỷ</strong>
+                                    <div style="font-size:11px;color:var(--muted);margin-top:2px">Không thể thực hiện thêm thao tác.</div>
                                 </div>
                             </div>
-
-                            <div style="margin-bottom:13px">
-                                <label class="form-lbl" for="at"><i class="bi bi-person me-1"></i> Assign Technician</label>
-                                <input type="text" id="at" name="AssignedTo"
-                                       value="@snap.AssignedTo" class="fi-inp"
-                                       placeholder="Technician name or staff code…" />
+                        }
+                        else if (curStatus == "Done")
+                        {
+                            <div class="done-banner">
+                                <i class="bi bi-check-circle-fill"></i>
+                                <div class="done-banner-txt">
+                                    Service hoàn thành! <strong>Chờ bộ phận Sale</strong> advance Order sang bước tiếp theo.
+                                </div>
                             </div>
+                        }
+                        else
+                        {
+                            <!-- Advance Form -->
+                            <form method="post" asp-page-handler="Update" asp-route-orderId="@order.OrderId" id="svcForm">
+                                <input type="hidden" name="OrderItemId" value="@item.OrderItemId" />
 
-                            <div style="margin-bottom:18px">
-                                <label class="form-lbl" for="note">
-                                    <i class="bi bi-pencil me-1"></i> Note to Customer
-                                </label>
-                                <textarea id="note" name="InternalNote" rows="4"
+                                <div style="margin-bottom:13px">
+                                    <label class="form-lbl" for="at">
+                                        <i class="bi bi-person me-1"></i> Assign Technician
+                                        <span style="color:var(--err);margin-left:2px">*</span>
+                                    </label>
+                                    <input type="text" id="at" name="AssignedTo"
+                                           value="@snap.AssignedTo" class="fi-inp"
+                                           placeholder="Tên kỹ thuật viên hoặc mã nhân viên…" />
+                                    <div class="field-err" id="at-err">
+                                        <i class="bi bi-exclamation-circle me-1"></i> Vui lòng nhập tên kỹ thuật viên.
+                                    </div>
+                                </div>
+
+                                <div style="margin-bottom:20px">
+                                    <label class="form-lbl" for="note">
+                                        <i class="bi bi-pencil me-1"></i> Ghi chú
+                                        <span style="font-size:10px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(tuỳ chọn)</span>
+                                    </label>
+                                    <textarea id="note" name="InternalNote" rows="3"
                                       class="fi-inp" style="resize:vertical"
-                                      placeholder="e.g. Lens is being cut, estimated 2 hours…">@snap.InternalNote</textarea>
-                            </div>
+                                      placeholder="e.g. Lens đang cắt, dự kiến 2 giờ…">@snap.InternalNote</textarea>
+                                </div>
 
-                            <button type="submit" class="btn-save"><i class="bi bi-save me-1"></i> Save Changes</button>
-                        </form>
+                                @if (!string.IsNullOrEmpty(nextStatus))
+                                {
+                                    <button type="submit" class="btn-advance" id="btnAdvance">
+                                        <span>Advance to <strong>@nextStatus</strong></span>
+                                        <div class="arrow-icon"><i class="bi bi-arrow-right"></i></div>
+                                    </button>
+                                    <div class="next-status-label">
+                                        Current: <span style="color:var(--txt2);font-weight:700">@curStatus</span>
+                                        &nbsp;→&nbsp; Next: <strong style="color:var(--acc)">@nextStatus</strong>
+                                    </div>
+                                }
+                            </form>
 
-                        <a asp-page="/Staff/ServiceOrders/Index" class="back-l">
-                            ← Back to Service Jobs
+                            <hr class="section-divider" />
+
+                            <!-- Cancel Form -->
+                            <form method="post" asp-page-handler="Cancel" asp-route-orderId="@order.OrderId" id="cancelForm">
+                                <button type="button" class="btn-cancel" id="btnCancelTrigger">
+                                    <i class="bi bi-x-circle"></i> Huỷ Service Order
+                                </button>
+                            </form>
+                        }
+
+                        <a asp-page="/Staff/ServiceOrders/Index" class="back-l" style="margin-top:14px">
+                            ← Danh sách Service Jobs
                         </a>
                     </div>
                 </div>
-
-                @if (!string.IsNullOrEmpty(snap.InternalNote))
-                {
-                    <div class="note-box">
-                        <div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px">Current Note</div>
-                        <p>@snap.InternalNote</p>
-                    </div>
-                }
             </div>
         </div>
     }
 </div>
+
+<!-- Confirm cancel modal (lightweight) -->
+<div id="cancelModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;padding:28px 28px 22px;max-width:380px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.18);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <div style="width:40px;height:40px;border-radius:50%;background:rgba(220,38,38,.1);display:flex;align-items:center;justify-content:center;">
+                <i class="bi bi-exclamation-triangle-fill" style="color:#dc2626;font-size:18px;"></i>
+            </div>
+            <div>
+                <div style="font-size:15px;font-weight:800;color:#0f172a">Xác nhận huỷ?</div>
+                <div style="font-size:12px;color:#94a3b8;margin-top:1px">Hành động này không thể hoàn tác.</div>
+            </div>
+        </div>
+        <p style="font-size:13px;color:#475569;margin:0 0 20px;line-height:1.6">
+            Bạn có chắc muốn huỷ service order này không? Khách hàng sẽ nhận được email thông báo.
+        </p>
+        <div style="display:flex;gap:10px;">
+            <button id="cancelModalNo"
+                    style="flex:1;padding:10px;border:1.5px solid #e2e8f0;border-radius:9px;background:#f1f5f9;color:#475569;font-size:13px;font-weight:700;cursor:pointer;">
+                Không, giữ lại
+            </button>
+            <button id="cancelModalYes"
+                    style="flex:1;padding:10px;border:none;border-radius:9px;background:#dc2626;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">
+                Huỷ ngay
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // ── Validate AssignedTo trước khi submit ──
+        document.getElementById('svcForm')?.addEventListener('submit', function (e) {
+            const inp = document.getElementById('at');
+            const err = document.getElementById('at-err');
+            if (!inp || inp.value.trim()) return;
+            e.preventDefault();
+            err.style.display = 'block';
+            inp.classList.add('error');
+            inp.focus();
+            inp.addEventListener('input', function () {
+                if (inp.value.trim()) { err.style.display = 'none'; inp.classList.remove('error'); }
+            });
+        });
+
+        // ── Cancel confirmation modal ──
+        const modal   = document.getElementById('cancelModal');
+        const trigger = document.getElementById('btnCancelTrigger');
+        const no      = document.getElementById('cancelModalNo');
+        const yes     = document.getElementById('cancelModalYes');
+
+        trigger?.addEventListener('click', () => { modal.style.display = 'flex'; });
+        no?.addEventListener('click',      () => { modal.style.display = 'none'; });
+        modal?.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
+        yes?.addEventListener('click', () => { document.getElementById('cancelForm')?.submit(); });
+
+        // ── Auto-hide success alert ──
+        const alOk = document.querySelector('.al-ok');
+        if (alOk) setTimeout(() => { alOk.style.transition = 'opacity .5s'; alOk.style.opacity = '0'; }, 4000);
+    </script>
+}

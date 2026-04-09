@@ -47,6 +47,30 @@ namespace EyewearStore_SWP391.Pages.Admin.ServiceOrders
         {
             var result = await LoadAsync(orderId);
             if (result != null) return result;
+            
+            var oldStatus = Snap.ServiceStatus ?? "Pending";
+
+            // Enforce State Machine Business Rules
+            if (ServiceStatus != oldStatus)
+            {
+                bool isTerminal = oldStatus == "Done" || oldStatus == "Cancelled";
+                string[] validSteps = { "Pending", "Processing", "Ready", "Done" };
+                int oldIndex = Array.IndexOf(validSteps, oldStatus);
+                int newIndex = Array.IndexOf(validSteps, ServiceStatus);
+
+                bool isValid = false;
+                if (!isTerminal)
+                {
+                    if (ServiceStatus == "Cancelled") isValid = true;
+                    else if (newIndex >= oldIndex) isValid = true;
+                }
+
+                if (!isValid)
+                {
+                    ModelState.AddModelError("ServiceStatus", $"Invalid status transition from '{oldStatus}' to '{ServiceStatus}'.");
+                    return Page();
+                }
+            }
 
             var raw = Item.SnapshotJson ?? "{}";
             using var doc = JsonDocument.Parse(raw);
@@ -62,7 +86,6 @@ namespace EyewearStore_SWP391.Pages.Admin.ServiceOrders
             Item.SnapshotJson = JsonSerializer.Serialize(mutable);
             await _db.SaveChangesAsync();
 
-            var oldStatus = Snap.ServiceStatus ?? "Pending";
             if (ServiceStatus != oldStatus && !string.IsNullOrEmpty(Customer.Email))
             {
                 await _email.SendServiceOrderStatusAsync(

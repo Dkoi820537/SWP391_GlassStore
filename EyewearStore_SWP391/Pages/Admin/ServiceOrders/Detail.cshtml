@@ -50,6 +50,7 @@
     string[] steps = { "Pending", "Processing", "Ready", "Done" };
     int stepIdx = curStatus switch { "Processing" => 1, "Ready" => 2, "Done" => 3, _ => 0 };
     bool isCancelled = curStatus == "Cancelled";
+    bool isTerminal = curStatus == "Done" || curStatus == "Cancelled";
 }
 
 @section Styles {
@@ -713,42 +714,52 @@
                               asp-route-orderId="@Model.Order!.OrderId">
                             <input type="hidden" name="OrderItemId" value="@Model.Item!.OrderItemId" />
 
-                            <div style="margin-bottom:18px">
-                                <span class="form-lbl">📊 Service Status</span>
-                                <div class="st-grid">
-                                    @foreach (var s in DetailModel.Statuses)
+                            <fieldset disabled="@(isTerminal ? "disabled" : null)" style="border: none; padding: 0; margin: 0;">
+                                <div style="margin-bottom:18px">
+                                    <span class="form-lbl">📊 Service Status</span>
+                                    <div class="st-grid">
+                                        @foreach (var s in DetailModel.Statuses)
+                                        {
+                                            bool isCur = curStatus == s;
+                                            bool isDisabled = isTerminal || (s != "Cancelled" && Array.IndexOf(steps, s) < Array.IndexOf(steps, curStatus));
+                                            
+                                            <label class="st-radio @(isCur ? "selected" : "") @(isDisabled && !isCur ? "disabled" : "")"
+                                                   style="@(isCur ? $"background:{StatusBg(s)};border-color:{StatusColor(s)};" : "") @(isDisabled && !isCur ? "opacity: 0.5; cursor: not-allowed;" : "")">
+                                                <input type="radio" name="ServiceStatus" value="@s" @(isCur ? "checked" : "") @(isDisabled && !isCur ? "disabled" : "") />
+                                                <span class="st-dot" style="background:@StatusColor(s)"></span>
+                                                <span style="font-size:15px">@StatusEmoji(s)</span>
+                                                <span class="st-radio-lbl" style="@(isCur ? $"color:{StatusColor(s)}" : "")">@s</span>
+                                            </label>
+                                        }
+                                    </div>
+                                    @if (!ViewData.ModelState.IsValid && ViewData.ModelState["ServiceStatus"]?.Errors.Count > 0)
                                     {
-                                        bool isCur = curStatus == s;
-                                        <label class="st-radio @(isCur ? "selected" : "")"
-                                               style="@(isCur ? $"background:{StatusBg(s)};border-color:{StatusColor(s)};" : "")">
-                                            <input type="radio" name="ServiceStatus" value="@s" @(isCur ? "checked" : "") />
-                                            <span class="st-dot" style="background:@StatusColor(s)"></span>
-                                            <span style="font-size:15px">@StatusEmoji(s)</span>
-                                            <span class="st-radio-lbl" style="@(isCur ? $"color:{StatusColor(s)}" : "")">@s</span>
-                                        </label>
+                                        <div style="color: #dc2626; font-size: 13px; margin-top: 8px; font-weight: 600;">
+                                            @ViewData.ModelState["ServiceStatus"]!.Errors[0].ErrorMessage
+                                        </div>
                                     }
                                 </div>
-                            </div>
 
-                            <div style="margin-bottom:14px">
-                                <label class="form-lbl">👤 Assigned To</label>
-                                <input type="text" name="AssignedTo" value="@snap.AssignedTo"
-                                       class="form-fi" placeholder="Staff name or code…" />
-                            </div>
+                                <div style="margin-bottom:14px">
+                                    <label class="form-lbl">👤 Assigned To</label>
+                                    <input type="text" name="AssignedTo" value="@snap.AssignedTo"
+                                           class="form-fi" placeholder="Staff name or code…" />
+                                </div>
 
-                            <div style="margin-bottom:20px">
-                                <label class="form-lbl">
-                                    📝 Note
-                                    <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:10px">
-                                        (shown to customer)
-                                    </span>
-                                </label>
-                                <textarea name="InternalNote" rows="4" class="form-fi"
-                                      style="resize:vertical"
-                                      placeholder="Add a note for the customer or team…">@snap.InternalNote</textarea>
-                            </div>
+                                <div style="margin-bottom:20px">
+                                    <label class="form-lbl">
+                                        📝 Note
+                                        <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:10px">
+                                            (shown to customer)
+                                        </span>
+                                    </label>
+                                    <textarea name="InternalNote" rows="4" class="form-fi"
+                                          style="resize:vertical"
+                                          placeholder="Add a note for the customer or team…">@snap.InternalNote</textarea>
+                                </div>
 
-                            <button type="submit" class="btn-save">💾 Save Changes</button>
+                                <button type="submit" class="btn-save" style="@(isTerminal ? "background: var(--muted); cursor: not-allowed;" : "")">💾 Save Changes</button>
+                            </fieldset>
                         </form>
 
                         <a asp-page="/Admin/ServiceOrders/Index" class="back-link">← Back to Service Orders</a>
@@ -769,10 +780,16 @@
 
 <script>
     document.querySelectorAll('.st-radio').forEach(lbl => {
-        lbl.addEventListener('click', () => {
+        lbl.addEventListener('click', (e) => {
+            if (lbl.classList.contains('disabled')) {
+                e.preventDefault();
+                return;
+            }
             document.querySelectorAll('.st-radio').forEach(b => {
-                b.classList.remove('selected');
-                b.style.cssText = '';
+                if (!b.classList.contains('disabled')) {
+                    b.classList.remove('selected');
+                    b.style.cssText = '';
+                }
             });
             lbl.classList.add('selected');
             const r = lbl.querySelector('input[type=radio]');
